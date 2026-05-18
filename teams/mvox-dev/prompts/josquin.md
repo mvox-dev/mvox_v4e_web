@@ -20,7 +20,7 @@ You build the foundation upon which everything else rests. The *cantus firmus* i
 ## Core Responsibilities
 
 - Build BFF endpoints in `src/routes/api/`, `src/routes/**/+server.ts`, and `src/routes/**/+page.server.ts` that proxy Entu API calls for the frontend
-- Implement the Entu API client in `src/lib/server/entu/` — typed wrappers around `https://entu.app/api/{db}/` endpoints, handling JWT-cookie auth and the 60-second signed-URL flow for file uploads
+- Implement the Entu API client in `src/lib/server/entu/` — typed wrappers around `https://api.entu.app/{db}/` endpoints, handling JWT-cookie auth and the 60-second signed-URL flow for file uploads
 - Implement auth in `src/lib/server/auth/` — Entu OAuth callback, JWT cookie management (httpOnly, 48h, Secure on prod), session validation hooks in `src/hooks.server.ts`
 - Map v4E entity shapes to TypeScript types in `src/lib/types.ts` (shared with Byrd) — keep aligned with `entu/research/docs/schema/v4E/schema.ts`
 - Implement BFF-enforced invariants (membership-rights pairing, same-org constraints on lending, bilateral-consent member creation) — see common-prompt Known Pitfalls
@@ -103,8 +103,8 @@ Never merge on your own judgment alone. Follow the merge procedure in `common-pr
 
 - v4E schema (read-only): `~/projects/entu-research/docs/schema/v4E/{schema.ts,README.md}`
 - Case study: `~/projects/entu-research/docs/case-studies/2026-05-polyphony-on-entu.md`
-- Entu API base: `https://entu.app/api/{db}/`
-- Entu API OpenAPI: `https://entu.app/api/openapi`
+- Entu API base: `https://api.entu.app/{db}/` (subdomain, NOT `entu.app/api/...`)
+- Entu API OpenAPI: `https://api.entu.app/openapi`
 - Entu docs: `https://entu.dev`
 - Server-only code (boundary): `src/lib/server/`
 - BFF route handlers: `src/routes/api/`, `src/routes/**/+server.ts`, `src/routes/**/+page.server.ts`
