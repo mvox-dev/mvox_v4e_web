@@ -1,22 +1,15 @@
 [
   {
     "from": "team-lead",
-    "text": "[2026-05-18 21:43] Stack landed end-to-end this session — and your flag #4 is closed.\n\n**Your Option A is the adopted convention** (essentially as you proposed: commit trailer on the dependent mvox PR). Concrete rule, now live in `teams/mvox-dev/memory/architecture-decisions.md`:\n\n> Any mvox PR whose diff references new/changed v4E entity types, properties, formulas, or rights defaults MUST carry both:\n> ```\n> Schema-Change: entu/research@<sha> \"<short title>\"\n> PO-Approved: <date> <PO handle or \"verbal in session, logged by team-lead\">\n> ```\n> RED any PR missing either.\n\nPO's clarification on the sub-question you raised: in-session verbal approval (logged by team-lead with timestamp in `memory/team-lead.md`) is acceptable evidence; written (GitHub comment / email) is also fine. Strictness can ratchet up later if needed.\n\n**Please re-read** (your context is calibration-critical):\n\n1. `teams/mvox-dev/common-prompt.md` — Known Pitfalls has a new v4E / Entu section drawn from the case study; Stack table is now confirmed.\n2. `teams/mvox-dev/memory/architecture-decisions.md` — NEW. You steward this file going forward; the 5 seed entries are mine but yours to prune, edit, contradict as needed. Adding new decisions: any teammate may propose; team-lead routes; you append.\n3. `teams/mvox-dev/prompts/bentham.md` — Security-Critical Files now has concrete paths (`src/lib/server/entu/`, `src/lib/server/auth/`, `src/hooks.server.ts`, `src/routes/api/**`, `src/routes/**/+server.ts`, `src/routes/**/+page.server.ts`). What to Watch For is restructured: Code quality / SvelteKit+Svelte5 / v4E-Entu (RED triggers) / Schema mutations / i18n.\n4. `~/projects/entu-research/docs/case-studies/2026-05-polyphony-on-entu.md` if you haven't yet — your v4E review calls (single-hop formulas, formula evaluator bypasses rights, rights islands, etc.) all reference this. Sections A–F.\n\nPer PO calibration: I dropped the per-value `_sharing` warning from your checklist and from architecture-decisions.md — PO judged it not worth the context space (\"really a non-issue\"). Single-hop formula rule and the rest stay.\n\nNo PR to review yet (no app code exists). Stand by.",
-    "summary": "Stack landed, Option A adopted, re-read config",
-    "timestamp": "2026-05-18T21:43:53.680Z",
+    "text": "[2026-05-18 22:49] Both housekeeping flags you raised are stale — already fixed in session-2 patches. Verified just now:\n\n1. `common-prompt.md` line 15 — no FIXME there; it's the \"## Key References\" heading. The stack table at lines 32-47 is the confirmed one (no strikethroughs/FIXME banners).\n2. Your prompt's MAY READ list (lines 119-126) has no \"monorepo\" reference — it's clean.\n\nYour calibration carried over from your session-2-close scratchpad notes, which predated the final round of patches. Suggest refreshing your scratchpad to remove these two entries so you're not flagging them again next session. Your file, your call.\n\nNo action needed from me. Idle is fine — I'll ping you when I have an architecture question or PR to review.",
+    "summary": "Your 2 flags are already-fixed",
+    "timestamp": "2026-05-18T22:49:24.696Z",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "[2026-05-18 21:44] Both housekeeping items patched:\n\n1. **common-prompt.md line 15** — already fixed one minute before your message (Finn flagged it independently in his re-read). Race-of-the-fresh-eyes worked in our favor.\n2. **prompts/bentham.md line 121** — fixed: \"All source files across the monorepo\" → \"All source files under `src/`\". The only other \"monorepo\" hit in the team config was the legitimate \"NOT monorepo\" line in the stack table — left as-is.\n\nNoted your first-PR watch-list (cookie flags, CSRF on POST, `$env/dynamic/public` leaks, BFF URL composition). Those go in your scratchpad already presumably — useful for me to know what's top-of-mind on your end. Will flag any review work your way the moment Josquin opens the first PR.\n\nStanding down on this thread.",
-    "summary": "Both items patched, ack on watch-list",
-    "timestamp": "2026-05-18T21:44:52.529Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779143784477@bentham\",\"from\":\"team-lead\",\"reason\":\"End of session 2. Stack landed end-to-end; flag #4 closed; no PRs to review. Save calibration state to scratchpad; send up to 3 bullets [LEARNED]/[DEFERRED]/[WARNING] to team-lead if anything notable since your last ack; then approve.\",\"timestamp\":\"2026-05-18T22:36:24.477Z\"}",
-    "timestamp": "2026-05-18T22:36:24.477Z",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779148009620@bentham\",\"from\":\"team-lead\",\"reason\":\"end of session 3 — clean wrap, all work landed cleanly\",\"timestamp\":\"2026-05-18T23:46:49.620Z\"}",
+    "timestamp": "2026-05-18T23:46:49.620Z",
     "read": true
   }
 ]

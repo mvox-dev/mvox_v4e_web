@@ -1,22 +1,21 @@
 [
   {
     "from": "team-lead",
-    "text": "[2026-05-18 21:43] Stack landed end-to-end this session. Please re-read so future research requests benefit from the current context:\n\n1. `teams/mvox-dev/common-prompt.md` — Stack table is now confirmed (no more FIXMEs), Known Pitfalls has a fresh v4E / Entu section, TDD chain paths are flat-app SvelteKit.\n2. `teams/mvox-dev/memory/architecture-decisions.md` — NEW file. Five seed decisions covering stack, repo layout (flat single-app), v4E schema ownership (option A — schema lives in entu/research; mvox PRs cite via commit trailers), BFF user-rights default, formula rules.\n3. `teams/mvox-dev/prompts/{josquin,byrd,tallis,comenius,bentham}.md` — all rewritten to drop polyphony/D1 paths and reflect the real stack. Particularly bentham.md now has a concrete v4E review checklist.\n4. `~/workspace/CLAUDE.md` — Status flipped to \"stack landed\"; Open questions section collapsed.\n\nTwo reference repos likely to come up in future research:\n- `~/projects/entu-research/` — the POC that validated this stack; has v4E schema source-of-truth at `docs/schema/v4E/` and the case study at `docs/case-studies/2026-05-polyphony-on-entu.md`. Both worth knowing about for research requests touching schema or Entu integration patterns.\n- `~/projects/polyphony/` — archived prototype. Useful for \"how did polyphony solve X\" reference only; do NOT recommend polyphony's D1/Registry/Vault patterns for mvox.\n\nNo action expected — just keeping you current.",
-    "summary": "Stack landed, re-read team config",
-    "timestamp": "2026-05-18T21:43:47.141Z",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"3\",\"subject\":\"Finn: check Cloudflare Pages subdomain availability for mvox / multivox / mvox-app\",\"description\":\"PO wants availability data before picking the CF Pages project name. Finn checks whether `<name>.pages.dev` is free for each of: mvox, multivox, mvox-app. Cloudflare returns a known 404/200 distinguishing pattern for unclaimed-vs-claimed Pages subdomains.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-18T22:59:11.353Z\"}",
+    "timestamp": "2026-05-18T22:59:11.353Z",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "[2026-05-18 21:44] Good catch — the line-15 FIXME was a leftover I missed (also the \"(TBD)\" on the CLAUDE.md key reference one line below). Both patched in common-prompt.md. Thanks.\n\nKeep flagging things like this as you spot them — that's exactly the kind of pass that catches what a single editor misses.",
-    "summary": "Stale FIXME patched, thanks",
-    "timestamp": "2026-05-18T21:44:36.086Z",
+    "text": "[2026-05-18 22:59] First research task — task #3 on the team list.\n\n## Research Request\n- **From:** team-lead\n- **Story:** general (Cloudflare project naming, blocking Victoria's scaffolding chores)\n- **Urgency:** blocking\n- **Question:** For each of these three names, is `<name>.pages.dev` currently claimed on Cloudflare Pages?\n  1. `mvox`\n  2. `multivox`\n  3. `mvox-app`\n\n### Context\nCloudflare Pages subdomains are globally unique. entu-research already uses `entuphony.pages.dev`. PO will pick the mvox project name based on which of the three are free.\n\nSuggested probe: `curl -sI https://<name>.pages.dev` — claimed projects respond with a CF Pages-served page (200 or 302), unclaimed return a distinctive `Not Found` from the `*.pages.dev` wildcard handler. Report status code + any clear \"this project doesn't exist\" body marker per name.\n\nDeliver as a small markdown table. Then mark task #3 completed.",
+    "summary": "Check CF Pages subdomain availability x3",
+    "timestamp": "2026-05-18T22:59:14.539Z",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779143783433@finn\",\"from\":\"team-lead\",\"reason\":\"End of session 2. Stack landed end-to-end; no pending research requests. Save what's worth keeping (scratchpad WIP/CHECKPOINT), send up to 3 bullets [LEARNED]/[DEFERRED]/[WARNING] to team-lead if anything notable, then approve.\",\"timestamp\":\"2026-05-18T22:36:23.433Z\"}",
-    "timestamp": "2026-05-18T22:36:23.433Z",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779148008866@finn\",\"from\":\"team-lead\",\"reason\":\"end of session 3 — clean wrap, all work landed cleanly\",\"timestamp\":\"2026-05-18T23:46:48.866Z\"}",
+    "timestamp": "2026-05-18T23:46:48.866Z",
     "read": true
   }
 ]

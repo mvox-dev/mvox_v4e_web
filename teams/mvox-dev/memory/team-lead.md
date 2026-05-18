@@ -1,5 +1,71 @@
 # Palestrina — Team Lead Scratchpad
 
+### [NEXT SESSION] 2026-05-18 — session-3 → session-4
+
+**Where we are**: v1 backlog is live. **23 GitHub issues open at `mvox-dev/mvox_v4e_web` as #1–#23** — 6 scaffolding chores + 14 user-facing stories + 5 admin/manager stories. PO authorized opening all of them in this session. No app code yet — first TDD cycle is the next concrete step.
+
+**Expected first action (session 4): spawn Tallis + Josquin and start CHORE-1 (Bootstrap SvelteKit app with Cloudflare adapter, issue #1).** It's the unblocker for everything else (CHORE-2 Tailwind, CHORE-3 Paraglide, CHORE-4 Vitest+Playwright, CHORE-5 Entu BFF skeleton, CHORE-6 Email all extend the scaffold).
+
+**Per Bentham's session-2 [WARNING] — still relevant**: the first PR (bootstrap + auth + first BFF endpoint) carries disproportionate review weight. Cookie flags, CSRF posture, `$env/dynamic/public` discipline, BFF URL composition all set precedent. Bentham budgeting closer review. Suggest landing scaffolding chores as ~6 separate small PRs rather than one big one — easier to review, easier to isolate regressions.
+
+**PO action items I'm tracking for session 4**:
+- **CHORE-6 (issue #6) requires SPF + DKIM DNS records on the chosen sender domain.** PO action — Josquin can't do this. Should be done before ADMIN-3 (issue #21) GREEN phase, not before CHORE-6 GREEN (which just wires the provider). Pick a sender domain (probably `multivox.pages.dev` or a custom domain).
+- No other PO-blocked work pending.
+
+**Concrete pointers (no re-discovery)**:
+- GitHub issues: https://github.com/mvox-dev/mvox_v4e_web/issues — 23 open, sequential #1–#23
+- 13 labels created in repo (`chore`, `scaffolding`, `i18n`, `testing`, `backend`, `epic-a`/`b`/`c`/`d`, `singer`, `conductor`, `admin`, `onboarding`). No `manager` (collapsed into `admin`).
+- Credentials: `~/.config/mvox/credentials.env` (chmod 600 — Entu API key + Cloudflare token + account ID `1431b76f0b65e3d23833966744ff2bdf`; CF token currently has Pages-read scope, needs Pages-Edit upgrade for `wrangler pages deploy`).
+- Cloudflare Pages project name: `multivox` (settled session 3). `multivox.pages.dev`. `mvox.pages.dev` is third-party owned.
+- v4E schema source-of-truth: `~/projects/entu-research/docs/schema/v4E/{schema.ts,README.md}` — PR #41 is **MERGED** (2026-05-18 10:33Z), 5 new properties are live (`organization.rsvp_lockout_hours`, `event.capacity`, `repertoire_item.status`, `edition.external_link`, +1).
+- Auth flow reference impl: `~/projects/entu-research/src/lib/server/entu/auth.ts` + `src/test/api/api-key-exchange.spec.ts` — Josquin should read both before CHORE-5.
+- Architecture decisions: `teams/mvox-dev/memory/architecture-decisions.md` (in-repo, working file, Bentham stewards) + brilliant KB mirror at `Decisions/mvox/*` (8 entries).
+
+**Brilliant KB integration landed this session**:
+- `Projects/mvox` entry: `ef517671-e3a3-4e43-ad1f-8c00479f4773`
+- `Teams/ai-teams/mvox-dev` entry: `9a16ed48-fee0-4731-b183-67488b860ec4`
+- 8 `Decisions/mvox/*` entries (stack, repo-layout, schema-as-contract, schema-mutation-gate, bff-user-rights-default, formula-rules, test-data-strategy, cloudflare-project-name)
+- 13 typed edges linking everything (project ↔ polyphony/entu-research/Teams/entu, team → project, 8× decision → project, mvox-dev ↔ polyphony-dev sibling)
+- **Dual-write discipline going forward**: when Bentham appends a new entry to `architecture-decisions.md`, mirror to `Decisions/mvox/<slug>` in brilliant. I (team-lead) handle the mirror; Bentham stewards the in-repo file.
+- Design history for v4E (Topic 1 + Topic 2 narrative) lives in `Projects/polyphony` body — don't duplicate, link.
+
+**Suggested session-4 task sequence**:
+1. Spawn Tallis + Josquin in parallel.
+2. Hand Tallis issue #1 (CHORE-1 bootstrap) — he writes a RED smoke-test ensuring `pnpm build` produces `.svelte-kit/cloudflare/` output and `pnpm check` returns 0.
+3. Josquin GREENs against the RED.
+4. Bentham reviews (first PR — extra calibration scrutiny per session-2 WARNING).
+5. Josquin squash-merges locally (NOT `gh pr merge`).
+6. team-lead closes #1, then routes #2/#3/#4 (Tailwind, Paraglide, Vitest+Playwright — independent, can be parallelized).
+7. Reserve #5 (Entu BFF skeleton) for after #1 is solid since it builds on the SvelteKit shell.
+8. #6 (Email) can ride alongside #5 if PO has done the DNS work.
+
+**Stack-order considerations**: #1 → #2 (Tailwind needs the SvelteKit shell) → #3/#4 parallel → #5 (BFF) → #6 (Email). A1/A2 (#7/#8) are the first user-facing stories; they need #1 + #5 minimum.
+
+**Known runtime issue noticed this session**: the team task list at `~/.claude/tasks/mvox-dev/` got cleared mid-session at least twice (highwatermark reset; JSON files vanished). Investigate or work around. Suspect either an out-of-band cleanup hook or a bug in TaskUpdate when the task ID changes during the call. Not blocking — conversation context is the durable source — but if it persists, consider tracking work in `memory/wip.md` instead of TaskCreate.
+
+When you've processed this seed, downgrade the tag from `[NEXT SESSION]` to `[PROCESSED 2026-05-18]` or remove the section.
+
+---
+
+### [CHECKPOINT] 2026-05-18 (session 3) — post-PO-decisions work
+
+After the [DECISION] entry below (which captured the 5 gap resolutions and was committed in `1dba87e`), this session continued:
+
+**Brilliant KB integration**: PO surfaced mid-session that the brilliant database is available. Explored: 231 entries, admin role, owner = PO personally. `Projects/polyphony` is the design home for v4E (Topic 1/2 narrative as `(*PD:Palestrina*)` appends). Created stubs + mirror per PO direction: 1 project + 1 team + 8 decision entries + 13 typed edges. See [NEXT SESSION] above for IDs.
+
+**Victoria's first task**: spawned Victoria for the issue-filing pass. She drafted 23 issues (6 chores + 14 user-facing + 5 admin) with 3 flagged-for-PO questions (A4/C4 parked → defer; B2 scope split → confirm; ADMIN-3 email mechanism → CF-Workers-compatible provider, Resend default). PO answered all three; Victoria revised; PO authorized open-all; Victoria opened 23 issues sequentially as `mvox-dev/mvox_v4e_web` #1-23 + created 13 labels. Collapsed `admin`+`manager` labels into just `admin`. Added "Depends on CHORE-6 before GREEN" note to #21.
+
+**Quality observation**: Victoria's AC are testable and v4E-aware (all 22 user-facing/admin stories are ✅ schema-native — PR #41 covered everything; no 🔧 in v1). The TDD chain has good upstream definition now.
+
+**Lessons captured for future sessions**:
+- When the user mentions a new tool/system mid-session ("we have brilliant too"), explore minimally first (session_init + get_types) before deciding scope. Spawning an Explore subagent to digest the session_init dump avoided burning my context on 2,874 lines.
+- Cross-repo dependency verification cost: 1 `gh pr view` for PR #41 status. Cheap and useful — Victoria flagged it as a potential dependency; verifying merged-status closed the concern fast.
+- Cloudflare API token check via direct `curl https://api.cloudflare.com/client/v4/accounts/<id>/pages/projects` is faster than `wrangler login` round-trips when you have an account-scoped token + account ID.
+
+(*MVOX:Palestrina*)
+
+---
+
 ### [DECISION] 2026-05-18 (session 3) — 5 session-2 carryforward gaps resolved with PO
 
 All five gaps surfaced in the session-2 → session-3 seed are now answered. Walked them through one-by-one with PO this session. Outcomes:
