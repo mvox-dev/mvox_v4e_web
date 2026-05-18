@@ -1,0 +1,8 @@
+# Claude Code per-user settings (not committed)
+.claude/settings.local.json
+.claude/worktrees/
+
+# Common
+node_modules/
+.DS_Store
+*.log
