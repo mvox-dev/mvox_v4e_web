@@ -1,5 +1,5 @@
 #!/bin/bash
-# mvox-dev statusline (*MVOX:Brunel*)
+# mvox-dev statusline (*FR:Brunel*)
 #
 # Shows: ENV_ID badge | model | context bar | dir | git branch | pnpm test summary | cost
 #

@@ -1,5 +1,39 @@
 # Palestrina — Team Lead Scratchpad
 
+### [NEXT SESSION] 2026-05-18 — session-2 → session-3
+
+**Where we are**: stack landed end-to-end in session 2 (SvelteKit 2 + Svelte 5 + TS + Tailwind v4 on Cloudflare, Entu API backend, Entu OAuth + BFF JWT cookie, Paraglide en/et/lv/uk, Vitest+Playwright, pnpm, flat single-app). Team config + 5 role prompts + `architecture-decisions.md` reflect this. Entu credentials probed end-to-end against polyphony db (key exchanges for JWT, JWT works for queries).
+
+**First action (session 3): spawn Victoria.** Her first task: turn the 12 🟢 user stories at `~/projects/entu-research/docs/user-stories.md` into GitHub issues + 4-5 `chore:` scaffolding issues. Story doc is mature (schema-validation pass done 2026-05-18, PR #41 closed all gaps).
+
+**Surface to PO before Victoria finalizes the issue list**:
+- No library / org-admin / section-lead stories in the doc — defer to v2 or add now?
+- D1 has two UX TODOs (workspace switcher, notification collapse) — need decisions before implementation
+- C1 programme-readiness algorithm needs a concrete definition
+- Whether to seed test events/works first or implement empty-state UI (polyphony db has 6 orgs + 116 members but 0 events / 0 works)
+- Cloudflare Pages project name for mvox (don't collide with entu-research's "entuphony")
+- `ENTU_API_KEY` rotation cadence — current key lives in `~/.config/mvox/credentials.env` (chmod 600, outside any repo); not clear how / when PO will rotate. Don't echo the key value anywhere git-tracked.
+
+**Concrete pointers (no re-discovery needed)**:
+- Credentials: `~/.config/mvox/credentials.env` (chmod 600, outside any repo)
+- v4E schema: `~/projects/entu-research/docs/schema/v4E/{schema.ts,README.md}`
+- Entu case study: `~/projects/entu-research/docs/case-studies/2026-05-polyphony-on-entu.md`
+- User stories: `~/projects/entu-research/docs/user-stories.md`
+- **Entu API base is `https://api.entu.app`** (subdomain, NOT `entu.app/api`) — entu-research's env files have this wrong; we patched our copy
+- Auth flow reference impl: `~/projects/entu-research/src/lib/server/entu/auth.ts` + `src/test/api/api-key-exchange.spec.ts` — josquin should read both before scaffolding the auth shell
+- Test data state: polyphony db has 6 real Estonian choirs (incl. case-study cast: EKL umbrella + Filharmoonia + Sireen), 116 members, 0 events, 0 works
+- JWT `aud` claim has odd format (`<IPv6 prefix>127.0.0.1`) — Entu quirk noted, not blocking, Bentham flagged it for the first auth review
+
+**Suggested session-3 task sequence after Victoria's intro**:
+1. Victoria files issues (parallel)
+2. Spawn josquin + tallis for scaffolding chores in parallel (`pnpm create svelte` + adapter-cloudflare + Tailwind v4 + Paraglide; auth shell wiring API_KEY→JWT; base Entu client; hooks.server.ts; vitest+playwright configs)
+3. Surface listed gaps to PO; get answers
+4. A1 (singer's agenda) as first real TDD cycle once scaffolding GREEN — **but don't pile multiple features behind it the same day.** Per Bentham's session-2 close [WARNING]: the first PR (auth/OAuth + first BFF endpoint) carries disproportionate review weight; it sets precedent for cookie flags, CSRF posture, `$env/dynamic/public` discipline, and BFF URL-composition. He's budgeting closer review; you should budget calibration time on your side too.
+
+When you've processed this seed, downgrade the tag from `[NEXT SESSION]` to `[PROCESSED]` or remove the section.
+
+---
+
 ## 2026-05-18 — First session of mvox-dev
 
 Team bootstrapped today. Repo: only `teams/mvox-dev/` exists, no app code yet. Spawned finn + bentham (always-on); implementers wait for first task.
@@ -52,6 +86,46 @@ When you wake up:
 - The `[DEFERRED]` and `[REMINDER]` sections above are your loose-ends list — process them before announcing "ready" to PO unless PO speaks first.
 - The `[PATCH]` log is for historical reference; don't re-do any of it.
 - Big open item from Bentham (his flag #4): no formal mechanism yet for recording PO approval of v4E schema mutations. He'll preemptively RED any such PR. Decide a convention with PO before Josquin's first schema-touching task.
+
+### [DECISION] 2026-05-18 (session 2) — stack landed end-to-end
+
+PO briefing of v4E + the polyphony-on-entu case study, then locked all five stack-shape choices in a single session:
+
+1. **mvox vs entu-research**: schema-as-contract (option b). mvox is the production fork; consumes v4E from entu-research but otherwise independent codebase.
+2. **Hosting**: Cloudflare Pages + Workers via `@sveltejs/adapter-cloudflare`.
+3. **i18n**: Paraglide, 4 locales en/et/lv/uk.
+4. **v4E schema ownership**: option A — schema lives in entu/research; mvox PRs cite via commit trailers (Bentham's Option A from his session-2 intro, adopted essentially as proposed).
+5. **Repo layout**: flat single-app SvelteKit (`src/lib/`, `src/routes/`, `src/lib/server/`). No monorepo until a second deployable exists.
+
+Confirmed stack table (replaced all FIXME/strikethrough cells in `common-prompt.md`):
+- SvelteKit 2 + Svelte 5 (Runes) + TS strict + Tailwind v4
+- Cloudflare Pages/Workers (no D1, R2, KV, Durable Objects)
+- Entu API backend, S3 via signed URLs
+- Entu OAuth + BFF JWT cookie (httpOnly, 48h, no refresh)
+- Paraglide i18n
+- Vitest + Playwright
+- pnpm (no workspaces)
+
+Files patched this round:
+- `common-prompt.md` — stack table, TDD-chain paths, Known Pitfalls rewrite (added v4E section per case study D1/D3/D6, dropped per-value `_sharing` warning per PO calibration — "not worth the context")
+- `prompts/{josquin,byrd,tallis,comenius}.md` — full rewrites (all FIXME blocks resolved, paths flat-app, polyphony patterns removed)
+- `prompts/bentham.md` — Security-Critical Files + What to Watch For rewritten with v4E review checklist + concrete flag-#4 trailer rule
+- `memory/architecture-decisions.md` — NEW. Seeded with the 5 decisions above. Bentham stewards going forward.
+- `~/workspace/CLAUDE.md` — Status flipped to "stack landed"; Open questions collapsed (all four resolved); conventions list extended with v4E trailer rule.
+
+**Bentham's flag #4 is now closed** by the architecture-decisions.md trailer entry. Task #2 in the team task list resolved.
+
+Lesson: when PO is in active decision-making mode, a single session can land an unbounded amount of structural state. Don't over-batch the patches — issue them in the same turn after PO confirms the plan. The Edit/Write tool can take parallel calls; use them.
+
+### [REVERSAL] 2026-05-18 (session 2) — restored FR:Celes / FR:Brunel trailers
+
+PO clarification: Celes and Brunel were not polyphony-dev members — they were the original authors on **framework-research** (`FR:`). My session-1 bulk sed of `PD:` → `MVOX:` was correct for `PD:` author trailers (those were us-via-polyphony), but the 8 prompt files actually carried `PD:Celes` because polyphony-dev had already mis-relabeled the original `FR:Celes` lineage. So `MVOX:Celes` was doubly wrong (both prefix and erasing FR authorship). Same logic applied to `FR:Brunel` → `MVOX:Brunel` change in `.claude/statusline-command.sh` line 19 above — that was also wrong by the same reasoning.
+
+Reverted this session:
+- 8 prompt files (`palestrina, josquin, byrd, tallis, bentham, comenius, finn, victoria`): `(*MVOX:Celes*)` → `(*FR:Celes*)`
+- `.claude/statusline-command.sh` line 2: `(*MVOX:Brunel*)` → `(*FR:Brunel*)`
+
+Lesson: when bulk-renaming author trailers, distinguish CONTENT lineage (FR/PD = where the file came from) from CURRENT-WORK attribution (MVOX = something we wrote/edited). Original authors keep their FR: trailer in perpetuity unless we substantially rewrite the file. The historical note on L19 above is left as-is (accurate record of what session-1-me did, even though now reverted).
 
 ### [REMINDER] Finn's scratchpad needs cleanup at next spawn
 

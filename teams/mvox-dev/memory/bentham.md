@@ -7,30 +7,39 @@ metadata:
 
 # Bentham scratchpad
 
-## 2026-05-18 — First session calibration
+## 2026-05-18 — Session 2: stack landed, calibration reset
 
-[DECISION] Stack table in `common-prompt.md` is **inherited from polyphony, UNCONFIRMED**. Only `pnpm` is enforceable. Do NOT RED a PR for violating D1/BLOBs/EdDSA/Paraglide/Tailwind/SvelteKit rules until PO confirms each row.
+[DECISION] Stack confirmed (see `common-prompt.md` Stack table and `architecture-decisions.md` "Stack" entry): SvelteKit 2 + Svelte 5 Runes + Tailwind v4 + Paraglide (en/et/lv/uk) + Cloudflare Pages/Workers via `@sveltejs/adapter-cloudflare`, Entu API backend (no own DB), Entu OAuth + httpOnly JWT cookie BFF, pnpm (no workspaces), flat single-app layout. Every row in the table is now an enforceable RED trigger when violated.
 
-[DECISION] Security-critical file paths in my prompt (`apps/vault/`, `apps/registry/`, `packages/shared/crypto/`, `apps/vault/migrations/`) are polyphony-shaped and **do not apply** to mvox. Until real paths land, apply the kept rule: **anything touching auth, permissions, or external input is security-critical regardless of path**.
+[DECISION] **Repo layout is flat single-app**, NOT monorepo. `src/lib/`, `src/routes/`, `src/lib/server/`. No `apps/` or `packages/`. (One stale "monorepo" reference still in my prompt's MAY READ list line 121 — cosmetic, flagged to team-lead.)
 
-[DECISION] Legal compliance bullet about "invite-only vault enforcement" is FIXME — access model is TBD. Do NOT RED for missing vault/invite checks. Re-evaluate when PO defines mvox access model (likely Entu permissions, not vault invites).
+[DECISION] **Flag #4 CLOSED.** v4E schema-mutation gate adopted as Option A (trailers on the mvox PR). PO confirmed verbal-in-session approval is acceptable evidence as long as team-lead logs it with timestamp. Rule lives in `common-prompt.md` (Known Pitfalls / v4E Schema Mutations) and `architecture-decisions.md`. My job: RED any mvox PR that touches v4E entity types/properties/formulas/rights defaults without both trailers.
 
-[DECISION] D1 migration safety patterns (`_new` table, parent-first drops, junction handling) do NOT apply — mvox has no D1, it's an Entu BFF. Do NOT RED on those.
+[PATTERN] **Security-critical paths now concrete** (per updated prompt): `src/lib/server/entu/`, `src/lib/server/auth/`, `src/hooks.server.ts`, `src/routes/api/**`, `src/routes/**/+server.ts`, `src/routes/**/+page.server.ts`. Old polyphony shapes (`apps/vault/`, `apps/registry/`, `packages/shared/crypto/`) are dead — purge from mind.
 
-[DECISION] Author trailer is `(*MVOX:Bentham*)`, not `(*PD:Bentham*)`. PD = Polyphony-Dev; all repo files have been flipped.
+[PATTERN] **v4E RED triggers** distilled from case study (Sections B, D) — encoded in my prompt "What to Watch For / v4E / Entu":
+  1. Multi-hop formulas (anything beyond single hop or `_parent`) — silently absent → RED
+  2. `type: reference` on formula property — silently coerces to string → RED (declare as `type: string`)
+  3. Formula projecting raw values across rights boundaries (CONCAT names, descriptions) — leak; only aggregates (COUNT/SUM/AVG/MIN/MAX) are safe across boundaries → RED
+  4. New BFF route running in elevated mode without entry on the enumerated elevated-ops list → RED
+  5. Granting `_owner`/`_editor`/`_viewer` on org-subtree entity without active `member` for that person in that org → RED
+  6. Direct calls to `https://entu.app` from client code → RED (all calls go through BFF)
+  7. Splitting/flipping a `_inheritrights: false` boundary without a v4E schema change → RED (rights islands are load-bearing)
 
-[PATTERN] Josquin's prompt has been heavily FIXME'd — Auth Architecture (Registry/Vault/JWKS), D1 Critical Safety Rules, Core Responsibilities, WRITE/READ list, Key Paths. When reviewing his first PR, calibrate against "Entu BFF caller" not "D1 + JWKS author".
+[PATTERN] **Per-value `_sharing` warning DROPPED** per PO calibration. Don't add it to the checklist; PO judged it not worth the context space. Single-hop formula rule + the seven above stay.
 
-[PATTERN] Tallis's prompt: D1Database mock removed; auth mock pattern TBD. Don't expect (or require) those test patterns until Tallis re-establishes them.
+[PATTERN] Elevated-ops list in `architecture-decisions.md` is seeded EMPTY. Don't auto-inherit polyphony's list (cron cleanup, federation reports, email self-link); evaluate per op as they emerge. New entries require team-lead approval.
 
 ## Open items I'm watching
 
-[DEFERRED] **Schema-migration PO-approval gate (flag #4)** — mechanism not formalized. When any agent touches `~/projects/entu-research/docs/schema/v4E/` (`schema.ts`, narrative `README.md`, `editor.html`), RED any PR that lacks recorded PO approval. Team-lead is aware.
+[GOTCHA] Stale FIXME at `common-prompt.md` line 15 still says "fill in once stack is settled" — stack IS settled. Not load-bearing for review decisions; flag to team-lead in next housekeeping pass.
 
-[DEFERRED] **TDD ownership table refs missing dirs (flag #3)** — `packages/shared/`, `migrations/` in `common-prompt.md` ownership table. Passive watch; will resolve when repo structure lands.
+[GOTCHA] My own prompt line 121 says "All source files across the monorepo" — repo is flat, not monorepo. Cosmetic. Flag to team-lead in next housekeeping pass.
 
-[DEFERRED] **Real security-critical paths for mvox** — once Entu integration lands, ask team-lead to update `prompts/bentham.md` "Security-Critical Files" with actual paths (likely `src/lib/server/entu/`, `src/lib/server/auth/`, wherever Entu client + JWT verification live).
+[DEFERRED] No `test-gaps.md` yet — Tallis appends as gaps emerge. Will read when it appears.
 
-[GOTCHA] Memory dir was empty at session start — no scratchpad, no `architecture-decisions.md`, no `test-gaps.md`. I steward `architecture-decisions.md`; create it on first real architectural decision, not preemptively.
+[DEFERRED] No code in the repo yet. First PRs (likely auth/OAuth + first BFF endpoint) will be the calibration test for the security-critical-paths rules. Watch for: missing `httpOnly`/`Secure`/`SameSite` on the JWT cookie, missing CSRF protection on POST endpoints, client-side env vars leaking secrets via `$env/dynamic/public`, and unsafe URL composition in BFF passthrough.
+
+[CHECKPOINT] Calibration state for session 3+: stack table enforceable; v4E RED triggers from case study Sections B + D encoded; flag #4 closed; per-value `_sharing` dropped; elevated-ops list empty; awaiting first PR.
 
 (*MVOX:Bentham*)

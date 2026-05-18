@@ -12,11 +12,9 @@
 
 Backed by Entu (entity-property database platform); no own database. Acts as a BFF in front of Entu's API. Successor to the polyphony prototype, with refined data model and federation-ready design.
 
-> FIXME — fill in once stack is settled: framework, deployment target, auth flow, package manager. Until then, treat the stack table below as a starting point inherited from the polyphony prototype, not as a finalised decision.
-
 ## Key References
 
-- `CLAUDE.md` — project overview, architecture, commands, conventions (TBD)
+- `CLAUDE.md` — project overview, architecture, commands, conventions
 - `entu/research` repo, `docs/schema/v4E/` — canonical schema (typed `schema.ts`, narrative `README.md`, diagram editor `editor.html`)
 - GitHub Issues — check open issues for task context
 
@@ -33,19 +31,20 @@ All persistent text output (architecture decisions, PR descriptions, shared know
 
 ## Stack
 
-> **FIXME — stack inherited from the polyphony prototype, unconfirmed for mvox.** mvox is Entu-backed (no own DB), so at minimum Database / File Storage / Auth rows below are wrong. Treat all entries as starting hypotheses, not enforceable rules. **Bentham:** do not RED a PR for violating these until the PO has explicitly confirmed each row. Confirmed so far: `pnpm` (see `~/workspace/CLAUDE.md`).
+Landed 2026-05-18 session 2. See `memory/architecture-decisions.md` for the rationale behind each row.
 
-| Component       | Technology (UNCONFIRMED)       | Notes (UNCONFIRMED)                                       |
-| --------------- | ------------------------------ | --------------------------------------------------------- |
-| Framework       | ~~SvelteKit 2 + Svelte 5~~ TBD | Likely (per `~/workspace/CLAUDE.md`), unconfirmed. If kept: Runes ($state, $derived, $effect) NOT legacy $ syntax |
-| Platform        | ~~Cloudflare Pages + Workers~~ TBD | One of: Cloudflare, Vercel, self-hosted (per `~/workspace/CLAUDE.md` open questions) |
-| Database        | ~~Cloudflare D1 (SQLite)~~ TBD | mvox is Entu-backed — no own DB                           |
-| File Storage    | ~~D1 BLOBs (chunked)~~ TBD     | Entu file handling TBD                                    |
-| Auth            | ~~EdDSA (Ed25519) JWTs~~ TBD   | Polyphony Registry/Vault split does not apply             |
-| i18n            | ~~Paraglide~~ TBD              | 4 locales target: en, et, lv, uk (per `~/workspace/CLAUDE.md` open questions); tooling unconfirmed |
-| Testing         | Vitest + Playwright            | Unit + E2E                                                |
-| Package Manager | pnpm (workspaces)              | **CONFIRMED** — always pnpm, never npm                    |
-| CSS             | Tailwind CSS v4                | Full class names only — no dynamic template literals      |
+| Component       | Technology                     | Notes                                                                                                                                                                  |
+| --------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Framework       | SvelteKit 2 + Svelte 5         | Runes ONLY (`$state`, `$derived`, `$effect`, `$props`, `$bindable`) — never legacy `export let` / `$:`                                                                 |
+| Platform        | Cloudflare Pages + Workers     | `@sveltejs/adapter-cloudflare`. Env vars only — NO D1, R2, KV, or Durable Objects                                                                                      |
+| Backend         | Entu API                       | MongoDB + S3 under the hood; mvox has no own DB. v4E schema source-of-truth: `entu/research` repo, `docs/schema/v4E/`                                                  |
+| File storage    | S3 via Entu signed URLs        | 60-second TTL; client uploads direct to S3 after BFF requests the URL from Entu                                                                                        |
+| Auth            | Entu OAuth + BFF JWT cookie    | OAuth providers via Entu (Google, Apple, Smart-ID, Mobile-ID, ID-card, e-mail). SvelteKit server stores Entu JWT (48h, no refresh) in httpOnly cookie; proxies all API |
+| i18n            | Paraglide                      | 4 locales: en, et, lv, uk. Messages at `messages/{locale}.json`; generated TS at `src/lib/paraglide/`; usage `import * as m from '$lib/paraglide/messages.js'`         |
+| Testing         | Vitest + Playwright            | Unit + E2E                                                                                                                                                             |
+| Package manager | pnpm                           | Always pnpm, never npm. Flat single-app — no workspaces                                                                                                                |
+| CSS             | Tailwind CSS v4                | Full class names only — no dynamic template literals                                                                                                                   |
+| Repo layout     | Flat single-app SvelteKit      | `src/lib/`, `src/routes/`, `src/lib/server/` (server-only boundary). NOT monorepo — defer `apps/` + `packages/` until a second deployable exists                       |
 
 ## Quality Gates
 
@@ -84,15 +83,13 @@ Make the decision, log it to your scratchpad, report to team-lead. PO may revers
 
 Only one agent (or defined pair) owns the working branch at any moment. Ownership transfers explicitly via handoff message.
 
-> **FIXME — "May write" path columns below were polyphony-shaped (`packages/shared/`, `migrations/`, `messages/*.json`).** mvox repo layout is TBD; treat path columns as conventions, not concrete paths.
-
-| Phase | Owner | May write (paths TBD per mvox layout) | Passes to |
+| Phase | Owner | May write | Passes to |
 |-------|-------|-----------|-----------|
 | 0. Issue | Victoria | GitHub Issues only | team-lead |
 | 1. Assign | team-lead | (creates branch only) | Tallis |
-| 2. RED | Tallis | test files (`*.spec.ts`, integration & E2E dirs) | Byrd and/or Josquin |
-| 3. GREEN | Byrd + Josquin | implementation files (component, route, BFF/API, shared types) | Comenius |
-| 4. i18n | Comenius | locale / message files, `m.*()` calls in components | Bentham |
+| 2. RED | Tallis | `*.spec.ts` colocated with source; `tests/` (Playwright E2E) | Byrd and/or Josquin |
+| 3. GREEN | Byrd + Josquin | Byrd: `src/lib/components/`, `src/routes/**/*.svelte`, `src/lib/types.ts`. Josquin: `src/lib/server/`, `src/routes/**/+page.server.ts`, `src/routes/**/+server.ts`, `src/routes/api/` | Comenius |
+| 4. i18n | Comenius | `messages/{en,et,lv,uk}.json`; minimal `m.*()` substitutions in `.svelte` / `.ts` | Bentham |
 | 5. REVIEW | Bentham | review comments only (no file writes) | Josquin |
 | 6. MERGE | Josquin | PR creation, squash-merge | team-lead (close issue) |
 
@@ -155,9 +152,7 @@ git push origin --delete <feature-branch>
 
 ## Known Pitfalls
 
-> FIXME — stack-specific pitfalls below were inherited from the polyphony (D1-backed) prototype. mvox is Entu-backed, so the D1-related entries no longer apply. Sections will be re-seeded with Entu API specifics once the integration shape is settled.
-
-### Svelte 5 (tentative — assuming SvelteKit stays)
+### Svelte 5
 
 - Runes ONLY: `$props()`, `$state()`, `$derived()`, `$effect()`, `$bindable()`
 - NEVER legacy `export let` or `$:` syntax
@@ -165,13 +160,36 @@ git push origin --delete <feature-branch>
 - Server-only code MUST be in `src/lib/server/` — never import server modules in client
 - Sticky + overflow: NEVER put `overflow` on ancestors of `position: sticky` elements
 
+### v4E / Entu
+
+- **Single-hop formula traversal only.** `propertyName.*.property` and `_parent` work; chained forms like `ref.*._parent.*.name` silently return absent. Denormalize via intermediate single-hop formulas (case study Section D1).
+- **Formula output is string or number only.** Declaring `type: reference` on a formula property doesn't enforce reference output — it silently coerces to string. Declare as `type: string` for honest schema (case study D3).
+- **Formula evaluator bypasses rights** (`entu/api/utils/formula.js`). Use formulas for AGGREGATES (counts, sums) across rights boundaries — never project raw values (names, descriptions) via formulas, since that leaks (case study D6).
+- **Rights islands at org boundaries.** `_inheritrights: false` on `organization` is load-bearing — blocks cascade from umbrella to collective. Don't flip it without a v4E schema change (case study B3).
+- **BFF user-rights default.** SvelteKit server proxies as the authenticated user via their Entu JWT. Elevated ops live on an explicit enumerated list (cron cleanup, federation reports); add to that list only with team-lead approval (case study B4).
+- **Membership-rights invariant.** Any explicit `_owner` / `_editor` / `_viewer` grant on an org-subtree entity requires an active `member` for that person in that org. BFF enforces (case study B2).
+- **Field-level rights don't exist.** Rights are per-entity. If two roles need different write access to one entity, split it into two entities (case study D5).
+- **No multi-hop reference picker scoping.** `reference_query` on a reference property type is static — no `{{_parent}}` substitution. Enforce contextual scoping in your BFF / UI layer (case study D7).
+
 ### Git Safety
 
 - Never force-push or reset without team-lead approval
 - Prefer new commits over amending
 - Only commit to your assigned story branch
 
-> FIXME — Schema/backend migration protocol (replacing the polyphony D1 remote-migration flow) will be defined once Entu integration is in place. For now: any schema change in `entu/research/docs/schema/v4E/` requires PO approval before landing.
+### v4E Schema Mutations
+
+The v4E schema lives in `entu/research` (`docs/schema/v4E/`), outside this repo. When a mvox feature requires a schema change:
+
+1. Open a PR against `entu/research` first; get PO approval there
+2. After it lands, open the mvox PR with a commit trailer citing the change:
+   ```
+   Schema-Change: entu/research@<sha> "<short title>"
+   PO-Approved: <date> <PO handle or "verbal in session, logged by team-lead">
+   ```
+3. Bentham REDs any mvox PR whose diff references new/changed v4E entity types, properties, formulas, or rights defaults without both trailers.
+
+See `memory/architecture-decisions.md` for full rationale.
 
 ## Research Support
 
@@ -268,9 +286,10 @@ When you receive a shutdown request:
 The team lead shuts down LAST. Execute in this order:
 
 1. **Write own scratchpad** — save decisions, WIP, warnings to `memory/team-lead.md`.
-2. **Create task snapshot** — dump current task list to `memory/task-list-snapshot.md`.
-3. **Send shutdown requests** — to all agents. Wait for each `teammate_terminated`.
-4. **Persist inboxes** — copy pruned inboxes from runtime to repo:
+2. **Write [NEXT SESSION] seed** — at the TOP of `memory/team-lead.md`, write a 3-5 bullet starter for the next team-lead session: state of play, expected first action, any open decisions awaiting PO, and concrete pointers (file paths, credentials locations, last-known data state) so future-Palestrina starts from orientation rather than re-reading cold. Tag the section `### [NEXT SESSION] YYYY-MM-DD — session-N → session-N+1` so it's distinct from historical `[DECISION]` / `[CHECKPOINT]` / `[DEFERRED]` entries. When next-session-Palestrina has processed it, they remove or downgrade the tag.
+3. **Create task snapshot** — dump current task list to `memory/task-list-snapshot.md`.
+4. **Send shutdown requests** — to all agents. Wait for each `teammate_terminated`.
+5. **Persist inboxes** — copy pruned inboxes from runtime to repo:
    ```bash
    TEAM_CONFIG="$(git rev-parse --show-toplevel)/teams/mvox-dev"
    TEAM_DIR="$HOME/.claude/teams/mvox-dev"
@@ -282,9 +301,10 @@ The team lead shuts down LAST. Execute in this order:
      done
    fi
    ```
-5. **Commit and push** — all scratchpads, task snapshot, and inboxes:
+6. **Commit and push** — all scratchpads, task snapshot, and inboxes:
    ```bash
    git add teams/mvox-dev/memory/ teams/mvox-dev/inboxes/
    git commit -m "chore: save mvox-dev team state"
    git push
    ```
+   By convention, **pause before `git push`** so PO can review the diff first (especially the [NEXT SESSION] seed and any scratchpad additions).

@@ -132,5 +132,165 @@
     "timestamp": "2026-05-18T20:37:12.649Z",
     "color": "blue",
     "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "[2026-05-18 20:53] Bentham reporting in for session 2 — ready.\n\n## Read status\n- Re-read `prompts/bentham.md`, `common-prompt.md`, my scratchpad, and `~/workspace/CLAUDE.md`.\n- Calibration from session 1 still holds: stack table is unconfirmed (only `pnpm` is enforceable); polyphony-shaped security paths and D1/vault rules do not apply.\n- Memory dir confirmed: `bentham.md`, `finn.md`, `task-list-snapshot.md`, `team-lead.md` exist. Still no `architecture-decisions.md` / `test-gaps.md` — correct (I'll create on first real architectural decision, not preemptively).\n\n## Nothing new in the read\nNo diffs vs. session 1 worth flagging — stack table still FIXME'd, prompts still carry polyphony lineage markers. No PRs to review, agreed.\n\n## Flag #4 — proposal for v4E schema-mutation PO-approval gate\n\nThe schema lives outside this repo (in `~/projects/entu-research/`, repo `entu/research`, path `docs/schema/v4E/`), so a same-repo PR label or CI check can't guard it from this side. Three options, cheapest first:\n\n**Option A — Commit trailer on the mvox PR that depends on the schema change** (recommended):\n- When a PR in `mvox_v4e_web` requires a schema mutation that has already landed (or will land) in `entu/research`, the PR description must include a trailer like:\n  ```\n  Schema-Change: entu/research@<sha> \"<short title>\"\n  PO-Approved: <date> <PO handle or \"verbal in session\">\n  ```\n- I RED any PR whose diff references new/changed v4E entity types, properties, or relations without both trailers.\n- Cost: zero tooling. Convention-only. Enforced by me at review.\n\n**Option B — `docs/schema-approvals.md` log in this repo**:\n- Append-only log: date, schema element changed, PO approval evidence, link to entu/research commit.\n- I RED if the log isn't updated alongside the dependent code.\n- Cost: one file to seed; light maintenance.\n\n**Option C — PR label `schema-mutation` + checklist**:\n- Requires team-lead to apply the label; checklist item \"PO approval recorded\" must be ticked.\n- Cost: label management overhead, easy to forget. Weakest gate.\n\nMy pick: **A + B together** — the trailer makes the dependency visible at review time, the log gives a queryable history. B alone gets stale; A alone leaves no audit trail. Both are convention-only, no tooling.\n\nOpen question for PO: does \"PO approval\" need to be written (e.g., GitHub comment, email) or is in-session verbal acknowledgement (logged by team-lead) sufficient? Cheapest path is \"verbal-in-session, logged by team-lead with timestamp\"; strictest is \"PO must comment on the entu/research PR before mvox PR merges.\"\n\nI'll stand by. Route review work my way when the stack lands.\n\n(*MVOX:Bentham*)",
+    "summary": "Bentham ready, flag #4 proposal",
+    "timestamp": "2026-05-18T20:54:13.385Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"1\",\"subject\":\"Spawn finn + bentham, await intros\",\"description\":\"After both finn and bentham have introed, send the ready message to PO summarising session-2 startup state and carried-forward items.</description>\\n</invoke>\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-18T20:54:13.623Z\"}",
+    "timestamp": "2026-05-18T20:54:13.623Z",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-18T20:54:15.912Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-18T20:54:15.912Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-05-18 20:54] Finn reporting in — ready for session 2.\n\n**Scratchpad cleanups done:**\n- Attribution trailer updated from `(*PD:Finn*)` to `(*MVOX:Finn*)`\n- Stale CHECKPOINT line about `/tmp/polyphony-test-status.txt` struck through and marked FIXED\n\n**One thing I noticed on read:**\n- `architecture-decisions.md` does not exist yet at `teams/mvox-dev/memory/architecture-decisions.md` — my startup read list says to read all shared files, but this file is missing. Not a blocker, just noting it so you know the shared knowledge base is still empty.\n- The `(*MVOX:Celes*)` trailer at the bottom of `finn.md` prompt file (`prompts/finn.md:75`) is still the old polyphony attribution — that's in the prompt file itself, not my scratchpad, so I left it untouched (read-only rule). Flag for whoever is cleaning up prompts.\n\nStanding by for research requests.",
+    "summary": "Finn ready, scratchpad cleaned up",
+    "timestamp": "2026-05-18T20:54:16.966Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-18T20:54:19.344Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-18T20:54:19.344Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"3\",\"subject\":\"Patch polyphony remnants as encountered\",\"description\":\"Session 1 PD→MVOX bulk-sed + manual sweeps caught most things, but PO warned more remnants will surface. Both prompt files (finn.md, bentham.md) still end with `(*MVOX:Celes*)` instead of an appropriate author trailer — likely a polyphony-era leftover or template artifact. Catalogue and patch as discovered; don't do a preemptive sweep.</description>\\n</invoke>\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-18T20:56:56.590Z\"}",
+    "timestamp": "2026-05-18T20:56:56.590Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"4\",\"subject\":\"Patch common-prompt.md (stack table, TDD paths, pitfalls)\",\"description\":\"Replace stack table FIXMEs/strikethroughs with confirmed values. Update TDD chain \\\"May write\\\" column with flat-app SvelteKit paths. Rewrite Known Pitfalls section: drop D1 entries, add v4E/Entu pitfalls (single-hop formula limit, rights islands, BFF user-rights default). Drop the per-value _sharing warning per PO calibration.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-18T21:40:31.833Z\"}",
+    "timestamp": "2026-05-18T21:40:31.833Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"5\",\"subject\":\"Patch 5 role prompts (josquin, byrd, tallis, comenius, bentham)\",\"description\":\"josquin: full Core Responsibilities rewrite (BFF + Entu + rights + formula). byrd: flat paths, drop wrangler, reaffirm Runes+Paraglide. tallis: flat paths, replace D1 mock with vi.mock on Entu client, note Vitest+Playwright. comenius: flat paths, Paraglide patterns. bentham: security paths to BFF layer, v4E review checklist, flag #4 resolution.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-18T21:41:56.703Z\"}",
+    "timestamp": "2026-05-18T21:41:56.703Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"6\",\"subject\":\"Create teams/mvox-dev/memory/architecture-decisions.md\",\"description\":\"Seed with 5 decisions from this session: stack table, repo layout (flat single-app), v4E schema ownership (option A + trailer convention), BFF user-rights default + enumerated elevated ops, single-hop formula rule. Bentham stewards going forward.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-18T21:42:59.303Z\"}",
+    "timestamp": "2026-05-18T21:42:59.303Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"7\",\"subject\":\"Update workspace/CLAUDE.md (status + open questions)\",\"description\":\"Flip Status from \\\"Brand new, stack pending\\\" to \\\"Stack landed\\\". Resolve the four Open Questions at bottom (all answered: SvelteKit confirmed, Entu OAuth + BFF, Cloudflare, Paraglide). Update key conventions list.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-18T21:43:16.927Z\"}",
+    "timestamp": "2026-05-18T21:43:16.933Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"8\",\"subject\":\"Update team-lead scratchpad + resolve task #2\",\"description\":\"Write [DECISION] entry on stack landing in memory/team-lead.md. Close out task #2 (flag #4 is now resolved by the commit-trailer convention seeded into architecture-decisions.md).\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-18T21:43:28.055Z\"}",
+    "timestamp": "2026-05-18T21:43:28.055Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"9\",\"subject\":\"Notify finn + bentham of stack landing\",\"description\":\"Send SendMessage to both: read the new architecture-decisions.md + updated common-prompt.md. Bentham specifically: acknowledge his Option A is the adopted convention; he'll RED any v4E-touching PR without the trailer.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-18T21:43:39.647Z\"}",
+    "timestamp": "2026-05-18T21:43:39.647Z",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-05-18 21:44] Acknowledged. Read all four updated files: common-prompt.md (stack confirmed, v4E/Entu pitfalls section, flat TDD paths), architecture-decisions.md (5 seed decisions), and noted the two reference repos.\n\nScratchpad updated with stack decisions and v4E formula gotchas so a fresh Finn won't need to re-derive them.\n\nOne minor note: common-prompt.md line 15 still has the old FIXME header (\"fill in once stack is settled\") — the stack table below it is now confirmed, but that FIXME paragraph wasn't removed. Flagging in case it was intentional or missed; not my file to fix.\n\nReady for research requests.",
+    "summary": "Context read, scratchpad updated, ready",
+    "timestamp": "2026-05-18T21:44:18.944Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-18T21:44:20.819Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-18T21:44:20.819Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "[2026-05-18 21:43] Re-read complete. Calibration reset for session 3+.\n\n## Acknowledged\n- **Stack table is now enforceable** (every row a RED trigger when violated): SvelteKit 2 + Svelte 5 Runes, Cloudflare Pages/Workers via `@sveltejs/adapter-cloudflare`, Entu API + OAuth + httpOnly JWT cookie BFF, Paraglide (en/et/lv/uk), pnpm flat single-app.\n- **Flag #4 CLOSED.** Option A adopted essentially as I proposed. Acceptable PO-approval evidence per your clarification: verbal-in-session logged by team-lead in `memory/team-lead.md` with timestamp, OR written (GitHub comment / email). I RED any mvox PR that touches v4E entity types/properties/formulas/rights defaults without both trailers.\n- **Security-critical paths now concrete:** `src/lib/server/entu/`, `src/lib/server/auth/`, `src/hooks.server.ts`, `src/routes/api/**`, `src/routes/**/+server.ts`, `src/routes/**/+page.server.ts`. Polyphony shapes purged.\n- **v4E RED triggers encoded** (case study B + D): multi-hop formulas, `type: reference` on formulas, raw-value projection across rights boundaries, unlisted elevated BFF routes, missing membership-rights pairing, client-side `entu.app` calls, unauthorized flips of `_inheritrights: false` boundaries.\n- **Per-value `_sharing` warning DROPPED** per your PO-calibration note. Won't appear in my reviews.\n- **Architecture-decisions.md stewarded** — I'll prune/append going forward; the 5 seed entries are clean.\n\n## Two minor housekeeping items (non-blocking, flagging for next cleanup pass)\n1. `common-prompt.md` line 15 still has a \"fill in once stack is settled\" FIXME — stack IS settled. Stale.\n2. `prompts/bentham.md` MAY READ section line 121 says \"All source files across the monorepo\" — should be \"across the repo\" since we're flat single-app, not monorepo.\n\nNeither affects review decisions; just dropping them on your radar.\n\n## Scratchpad updated\n`memory/bentham.md` rewritten: old calibration retired (polyphony shapes, D1 patterns, vault/invite model), new calibration in (stack rows, v4E RED triggers, flag #4 closed, elevated-ops list empty).\n\nStanding by. First PRs (likely OAuth + first BFF endpoint) will be the real calibration test — I'll be watching cookie flags (`httpOnly`/`Secure`/`SameSite`), CSRF on POST endpoints, `$env/dynamic/public` leaks, and BFF URL-composition safety.\n\n(*MVOX:Bentham*)",
+    "summary": "Bentham re-calibrated, flag #4 closed",
+    "timestamp": "2026-05-18T21:44:22.813Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-18T21:44:39.967Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-18T21:44:39.967Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-05-18 21:44] Acknowledged. Will keep flagging stale text on read-through.",
+    "summary": "Acknowledged, will keep flagging",
+    "timestamp": "2026-05-18T21:44:44.391Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-18T21:44:45.565Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-18T21:44:45.565Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-18T21:44:54.884Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-18T21:44:54.884Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "[2026-05-18 22:36] Closing for session 2.\n\n- [LEARNED] Schema-as-contract (option b) + commit-trailer gate (Option A) is the cheapest defensible boundary when the contract lives in a separate repo — no tooling, audit trail comes for free from the upstream PR. Worth remembering as a pattern for future cross-repo coordination problems.\n- [DEFERRED] Elevated-ops list in `architecture-decisions.md` is intentionally seeded empty. First real op proposal will be the calibration test for \"what justifies elevation\" — I'll RED any unlisted elevated route until precedent is set.\n- [WARNING] First PR (auth/OAuth + first BFF endpoint) carries disproportionate review weight: it'll set precedent for cookie flags, CSRF posture, `$env/dynamic/public` discipline, and BFF URL-composition. Worth a closer-than-usual review pass — I'll budget accordingly.\n\nScratchpad already current. Standing down.\n\n(*MVOX:Bentham*)",
+    "summary": "Session 2 closing bullets",
+    "timestamp": "2026-05-18T22:36:33.240Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779143784477@bentham\",\"from\":\"bentham\",\"timestamp\":\"2026-05-18T22:36:35.183Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-18T22:36:35.183Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-05-18 22:36] Finn closing session 2.\n\n- [LEARNED] Stack is fully confirmed and persisted in scratchpad — fresh Finn session 3 can skip re-reading common-prompt for stack basics, just read scratchpad first.\n- [LEARNED] FIXME/stale-text pass on read-through is useful — caught two in this session (line-15 FIXME, (TBD) on key reference). Worth doing by default whenever reading team config files.\n- [DEFERRED] `prompts/finn.md:75` still carries `(*MVOX:Celes*)` attribution — not my file to fix, flagged to team-lead session 2, no action yet.",
+    "summary": "Finn closing session 2",
+    "timestamp": "2026-05-18T22:36:36.282Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779143783433@finn\",\"from\":\"finn\",\"timestamp\":\"2026-05-18T22:36:41.253Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-18T22:36:41.253Z",
+    "color": "blue",
+    "read": true
   }
 ]

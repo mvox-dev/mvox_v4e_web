@@ -66,18 +66,47 @@ For every PR, verify:
 
 ## Security-Critical Files (Always Review Thoroughly)
 
-> **FIXME — paths inherited from polyphony (`apps/vault/`, `apps/registry/`, `packages/shared/`).** mvox is Entu-backed BFF; the polyphony Registry/Vault split + EdDSA/JWKS does not apply here. Real security-critical paths will be (probably): the Entu client layer, the BFF auth/permissions layer, anything handling user input before it reaches Entu. Update this list once mvox's structure lands. Until then: treat anything touching auth, permissions, or external input as security-critical.
+- `src/lib/server/entu/` — Entu API client. Any change to outbound JWT handling, request signing, or response parsing.
+- `src/lib/server/auth/` — OAuth callback, JWT cookie management (httpOnly, Secure, SameSite), session validation.
+- `src/hooks.server.ts` — per-request session/cookie processing.
+- `src/routes/api/**`, `src/routes/**/+server.ts`, `src/routes/**/+page.server.ts` — BFF endpoints (user input before it reaches Entu).
 
 ## What to Watch For
+
+### Code quality
 
 - Duplicate utility functions across files
 - Inconsistent patterns (section ordering, date formatting)
 - Over-engineering (unnecessary abstractions, premature generalization)
-- Server-only code imported in client (must be in `src/lib/server/`, assuming SvelteKit)
-- Svelte 5 runes: no legacy `$:` or `export let` syntax (assuming Svelte stays)
-- ~~D1 migration safety~~ — REMOVED: mvox has no D1. Schema mutation guardrails for Entu are TBD; for now, any v4E schema change requires explicit PO approval.
-- i18n gaps: hardcoded English strings in new UI code (assuming Paraglide stays)
-- Legal compliance — **FIXME**: polyphony's "invite-only vault" model does not apply to mvox. Access model TBD (Entu permissions?). Do not enforce a vault-shaped rule until PO clarifies.
+
+### SvelteKit + Svelte 5
+
+- Server-only code imported in client (must be in `src/lib/server/`)
+- Svelte 5 runes: no legacy `$:` or `export let` syntax
+
+### v4E / Entu (RED triggers)
+
+- **Multi-hop formulas** — anything beyond `propertyName.*.property` or `_parent` is broken (silently). Denormalize via single-hop intermediates.
+- **Formula on a reference-typed property** — silently coerces to string. Declare as `type: string` for honest schema.
+- **Formulas projecting raw values across rights boundaries** — formula evaluator bypasses rights. Aggregates (COUNT, SUM) are safe; CONCAT of names is a leak.
+- **Bypassing the user-rights default** — any new BFF route that runs in elevated mode must be added to the enumerated elevated-ops list in `architecture-decisions.md` with rationale. RED otherwise.
+- **Missing membership-rights pairing** — any code that grants `_owner` / `_editor` / `_viewer` on an org-subtree entity must also verify (or create) an active `member` for that person in that org.
+- **Direct calls to `https://entu.app` from client code** — RED. All Entu calls go through the BFF.
+- **Splitting a `_inheritrights: false` boundary without a v4E schema change** — RED. Rights islands are load-bearing for tenant isolation.
+
+### v4E Schema Mutations
+
+Any PR whose diff references new/changed v4E entity types, properties, formulas, or rights defaults MUST carry both trailers:
+```
+Schema-Change: entu/research@<sha> "<short title>"
+PO-Approved: <date> <PO handle or "verbal in session, logged by team-lead">
+```
+Missing either → RED ("TDD-equivalent for schema: no implementation without approved schema change"). See `architecture-decisions.md` for full rationale.
+
+### i18n
+
+- Hardcoded English strings in new UI code — should be `m.key_name()` calls
+- Locale files out of sync — `en.json` keys missing from `et.json` / `lv.json` / `uk.json`
 
 ## Scratchpad Rule: Write on RED, Skip on GREEN
 
@@ -89,7 +118,7 @@ For every PR, verify:
 
 **YOU MAY READ:**
 
-- All source files across the monorepo
+- All source files under `src/`
 - All test files
 - `docs/` — architecture, schema, glossary, legal framework
 - `teams/mvox-dev/memory/bentham.md` — your scratchpad
@@ -117,4 +146,4 @@ Your scratchpad is at `teams/mvox-dev/memory/bentham.md`.
 
 Tags: `[DECISION]`, `[PATTERN]`, `[WIP]`, `[CHECKPOINT]`, `[DEFERRED]`, `[GOTCHA]`
 
-(*MVOX:Celes*)
+(*FR:Celes*)

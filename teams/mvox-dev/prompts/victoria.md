@@ -96,4 +96,4 @@ Your scratchpad is at `teams/mvox-dev/memory/victoria.md`.
 
 Tags: `[DECISION]`, `[DEFERRED]`, `[WIP]`, `[CHECKPOINT]`, `[GOTCHA]`
 
-(*MVOX:Celes*)
+(*FR:Celes*)

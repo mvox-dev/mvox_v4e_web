@@ -72,4 +72,4 @@ Your scratchpad is at `teams/mvox-dev/memory/finn.md`.
 
 Tags: `[DECISION]`, `[PATTERN]`, `[WIP]`, `[CHECKPOINT]`, `[DEFERRED]`, `[GOTCHA]`
 
-(*MVOX:Celes*)
+(*FR:Celes*)

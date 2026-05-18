@@ -13,9 +13,10 @@ This file is the project-level guidance for Claude Code running in this repo.
 
 ## Status
 
-Brand new — repo bootstrapped 2026-05-18 with only the dev team's prompts/config under `teams/mvox-dev/`. No app code yet.
+Repo bootstrapped 2026-05-18. Team config + prompts under `teams/mvox-dev/` are stack-current as of session 2 (2026-05-18). No app code yet — scaffolding is the next concrete task.
 
-Stack decisions pending. Likely SvelteKit-on-Entu following the BFF pattern from the schema work, but unconfirmed.
+**Stack landed** (see `teams/mvox-dev/common-prompt.md` "Stack" and `teams/mvox-dev/memory/architecture-decisions.md` for rationale):
+SvelteKit 2 + Svelte 5 (Runes) + TS strict + Tailwind v4 + Vitest + Playwright + pnpm, on Cloudflare Pages/Workers, backed by Entu API (no own DB), auth via Entu OAuth + BFF JWT cookie, i18n via Paraglide (en/et/lv/uk), flat single-app layout.
 
 ## Team
 
@@ -28,14 +29,13 @@ Lives at `teams/mvox-dev/`:
 
 **Startup**: in local mode, the team-lead spawns members via the Agent tool with `team_name: "mvox-dev"`, `name: "<member>"`, `run_in_background: true`. Container/tmux mode is not used here.
 
-## Key conventions inherited from polyphony
-
-These will be reaffirmed or replaced as mvox's stack settles:
+## Key conventions
 
 - Use `pnpm`, never `npm`
-- All persistent text output authored under `(*MVOX:<AgentName>*)` attribution
+- All persistent text output authored under `(*MVOX:<AgentName>*)` attribution — exception: files originally authored by another team's member keep the original author's trailer (e.g., `(*FR:Celes*)`) unless substantially rewritten
 - Co-author trailer `Co-authored-by: Mihkel Putrinš <mihkel.putrinsh@gmail.com>` on all commits
 - TDD chain: Tallis (RED) → Byrd + Josquin (GREEN) → Comenius (i18n) → Bentham (review) → Josquin (merge)
+- v4E schema mutations require a PR against `entu/research` first, then a mvox PR with `Schema-Change:` + `PO-Approved:` commit trailers — see `teams/mvox-dev/memory/architecture-decisions.md`
 
 ## Where things live
 
@@ -46,9 +46,8 @@ These will be reaffirmed or replaced as mvox's stack settles:
 | Polyphony prototype (archived) | `~/projects/polyphony/` |
 | Team runtime config (ephemeral, TeamCreate-managed) | `~/.claude/teams/mvox-dev/` |
 
-## Open questions for early work
+## Open questions
 
-- **Stack** — SvelteKit + Cloudflare like polyphony, or different (Astro, Next, etc.)?
-- **Auth** — reuse polyphony's Registry pattern (separate auth gateway with JWKS) or Entu-native auth or something else?
-- **Hosting** — Cloudflare Pages/Workers, Vercel, self-hosted?
-- **i18n** — same 4 locales (en/et/lv/uk) via Paraglide, or different?
+All four stack-shape questions resolved in session 2 (2026-05-18). See `teams/mvox-dev/memory/architecture-decisions.md` for the decisions and rationale; `teams/mvox-dev/common-prompt.md` Stack table for the working summary.
+
+Current open items live in `teams/mvox-dev/memory/team-lead.md` under `[DEFERRED]`.

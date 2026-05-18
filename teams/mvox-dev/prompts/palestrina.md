@@ -95,4 +95,4 @@ Issue closure is YOUR responsibility — never delegate it.
 
 Your scratchpad is at `teams/mvox-dev/memory/team-lead.md`.
 
-(*MVOX:Celes*)
+(*FR:Celes*)
