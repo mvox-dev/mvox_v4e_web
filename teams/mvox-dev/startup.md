@@ -1,6 +1,6 @@
-# polyphony-dev — Startup Checklist
+# mvox-dev — Startup Checklist
 
-Paths and step-by-step startup procedure for the polyphony-dev team.
+Paths and step-by-step startup procedure for the mvox-dev team.
 
 ## Paths
 
@@ -9,16 +9,16 @@ All paths derived from two anchors:
 | Anchor | How to resolve |
 |---|---|
 | `REPO` | `git rev-parse --show-toplevel` or the working directory |
-| `TEAM_DIR` | `$HOME/.claude/teams/polyphony-dev` (runtime, ephemeral) |
+| `TEAM_DIR` | `$HOME/.claude/teams/mvox-dev` (runtime, ephemeral) |
 
 | Item | Path |
 |---|---|
 | Repo root | `$REPO/` |
-| Team config dir | `$REPO/teams/polyphony-dev/` |
+| Team config dir | `$REPO/teams/mvox-dev/` |
 | Runtime dir | `$TEAM_DIR/` |
-| Roster | `$REPO/teams/polyphony-dev/roster.json` |
-| Common prompt | `$REPO/teams/polyphony-dev/common-prompt.md` |
-| Memory dir | `$REPO/teams/polyphony-dev/memory/` |
+| Roster | `$REPO/teams/mvox-dev/roster.json` |
+| Common prompt | `$REPO/teams/mvox-dev/common-prompt.md` |
+| Memory dir | `$REPO/teams/mvox-dev/memory/` |
 
 ## Startup Sequence
 
@@ -48,7 +48,7 @@ cd "$REPO" && git pull
 ### Phase 2: Clean
 
 ```bash
-TEAM_DIR="$HOME/.claude/teams/polyphony-dev"
+TEAM_DIR="$HOME/.claude/teams/mvox-dev"
 if [ -d "$TEAM_DIR" ]; then
   echo "STALE DIR — will clean"
   rm -rf "$TEAM_DIR"
@@ -61,10 +61,10 @@ fi
 
 ### Phase 3: Create
 
-1. `TeamCreate(team_name="polyphony-dev")`
-2. Verify: `ls "$HOME/.claude/teams/polyphony-dev/config.json"`
+1. `TeamCreate(team_name="mvox-dev")`
+2. Verify: `ls "$HOME/.claude/teams/mvox-dev/config.json"`
    - YES → Phase 3 complete. Proceed to Phase 4.
-   - NO → Recovery: `TeamDelete(team_name="polyphony-dev")` then `TeamCreate` again (max 1 retry).
+   - NO → Recovery: `TeamDelete(team_name="mvox-dev")` then `TeamCreate` again (max 1 retry).
 
 **Expected outcome:** Fresh `config.json` with current `leadSessionId`.
 
@@ -73,8 +73,8 @@ fi
 ### Phase 4: Restore
 
 ```bash
-TEAM_CONFIG="$(git rev-parse --show-toplevel)/teams/polyphony-dev"
-TEAM_DIR="$HOME/.claude/teams/polyphony-dev"
+TEAM_CONFIG="$(git rev-parse --show-toplevel)/teams/mvox-dev"
+TEAM_DIR="$HOME/.claude/teams/mvox-dev"
 
 # Restore inboxes from repo (durable copy from prior session's shutdown)
 if [ -d "$TEAM_CONFIG/inboxes" ]; then
@@ -87,7 +87,7 @@ fi
 
 # Verify team is operational
 if [ -f "$TEAM_DIR/config.json" ] && [ -d "$TEAM_DIR/inboxes" ]; then
-  echo "Team polyphony-dev operational: config.json OK, inboxes dir exists."
+  echo "Team mvox-dev operational: config.json OK, inboxes dir exists."
 else
   echo "WARNING: Team infrastructure incomplete. Re-run Phase 3."
 fi
@@ -112,14 +112,14 @@ Phase 1 is a gate: do not spawn implementer agents until finn + bentham have int
 
 **Spawn method depends on environment** (see `.claude/CLAUDE.md` "Spawn Method"):
 - **Container:** use `spawn_member.sh` with the Pane Map.
-- **Local:** use the `Agent` tool directly. The prompt is the content of `teams/polyphony-dev/prompts/<name>.md`.
+- **Local:** use the `Agent` tool directly. The prompt is the content of `teams/mvox-dev/prompts/<name>.md`.
 
 **Spawn checklist per agent:**
 
 ```
-1. jq '.members[].name' "$HOME/.claude/teams/polyphony-dev/config.json"  # check duplicates
-2. Read prompt content from teams/polyphony-dev/prompts/<name>.md
-3. Spawn (env-specific method above) with name="<name>", team_name="polyphony-dev", run_in_background=true
+1. jq '.members[].name' "$HOME/.claude/teams/mvox-dev/config.json"  # check duplicates
+2. Read prompt content from teams/mvox-dev/prompts/<name>.md
+3. Spawn (env-specific method above) with name="<name>", team_name="mvox-dev", run_in_background=true
 4. Wait for intro message from agent
 ```
 
@@ -133,7 +133,7 @@ Send ready message to user. Wait for task assignment.
 
 ### Common (both envs)
 
-- **TeamCreate silent failure** — can return success but not write `config.json`. Always verify with `ls "$HOME/.claude/teams/polyphony-dev/config.json"` after TeamCreate. Max 1 retry with TeamDelete before retry.
+- **TeamCreate silent failure** — can return success but not write `config.json`. Always verify with `ls "$HOME/.claude/teams/mvox-dev/config.json"` after TeamCreate. Max 1 retry with TeamDelete before retry.
 - **pnpm, not npm** — this is a pnpm workspace. All commands use `pnpm`.
 
 ### Container env
@@ -146,6 +146,6 @@ Send ready message to user. Wait for task assignment.
 ### Local env
 
 - `$HOME=/home/<user>` (no rewrite needed). Workspace path: resolve via `REPO="$(git rev-parse --show-toplevel)"`.
-- No tmux Pane Map. Spawn agents via the `Agent` tool with `run_in_background: true`, `name: "<name>"`, `team_name: "polyphony-dev"`. The agent's prompt is the content of `teams/polyphony-dev/prompts/<name>.md`.
+- No tmux Pane Map. Spawn agents via the `Agent` tool with `run_in_background: true`, `name: "<name>"`, `team_name: "mvox-dev"`. The agent's prompt is the content of `teams/mvox-dev/prompts/<name>.md`.
 
 (*FR:Volta*)

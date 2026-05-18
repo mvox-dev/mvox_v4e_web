@@ -1,24 +1,23 @@
-# Polyphony Dev — Common Standards
+# Mvox Dev — Common Standards
 
 ## Team
 
-- **Team name:** `polyphony-dev`
+- **Team name:** `mvox-dev`
 - **Members:** team-lead/Palestrina (coordinator), byrd (frontend), josquin (database/API), tallis (testing), bentham (reviewer), comenius (i18n), victoria (requirements analyst), finn (research)
 - **Human PO:** The human user is the Product Owner. Victoria drafts requirements; the PO decides.
 
 ## Project
 
-Polyphony — a choral music sharing platform. Two-tier architecture:
+**Mvox** — web application for choral music sharing, built on the v4E schema (see `entu/research` repo `docs/schema/v4E/`).
 
-- **Registry**: Zero-storage auth gateway (OAuth, magic link, SSO cookies, JWKS)
-- **Vault**: Single deployment hosting ALL organizations (members, works, editions, events, participation)
+Backed by Entu (entity-property database platform); no own database. Acts as a BFF in front of Entu's API. Successor to the polyphony prototype, with refined data model and federation-ready design.
+
+> FIXME — fill in once stack is settled: framework, deployment target, auth flow, package manager. Until then, treat the stack table below as a starting point inherited from the polyphony prototype, not as a finalised decision.
 
 ## Key References
 
-- `CLAUDE.md` — project overview, architecture, commands, conventions
-- `docs/ARCHITECTURE.md` — technical architecture
-- `docs/schema/README.md` — D1 schema (split into modules under `docs/schema/`)
-- `docs/GLOSSARY.md` — canonical terminology
+- `CLAUDE.md` — project overview, architecture, commands, conventions (TBD)
+- `entu/research` repo, `docs/schema/v4E/` — canonical schema (typed `schema.ts`, narrative `README.md`, diagram editor `editor.html`)
 - GitHub Issues — check open issues for task context
 
 ## Communication Rule
@@ -60,15 +59,15 @@ Before any PR:
 - Task routing and assignment to specialists
 - Spawn order and agent lifecycle
 - Branch strategy (feat/ vs fix/ naming)
-- Dev environment operations (local D1 migrations)
+- Dev environment operations (local backend setup, scratch data)
 - PR merge timing (after Bentham GREEN)
 - GitHub issue creation and closure
 - Code review assignment
 
 ### Team-lead MUST escalate to PO:
-- Production/remote D1 migrations
+- Production/remote backend changes (Entu schema edits, data migrations)
 - Production deployment
-- Architecture decisions (new tables, auth changes)
+- Architecture decisions (new entity types, auth changes, federation)
 - Feature scope changes
 - Priority disputes
 - External communication
@@ -152,20 +151,9 @@ git push origin --delete <feature-branch>
 
 ## Known Pitfalls
 
-### Wrangler D1 Queries
+> FIXME — stack-specific pitfalls below were inherited from the polyphony (D1-backed) prototype. mvox is Entu-backed, so the D1-related entries no longer apply. Sections will be re-seeded with Entu API specifics once the integration shape is settled.
 
-- **Before querying remote D1**, always read `docs/schema/README.md` (and relevant module files under `docs/schema/`) to know exact column names and table structure. Do NOT guess column names.
-
-### D1 Critical Behaviors
-
-- **`PRAGMA foreign_keys = OFF` is a NO-OP on D1** — CASCADE always fires on DROP TABLE
-- **`PRAGMA defer_foreign_keys = ON` also does NOT prevent CASCADE**
-- **D1-safe table rebuild pattern**: Create `_new` tables, copy data, drop old tables **parent-first**, rename `_new` tables
-- **Multi-parent junction tables**: If a junction table (e.g., `event_works`) references two parents, explicitly drop it between parent drops — D1 CASCADE checks ALL FKs in the DDL
-- **Complex migrations may fail as batches on remote** — split into manual steps via `wrangler d1 execute --remote`
-- **Always backup before remote migrations**: `pnpm exec wrangler d1 export DB --remote --output=/tmp/vault-backup-$(date +%Y-%m-%d).sql`
-
-### Svelte 5
+### Svelte 5 (tentative — assuming SvelteKit stays)
 
 - Runes ONLY: `$props()`, `$state()`, `$derived()`, `$effect()`, `$bindable()`
 - NEVER legacy `export let` or `$:` syntax
@@ -179,17 +167,7 @@ git push origin --delete <feature-branch>
 - Prefer new commits over amending
 - Only commit to your assigned story branch
 
-## Remote Migration Protocol
-
-Remote D1 migrations are **Tier 1 (PO approval required)**:
-
-1. Josquin prepares migration and tests locally
-2. Josquin reports to team-lead: "Migration XXXX ready. Changes: [summary]"
-3. Team-lead reviews and escalates to PO for approval
-4. PO approves → team-lead authorizes Josquin
-5. Josquin runs backup: `pnpm exec wrangler d1 export DB --remote --output=...`
-6. Josquin verifies backup, then applies migration
-7. Josquin reports result to team-lead
+> FIXME — Schema/backend migration protocol (replacing the polyphony D1 remote-migration flow) will be defined once Entu integration is in place. For now: any schema change in `entu/research/docs/schema/v4E/` requires PO approval before landing.
 
 ## Research Support
 
@@ -220,12 +198,12 @@ The team-lead is a coordinator only. If you observe team-lead doing any of the f
 
 ### Personal Scratchpads
 
-Each teammate maintains a personal notes file at `teams/polyphony-dev/memory/<your-name>.md`.
+Each teammate maintains a personal notes file at `teams/mvox-dev/memory/<your-name>.md`.
 You own this file — only you write to it. Keep it under 100 lines; prune stale entries.
 
 ### Shared Knowledge Files
 
-For cross-cutting discoveries, append to the relevant shared file in `teams/polyphony-dev/memory/`:
+For cross-cutting discoveries, append to the relevant shared file in `teams/mvox-dev/memory/`:
 
 - **`architecture-decisions.md`** — settled architectural choices (format: decision, rationale, date). Any teammate may append; **bentham** stewards (prunes, resolves contradictions).
 - **`test-gaps.md`** — untested areas for triage. **tallis** appends, **victoria** triages into issues.
@@ -235,7 +213,7 @@ For cross-cutting discoveries, append to the relevant shared file in `teams/poly
 
 On startup, before your first action:
 
-1. Read `teams/polyphony-dev/memory/<your-name>.md` if it exists
+1. Read `teams/mvox-dev/memory/<your-name>.md` if it exists
 2. Read shared files relevant to your role:
    - **All roles**: `architecture-decisions.md`
    - **byrd, josquin**: `architecture-decisions.md` (API contracts, component patterns)
@@ -290,8 +268,8 @@ The team lead shuts down LAST. Execute in this order:
 3. **Send shutdown requests** — to all agents. Wait for each `teammate_terminated`.
 4. **Persist inboxes** — copy pruned inboxes from runtime to repo:
    ```bash
-   TEAM_CONFIG="$(git rev-parse --show-toplevel)/teams/polyphony-dev"
-   TEAM_DIR="$HOME/.claude/teams/polyphony-dev"
+   TEAM_CONFIG="$(git rev-parse --show-toplevel)/teams/mvox-dev"
+   TEAM_DIR="$HOME/.claude/teams/mvox-dev"
    if [ -d "$TEAM_DIR/inboxes" ]; then
      mkdir -p "$TEAM_CONFIG/inboxes"
      for f in "$TEAM_DIR/inboxes/"*.json; do
@@ -302,7 +280,7 @@ The team lead shuts down LAST. Execute in this order:
    ```
 5. **Commit and push** — all scratchpads, task snapshot, and inboxes:
    ```bash
-   git add teams/polyphony-dev/memory/ teams/polyphony-dev/inboxes/
-   git commit -m "chore: save polyphony-dev team state"
+   git add teams/mvox-dev/memory/ teams/mvox-dev/inboxes/
+   git commit -m "chore: save mvox-dev team state"
    git push
    ```
