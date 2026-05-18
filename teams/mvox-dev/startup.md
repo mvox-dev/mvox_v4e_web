@@ -24,6 +24,8 @@ All paths derived from two anchors:
 
 Execute in order. State each phase name before executing.
 
+**CRITICAL: Do NOT call `TaskCreate` before Phase 3 completes.** Until then, the active task list is session-scoped (`~/.claude/tasks/<sessionId>/`). When `TeamCreate` runs in Phase 3, the active list switches to team-scoped (`~/.claude/tasks/mvox-dev/`). Any tasks created earlier are orphaned — invisible to teammates but their numbers can still leak into agent context and cause confusion (e.g., a teammate seeing a "task #N" that doesn't exist on the team list). Track Phase 0-2 progress mentally or in plain text. Create formal tasks starting Phase 5 (when you actually need to route work to teammates).
+
 ### Phase 0: Orient
 
 Read these files in order:

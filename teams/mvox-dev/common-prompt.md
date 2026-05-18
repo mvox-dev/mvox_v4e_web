@@ -28,22 +28,24 @@ Every message you send via SendMessage must be prepended with the current timest
 
 ## Author Attribution
 
-All persistent text output (architecture decisions, PR descriptions, shared knowledge files, scratchpad entries) must carry the author's name: `(*PD:<AgentName>*)`. Place on a new line below the block, or next to the section heading if you wrote the entire section.
+All persistent text output (architecture decisions, PR descriptions, shared knowledge files, scratchpad entries) must carry the author's name: `(*MVOX:<AgentName>*)`. Place on a new line below the block, or next to the section heading if you wrote the entire section.
 
 
 ## Stack
 
-| Component       | Technology                 | Notes                                                     |
-| --------------- | -------------------------- | --------------------------------------------------------- |
-| Framework       | SvelteKit 2 + Svelte 5     | Use Runes ($state, $derived, $effect) NOT legacy $ syntax |
-| Platform        | Cloudflare Pages + Workers | Edge deployment                                           |
-| Database        | Cloudflare D1 (SQLite)     | Per-deployment, local dev with wrangler                   |
-| File Storage    | D1 BLOBs (chunked)         | NO R2 — files in edition_files/edition_chunks tables      |
-| Auth            | EdDSA (Ed25519) JWTs       | Registry signs, Vaults verify via JWKS                    |
-| i18n            | Paraglide                  | 4 locales: en, et, lv, uk                                 |
-| Testing         | Vitest + Playwright        | Unit + E2E                                                |
-| Package Manager | pnpm (workspaces)          | ALWAYS use pnpm, never npm                                |
-| CSS             | Tailwind CSS v4            | Full class names only — no dynamic template literals      |
+> **FIXME — stack inherited from the polyphony prototype, unconfirmed for mvox.** mvox is Entu-backed (no own DB), so at minimum Database / File Storage / Auth rows below are wrong. Treat all entries as starting hypotheses, not enforceable rules. **Bentham:** do not RED a PR for violating these until the PO has explicitly confirmed each row. Confirmed so far: `pnpm` (see `~/workspace/CLAUDE.md`).
+
+| Component       | Technology (UNCONFIRMED)       | Notes (UNCONFIRMED)                                       |
+| --------------- | ------------------------------ | --------------------------------------------------------- |
+| Framework       | ~~SvelteKit 2 + Svelte 5~~ TBD | Likely (per `~/workspace/CLAUDE.md`), unconfirmed. If kept: Runes ($state, $derived, $effect) NOT legacy $ syntax |
+| Platform        | ~~Cloudflare Pages + Workers~~ TBD | One of: Cloudflare, Vercel, self-hosted (per `~/workspace/CLAUDE.md` open questions) |
+| Database        | ~~Cloudflare D1 (SQLite)~~ TBD | mvox is Entu-backed — no own DB                           |
+| File Storage    | ~~D1 BLOBs (chunked)~~ TBD     | Entu file handling TBD                                    |
+| Auth            | ~~EdDSA (Ed25519) JWTs~~ TBD   | Polyphony Registry/Vault split does not apply             |
+| i18n            | ~~Paraglide~~ TBD              | 4 locales target: en, et, lv, uk (per `~/workspace/CLAUDE.md` open questions); tooling unconfirmed |
+| Testing         | Vitest + Playwright            | Unit + E2E                                                |
+| Package Manager | pnpm (workspaces)              | **CONFIRMED** — always pnpm, never npm                    |
+| CSS             | Tailwind CSS v4                | Full class names only — no dynamic template literals      |
 
 ## Quality Gates
 
@@ -82,13 +84,15 @@ Make the decision, log it to your scratchpad, report to team-lead. PO may revers
 
 Only one agent (or defined pair) owns the working branch at any moment. Ownership transfers explicitly via handoff message.
 
-| Phase | Owner | May write | Passes to |
+> **FIXME — "May write" path columns below were polyphony-shaped (`packages/shared/`, `migrations/`, `messages/*.json`).** mvox repo layout is TBD; treat path columns as conventions, not concrete paths.
+
+| Phase | Owner | May write (paths TBD per mvox layout) | Passes to |
 |-------|-------|-----------|-----------|
 | 0. Issue | Victoria | GitHub Issues only | team-lead |
 | 1. Assign | team-lead | (creates branch only) | Tallis |
-| 2. RED | Tallis | `*.spec.ts`, `src/tests/`, `tests/` | Byrd and/or Josquin |
-| 3. GREEN | Byrd + Josquin | `src/`, `packages/shared/`, `migrations/` | Comenius |
-| 4. i18n | Comenius | `messages/*.json`, `m.*()` calls in components | Bentham |
+| 2. RED | Tallis | test files (`*.spec.ts`, integration & E2E dirs) | Byrd and/or Josquin |
+| 3. GREEN | Byrd + Josquin | implementation files (component, route, BFF/API, shared types) | Comenius |
+| 4. i18n | Comenius | locale / message files, `m.*()` calls in components | Bentham |
 | 5. REVIEW | Bentham | review comments only (no file writes) | Josquin |
 | 6. MERGE | Josquin | PR creation, squash-merge | team-lead (close issue) |
 

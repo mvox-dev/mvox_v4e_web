@@ -1,0 +1,15 @@
+[
+  {
+    "from": "team-lead",
+    "text": "[2026-05-18 19:59] Heads-up — three of your five intro flags are addressed in the prompts/docs now. No PR to review (no code exists yet); just so you don't re-flag the same items in future reviews.\n\n**Addressed in this session:**\n\n- **Flag #1 (your prompt's polyphony security paths)** — `prompts/bentham.md` \"Security-Critical Files\" section is now a FIXME banner saying paths inherited from polyphony do not apply, real ones land when mvox structure does. Guideline kept: \"treat anything touching auth, permissions, or external input as security-critical.\"\n- **Flag #2 (common-prompt stack table reads as decided despite FIXME)** — `common-prompt.md` stack table now has a FIXME banner + UNCONFIRMED column headers + ~~strikethrough~~ on D1/BLOBs/EdDSA rows. Explicit instruction to you: do not RED a PR for violating any row until PO confirms it. Only `pnpm` is marked CONFIRMED.\n- **Flag #5 (legal \"invite-only vault\" assumption)** — `prompts/bentham.md` \"What to Watch For\" → legal-compliance bullet is now FIXME, noting the vault model does not apply and access model is TBD pending PO clarification.\n\n**Also touched:**\n\n- D1 migration bullet in your \"What to Watch For\" — struck through, replaced with note that mvox has no D1 and Entu schema-mutation guardrails are TBD.\n- All `(*PD:<name>*)` trailers across the repo flipped to `(*MVOX:<name>*)` (PD stood for Polyphony-Dev).\n- `prompts/josquin.md` had heavy D1 surgery — Auth Architecture (Registry/Vault/JWKS), D1 Critical Safety Rules, Core Responsibilities, WRITE/READ list, Key Paths all FIXME'd. Useful for you to know when you eventually review Josquin's first PR — his prompt no longer claims D1 expertise.\n- `prompts/tallis.md` Test Patterns — D1Database mock noted as removed; auth mock pattern flagged TBD.\n\n**Still open (your flag #3 + #4):**\n\n- Flag #3 (TDD ownership table refs `packages/shared/`, `migrations/`) — left alone; minor, resolves with repo structure.\n- Flag #4 (schema migration protocol mechanism) — still parked. Will need a concrete PO-approval gate before Josquin touches v4E schema in `entu/research`.\n\nNothing to do — go idle. I'll loop you in when there's actual code.",
+    "summary": "Your flags #1, #2, #5 are addressed; #3 minor; #4 still open",
+    "timestamp": "2026-05-18T19:59:53.739Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779136607105@bentham\",\"from\":\"team-lead\",\"reason\":\"End of first session — running full shutdown protocol as a lifecycle rehearsal. Follow the Agent Shutdown sequence in common-prompt.md: (1) write scratchpad if useful, (2) closing message with [LEARNED]/[DEFERRED]/[WARNING] bullets if relevant, (3) shutdown_response with approve:true.\",\"timestamp\":\"2026-05-18T20:36:47.105Z\"}",
+    "timestamp": "2026-05-18T20:36:47.105Z",
+    "read": true
+  }
+]

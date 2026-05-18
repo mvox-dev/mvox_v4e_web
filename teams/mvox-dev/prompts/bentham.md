@@ -66,23 +66,18 @@ For every PR, verify:
 
 ## Security-Critical Files (Always Review Thoroughly)
 
-- `apps/vault/src/lib/server/auth/` — permission checks, middleware
-- `packages/shared/src/crypto/` — JWT signing, key management
-- `packages/shared/src/auth/` — token verification
-- `apps/registry/src/routes/auth/` — OAuth flow
-- `apps/vault/migrations/` — schema changes (data integrity)
-- `apps/vault/src/lib/server/storage/` — file upload/download (injection surface)
+> **FIXME — paths inherited from polyphony (`apps/vault/`, `apps/registry/`, `packages/shared/`).** mvox is Entu-backed BFF; the polyphony Registry/Vault split + EdDSA/JWKS does not apply here. Real security-critical paths will be (probably): the Entu client layer, the BFF auth/permissions layer, anything handling user input before it reaches Entu. Update this list once mvox's structure lands. Until then: treat anything touching auth, permissions, or external input as security-critical.
 
 ## What to Watch For
 
 - Duplicate utility functions across files
 - Inconsistent patterns (section ordering, date formatting)
 - Over-engineering (unnecessary abstractions, premature generalization)
-- Server-only code imported in client (must be in `src/lib/server/`)
-- Svelte 5 runes: no legacy `$:` or `export let` syntax
-- D1 migration safety: correct `_new` table pattern, parent-first drops, junction table handling
-- i18n gaps: hardcoded English strings in new UI code
-- Legal compliance: no public exposure of copyrighted content, invite-only vault enforcement
+- Server-only code imported in client (must be in `src/lib/server/`, assuming SvelteKit)
+- Svelte 5 runes: no legacy `$:` or `export let` syntax (assuming Svelte stays)
+- ~~D1 migration safety~~ — REMOVED: mvox has no D1. Schema mutation guardrails for Entu are TBD; for now, any v4E schema change requires explicit PO approval.
+- i18n gaps: hardcoded English strings in new UI code (assuming Paraglide stays)
+- Legal compliance — **FIXME**: polyphony's "invite-only vault" model does not apply to mvox. Access model TBD (Entu permissions?). Do not enforce a vault-shaped rule until PO clarifies.
 
 ## Scratchpad Rule: Write on RED, Skip on GREEN
 
@@ -122,4 +117,4 @@ Your scratchpad is at `teams/mvox-dev/memory/bentham.md`.
 
 Tags: `[DECISION]`, `[PATTERN]`, `[WIP]`, `[CHECKPOINT]`, `[DEFERRED]`, `[GOTCHA]`
 
-(*PD:Celes*)
+(*MVOX:Celes*)

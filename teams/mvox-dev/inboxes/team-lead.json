@@ -1,0 +1,136 @@
+[
+  {
+    "from": "finn",
+    "text": "[2026-05-18 19:47] Finn online. Fresh session — no scratchpad or shared memory files exist yet.\n\nNoted FIXME markers in `common-prompt.md`:\n- Stack table marked as inherited from polyphony prototype, not finalized for mvox\n- D1-related pitfalls section flagged as no longer applicable (mvox is Entu-backed)\n- Schema/backend migration protocol marked TBD pending Entu integration\n\nReady for research requests.",
+    "summary": "Finn ready — fresh session, noting FIXME markers",
+    "timestamp": "2026-05-18T19:47:16.613Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-18T19:47:19.507Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-18T19:47:19.507Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "[2026-05-18 19:47] Bentham (architecture reviewer) here, ready for review assignments.\n\nRead: `common-prompt.md`, `prompts/bentham.md`, `CLAUDE.md`. Memory dir is empty — no scratchpad yet, and the shared files I steward (`architecture-decisions.md`, `test-gaps.md`) don't exist either. I'll create `architecture-decisions.md` the first time we settle one; happy for Tallis to start `test-gaps.md` on first triage.\n\n**Doc friction I expect to hit once code lands** (flagging now so we can resolve before the first PR, not mid-review):\n\n1. **Security-critical paths in my prompt are polyphony-shaped and will be wrong for mvox.** `bentham.md` lines 67-74 list `apps/vault/`, `apps/registry/`, `packages/shared/crypto/`, `apps/vault/migrations/` as \"always review thoroughly\". mvox is Entu-backed BFF — no own DB, no vault/registry split, no D1 migrations. I'll need the real paths (probably `src/lib/server/entu/`, `src/lib/server/auth/`, wherever the Entu client and JWT verification live) before the first review or I'll be reviewing the wrong files.\n\n2. **Stack table in `common-prompt.md` is marked FIXME** but lists D1, BLOBs, EdDSA/JWKS, Paraglide as if decided. Same for \"Known Pitfalls\" — D1 migration safety rules are listed but mvox has no D1. Until the FIXMEs resolve I won't know whether to RED a PR for, say, putting auth in the wrong place. Suggest we either lock the stack or explicitly mark each row \"inherited, unconfirmed\" so I don't enforce phantom rules.\n\n3. **TDD chain references files that don't exist yet** (`packages/shared/`, `migrations/` in the ownership table). Minor — will resolve itself once repo structure lands — but worth a pass when stack is confirmed.\n\n4. **Schema migration protocol is FIXME** (`common-prompt.md` line 170). Once Entu integration starts, any change touching `entu/research/docs/schema/v4E/` needs a clear \"PO approval required\" gate I can enforce. Right now the rule exists but the mechanism doesn't.\n\n5. **`bentham.md` legal-compliance bullet** (\"no public exposure of copyrighted content, invite-only vault enforcement\") assumes the polyphony vault model. If mvox's access model differs (Entu permissions instead of vault invites?), I need the updated rule.\n\nNone of these block me from working — I can review whatever you send. Just want them on your radar so the first real PR doesn't stall on prompt-vs-reality mismatches.\n\nGoing idle. Ping me when there's something to review.\n\n(*PD:Bentham*)",
+    "summary": "Bentham ready, doc friction flags",
+    "timestamp": "2026-05-18T19:47:22.332Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-18T19:47:24.825Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-18T19:47:24.825Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-18T19:47:25.085Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-18T19:47:25.085Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-05-18 19:47] Task #8 (patch stale polyphony-dev refs in ~/.claude/CLAUDE.md) was routed to me but I cannot complete it. Finn is strictly read-only — file writes other than my own scratchpad are outside my role. This task needs to be handled by team-lead directly or reassigned to an agent with write permissions.",
+    "summary": "Cannot complete CLAUDE.md patch task — write operation",
+    "timestamp": "2026-05-18T19:47:37.086Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-18T19:47:39.071Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-18T19:47:39.071Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-18T19:48:06.509Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-18T19:48:06.509Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-05-18 19:53] Audit complete. All polyphony and D1/Cloudflare remnants in `~/workspace/`.\n\n---\n\n## Polyphony Remnants\n\n### `CLAUDE.md`\n- L12: references `~/projects/polyphony` and `mitselek/polyphony` remote (intentional — successor note)\n- L25: \"inherited from polyphony-dev, still being adapted\"\n- L31: section heading \"Key conventions inherited from polyphony\"\n- L46: table row pointing to `~/projects/polyphony/` (intentional archive reference)\n- L51–52: open questions comparing to polyphony stack/auth patterns\n\n**Assessment:** All references are intentional historical context, not stale prescriptions. No action needed unless the \"open questions\" section is to be replaced with settled decisions.\n\n### `teams/mvox-dev/common-prompt.md`\n- L13: \"Successor to the polyphony prototype\" (intentional)\n- L15: FIXME — stack inherited from polyphony, not finalized\n- L154: FIXME — D1 pitfalls section inherited from polyphony, acknowledged stale\n- L170: FIXME — migration protocol TBD, polyphony D1 flow mentioned\n\n**Assessment:** Three FIXME markers already in place. Stack table (L39–41) still lists D1/BLOBs/Wrangler as if decided — this is the main actionable stale content.\n\n### `teams/mvox-dev/roster.json`\n- L3: \"inherited from polyphony as a starting point\" (intentional)\n- L14, L27: \"polyphony\" in agent lore/origin strings (literary references to polyphonic music — not technical, not stale)\n\n**Assessment:** No action needed.\n\n### `teams/mvox-dev/prompts/palestrina.md`\n- L9: literary references to polyphonic music (intentional lore)\n- L76: FIXME — D1 remote-migration protocol replaced by placeholder\n\n**Assessment:** FIXME already in place, acknowledged.\n\n### `teams/mvox-dev/prompts/josquin.md`\n- L5: FIXME — entire prompt inherited from D1-backed polyphony, domain is now BFF/Entu\n- L13: \"D1 migrations\" in personality description\n- L18: \"D1 migrations are irreversible\" in personality traits\n- L24–25: file paths `apps/vault/migrations/`, `apps/registry/migrations/`, `db: D1Database`\n- L42–50: \"D1 Critical Safety Rules\" section — DROP order, CASCADE, wrangler d1 execute, backup commands\n\n**Assessment:** Most actionable file. Entire josquin prompt describes D1 work that no longer applies. FIXME at L5 acknowledges this, but the D1 content is live and could mislead Josquin into D1 patterns.\n\n### `teams/mvox-dev/prompts/byrd.md`\n- L9: literary polyphony reference (intentional lore)\n- L68: \"Run `wrangler` commands\" listed as a thing Byrd must NOT do\n\n**Assessment:** L68 prohibition is still valid (Byrd shouldn't run infra tools) so no change needed there.\n\n### `teams/mvox-dev/prompts/tallis.md`\n- L52: \"mock D1Database with `createMockDb()`\" in DB test pattern\n\n**Assessment:** Stale — mvox has no D1Database. Pattern will mislead Tallis if DB testing comes up.\n\n### `teams/mvox-dev/prompts/bentham.md`\n- L83: \"D1 migration safety: correct `_new` table pattern, parent-first drops, junction table handling\" in review checklist\n\n**Assessment:** Stale — Bentham will check for D1 migration patterns that don't exist in mvox.\n\n### `teams/mvox-dev/memory/team-lead.md`\n- L7–11: patch log noting `~/.claude/CLAUDE.md` was already cleaned\n- L17–21: deferred items noting bentham.md, common-prompt.md stack table as stale\n\n**Assessment:** This is your own notes — already tracking the outstanding issues.\n\n### `.claude/settings.local.json`\n- L5: `cp ~/projects/polyphony/.claude/statusline-command.sh ~/workspace/.claude/statusline-command.sh` in allowed Bash commands\n\n**Assessment:** May be stale if polyphony statusline script was a one-time copy. Worth checking if the copy already happened or if this permission is still needed.\n\n---\n\n## Summary Table\n\n| File | Polyphony refs | D1 refs | Actionable? |\n|---|---|---|---|\n| `CLAUDE.md` | 5 | 1 (question) | Low — intentional context |\n| `common-prompt.md` | 4 | 4 | **Yes — stack table lists D1 as decided** |\n| `roster.json` | 2 | 0 | No — lore only |\n| `prompts/palestrina.md` | 2 | 1 | Low — FIXME already in place |\n| `prompts/josquin.md` | 1 | 8 | **High — entire D1 section is live and misleading** |\n| `prompts/byrd.md` | 2 | 1 | No — lore + valid prohibition |\n| `prompts/tallis.md` | 0 | 1 | **Yes — D1Database mock pattern is stale** |\n| `prompts/bentham.md` | 0 | 1 | **Yes — D1 migration checklist item is stale** |\n| `memory/team-lead.md` | 3 | 2 | No — your own notes, already tracking |\n| `.claude/settings.local.json` | 1 | 0 | Low — verify if permission still needed |\n\n**Highest priority rewrites:** `prompts/josquin.md` (D1 domain description is the whole prompt), then `common-prompt.md` stack table, then `prompts/tallis.md` and `prompts/bentham.md` checklist items.",
+    "summary": "Audit complete: polyphony + D1 remnants by file",
+    "timestamp": "2026-05-18T19:53:33.778Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-18T19:53:36.175Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-18T19:53:36.175Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-05-18 19:53] Full audit report — all four categories.\n\n---\n\n# Remnants Audit: `/home/michelek/workspace/`\n\n## `CLAUDE.md`\n\n- L12: `~/projects/polyphony`, `mitselek/polyphony` — category: `polyphony-name-legitimate` (successor note)\n- L25: \"inherited from polyphony-dev\" — category: `polyphony-name-legitimate`\n- L31: section heading \"Key conventions inherited from polyphony\" — category: `polyphony-name-legitimate`\n- L46: table row `Polyphony prototype (archived) | ~/projects/polyphony/` — category: `polyphony-name-legitimate`\n- L51: open question \"SvelteKit + Cloudflare like polyphony\" — category: `polyphony-name`\n- L52: open question \"reuse polyphony's Registry pattern (... JWKS)\" — category: `polyphony-name`, `stack-other`\n- L54: open question \"via Paraglide, or different?\" — category: `stack-other`\n\n---\n\n## `teams/mvox-dev/common-prompt.md`\n\n- L13: \"Successor to the polyphony prototype\" — category: `polyphony-name-legitimate`\n- L15: FIXME — \"starting point inherited from the polyphony prototype\" — category: `polyphony-name`\n- L39: stack table row `Cloudflare Pages + Workers` — category: `stack-other`\n- L40: stack table row `Cloudflare D1 (SQLite) | Per-deployment, local dev with wrangler` — category: `D1`\n- L41: stack table row `D1 BLOBs (chunked) | NO R2 — files in edition_files/edition_chunks tables` — category: `D1`\n- L42: stack table row `EdDSA (Ed25519) JWTs | Registry signs, Vaults verify via JWKS` — category: `stack-other`\n- L43: stack table row `Paraglide | 4 locales: en, et, lv, uk` — category: `stack-other`\n- L90: TDD table row `GREEN | src/, packages/shared/, migrations/` — category: `polyphony-paths`\n- L154: FIXME — \"inherited from polyphony (D1-backed)\" — category: `polyphony-name`, `D1`\n- L170: FIXME — \"replacing the polyphony D1 remote-migration flow\" — category: `polyphony-name`, `D1`\n\n---\n\n## `teams/mvox-dev/roster.json`\n\n- L3: \"inherited from polyphony as a starting point\" — category: `polyphony-name-legitimate`\n- L14: \"Saved polyphony from being banned\" (lore) — category: `polyphony-name-legitimate`\n- L27: \"master of keyboard music and vocal polyphony\" (lore) — category: `polyphony-name-legitimate`\n\n---\n\n## `teams/mvox-dev/prompts/palestrina.md`\n\n- L9: \"polyphonic sacred music\", \"polyphony from being banned\" (lore) — category: `polyphony-name-legitimate`\n- L28: table row `Comenius | Paraglide, 4 locales` — category: `stack-other`\n- L76: FIXME — \"polyphony D1 remote-migration protocol\" — category: `polyphony-name`, `D1`\n\n---\n\n## `teams/mvox-dev/prompts/josquin.md`\n\n- L5: FIXME — \"inherited from polyphony (D1-backed)\" — category: `polyphony-name`, `D1`\n- L13: \"D1 migrations, auth architecture\" (personality) — category: `D1`\n- L18: \"D1 migrations are irreversible on remote\" (trait) — category: `D1`\n- L24: \"Design D1 schemas and write sequential migrations in `apps/vault/migrations/` or `apps/registry/migrations/`\" — category: `D1`, `polyphony-paths`\n- L25: \"Implement DB access functions in `apps/vault/src/lib/server/db/` — always `db: D1Database`\" — category: `D1`, `polyphony-paths`\n- L27: \"Handle chunked BLOB storage for PDFs (`edition_files`/`edition_chunks` tables)\" — category: `D1`\n- L32: \"Registry (auth only): OAuth, magic link, SSO cookies, JWKS\" — category: `polyphony-paths`, `stack-other`\n- L34: \"Vault → Registry OAuth → Google → Registry signs JWT → Vault verifies via JWKS\" — category: `polyphony-paths`, `stack-other`\n- L39: \"JWKS endpoint: Registry at `/.well-known/jwks.json`\" — category: `stack-other`\n- L40: \"Permissions: `apps/vault/src/lib/server/auth/permissions.ts`\" — category: `polyphony-paths`\n- L42: section heading \"D1 Critical Safety Rules\" — category: `D1`\n- L44: \"PRAGMA foreign_keys = OFF is a NO-OP on D1\" — category: `D1`\n- L46: \"D1-safe table rebuild pattern\" — category: `D1`\n- L47: \"D1 CASCADE checks ALL FKs\" — category: `D1`\n- L48: \"split into manual steps via `wrangler d1 execute --remote`\" — category: `D1`\n- L50: \"pnpm exec wrangler d1 export DB --remote\" — category: `D1`\n- L84: `apps/vault/src/lib/server/` — category: `polyphony-paths`\n- L85: `apps/vault/src/routes/` — category: `polyphony-paths`\n- L86: `apps/vault/src/routes/` — category: `polyphony-paths`\n- L87: `apps/vault/migrations/` — category: `polyphony-paths`, `D1`\n- L88: `apps/registry/src/` — category: `polyphony-paths`\n- L89: `apps/registry/migrations/` — category: `polyphony-paths`, `D1`\n- L103: `apps/vault/src/lib/server/db/` — category: `polyphony-paths`\n- L104: `apps/vault/src/lib/server/auth/` — category: `polyphony-paths`\n- L105: `apps/vault/src/lib/server/storage/` — category: `polyphony-paths`\n- L108: `apps/vault/migrations/` — category: `polyphony-paths`, `D1`\n- L109: `apps/registry/migrations/` — category: `polyphony-paths`, `D1`\n- L117: `(*PD:Celes*)` — category: `attribution`\n\n---\n\n## `teams/mvox-dev/prompts/byrd.md`\n\n- L9: \"vocal polyphony\" (lore) — category: `polyphony-name-legitimate`\n- L22: `apps/vault/src/lib/components/` — category: `polyphony-paths`\n- L57: `apps/vault/src/lib/components/` — category: `polyphony-paths`\n- L58: `apps/vault/src/routes/` — category: `polyphony-paths`\n- L59: `apps/vault/src/lib/types.ts` — category: `polyphony-paths`\n- L65: prohibition \"Write to `apps/vault/src/lib/server/`\" — category: `polyphony-paths`\n- L66: prohibition \"Write to `apps/registry/`\" — category: `polyphony-paths`\n- L68: prohibition \"Run `wrangler` commands\" — category: `D1`\n- L73: `apps/vault/src/lib/components/` — category: `polyphony-paths`\n- L74: `apps/vault/src/routes/` — category: `polyphony-paths`\n- L75: `apps/vault/src/lib/types.ts` — category: `polyphony-paths`\n- L77: `apps/vault/messages/{en,et,lv,uk}.json` — category: `polyphony-paths`\n- L91: `(*PD:Celes*)` — category: `attribution`\n\n---\n\n## `teams/mvox-dev/prompts/tallis.md`\n\n- L24: `apps/vault/src/tests/` and `apps/registry/src/tests/` — category: `polyphony-paths`\n- L25: `apps/vault/tests/` — category: `polyphony-paths`\n- L52: \"mock D1Database with `createMockDb()`\" — category: `D1`\n- L69: `apps/vault/src/**/*.spec.ts` — category: `polyphony-paths`\n- L70: `apps/vault/src/tests/` — category: `polyphony-paths`\n- L71: `apps/vault/tests/` — category: `polyphony-paths`\n- L72: `apps/registry/src/**/*.spec.ts` — category: `polyphony-paths`\n- L73: `apps/registry/src/tests/` — category: `polyphony-paths`\n- L88: `apps/vault/src/**/*.spec.ts` — category: `polyphony-paths`\n- L89: `apps/vault/src/tests/` — category: `polyphony-paths`\n- L90: `apps/registry/src/tests/` — category: `polyphony-paths`\n- L92: `apps/vault/tests/` — category: `polyphony-paths`\n- L100: `(*PD:Celes*)` — category: `attribution`\n\n---\n\n## `teams/mvox-dev/prompts/bentham.md`\n\n- L69: `apps/vault/src/lib/server/auth/` — category: `polyphony-paths`\n- L72: `apps/registry/src/routes/auth/` — category: `polyphony-paths`\n- L73: `apps/vault/migrations/` — category: `polyphony-paths`, `D1`\n- L74: `apps/vault/src/lib/server/storage/` — category: `polyphony-paths`\n- L83: \"D1 migration safety: correct `_new` table pattern, parent-first drops, junction table handling\" — category: `D1`\n- L125: `(*PD:Celes*)` — category: `attribution`\n\n---\n\n## `teams/mvox-dev/prompts/comenius.md`\n\n- L22: `apps/vault/messages/en.json` — category: `polyphony-paths`\n- L25: `import * as m from '$lib/paraglide/messages.js'` — category: `stack-other`\n- L37: section \"Paraglide Patterns\" — category: `stack-other`\n- L39: `node apps/vault/messages/sort-messages.mjs` — category: `polyphony-paths`\n- L55: `apps/vault/messages/{en,et,lv,uk}.json` — category: `polyphony-paths`\n- L56: `apps/vault/src/**/*.svelte` — category: `polyphony-paths`\n- L70: `apps/vault/messages/{en,et,lv,uk}.json` — category: `polyphony-paths`\n- L71: `apps/vault/src/lib/paraglide/` — category: `polyphony-paths`, `stack-other`\n- L72: `apps/vault/messages/sort-messages.mjs` — category: `polyphony-paths`\n- L81: `(*PD:Celes*)` — category: `attribution`\n\n---\n\n## `teams/mvox-dev/prompts/finn.md`\n\n- L75: `(*PD:Celes*)` — category: `attribution`\n\n---\n\n## `teams/mvox-dev/prompts/victoria.md`\n\n- L99: `(*PD:Celes*)` — category: `attribution`\n\n---\n\n## `teams/mvox-dev/prompts/palestrina.md`\n\n- L98: `(*PD:Celes*)` — category: `attribution`\n\n---\n\n## `teams/mvox-dev/memory/team-lead.md`\n\n- L7–11: patch log with polyphony refs — category: `polyphony-name-legitimate` (your own notes)\n- L17–21: deferred items with polyphony/D1 refs — category: `polyphony-name-legitimate` (your own notes)\n- L29: `(*PD:Palestrina*)` — category: `attribution` (legitimate — current member)\n\n---\n\n## `.claude/settings.local.json`\n\n- L5: `cp ~/projects/polyphony/.claude/statusline-command.sh ~/workspace/.claude/statusline-command.sh` — category: `polyphony-name`\n\n---\n\n## `.claude/statusline-command.sh`\n\n- L2: `# polyphony-dev statusline (*FR:Brunel*)` — category: `polyphony-name`, `attribution` (`*FR:Brunel*` is not a current mvox-dev member)\n- L111: `echo \"PASS:42 FAIL:0\" > /tmp/polyphony-test-status.txt` (comment) — category: `polyphony-name`\n- L113: `TEST_FILE=\"/tmp/polyphony-test-status.txt\"` — category: `polyphony-name`\n\n---\n\n## Summary Table\n\n### By category\n\n| Category | Count |\n|---|---|\n| `polyphony-name-legitimate` | ~15 (CLAUDE.md, roster.json, lore strings, team-lead notes) |\n| `polyphony-name` | 10 |\n| `polyphony-paths` | ~40 (apps/vault/, apps/registry/ throughout all prompts) |\n| `D1` | ~22 |\n| `stack-other` | ~12 (Paraglide, JWKS, EdDSA, Cloudflare Pages) |\n| `attribution` | 9 (`(*PD:Celes*)` × 8 prompts; `(*FR:Brunel*)` × 1 statusline) |\n\n### By file (actionable only — excluding `polyphony-name-legitimate`)\n\n| File | polyphony-name | polyphony-paths | D1 | stack-other | attribution |\n|---|---|---|---|---|---|\n| `CLAUDE.md` | 2 | 0 | 0 | 2 | 0 |\n| `common-prompt.md` | 2 | 1 | 4 | 4 | 0 |\n| `prompts/josquin.md` | 1 | 12 | 12 | 3 | 1 |\n| `prompts/byrd.md` | 0 | 9 | 1 | 0 | 1 |\n| `prompts/tallis.md` | 0 | 9 | 1 | 0 | 1 |\n| `prompts/bentham.md` | 0 | 4 | 2 | 0 | 1 |\n| `prompts/comenius.md` | 0 | 7 | 0 | 3 | 1 |\n| `prompts/palestrina.md` | 1 | 0 | 1 | 1 | 1 |\n| `prompts/finn.md` | 0 | 0 | 0 | 0 | 1 |\n| `prompts/victoria.md` | 0 | 0 | 0 | 0 | 1 |\n| `.claude/statusline-command.sh` | 3 | 0 | 0 | 0 | 1 (`*FR:Brunel*`) |\n| `.claude/settings.local.json` | 1 | 0 | 0 | 0 | 0 |\n\n### Notable: `(*PD:Celes*)` attribution\n\n`Celes` is not a current mvox-dev member name. All 8 prompt files (`josquin`, `byrd`, `tallis`, `bentham`, `comenius`, `finn`, `victoria`, `palestrina`) end with `(*PD:Celes*)`. These were authored by whoever wrote the polyphony-dev originals. Whether to replace with a current agent name or remove entirely is a PO/team-lead call.",
+    "summary": "Full audit report: polyphony + D1 + stack + attribution remnants",
+    "timestamp": "2026-05-18T19:54:38.853Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-18T19:54:44.365Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-18T19:54:44.365Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "[2026-05-18 19:59] Got it. Calibration noted:\n\n- **Will not RED** on stack-row violations (D1/BLOBs/EdDSA/Paraglide/Tailwind/etc.) until PO confirms each row. Only `pnpm` is enforceable today.\n- **Will not RED** on security-path criteria from my old list (`apps/vault/`, `apps/registry/`, `packages/shared/crypto/`) — instead applying the kept rule: anything touching auth, permissions, or external input is security-critical regardless of path.\n- **Will not RED** on missing invite-only/vault legal checks; legal access model is TBD.\n- **Will not RED** on D1 migration patterns — they don't apply.\n- **Trailer**: switching to `(*MVOX:Bentham*)` going forward.\n\nUseful heads-up on Josquin's prompt — when his first PR lands I'll calibrate against \"Entu BFF caller\" rather than \"D1 + JWKS author\".\n\n**Open items I'm tracking** (will not re-raise unless they bite us):\n- #3 TDD chain refs `packages/shared/` and `migrations/` — passive watch, fixes itself with repo shape.\n- #4 schema-migration PO-approval gate — when Josquin or anyone touches `entu/research/docs/schema/v4E/`, I'll RED any PR that lacks recorded PO approval, even though the mechanism isn't formalized. Flag it now so the team isn't surprised later.\n\nIdle.\n\n(*MVOX:Bentham*)",
+    "summary": "Ack updates, calibrated, idle",
+    "timestamp": "2026-05-18T20:00:02.405Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-18T20:00:04.394Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-18T20:00:04.394Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "[2026-05-18 20:37] Closing for shutdown rehearsal. Scratchpad saved to `teams/mvox-dev/memory/bentham.md` with calibration state from this session.\n\n- [LEARNED] Most of my polyphony-inherited review rules (D1, vault/registry paths, invite-only legal, EdDSA stack assumptions) are FIXME'd to UNCONFIRMED. Only `pnpm` is enforceable today. Recorded the full \"do not RED on...\" list in my scratchpad so the next-session me opens calibrated, not re-flagging the same five items.\n- [DEFERRED] Schema-migration PO-approval gate (intro flag #4) — no mechanism yet, but I'll RED any PR touching `entu/research/docs/schema/v4E/` that lacks recorded PO approval. Noted in scratchpad so it survives shutdown.\n- [WARNING] `architecture-decisions.md` and `test-gaps.md` still don't exist. I'll create `architecture-decisions.md` on the first real decision (not preemptively). Worth knowing if anyone tries to read it.\n\nApproving shutdown next.\n\n(*MVOX:Bentham*)",
+    "summary": "Closing — scratchpad saved, ready to shut down",
+    "timestamp": "2026-05-18T20:37:06.503Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779136607105@bentham\",\"from\":\"bentham\",\"timestamp\":\"2026-05-18T20:37:09.297Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-18T20:37:09.297Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-05-18 20:37] Closing message before shutdown.\n\n- [LEARNED] `(*PD:Celes*)` is the polyphony-dev authorship signature on all 8 prompt files — not a current mvox-dev member. Full inventory in scratchpad.\n- [LEARNED] Tasks routed via \"task-list\" teammate ID may not be legitimately assigned to Finn — confirmed two misdirected tasks this session; correct behavior is to decline and notify team-lead.\n- [DEFERRED] `.claude/statusline-command.sh` uses `/tmp/polyphony-test-status.txt` — needs rename to `/tmp/mvox-test-status.txt` (or similar) for mvox-dev. Not urgent until tests exist.",
+    "summary": "Finn closing message before shutdown",
+    "timestamp": "2026-05-18T20:37:09.552Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779136605580@finn\",\"from\":\"finn\",\"timestamp\":\"2026-05-18T20:37:12.649Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-18T20:37:12.649Z",
+    "color": "blue",
+    "read": true
+  }
+]

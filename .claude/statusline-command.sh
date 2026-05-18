@@ -1,12 +1,12 @@
 #!/bin/bash
-# polyphony-dev statusline (*FR:Brunel*)
+# mvox-dev statusline (*MVOX:Brunel*)
 #
 # Shows: ENV_ID badge | model | context bar | dir | git branch | pnpm test summary | cost
 #
-# Installed at: /home/ai-teams/workspace/.claude/statusline-command.sh (inside container)
+# Installed at: ~/workspace/.claude/statusline-command.sh
 # Referenced in: .claude/settings.json → statusLine.command
 #
-# Requires: jq (installed in base image), git, pnpm (installed in container image)
+# Requires: jq, git, pnpm
 # Graceful degradation: all project-specific info is optional — no hard failures.
 
 input=$(cat)
@@ -14,7 +14,7 @@ input=$(cat)
 # ── ENV_ID check ──────────────────────────────────────────────────────────────
 ENV_ID="${CLAUDE_ENV_ID:-}"
 if [ -z "$ENV_ID" ] || ! echo "$ENV_ID" | grep -qE '^[0-9A-Z-]{2,10}$'; then
-  printf "\033[33mSet CLAUDE_ENV_ID in ~/.bashrc. Example: export CLAUDE_ENV_ID=\"POLY\"\033[0m\n"
+  printf "\033[33mSet CLAUDE_ENV_ID in ~/.bashrc. Example: export CLAUDE_ENV_ID=\"MVOX\"\033[0m\n"
   exit 0
 fi
 
@@ -108,9 +108,9 @@ esac
 # ── pnpm test summary ─────────────────────────────────────────────────────────
 # Read cached test results from /tmp (written by agents after test runs).
 # Does NOT run tests live — that would block every status update.
-# Agents write: echo "PASS:42 FAIL:0" > /tmp/polyphony-test-status.txt
+# Agents write: echo "PASS:42 FAIL:0" > /tmp/mvox-test-status.txt
 TEST_STATUS=""
-TEST_FILE="/tmp/polyphony-test-status.txt"
+TEST_FILE="/tmp/mvox-test-status.txt"
 if [ -f "$TEST_FILE" ]; then
   CACHED=$(cat "$TEST_FILE" 2>/dev/null)
   PASS=$(echo "$CACHED" | grep -oP 'PASS:\K[0-9]+' || echo "")

@@ -33,7 +33,7 @@ Lives at `teams/mvox-dev/`:
 These will be reaffirmed or replaced as mvox's stack settles:
 
 - Use `pnpm`, never `npm`
-- All persistent text output authored under `(*PD:<AgentName>*)` attribution
+- All persistent text output authored under `(*MVOX:<AgentName>*)` attribution
 - Co-author trailer `Co-authored-by: Mihkel Putrinš <mihkel.putrinsh@gmail.com>` on all commits
 - TDD chain: Tallis (RED) → Byrd + Josquin (GREEN) → Comenius (i18n) → Bentham (review) → Josquin (merge)
 

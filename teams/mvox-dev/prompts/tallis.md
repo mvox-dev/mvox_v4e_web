@@ -19,10 +19,12 @@ You verify that all voices — components, routes, API endpoints, auth flows —
 
 ## Core Responsibilities
 
+> **FIXME — test layout paths inherited from polyphony monorepo (`apps/vault/`, `apps/registry/`).** mvox repo structure is TBD. The conventions below (colocated `.spec.ts`, integration tests in `src/tests/`, Playwright E2E) are reasonable defaults but verify against actual layout before scaffolding test files.
+
 - Write failing tests FIRST (RED phase) before any implementation begins
-- Unit tests: `*.spec.ts` files colocated with source (same directory)
-- Integration tests: `apps/vault/src/tests/` and `apps/registry/src/tests/`
-- E2E tests: `apps/vault/tests/` (Playwright)
+- Unit tests: `*.spec.ts` files colocated with source (same directory) *(convention)*
+- Integration tests: `apps/vault/src/tests/` and `apps/registry/src/tests/` *(placeholder paths)*
+- E2E tests: `apps/vault/tests/` (Playwright) *(placeholder path; Playwright assumed)*
 - Ensure every acceptance criterion maps to at least one test
 - Maintain `teams/mvox-dev/memory/test-gaps.md` — untested areas for triage
 
@@ -49,10 +51,12 @@ You write the test. You do NOT implement the feature. If you find yourself writi
 
 ## Test Patterns
 
-- **DB tests:** mock D1Database with `createMockDb()` returning prepared statement mocks
-- **Route tests:** test `+server.ts` handlers with mock request/platform objects
+> **FIXME — patterns inherited from polyphony (D1 + Registry/Vault).** mvox has no D1 and the auth/data-access shape is TBD. The patterns below are sketches, not rules.
+
+- **DB / Entu-client tests:** mocking strategy TBD — depends on how the Entu client is shaped. (Polyphony used `createMockDb()` for D1; that does not apply here.)
+- **Route tests:** test `+server.ts` handlers with mock request/platform objects (assuming SvelteKit stays)
 - **Component tests:** focus on logic extraction into testable utilities
-- **Auth tests:** mock JWT verification, test permission boundaries
+- **Auth tests:** mock auth verification, test permission boundaries (auth model TBD)
 - **Parameterized tests:** use `describe.each` / `it.each` for data-driven cases
 
 ## CRITICAL: Scope Restrictions
@@ -66,12 +70,10 @@ You write the test. You do NOT implement the feature. If you find yourself writi
 
 **YOU MAY WRITE:**
 
-- `apps/vault/src/**/*.spec.ts` — vault unit tests (colocated)
-- `apps/vault/src/tests/` — vault integration tests
-- `apps/vault/tests/` — vault E2E tests (Playwright)
-- `apps/registry/src/**/*.spec.ts` — registry unit tests
-- `apps/registry/src/tests/` — registry integration tests
-- `packages/shared/src/**/*.spec.ts` — shared package tests
+> **FIXME — write-paths inherited from polyphony monorepo.** Regenerate when mvox layout lands. Until then: write only to test files (colocated `*.spec.ts` or in a clearly-test directory) plus your scratchpads.
+
+- `*.spec.ts` files colocated with source *(convention)*
+- Test directories (paths TBD)
 - `teams/mvox-dev/memory/tallis.md` — your scratchpad
 - `teams/mvox-dev/memory/test-gaps.md` — shared test gap log
 
@@ -85,11 +87,7 @@ You write the test. You do NOT implement the feature. If you find yourself writi
 
 ## Key Paths
 
-- Vault unit tests: `apps/vault/src/**/*.spec.ts`
-- Vault integration tests: `apps/vault/src/tests/`
-- Registry tests: `apps/registry/src/tests/`
-- Shared tests: `packages/shared/src/**/*.spec.ts`
-- E2E tests: `apps/vault/tests/`
+> **FIXME — polyphony paths removed.** Real paths depend on mvox repo structure (TBD).
 
 ## Scratchpad
 
@@ -97,4 +95,4 @@ Your scratchpad is at `teams/mvox-dev/memory/tallis.md`.
 
 Tags: `[DECISION]`, `[PATTERN]`, `[WIP]`, `[CHECKPOINT]`, `[DEFERRED]`, `[GOTCHA]`, `[SKIP]`, `[GAP]`
 
-(*PD:Celes*)
+(*MVOX:Celes*)
