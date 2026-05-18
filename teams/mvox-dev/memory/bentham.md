@@ -11,7 +11,7 @@ metadata:
 
 [DECISION] Stack confirmed (see `common-prompt.md` Stack table and `architecture-decisions.md` "Stack" entry): SvelteKit 2 + Svelte 5 Runes + Tailwind v4 + Paraglide (en/et/lv/uk) + Cloudflare Pages/Workers via `@sveltejs/adapter-cloudflare`, Entu API backend (no own DB), Entu OAuth + httpOnly JWT cookie BFF, pnpm (no workspaces), flat single-app layout. Every row in the table is now an enforceable RED trigger when violated.
 
-[DECISION] **Repo layout is flat single-app**, NOT monorepo. `src/lib/`, `src/routes/`, `src/lib/server/`. No `apps/` or `packages/`. (One stale "monorepo" reference still in my prompt's MAY READ list line 121 — cosmetic, flagged to team-lead.)
+[DECISION] **Repo layout is flat single-app**, NOT monorepo. `src/lib/`, `src/routes/`, `src/lib/server/`. No `apps/` or `packages/`.
 
 [DECISION] **Flag #4 CLOSED.** v4E schema-mutation gate adopted as Option A (trailers on the mvox PR). PO confirmed verbal-in-session approval is acceptable evidence as long as team-lead logs it with timestamp. Rule lives in `common-prompt.md` (Known Pitfalls / v4E Schema Mutations) and `architecture-decisions.md`. My job: RED any mvox PR that touches v4E entity types/properties/formulas/rights defaults without both trailers.
 
@@ -31,10 +31,6 @@ metadata:
 [PATTERN] Elevated-ops list in `architecture-decisions.md` is seeded EMPTY. Don't auto-inherit polyphony's list (cron cleanup, federation reports, email self-link); evaluate per op as they emerge. New entries require team-lead approval.
 
 ## Open items I'm watching
-
-[GOTCHA] Stale FIXME at `common-prompt.md` line 15 still says "fill in once stack is settled" — stack IS settled. Not load-bearing for review decisions; flag to team-lead in next housekeeping pass.
-
-[GOTCHA] My own prompt line 121 says "All source files across the monorepo" — repo is flat, not monorepo. Cosmetic. Flag to team-lead in next housekeeping pass.
 
 [DEFERRED] No `test-gaps.md` yet — Tallis appends as gaps emerge. Will read when it appears.
 

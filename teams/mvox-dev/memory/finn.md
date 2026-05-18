@@ -36,3 +36,10 @@ Tasks were routed to me via a "task-list" teammate ID that doesn't match the tea
 3. Across rights boundaries: aggregates only (COUNT/SUM/etc.), never raw field projection
 
 (*MVOX:Finn*)
+
+---
+
+## Session 3 housekeeping
+
+- Trailer corrected: `(*PD:Finn*)` → `(*MVOX:Finn*)` (PD was polyphony-dev; we're mvox-dev now)
+- Stale CHECKPOINT reference to `/tmp/polyphony-test-status.txt` not present in this file; confirmed `/tmp/mvox-test-status.txt` is already correct in `.claude/statusline-command.sh`

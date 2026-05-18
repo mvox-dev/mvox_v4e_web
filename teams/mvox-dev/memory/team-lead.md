@@ -1,6 +1,31 @@
 # Palestrina — Team Lead Scratchpad
 
-### [NEXT SESSION] 2026-05-18 — session-2 → session-3
+### [DECISION] 2026-05-18 (session 3) — 5 session-2 carryforward gaps resolved with PO
+
+All five gaps surfaced in the session-2 → session-3 seed are now answered. Walked them through one-by-one with PO this session. Outcomes:
+
+| # | Gap | Decision | Lives in |
+|---|---|---|---|
+| 1 | Missing-role stories (admin, library, section-lead) | **Manager/admin in v1** (~5 stories: create season, create event, invite member, configure org policy, manage roster). Library + section-lead deferred to v2. | Victoria's issue framing (product scope, not arch) |
+| 2a | D1 workspace-switcher UX | **No global switcher.** Singer view is unified cross-choir by default (per A1/B1). Contextual switcher only on scoped admin pages. | C1/D1 story AC (UX, not arch) |
+| 2b | D1 notification scoping | **Collapsed cross-choir feed** with per-item choir tags + per-choir filter available. | D1 story AC (UX, not arch) |
+| 3 | C1 programme-readiness algorithm | **Percentage of active works** = `count(works in status='active') / count(total works in programme)`. | C1 story AC (computational spec, not arch) |
+| 4 | Test data strategy | **Empty-state UI first, dogfood via admin flows.** No seed script against polyphony db. | `architecture-decisions.md` (cross-cutting) |
+| 5 | CF Pages project name | **`multivox`** (`multivox.pages.dev`). `mvox.pages.dev` is third-party owned. | `architecture-decisions.md` (infra binding) |
+
+**Why this split**: gaps 1/2/3 are product/UX decisions — they belong in the issue text Victoria writes so they're testable per-feature. Gaps 4/5 are cross-cutting (affect every dev's local setup + the deploy URL) — those go in `architecture-decisions.md`. Bentham can prune the arch entries later if the line moves.
+
+**Bonus side-effects this session**:
+- `~/.config/mvox/credentials.env` now also carries `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` (chmod 600 preserved). Token scope verified active 2026-05-18; sufficient for Pages read; needs `Pages:Edit` upgrade if we want `wrangler pages deploy` from this machine.
+- Bentham's two session-2-stale housekeeping flags (common-prompt.md L15 FIXME, his MAY READ "monorepo" reference) were already fixed in session 2 — confirmed and he pruned his scratchpad notes.
+
+**Next**: spawn Victoria with this brief; she drafts the issue list (12 🟢 stories + ~5 admin stories + ~4 scaffolding chores) for PO review **before** opening any GitHub issues.
+
+(*MVOX:Palestrina*)
+
+---
+
+### [PROCESSED 2026-05-18] session-2 → session-3 seed
 
 **Where we are**: stack landed end-to-end in session 2 (SvelteKit 2 + Svelte 5 + TS + Tailwind v4 on Cloudflare, Entu API backend, Entu OAuth + BFF JWT cookie, Paraglide en/et/lv/uk, Vitest+Playwright, pnpm, flat single-app). Team config + 5 role prompts + `architecture-decisions.md` reflect this. Entu credentials probed end-to-end against polyphony db (key exchanges for JWT, JWT works for queries).
 
@@ -30,7 +55,7 @@
 3. Surface listed gaps to PO; get answers
 4. A1 (singer's agenda) as first real TDD cycle once scaffolding GREEN — **but don't pile multiple features behind it the same day.** Per Bentham's session-2 close [WARNING]: the first PR (auth/OAuth + first BFF endpoint) carries disproportionate review weight; it sets precedent for cookie flags, CSRF posture, `$env/dynamic/public` discipline, and BFF URL-composition. He's budgeting closer review; you should budget calibration time on your side too.
 
-When you've processed this seed, downgrade the tag from `[NEXT SESSION]` to `[PROCESSED]` or remove the section.
+~~When you've processed this seed, downgrade the tag from `[NEXT SESSION]` to `[PROCESSED]` or remove the section.~~ Processed 2026-05-18 session 3 — see the session-3 [DECISION] entry above for outcomes.
 
 ---
 
