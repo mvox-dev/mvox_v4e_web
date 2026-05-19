@@ -2,13 +2,13 @@ import { describe, it, expect } from 'vitest';
 import { PHASE_A_PROPERTY_ADDITIONS, isInPhaseAScope } from './phase-a-scope';
 
 describe('PHASE_A_PROPERTY_ADDITIONS', () => {
-	it('contains the 33 properties from divergence §4.2 (excluding section.member_count formula-update)', () => {
+	it('contains the 35 properties from divergence §4.2 (excluding section.member_count formula-update)', () => {
 		// Count total entries across all parent types
 		let total = 0;
 		for (const props of Object.values(PHASE_A_PROPERTY_ADDITIONS)) {
 			total += props.size;
 		}
-		expect(total).toBe(33);
+		expect(total).toBe(35);
 	});
 
 	it('includes confirmed §4.2 entries', () => {
@@ -26,6 +26,10 @@ describe('PHASE_A_PROPERTY_ADDITIONS', () => {
 		expect(PHASE_A_PROPERTY_ADDITIONS.work?.has('original_voicing') ?? false).toBe(false);
 		expect(PHASE_A_PROPERTY_ADDITIONS.work?.has('original_duration') ?? false).toBe(false);
 		expect(PHASE_A_PROPERTY_ADDITIONS.work?.has('original_language') ?? false).toBe(false);
+	});
+
+	it('excludes person.voice (absent from §4.2 — Phase B type-change, not Phase A add)', () => {
+		expect(PHASE_A_PROPERTY_ADDITIONS.person?.has('voice') ?? false).toBe(false);
 	});
 
 	it('excludes Phase D rights flags', () => {
