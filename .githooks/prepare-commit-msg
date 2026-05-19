@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Append a Co-authored-by trailer for the human PO on every non-merge commit.
+# Idempotent: if the trailer is already present (any case / spacing variant via
+# `git interpret-trailers`), no change is made.
+
+set -e
+
+COMMIT_MSG_FILE="$1"
+COMMIT_SOURCE="$2"
+
+# Skip merge commits — they already carry parent metadata.
+if [ "$COMMIT_SOURCE" = "merge" ]; then
+	exit 0
+fi
+
+TRAILER_KEY="Co-authored-by"
+TRAILER_VALUE="Mihkel Putrinš <mihkel.putrinsh@gmail.com>"
+
+# `git interpret-trailers --if-exists doNothing` only appends when absent and
+# normalises trailer-block formatting (blank line separator, etc.).
+git interpret-trailers \
+	--if-exists doNothing \
+	--trailer "${TRAILER_KEY}: ${TRAILER_VALUE}" \
+	--in-place \
+	"$COMMIT_MSG_FILE"
