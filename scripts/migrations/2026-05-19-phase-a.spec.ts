@@ -22,7 +22,7 @@ describe('runPhaseA — E2E', () => {
 		fetchMock.mockResolvedValueOnce(
 			new Response(JSON.stringify({ token: 'fake-jwt' }), { status: 200 })
 		);
-		// list entity types (filter: meta-type=entity, parent=db) → empty
+		// list entity types (filter: meta-type=entity) → empty
 		fetchMock.mockResolvedValueOnce(
 			new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 })
 		);
@@ -40,7 +40,7 @@ describe('runPhaseA — E2E', () => {
 		expect(result.exitCode).toBe(0);
 		expect(result.report.summary.dryRun).toBe(true);
 		expect(result.report.summary.wouldCreateTypes).toBe(2); // season + voice
-		expect(result.report.summary.wouldAddProperties).toBe(3); // season×2 + voice×1
+		expect(result.report.summary.wouldAddProperties).toBe(4); // season×3 + voice×1
 
 		// Report files written
 		const jsonContent = await readFile(result.reportPaths.json, 'utf8');
@@ -70,13 +70,17 @@ describe('runPhaseA — E2E', () => {
 		fetchMock.mockResolvedValueOnce(
 			new Response(JSON.stringify({ _id: 'p2' }), { status: 200 })
 		);
+		// Create season.description
+		fetchMock.mockResolvedValueOnce(
+			new Response(JSON.stringify({ _id: 'p3' }), { status: 200 })
+		);
 		// Create voice type
 		fetchMock.mockResolvedValueOnce(
 			new Response(JSON.stringify({ _id: 'voice-id' }), { status: 200 })
 		);
-		// Create voice.label
+		// Create voice.name
 		fetchMock.mockResolvedValueOnce(
-			new Response(JSON.stringify({ _id: 'p3' }), { status: 200 })
+			new Response(JSON.stringify({ _id: 'p4' }), { status: 200 })
 		);
 
 		const result = await runPhaseA({
@@ -91,7 +95,7 @@ describe('runPhaseA — E2E', () => {
 
 		expect(result.exitCode).toBe(0);
 		expect(result.report.summary.createdTypes).toBe(2);
-		expect(result.report.summary.addedProperties).toBe(3);
+		expect(result.report.summary.addedProperties).toBe(4); // season×3 + voice×1
 		expect(result.report.summary.failed).toBe(0);
 	});
 
