@@ -310,7 +310,7 @@ Source: `~/projects/entu-research/docs/schema/v4E/schema.json` (version `v4E.0.1
 #### `person` — renames + additions (Phase A + B)
 | Action | Detail |
 |---|---|
-| Add `voice` (reference to voice type, list) | Phase A — after `voice` entity type created; currently `voice` is `string` list |
+| `voice` (string list → reference list) | Phase B — prop already exists as `string` list; Phase B type-change on existing prop, same as `section.voice_type` → `section.voice`; requires Phase A `voice` entity type first |
 | Add `bio` (text) | Phase A |
 | Add `avatar` (file) — rename from `photo` | Phase B: rename property definition; data backfill |
 | Add `preferred_contact_email` (string) | Phase A |
@@ -424,7 +424,7 @@ Add these properties. Set `mandatory: false` initially for all (see open questio
 | `work` | `catalog_system` | string | — | — |
 | `work` | `part_of` | reference | — | self-referential |
 
-Total: **34 property additions** on existing types.
+Total: **35 property additions** on existing types.
 
 **Phase A formula update (not a new property):** `section.member_count` already exists in polyphony (formula: `_referrer.member.name COUNT`). Phase A updates the formula expression to v4E's recursive form `(_child.member COUNT) (_child.section.member_count SUM) +`. This is a formula-definition edit, not a new property create.
 
