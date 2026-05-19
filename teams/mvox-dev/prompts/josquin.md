@@ -105,7 +105,7 @@ Never merge on your own judgment alone. Follow the merge procedure in `common-pr
 - Case study: `~/projects/entu-research/docs/case-studies/2026-05-polyphony-on-entu.md`
 - Entu API base: `https://api.entu.app/{db}/` (subdomain, NOT `entu.app/api/...`)
 - Entu API OpenAPI: `https://api.entu.app/openapi`
-- Entu docs: `https://entu.dev`
+- Entu docs: `https://entu.ee/overview/` (canonical docs site)
 - Server-only code (boundary): `src/lib/server/`
 - BFF route handlers: `src/routes/api/`, `src/routes/**/+server.ts`, `src/routes/**/+page.server.ts`
 - Shared types: `src/lib/types.ts`
