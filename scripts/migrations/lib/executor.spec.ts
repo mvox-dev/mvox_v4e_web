@@ -13,8 +13,8 @@ const ops: DiffOp[] = [
 	{
 		kind: 'CREATE_TYPE',
 		typeName: 'voice',
-		label: 'Voice',
-		properties: [{ name: 'label', type: 'string' }]
+		blurb: 'Vocal range taxonomy',
+		properties: [{ name: 'name', type: 'string' }]
 	},
 	{
 		kind: 'ADD_PROPERTY',
@@ -104,5 +104,28 @@ describe('executeAdditions', () => {
 			parentType: 'edition',
 			property: 'work'
 		});
+	});
+
+	it('passes Entu-shaped payloads to createEntity (not v4E-shaped)', async () => {
+		const v4eOps: DiffOp[] = [
+			{
+				kind: 'ADD_PROPERTY',
+				parentTypeName: 'season',
+				parentTypeId: 'season-id',
+				propertyName: 'end_date',
+				def: { name: 'end_date', type: 'date', required: true, blurb: 'When the season ends' }
+			}
+		];
+		const createMock = vi.fn().mockResolvedValue({ _id: 'p-id' });
+
+		await executeAdditions(client, v4eOps, {
+			dryRun: false,
+			createEntity: createMock,
+			now: () => '2026-05-19T20:00:00Z'
+		});
+
+		const [, payload] = createMock.mock.calls[0];
+		expect(payload).toContainEqual({ type: 'mandatory', boolean: true }); // not 'required'
+		expect(payload).toContainEqual({ type: 'label', string: 'When the season ends' }); // not 'blurb'
 	});
 });
