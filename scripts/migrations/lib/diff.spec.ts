@@ -8,17 +8,17 @@ const v4e: V4eSchema = {
 	entities: [
 		{
 			name: 'season',
-			label: 'Season',
+			blurb: "A choir's working year",
 			properties: [
-				{ name: 'start_date', type: 'date' },
+				{ name: 'start_date', type: 'date', required: true },
 				{ name: 'end_date', type: 'date' },
 				{ name: 'description', type: 'text' }
 			]
 		},
 		{
 			name: 'voice',
-			label: 'Voice',
-			properties: [{ name: 'label', type: 'string' }]
+			blurb: 'Vocal range taxonomy',
+			properties: [{ name: 'name', type: 'string' }]
 		}
 	]
 };
@@ -45,7 +45,7 @@ describe('computeAdditiveDiff', () => {
 		expect(ops.filter((o) => o.kind === 'CREATE_TYPE')).toHaveLength(1); // voice
 		const voiceCreate = ops.find((o) => o.kind === 'CREATE_TYPE') as CreateTypeOp;
 		expect(voiceCreate.typeName).toBe('voice');
-		expect(voiceCreate.properties).toHaveLength(1); // voice.label inline
+		expect(voiceCreate.properties).toHaveLength(1); // voice.name inline
 
 		const adds = ops.filter((o) => o.kind === 'ADD_PROPERTY') as AddPropertyOp[];
 		// season missing 2 properties (end_date, description) → 2 ADD ops
@@ -59,7 +59,7 @@ describe('computeAdditiveDiff', () => {
 	it('returns empty ops when db is already at v4E', () => {
 		const dbState: DbTypeState[] = [
 			{ typeId: 's', name: 'season', propertyNames: ['start_date', 'end_date', 'description'] },
-			{ typeId: 'v', name: 'voice', propertyNames: ['label'] }
+			{ typeId: 'v', name: 'voice', propertyNames: ['name'] }
 		];
 		expect(computeAdditiveDiff(v4e, dbState)).toEqual([]);
 	});
