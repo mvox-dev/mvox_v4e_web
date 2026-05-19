@@ -1,11 +1,11 @@
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { loadV4eSchema } from './lib/schema-loader';
 import {
 	getJwt,
 	listEntities,
-	POLYPHONY_DB_ENTITY_ID,
 	POLYPHONY_META_TYPE_ENTITY_ID,
 	POLYPHONY_META_TYPE_PROPERTY_ID,
 	type EntuClient
@@ -34,8 +34,8 @@ export interface RunPhaseAOutput {
 async function fetchDbState(client: EntuClient): Promise<DbTypeState[]> {
 	const typesResp = await listEntities(client, {
 		'_type.reference': POLYPHONY_META_TYPE_ENTITY_ID,
-		'_parent.reference': POLYPHONY_DB_ENTITY_ID,
-		props: 'name._id,name.string'
+		props: 'name._id,name.string',
+		limit: '200'
 	});
 
 	const dbTypes: DbTypeState[] = [];
@@ -108,6 +108,9 @@ export async function runPhaseA(input: RunPhaseAInput): Promise<RunPhaseAOutput>
 		result
 	};
 }
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 async function main() {
 	const dryRun = process.argv.includes('--dry-run');
