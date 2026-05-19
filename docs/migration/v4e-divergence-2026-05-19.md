@@ -288,13 +288,15 @@ Source: `~/projects/entu-research/docs/schema/v4E/schema.json` (version `v4E.0.1
 | `section` (ref list) | Phase C — structural parent relationship replaces inline ref |
 | `person` (reference, required) | exists — keep |
 
-#### `organization` — add 6 properties + rename 2 + rights change (Phase A + B + D)
+#### `organization` — add 8 properties + rename 2 + rights change (Phase A + B + D)
 | Action | Detail |
 |---|---|
 | Add `founded` (date) | Phase A |
 | Add `location` (string) | Phase A |
 | Add `website` (string) | Phase A |
 | Add `logo` (file) | Phase A |
+| Add `social_links` (string, list) | Phase A |
+| Add `public_contact` (reference to member, list) | Phase A |
 | Add `rsvp_lockout_hours` (number) | Phase A |
 | Add `member_count_per_section` (number, formula) | Phase A |
 | Remove `contact_email` | Phase B — v4E uses `person.preferred_contact_email` |
@@ -340,11 +342,11 @@ Source: `~/projects/entu-research/docs/schema/v4E/schema.json` (version `v4E.0.1
 | Add `description` (text) | Phase A |
 | Remove `work_count` (formula) | Phase B — not in v4E |
 
-#### `section` — add 2 properties + rename 2 (Phase A + B)
+#### `section` — add 1 property + update formula + rename 2 (Phase A + B)
 | Action | Detail |
 |---|---|
 | Add `description` (text) | Phase A |
-| Add `member_count` (formula: `(_child.member COUNT) (_child.section.member_count SUM) +`) | Phase A — replaces current `_referrer`-based formula |
+| Update `member_count` formula (already exists) | Phase A — existing formula is `_referrer.member.name COUNT`; v4E wants `(_child.member COUNT) (_child.section.member_count SUM) +` (recursive roll-up); update formula expression on existing prop def |
 | Rename `ordinal` → `display_order` | Phase B |
 | Rename + retype `voice_type` (string) → `voice` (reference to `voice` entity) | Phase B — requires `voice` entity type (Phase A); data migrate string values to reference |
 
@@ -406,6 +408,8 @@ Add these properties. Set `mandatory: false` initially for all (see open questio
 | `organization` | `location` | string | — | — |
 | `organization` | `website` | string | — | — |
 | `organization` | `logo` | file | — | — |
+| `organization` | `social_links` | string | — | list=true |
+| `organization` | `public_contact` | reference | — | list=true; ref to member |
 | `organization` | `rsvp_lockout_hours` | number | — | — |
 | `organization` | `member_count_per_section` | number | `SUM(_child section.member_count)` | formula |
 | `person` | `bio` | text | — | — |
@@ -420,7 +424,9 @@ Add these properties. Set `mandatory: false` initially for all (see open questio
 | `work` | `catalog_system` | string | — | — |
 | `work` | `part_of` | reference | — | self-referential |
 
-Total: **32 property additions** on existing types.
+Total: **34 property additions** on existing types.
+
+**Phase A formula update (not a new property):** `section.member_count` already exists in polyphony (formula: `_referrer.member.name COUNT`). Phase A updates the formula expression to v4E's recursive form `(_child.member COUNT) (_child.section.member_count SUM) +`. This is a formula-definition edit, not a new property create.
 
 ### 4.3 Deferred to Phase B/C/D
 
@@ -436,7 +442,6 @@ Total: **32 property additions** on existing types.
 | `person.forename`/`surname` → drop (keep formula `name`) | B | Delete props + data verify |
 | Add `program_item.name` formula (`edition.*.work CONCAT`) | B | Update formula definition |
 | Add `repertoire_item.name` formula (`work.*.name CONCAT`) | B | Update formula definition |
-| Add `section.member_count` formula (recursive) | B | Replaces `_referrer`-based formula |
 | Remove obsolete org props: `contact_email`, `language`, `locale`, `org_type`, `timezone` | B | Delete + data backfill |
 | Remove obsolete member props: `email`, `invited_by`, `joined_at`, `nickname` | B | Delete |
 | `member.role` (ref list) → rights grants | C | Data migrate role→rights; delete prop |
