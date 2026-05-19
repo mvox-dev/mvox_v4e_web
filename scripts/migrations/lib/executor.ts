@@ -8,7 +8,7 @@ import {
 	createEntity as defaultCreateEntity
 } from './entu-client';
 import type { DiffOp, CreateTypeOp, AddPropertyOp } from './diff';
-import type { V4ePropertyDef } from './schema-loader';
+import { translateEntityType, translatePropertyDef } from './v4e-translator';
 
 export interface CreatedTypeRecord {
 	name: string;
@@ -59,19 +59,6 @@ export interface ExecuteOptions {
 		properties: EntuProperty[]
 	) => Promise<CreateEntityResponse>;
 	now?: () => string;
-}
-
-function propertyToPayload(parentTypeId: string, def: V4ePropertyDef): EntuProperty[] {
-	const payload: EntuProperty[] = [
-		{ type: '_type', reference: POLYPHONY_META_TYPE_PROPERTY_ID },
-		{ type: '_parent', reference: parentTypeId },
-		{ type: 'name', string: def.name },
-		{ type: 'label', string: def.label ?? def.name },
-		{ type: 'type', string: def.type }
-	];
-	if (def.mandatory) payload.push({ type: 'mandatory', boolean: true });
-	if (def.formula) payload.push({ type: 'formula', string: def.formula });
-	return payload;
 }
 
 export async function executeAdditions(
@@ -130,12 +117,17 @@ export async function executeAdditions(
 	for (const op of ops) {
 		if (op.kind === 'CREATE_TYPE') {
 			try {
-				const typePayload: EntuProperty[] = [
-					{ type: '_type', reference: POLYPHONY_META_TYPE_ENTITY_ID },
-					{ type: '_parent', reference: POLYPHONY_DB_ENTITY_ID },
-					{ type: 'name', string: op.typeName },
-					{ type: 'label', string: op.label }
-				];
+				const typePayload = translateEntityType(
+					{
+						name: op.typeName,
+						blurb: op.blurb,
+						sharing: op.sharing,
+						inheritsRights: op.inheritsRights,
+						properties: []
+					},
+					POLYPHONY_DB_ENTITY_ID,
+					POLYPHONY_META_TYPE_ENTITY_ID
+				);
 				const created = await createEntity(client, typePayload);
 				const typeId = created._id;
 				result.createdTypes.push({ name: op.typeName, id: typeId, createdAt: now() });
@@ -144,7 +136,7 @@ export async function executeAdditions(
 					try {
 						const propCreated = await createEntity(
 							client,
-							propertyToPayload(typeId, prop)
+							translatePropertyDef(prop, typeId, POLYPHONY_META_TYPE_PROPERTY_ID)
 						);
 						result.addedProperties.push({
 							parentType: op.typeName,
@@ -178,7 +170,7 @@ export async function executeAdditions(
 			try {
 				const propCreated = await createEntity(
 					client,
-					propertyToPayload(op.parentTypeId, op.def)
+					translatePropertyDef(op.def, op.parentTypeId, POLYPHONY_META_TYPE_PROPERTY_ID)
 				);
 				result.addedProperties.push({
 					parentType: op.parentTypeName,

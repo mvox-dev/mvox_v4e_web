@@ -1,4 +1,5 @@
 import type { V4eSchema, V4ePropertyDef } from './schema-loader';
+import { isInPhaseAScope } from './phase-a-scope';
 
 export interface DbTypeState {
 	typeId: string;
@@ -9,7 +10,9 @@ export interface DbTypeState {
 export interface CreateTypeOp {
 	kind: 'CREATE_TYPE';
 	typeName: string;
-	label: string;
+	blurb?: string;
+	sharing?: string;
+	inheritsRights?: boolean;
 	properties: V4ePropertyDef[];
 }
 
@@ -38,21 +41,23 @@ export function computeAdditiveDiff(
 			creates.push({
 				kind: 'CREATE_TYPE',
 				typeName: v4eType.name,
-				label: v4eType.label,
+				blurb: v4eType.blurb,
+				sharing: v4eType.sharing,
+				inheritsRights: v4eType.inheritsRights,
 				properties: v4eType.properties
 			});
 		} else {
 			const existingProps = new Set(existing.propertyNames);
 			for (const prop of v4eType.properties) {
-				if (!existingProps.has(prop.name)) {
-					adds.push({
-						kind: 'ADD_PROPERTY',
-						parentTypeName: v4eType.name,
-						parentTypeId: existing.typeId,
-						propertyName: prop.name,
-						def: prop
-					});
-				}
+				if (existingProps.has(prop.name)) continue;
+				if (!isInPhaseAScope(v4eType.name, prop.name)) continue;
+				adds.push({
+					kind: 'ADD_PROPERTY',
+					parentTypeName: v4eType.name,
+					parentTypeId: existing.typeId,
+					propertyName: prop.name,
+					def: prop
+				});
 			}
 		}
 	}

@@ -74,6 +74,24 @@ export function formatMarkdownReport(result: ExecutionResult, meta: ReportMeta):
 		}
 		lines.push('');
 	}
+	if (result.wouldCreateTypes.length) {
+		lines.push('## Would create entity types');
+		lines.push('');
+		for (const t of result.wouldCreateTypes) {
+			const blurb = t.blurb ? ` — ${t.blurb}` : '';
+			lines.push(`- \`${t.typeName}\` (${t.properties.length} inline prop(s))${blurb}`);
+		}
+		lines.push('');
+	}
+	if (result.wouldAddProperties.length) {
+		lines.push('## Would add properties');
+		lines.push('');
+		for (const p of result.wouldAddProperties) {
+			const formula = p.def.formula ? ' [formula]' : '';
+			lines.push(`- \`${p.parentTypeName}.${p.propertyName}\` (type: ${p.def.type})${formula}`);
+		}
+		lines.push('');
+	}
 	if (result.skipped.length) {
 		lines.push('## Skipped');
 		lines.push('');

@@ -3,8 +3,10 @@ import { readFile } from 'node:fs/promises';
 export interface V4ePropertyDef {
 	name: string;
 	type: string;
-	label?: string;
-	mandatory?: boolean;
+	blurb?: string;
+	required?: boolean;
+	list?: boolean;
+	ref?: boolean;
 	formula?: string;
 	reference_query?: unknown;
 	[key: string]: unknown;
@@ -12,9 +14,9 @@ export interface V4ePropertyDef {
 
 export interface V4eEntityTypeDef {
 	name: string;
-	label: string;
-	label_plural?: string;
-	description?: string;
+	blurb?: string;
+	sharing?: string;
+	inheritsRights?: boolean;
 	properties: V4ePropertyDef[];
 	[key: string]: unknown;
 }
