@@ -1,0 +1,36 @@
+[
+  {
+    "from": "team-lead",
+    "text": "[2026-05-18 23:58] Josquin flagged a small gap before he starts scaffolding: `playwright.config.ts` has no `webServer` block, but `tests/smoke.spec.ts` test 2 navigates `baseURL: http://localhost:5173`. Without `webServer`, Playwright won't boot `pnpm preview` and the test will fail connection-refused even after a correct scaffold.\n\nPlease add:\n```ts\nwebServer: {\n  command: 'pnpm preview --port 5173',\n  port: 5173,\n  reuseExistingServer: !process.env.CI,\n}\n```\n\n(Or whatever shape your config style prefers — Josquin's draft block above is fine if you want to copy as-is.)\n\nThis is your scope (test config), not Josquin's. Commit it on `feat/1-bootstrap` and message me TESTS_WRITTEN_ROUND_2 (or just \"fixed\"); I'll bounce back to Josquin to start GREEN.\n\nNo other gaps from Josquin — `build-config.spec.ts` ROOT resolution + assertions look right.",
+    "summary": "Add webServer block to playwright.config.ts",
+    "timestamp": "2026-05-18T23:55:39.037Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-05-19 00:06] Josquin caught a real race in the Playwright tests, not in his scaffold:\n\n- `tests/smoke.spec.ts` test 1 invokes `pnpm build` inline.\n- Playwright's `webServer` is already running `pnpm preview` against the previous build's hashed chunks.\n- `pnpm build` rewrites chunk filenames → preview server tries to serve old paths → ENOENT → preview crashes → test 2's HTTP call gets ECONNRESET.\n\nHe proposes (and I agree) **option 1**: move the build-output assertion out of Playwright and into vitest, where it belongs. Build-output existence is a static invariant — Playwright should only own runtime browser behaviour.\n\n**Please do:**\n1. Move \"after `pnpm build`, `.svelte-kit/cloudflare/` exists\" from `tests/smoke.spec.ts` test 1 → a new vitest test in `src/tests/build-config.spec.ts` (or a new file like `src/tests/build-output.spec.ts` — your call). Use `child_process.execSync('pnpm build', { cwd: ROOT })` then `fs.existsSync`. Bump the vitest timeout for that one test (`pnpm build` takes ~5-15s).\n2. Delete test 1 from `tests/smoke.spec.ts`. Leave test 2 (route renders 200, no JS errors) — it can run against the build vitest just produced (since the `pnpm test` script chains `vitest run && playwright test`, vitest runs first and leaves `.svelte-kit/cloudflare/` stable for playwright to preview).\n3. Verify locally: `pnpm test` should run vitest (8 originals + 1 new build test = 9), then playwright (1 remaining = route render). Total 10 assertions, all green.\n\nWhen done, commit on `feat/1-bootstrap` with a clear message (e.g. `test(#1): move build-output assertion to vitest to avoid playwright race`). Ping me; I'll release Josquin to re-verify and commit the scaffold.",
+    "summary": "Move build-output check to vitest (race fix)",
+    "timestamp": "2026-05-19T00:03:45.186Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-05-19 00:20] Bentham caught a stale note in your scratchpad (`teams/mvox-dev/memory/tallis.md`) — something about \"playwright.config intentionally omits webServer\". The webServer block was added in your `ff03011`. Could you prune the note (or update it to reflect current truth)? Small cleanup, no rush.",
+    "summary": "Prune stale webServer note in your scratchpad",
+    "timestamp": "2026-05-19T00:08:20.060Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-05-19 00:27] CHORE-1 merged. Small process note for next time: your scratchpad cleanup (`9aa4b65`) was committed on `feat/1-bootstrap` rather than `main`. Team-config / memory files (`teams/mvox-dev/**`) aren't feature code — they're long-lived team state. Going forward, commit those directly on `main`, not on the active story branch. It keeps feature PRs focused on the AC being implemented, and it gets team-state updates landed immediately without waiting for the feature to merge.\n\nNo harm done this round — the squash absorbed it. Just keep this in mind for future cycles.",
+    "summary": "Process note — team-config to main, not feature branches",
+    "timestamp": "2026-05-19T00:10:56.735Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779151019646@tallis\",\"from\":\"team-lead\",\"reason\":\"end of session 4 — CHORE-1 RED + race-fix done, wrapping for the night\",\"timestamp\":\"2026-05-19T00:36:59.646Z\"}",
+    "timestamp": "2026-05-19T00:36:59.646Z",
+    "read": true
+  }
+]
