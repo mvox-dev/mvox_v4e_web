@@ -24,7 +24,7 @@ All paths derived from two anchors:
 
 Execute in order. State each phase name before executing.
 
-**CRITICAL: Do NOT call `TaskCreate` before Phase 3 completes.** Until then, the active task list is session-scoped (`~/.claude/tasks/<sessionId>/`). When `TeamCreate` runs in Phase 3, the active list switches to team-scoped (`~/.claude/tasks/mvox-dev/`). Any tasks created earlier are orphaned — invisible to teammates but their numbers can still leak into agent context and cause confusion (e.g., a teammate seeing a "task #N" that doesn't exist on the team list). Track Phase 0-2 progress mentally or in plain text. Create formal tasks starting Phase 5 (when you actually need to route work to teammates).
+**CRITICAL: Do NOT call `TaskCreate` before Phase 2 completes.** Until then, the active task list is session-scoped (`~/.claude/tasks/<sessionId>/`). When `TeamCreate` runs in Phase 2, the active list switches to team-scoped (`~/.claude/tasks/mvox-dev/`). Any tasks created earlier are orphaned — invisible to teammates but their numbers can still leak into agent context and cause confusion (e.g., a teammate seeing a "task #N" that doesn't exist on the team list). Track Phase 0-1 progress mentally or in plain text. Create formal tasks starting Phase 4 (task restore, if needed) or Phase 5 (routing new work to teammates).
 
 ### Phase 0: Orient
 
@@ -47,32 +47,27 @@ cd "$REPO" && git pull
 
 **Expected outcome:** Prompts, roster, and memory files are at HEAD.
 
-### Phase 2: Clean
+### Phase 2: Establish team
 
-```bash
-TEAM_DIR="$HOME/.claude/teams/mvox-dev"
-if [ -d "$TEAM_DIR" ]; then
-  echo "STALE DIR — will clean"
-  rm -rf "$TEAM_DIR"
-else
-  echo "CLEAN — normal state"
-fi
-```
+Probe the harness's lead state by attempting `TeamCreate`. Branch on the result — there are three possible states:
 
-**Expected outcome:** Runtime dir does not exist. Ready for Phase 3.
+1. Try `TeamCreate(team_name="mvox-dev")`.
+2. Classify:
+   - **Succeeds** → **State B (fresh start).** No prior team in harness state. Verify `ls "$HOME/.claude/teams/mvox-dev/config.json"` exists. No prior task list. Proceed to Phase 3.
+   - **Fails with `"Already leading team"`** → harness session state survived from a prior session (typical cause: `/clear` was used instead of exiting the CLI). Inspect disk to distinguish A from C:
+     - `config.json` present AND `leadAgentId == "team-lead@mvox-dev"` → **State A (warm reconnect).** Harness and disk agree; team is already operational. No action needed. Proceed to Phase 3. The existing task list survives untouched.
+     - `config.json` absent OR `leadAgentId` mismatched → **State C (inconsistent).** Disk got wiped while the harness held the lead (e.g. someone ran the old "Phase 2: Clean" `rm -rf`). Only recovery is `TeamDelete` + `TeamCreate`, which destroys `~/.claude/tasks/mvox-dev/` as a side effect. Sequence: `TeamDelete(team_name="mvox-dev")` → `TeamCreate(team_name="mvox-dev")` → verify `config.json`. **Set a flag: task restore needed in Phase 4** (snapshot at `memory/task-list-snapshot.md` is the source of truth).
+   - **Fails with any other error** → unexpected; read the error and decide manually. Do not blindly retry.
 
-### Phase 3: Create
+**Why State A is common:** `/clear` clears conversation context but does NOT exit the CLI process. The harness keeps its in-memory team-lead tracking. If the prior session's shutdown left `~/.claude/teams/mvox-dev/config.json` on disk, both halves of state are intact and `TeamCreate` is unnecessary — and will fail by design.
 
-1. `TeamCreate(team_name="mvox-dev")`
-2. Verify: `ls "$HOME/.claude/teams/mvox-dev/config.json"`
-   - YES → Phase 3 complete. Proceed to Phase 4.
-   - NO → Recovery: `TeamDelete(team_name="mvox-dev")` then `TeamCreate` again (max 1 retry).
+**Why the old "Phase 2: Clean" step was removed:** the previous procedure ran `rm -rf "$HOME/.claude/teams/mvox-dev"` before `TeamCreate`. With `/clear` (where harness state survives), this turns State A into State C — manufactured inconsistency, forced `TeamDelete`, wiped task list as collateral damage. Don't clean preemptively; let `TeamDelete` happen only when actually needed.
 
-**Expected outcome:** Fresh `config.json` with current `leadSessionId`.
+**Expected outcome:** `config.json` is current; you know whether tasks need restoring in Phase 4.
 
-**CRITICAL:** Do NOT spawn any agents until Phase 3 verification passes.
+**CRITICAL:** Do NOT spawn any agents until Phase 2 verification passes. Do NOT call `TaskCreate` until Phase 2 settles (see CRITICAL banner at the top of this file).
 
-### Phase 4: Restore
+### Phase 3: Restore inboxes
 
 ```bash
 TEAM_CONFIG="$(git rev-parse --show-toplevel)/teams/mvox-dev"
@@ -91,11 +86,25 @@ fi
 if [ -f "$TEAM_DIR/config.json" ] && [ -d "$TEAM_DIR/inboxes" ]; then
   echo "Team mvox-dev operational: config.json OK, inboxes dir exists."
 else
-  echo "WARNING: Team infrastructure incomplete. Re-run Phase 3."
+  echo "WARNING: Team infrastructure incomplete. Re-run Phase 2."
 fi
 ```
 
+**Note on State A:** inboxes from the prior session may still be in the runtime dir (they weren't wiped). The `cp` above is idempotent — it overwrites runtime copies with the repo copies, which should be equal or newer (per shutdown protocol).
+
 **Expected outcome:** Inboxes restored from repo (or no-op if first session). Team operational.
+
+### Phase 4: Restore tasks (conditional)
+
+**Skip this phase if Phase 2 ended in State A or State B.** The task list is intact (State A: never touched; State B: empty and fine).
+
+**Run only if Phase 2 ended in State C** — `TeamDelete` wiped `~/.claude/tasks/mvox-dev/` and the snapshot is now the only source. Recreate the active rows from `memory/task-list-snapshot.md`:
+
+1. Read `teams/mvox-dev/memory/task-list-snapshot.md`.
+2. For each non-completed row, call `TaskCreate(subject, description)` with the snapshot's subject + description verbatim.
+3. Completed rows from the snapshot are NOT recreated. The recreated task list starts with fresh IDs; original numbering is lost — note this in your scratchpad if the originals are referenced anywhere (commits, PRs, prior agent messages).
+
+**Expected outcome:** Active tasks from the prior session are visible to teammates. Lost ID numbering is acceptable collateral (closed-issue history lives in GitHub, not the local task list).
 
 ### Phase 5: Spawn
 

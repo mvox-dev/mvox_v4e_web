@@ -1,5 +1,32 @@
 # Palestrina — Team Lead Scratchpad
 
+### [GOTCHA] 2026-05-19 (session 5) — `/clear` vs CLI exit; startup procedure rewritten
+
+`/clear` clears conversation context but does NOT exit the Claude Code CLI process. The harness keeps its in-memory team-lead tracking across `/clear`. If you then run the old "Phase 2: Clean" (`rm -rf ~/.claude/teams/mvox-dev/`), you land in:
+
+- Disk: no `config.json`
+- Harness: still claims I lead the team
+- `TeamCreate` → fails ("Already leading")
+- Only escape: `TeamDelete` (which ALSO wipes `~/.claude/tasks/mvox-dev/`)
+
+Hit exactly this at session-5 startup. Session-4 task IDs #1–#7 got wiped at the `TeamDelete` step; I had to recreate active tasks from `task-list-snapshot.md` with fresh IDs #1–#6 (and the snapshot's "completed #1" status was lost — it's just unrecorded now).
+
+**Fix landed in `startup.md` (this session):**
+- Old Phase 2 (`rm -rf`) removed — that step was actively manufacturing the broken state.
+- New Phase 2 ("Establish team") probes by trying `TeamCreate` first and branches on the result into three states:
+  - **State A (warm reconnect, `/clear` case)** — `TeamCreate` fails "Already leading", disk matches → no-op, tasks intact.
+  - **State B (fresh CLI start)** — `TeamCreate` succeeds → done, no tasks.
+  - **State C (inconsistent)** — `TeamCreate` fails, disk doesn't match → only path is `TeamDelete` + `TeamCreate`, accept task loss.
+- New Phase 4 restores tasks from `memory/task-list-snapshot.md` only when Phase 2 ended in State C.
+- Phase numbering renumbered: 0 Orient, 1 Sync, 2 Establish, 3 Restore inboxes, 4 Restore tasks (conditional), 5 Spawn, 6 Ready. Phase 5/6 numbers unchanged; only middle phases reshuffled.
+- `~/.claude/CLAUDE.md` quick-summary updated to match.
+
+**Behavioral implication for the common path (`/clear` between sessions):** State A is now cost-free — no cleanup, no recreate, tasks preserved. PO confirmed `/clear` is the typical inter-session transition; treat it as the default.
+
+(*MVOX:Palestrina*)
+
+---
+
 ### [NEXT SESSION] 2026-05-19 — session-4 → session-5
 
 **Headline finding (most important context for session 5)**: the polyphony Entu db is **NOT v4E** — it's the pre-v4E polyphony schema. We discovered this late in session 4 when PO asked the question I should have asked earlier ("is the live schema actually in sync?"). Finn's full diff in his session-4 report: 9 of 19 v4E entity types absent; every present type has missing properties or type/name divergences; all 5 PR #41 additions absent; `organization._inheritrights: true` in db vs `false` in v4E (directly contradicts the load-bearing Section B3 rights-island invariant). DB also has 4 superseded pre-v4E entity types live (`affiliation`, `participation`, `inventory_copy`, `role`).
