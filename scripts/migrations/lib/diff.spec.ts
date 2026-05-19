@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { computeAdditiveDiff, type DbTypeState } from './diff';
+import { computeAdditiveDiff, type DbTypeState, type CreateTypeOp, type AddPropertyOp } from './diff';
 import type { V4eSchema } from './schema-loader';
 
 const v4e: V4eSchema = {
@@ -24,48 +24,35 @@ const v4e: V4eSchema = {
 };
 
 describe('computeAdditiveDiff', () => {
-	it('produces all CREATE_TYPE + ADD_PROPERTY ops for an empty db', () => {
+	it('produces all CREATE_TYPE ops for an empty db; new-type properties are inline', () => {
 		const dbState: DbTypeState[] = [];
 		const ops = computeAdditiveDiff(v4e, dbState);
 
-		const creates = ops.filter((o) => o.kind === 'CREATE_TYPE');
+		const creates = ops.filter((o) => o.kind === 'CREATE_TYPE') as CreateTypeOp[];
 		const adds = ops.filter((o) => o.kind === 'ADD_PROPERTY');
 		expect(creates).toHaveLength(2);
-		expect(adds).toHaveLength(4);
-
-		// Ordering invariant
-		const lastCreateIdx = ops.findIndex(
-			(o, i) => o.kind === 'ADD_PROPERTY' && ops[i - 1]?.kind === 'CREATE_TYPE'
-		);
-		const firstAddIdx = ops.findIndex((o) => o.kind === 'ADD_PROPERTY');
-		expect(firstAddIdx).toBeGreaterThan(-1);
-		expect(creates.every((c, i) => ops.indexOf(c) < firstAddIdx)).toBe(true);
+		expect(adds).toHaveLength(0); // properties on new types are inline in CreateTypeOp, not separate ops
+		expect(creates[0].properties).toHaveLength(3); // season's 3 props inline
+		expect(creates[1].properties).toHaveLength(1); // voice's 1 prop inline
 	});
 
-	it('skips existing types but still adds their missing properties', () => {
+	it('skips existing types but adds their missing properties as ADD_PROPERTY ops', () => {
 		const dbState: DbTypeState[] = [
-			{
-				typeId: 'season-id',
-				name: 'season',
-				propertyNames: ['start_date']
-			}
+			{ typeId: 'season-id', name: 'season', propertyNames: ['start_date'] }
 		];
 		const ops = computeAdditiveDiff(v4e, dbState);
 
-		expect(ops.filter((o) => o.kind === 'CREATE_TYPE')).toHaveLength(1); // voice only
-		expect((ops.filter((o) => o.kind === 'CREATE_TYPE')[0] as { typeName: string }).typeName).toBe(
-			'voice'
-		);
-		const adds = ops.filter((o) => o.kind === 'ADD_PROPERTY') as Array<{
-			parentTypeName: string;
-			propertyName: string;
-		}>;
-		// Season needs end_date + description; voice needs label
-		expect(adds).toHaveLength(3);
+		expect(ops.filter((o) => o.kind === 'CREATE_TYPE')).toHaveLength(1); // voice
+		const voiceCreate = ops.find((o) => o.kind === 'CREATE_TYPE') as CreateTypeOp;
+		expect(voiceCreate.typeName).toBe('voice');
+		expect(voiceCreate.properties).toHaveLength(1); // voice.label inline
+
+		const adds = ops.filter((o) => o.kind === 'ADD_PROPERTY') as AddPropertyOp[];
+		// season missing 2 properties (end_date, description) → 2 ADD ops
+		expect(adds).toHaveLength(2);
 		expect(adds.map((a) => `${a.parentTypeName}.${a.propertyName}`).sort()).toEqual([
 			'season.description',
-			'season.end_date',
-			'voice.label'
+			'season.end_date'
 		]);
 	});
 
