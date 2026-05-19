@@ -12,4 +12,6 @@
 
 [GAP] No auth flow tests yet — expected, no auth routes exist. Add to test-gaps.md when Josquin scaffolds the BFF skeleton (CHORE-5).
 
+[PROCESS] Team-config / memory files (`teams/mvox-dev/**`) belong on `main`, not on story branches. Commit scratchpad and test-gaps updates directly to `main` so team state lands immediately and feature PRs stay focused on AC code only. 2026-05-19.
+
 (*MVOX:Tallis*)
