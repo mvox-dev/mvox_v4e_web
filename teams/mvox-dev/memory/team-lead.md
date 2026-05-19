@@ -1,6 +1,80 @@
 # Palestrina — Team Lead Scratchpad
 
-### [NEXT SESSION] 2026-05-18 — session-3 → session-4
+### [NEXT SESSION] 2026-05-19 — session-4 → session-5
+
+**Headline finding (most important context for session 5)**: the polyphony Entu db is **NOT v4E** — it's the pre-v4E polyphony schema. We discovered this late in session 4 when PO asked the question I should have asked earlier ("is the live schema actually in sync?"). Finn's full diff in his session-4 report: 9 of 19 v4E entity types absent; every present type has missing properties or type/name divergences; all 5 PR #41 additions absent; `organization._inheritrights: true` in db vs `false` in v4E (directly contradicts the load-bearing Section B3 rights-island invariant). DB also has 4 superseded pre-v4E entity types live (`affiliation`, `participation`, `inventory_copy`, `role`).
+
+**PO decision 2026-05-19 00:35**: **migrate polyphony db to v4E in-place** (not new db, not pivot to pre-v4E). Dual motivation: preserve real data (6 choirs, 116 members) AND learn Entu's live schema-mutation API. Multi-session execution expected. Migration plan (4 phases by risk):
+
+- **Phase A (additive, low risk)**: 9 missing entity types as empty defs + missing properties on existing types + all 5 PR #41 additions
+- **Phase B (renames, moderate)**: `voicing`→`original_voicing`, `voice_type`→`voice`, `duration`→`original_duration`, `language`→`original_language`, `ordinal`→`display_order`
+- **Phase C (structural, high)**: split `participation`→`rsvp`+`attendance`; restructure `affiliation` into v4E org-tree; rename `inventory_copy`→`copy` + extract `assigned_to` into `lending`
+- **Phase D (rights + cleanup)**: flip `organization._inheritrights` true→false; adjust per-type `_sharing` to v4E spec; remove superseded entity types after data migrated
+
+**Expected first action (session 5): read Finn's overnight migration-handbook report** (he's running it as I write this; deliverable: API surface for the 8 schema-mutation operation classes, per-operation feasibility ratings, migration phase mapping, open questions for PO, doc-improvement-issue candidates against Entu). Once we have the handbook, design Phase A as a concrete sequence of API calls, ideally captured as an `entu/research` PR (migration script) since v4E mutations go through that repo per architecture-decisions.md.
+
+**Open questions PO will need to weigh in on (queue these for session 5 morning)**:
+- How does PO want migration commits attributed in entu/research? Existing convention is `Schema-Change: entu/research@<sha> "..."` + `PO-Approved: <date>` trailers in mvox PRs that consume schema changes — but for the migration itself the cause/effect is reversed (entu/research PR causes a db change).
+- Should the schema-as-data migration code live in entu/research, mvox repo, or somewhere else? My instinct: entu/research, as `scripts/migrations/<date>-<phase>-<short-name>.ts` or similar — keeps schema and migration co-located.
+- Backup strategy before Phase B+C+D — polyphony db has real ESL data (per `Projects/polyphony` brilliant entry: pilot at polyphony.uk for Kammerkoor Crede). Even Phase A is supposedly additive but accidents happen. Does Entu have a snapshot mechanism? Or do we export-via-API and store offline?
+
+**Mvox repo state (frozen at end of session 4)**:
+- `main` HEAD: `e7cf148` chore(mvox-dev): correct Entu docs URL in josquin prompt
+- `7892b1d` chore(mvox-dev): correct Entu API base URL in josquin prompt — mid-session prompt fix (api.entu.app subdomain)
+- `e7cf148` chore(mvox-dev): correct Entu docs URL in josquin prompt — mid-session prompt fix (entu.ee/overview/)
+- `6962329` feat(#1): bootstrap SvelteKit + adapter-cloudflare — CHORE-1 squash-merge, 10/10 tests, includes Tallis RED + Josquin GREEN + hook installer
+- `17e74d8` Tallis [PROCESS] note: team-config commits belong on main not feature branches
+- `85da3ee` Bentham scratchpad CHORE-1 calibration anchor
+- All pushed to origin. Working tree clean.
+
+**Hook installed and verified working**: `.githooks/prepare-commit-msg` + `scripts/install-hooks.sh` + `package.json` `prepare` script. Self-applied trailer on the very commit that installed it (`4489d83` on feat/1-bootstrap, absorbed into the squash). Every new commit going forward will have `Co-authored-by: Mihkel Putrinš <mihkel.putrinsh@gmail.com>` appended. Commits pre-hook (everything before `4489d83`) don't have it; PO accepted this — no history rewrites.
+
+**Issue backlog state (mvox-dev/mvox_v4e_web)**:
+- Closed: #1 (CHORE-1 bootstrap, see closing comment)
+- Open: #2 Tailwind, #3 Paraglide, #4 Vitest+Playwright docs, #5 Entu BFF skel, #6 Email, #7-#20 user stories, #21-#23 admin, **#24 README rewrite** (new), **#25 packageManager pin** (new)
+- **Critical reordering**: #2 / #3 / #4 are still parallel-runnable (they don't depend on Entu schema). **#5 (BFF skeleton) is now blocked by the migration — do not start until at least Phase A of migration is done**. Same for any user-facing story (#7-#23 all touch v4E entity shapes).
+- **CHORE-4 is ~90% done** — Tallis already added vitest.config.ts and playwright.config.ts during CHORE-1, plus build-config tests count as the "trivial passing test" AC. Only AC remaining: "co-location convention documented" — basically a CONTRIBUTING.md section. Could close very fast.
+
+**Calibration anchor (Bentham, session-4 CHORE-1 review)**: First-PR end-state is GREEN. Stack-table rows now enforceable. RED bar: security boundary violations, multi-hop formula attempts, missing Schema-Change/PO-Approved trailers on v4E touches, legacy Svelte syntax, npm-instead-of-pnpm, monorepo dirs, forbidden CF bindings, TDD violations. YELLOW bar: doc/README staleness, missing trailers, stale scratchpads, minor test gaps. Recorded in `teams/mvox-dev/memory/bentham.md`.
+
+**Process lessons from session 4 (worth remembering)**:
+- Don't trust "the schema is the schema" — verify the LIVE database matches the typed definitions before designing features against it. Asking the question 4 hours into a session is far better than 4 weeks. (Original sin: session-3 closed without ever verifying polyphony was v4E-shaped; I assumed it was just because the case study was about polyphony.)
+- Per-commit reviews must use `git show <sha>:<path>` — never trust the worktree, which gets contaminated by untracked WIP that shadows commit content (Bentham's CHORE-1 YELLOW #1 retraction was caused by exactly this).
+- Mid-session prompt patches go to `main`, not feature branches (the api.entu.app and entu.ee fixes both committed directly to main). Tallis also needed this reminder — captured in his scratchpad.
+- "Pause before push" convention applies to **team-lead shutdown commits**, NOT to mid-session scratchpad/team-config commits. Bentham over-applied it once in session 4. Convention should probably be clarified in common-prompt.md.
+- Playwright tests must NOT do `pnpm build` inline — the build rewrites hashed chunks and crashes the running preview server (race surface). Build-output invariants belong in vitest.
+- Local Entu instance available via docker-compose in `~/projects/entu-research/` (file: `docker-compose.entu.yml`). I haven't fired it up; Finn may have. Worth knowing for session 5 if we need a sandbox before touching the live db.
+
+**Concrete pointers for session 5 (no re-discovery)**:
+- Finn's session-4 divergence report: in his last conversation turn; not persisted to a file. **If we want the finding outside conversation memory, mirror to a brilliant entry or in-repo doc.** Suggest creating `Decisions/mvox/polyphony-v4e-divergence` in brilliant + linking to the 8 existing `Decisions/mvox/*` entries.
+- Finn's session-4 migration handbook: he's writing it as I write this. He'll deliver to me as a SendMessage. **Save the handbook content to either `entu/research/docs/migration/` or a brilliant entry as soon as he delivers** — don't let it die in chat.
+- Entu canonical docs: `https://entu.ee/overview/` (not entu.dev — fixed in josquin prompt this session).
+- API base: `https://api.entu.app/{db}/` (subdomain form — also fixed in josquin prompt this session).
+- Credentials: still at `~/.config/mvox/credentials.env`, chmod 600.
+- v4E source-of-truth: `~/projects/entu-research/docs/schema/v4E/{schema.ts,README.md}` — no changes since PR #41.
+- Entu may run locally via `~/projects/entu-research/docker-compose.entu.yml` — UNCONFIRMED whether fires up, but worth checking before touching live polyphony db.
+- Brilliant entries to consult: `Projects/polyphony` (long body — v4E design history Topics 1+2), `Projects/entu-research`, `Teams/entu`, the 8 `Decisions/mvox/*` from session 3.
+
+**Suggested session-5 sequence**:
+1. Read Finn's handbook (in inbox at session-5 startup).
+2. Spawn finn + bentham as always. Don't spawn implementers until migration design is set.
+3. PO + me: triage Finn's open questions, settle the few that need PO input.
+4. Pick the smallest meaningful additive change as a learning probe (suggest: add `event.capacity` from PR #41 — single property addition, no data backfill, validates the API call shape). Either I execute via raw Bash/curl with PO over my shoulder OR Josquin executes — TBD by complexity revealed by Finn.
+5. Document what we learned in the migration handbook (it becomes living doc as we execute).
+6. Capture results in brilliant + the entu/research case study.
+7. Iterate. Phase A in full is ~20-40 small operations; pace them.
+8. If Phase A goes smoothly, queue Phase B for next session. Don't push past Phase A in one session.
+
+**Don't forget after Finn delivers tonight**:
+- Save his migration handbook to a persistent location (in-repo doc or brilliant entry).
+- File doc-improvement issues he flagged against the Entu docs repo (whichever that turns out to be; he'll identify) — PO + me review first, don't auto-file.
+- Create the `Decisions/mvox/polyphony-v4e-divergence` brilliant entry mirroring tonight's finding + the in-place migration decision.
+
+---
+
+### [PROCESSED 2026-05-19] session-3 → session-4 seed
+
+Original seed text below. Processed in session 4 — CHORE-1 (#1) merged + closed end-to-end (10/10 tests GREEN, hook installed). Filed #24 (README) + #25 (packageManager) as Bentham YELLOW followups. Then session pivoted to the polyphony-v4E divergence finding (see session-4 → session-5 seed at top). Tag downgraded so future sessions don't double-process this seed.
 
 **Where we are**: v1 backlog is live. **23 GitHub issues open at `mvox-dev/mvox_v4e_web` as #1–#23** — 6 scaffolding chores + 14 user-facing stories + 5 admin/manager stories. PO authorized opening all of them in this session. No app code yet — first TDD cycle is the next concrete step.
 
