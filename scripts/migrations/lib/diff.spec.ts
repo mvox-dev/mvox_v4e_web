@@ -72,4 +72,29 @@ describe('computeAdditiveDiff', () => {
 		// Role is left alone; we only add what v4E specifies
 		expect(ops.find((o) => o.kind === 'CREATE_TYPE' && (o as { typeName: string }).typeName === 'role')).toBeUndefined();
 	});
+
+	it('respects Phase A scope filter — skips properties not in §4.2', () => {
+		// Use a v4e fixture that includes a known Phase-B-rename property
+		const v4eWithRename: V4eSchema = {
+			version: 'v4E',
+			sections: [],
+			entities: [
+				{
+					name: 'person',
+					properties: [
+						{ name: 'bio', type: 'text' },   // in §4.2 — should be added
+						{ name: 'avatar', type: 'file' } // Phase B rename — should be skipped
+					]
+				}
+			]
+		};
+		const dbState: DbTypeState[] = [
+			{ typeId: 'person-id', name: 'person', propertyNames: ['photo'] } // existing
+		];
+		const ops = computeAdditiveDiff(v4eWithRename, dbState);
+		const adds = ops.filter((o) => o.kind === 'ADD_PROPERTY') as AddPropertyOp[];
+		expect(adds.map((a) => `${a.parentTypeName}.${a.propertyName}`)).toEqual(['person.bio']);
+		// person.avatar should not appear
+		expect(adds.some((a) => a.propertyName === 'avatar')).toBe(false);
+	});
 });
