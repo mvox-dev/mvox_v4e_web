@@ -101,4 +101,32 @@ Renaming `section.ordinal` → `section.display_order` in the schema definition 
 
 Returns only title header, no endpoint documentation. Use `entu.ee` docs instead. Also: old URL pattern `entu.app/api/{db}/` is retired (returns 404) — correct URL is `api.entu.app/{db}/`.
 
+---
+
+## 2026-05-19 — Session 6 live probes (P1, P3, P4, P5, P6)
+
+### [DECISION] All 5 probes completed; handbook §3/§5/§6 updated
+
+**P1 — Formula re-aggregation:** No global recompute on formula definition change. Per-save only. No bulk re-aggregation API (all `/recalculate`, `/reindex` etc. return 404). Implication: formula changes need a full backfill-touch pass.
+
+**P3 — Entity type rename:** Transparent to instances — no data migration. `_type[0].reference` never changes. `_type[0].string` async cache updates in ~1 second. Use `?_type.reference=<id>` in migration scripts to avoid race conditions.
+
+**P4 — Cascade on type delete:** Instances survive as silent orphans: 200 readable + editable + deletable by `_id`, but invisible to all `?_type=` queries. CONFIRMED: never DELETE entity type defs with live data.
+
+**P5 — Bulk delete API:** No working bulk form. `DELETE /property/{id1},{id2}` = HTTP 500 Server Error. All other bulk patterns = 404 or rejected. Strictly serial. At 50ms/call: 104k values ≈ 87min. Ask Argo for internal bulk endpoint.
+
+**P6 — `_sharing` semantics:** `public` = true unauthenticated access (200 to no-auth GET). `private` and `domain` both = 403 no-auth (functionally identical via API). `_sharing` on entity TYPE entity does NOT default to data instances — instances need explicit `_sharing` at creation. No `/public/entity/` path.
+
+### [DECISION] "Way of Entu" — corrected mental model (session-6 debrief)
+
+Two session-6 probe framings were category errors; handbook corrected:
+- "`_sharing` not propagating type→instance" = expected, not a gap. Removed from §6.
+- "No bulk re-aggregation API" = internal concern outside API scope. Removed from §6.
+
+Correct model (now in handbook §1.5):
+- **Type ↔ instance:** nothing propagates. Type is a template/UI hint.
+- **Parent ↔ child:** rights via `_inheritrights` on the child.
+- **`_sharing`:** per-entity. No cascade mechanic anywhere.
+- **Formula:** materialized at save on the instance. Not retroactive from type definition change.
+
 (*MVOX:Finn*)

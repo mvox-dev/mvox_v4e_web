@@ -13,9 +13,30 @@ Entu's schema-mutation API is **fully programmable and uniform**: entity types a
 
 - **Adds are clean.** Creating new entity types and adding properties is immediate, no data migration.
 - **Renames + type changes use additive (soft-delete) semantics.** POST with the existing property's `_id` replaces the value; the old value is archived.
-- **Rights changes (`_inheritrights`, `_sharing`) are mutable on entity type definitions.** Changes take effect immediately for *new* entities; retroactive effect on existing entities requires a separate per-entity update pass.
-- **Deletes return `{deleted: true}` immediately** (Entu soft-deletes internally, presents hard-delete to callers). **Cascade behavior on entity type delete is undocumented** — safer to rename to `_DEPRECATED_*` than delete with live instance data.
+- **`_inheritrights` and `_sharing` are per-entity properties.** Changing them on a type entity affects that type entity only — not instances (see §1.5). Retroactive updates to instance entities require a separate per-entity update pass.
+- **Deletes return `{deleted: true}` immediately** (Entu soft-deletes internally, presents hard-delete to callers). **Cascade confirmed (session-6 probe):** deleting an entity type leaves data instances alive as silent orphans — not queryable by type, but readable by `_id`. Safer to rename to `_DEPRECATED_*` than delete with live instance data.
 - **No special admin role required** beyond `_owner` on the database entity. The PO's API key has sufficient rights.
+
+---
+
+## 1.5 Conceptual Model: What Propagates, What Doesn't
+
+This is the mental model that governs everything in this handbook. Entu has exactly two propagation mechanics; everything else is an instance's own materialized state.
+
+| Mechanic | What it does |
+|---|---|
+| **Type → instance** | Nothing at runtime. An entity type is a template and UI hint. System properties set on the type entity (including `_sharing`, `_inheritrights`, `_owner`) belong to the type entity itself — they do not flow into instances at create time or afterward. If a creating client (Entu admin UI, migration script, BFF) copies type-level properties onto new instances, that is a creating-client convention, not an Entu runtime mechanic. |
+| **Parent → child (rights cascade)** | Rights propagate via `_inheritrights`. When a child entity has `_inheritrights: true`, it inherits `_owner` / `_editor` / `_viewer` from its `_parent`. This is Entu's real cascade mechanic — and it is parent-child, not type-instance. |
+| **Formula re-aggregation** | Formula values are materialized at save time on the bearing entity. Changing a formula expression on a property-definition entity does not retroactively update existing instance entities. Each instance must be touched (re-saved) to recompute its formula output. Internal Entu server routines may re-aggregate server-side outside our scope, but there is no API endpoint to trigger this. |
+| **`_sharing` specifically** | Lives only on the bearing entity. No mechanic propagates it — not type→instance, not parent→child. Each entity carries its own. |
+
+**Concrete examples:**
+
+- `organization` entity type has `_sharing: domain`. This means the type-definition entity itself is domain-visible. The six `organization` data instances have their own `_sharing` (currently `domain` per probe). Setting the type entity's `_sharing` to `public` would make the type definition page public — it has no effect on existing or future organization instances.
+- `_inheritrights: false` on the `organization` type entity controls the type entity's own rights inheritance from the db entity. The six existing org instances each have their own `_inheritrights` value, set when they were created. To flip them, update each instance individually.
+- A formula on `edition.work` is materialized the next time each `edition` entity is saved. Adding or modifying the formula on the property-definition entity has no immediate effect on existing `edition` instances.
+
+**Why this matters for migration:** Every Phase D rights change (flip `organization._inheritrights`, set per-type `_sharing`) requires a separate per-instance update pass. There is no "change the type and have it cascade." This is not a limitation — it is the design. Instance state is authoritative and immutable except by explicit API write.
 
 ---
 
@@ -68,6 +89,8 @@ curl -s -X POST \
 ```
 
 Entu auto-adds `_sharing: domain`, `_inheritrights: true`, `_owner`, `_created` on creation.
+
+**`_sharing` on the type entity** controls the type entity's own visibility (see §1.5). Each instance owns its own `_sharing`. Creating clients (BFF, admin UI, migration scripts) must set `_sharing` explicitly at create time per the v4E spec for that entity type.
 
 **Doc ref:** https://entu.ee/configuration/entity-types
 
@@ -196,7 +219,12 @@ Formulas use Reverse Polish Notation: `field1 field2 FUNCTION`. Cross-entity: `r
 
 ### 2.6 Change rights defaults
 
-**`_inheritrights`** on an entity type entity controls whether new instances of that type inherit their parent's rights.
+**`_inheritrights`** is a per-entity property. On any entity (type entity or instance entity), it controls whether *that entity* inherits rights from its `_parent`.
+
+- On the `organization` **type entity**: controls the type entity's own rights inheritance from the db entity.
+- On an `organization` **instance entity**: controls that org's rights inheritance from its parent (the db entity). This is the load-bearing value for access control on actual data.
+
+The Entu admin UI may copy `_inheritrights` from the type entity onto new instances at create time as a convention, but that is a creating-client behavior, not an Entu runtime cascade. Changing `_inheritrights` on the type entity has no retroactive effect on existing instances.
 
 ```bash
 ORG_TYPE_ID="69c7ea478489bfcb0e819e3d"
@@ -209,11 +237,11 @@ curl -s -X POST \
   -d '[{"_id": "'${CURRENT_INHRIGHTS_ID}'", "type": "_inheritrights", "boolean": false}]'
 ```
 
-**Verified:** Tested live on season entity type (true → false → true). Works immediately.
+**Verified:** Tested live on season entity type (true → false → true). Works immediately on the type entity.
 
-**Critical caveat:** Changing `_inheritrights` on the entity type definition applies **only to new instances**. Existing organization entities have `_inheritrights: true` set on each entity (inherited at creation time). Each existing org entity will need an individual update. With 6 orgs, this is a small step — but it must be done separately for each.
+**Phase D implication:** To make the 6 existing org instances rights-isolated, update each instance entity individually — not the type entity. With 6 orgs this is manageable, but must be done as a separate step.
 
-**`_sharing`** on the entity type: same pattern. Polyphony db currently uses `domain` for all types; v4E specifies `public`/`private`/`domain` per type. Changing the entity type's `_sharing` does NOT cascade to existing entities — bulk update required.
+**`_sharing`** on an entity type entity: same pattern — sets the type entity's own sharing. Each instance owns its own `_sharing` (see §1.5). Migration scripts must set `_sharing` explicitly on each new instance at create time. Polyphony db currently has `domain` on all instance entities; v4E specifies per-type defaults — bulk update required for Phase D.
 
 ---
 
@@ -270,10 +298,11 @@ curl -s -X DELETE \
 | Modify a formula expression | **Easy** | POST with/without existing `_id` |
 | Change `_inheritrights` on entity type | **Easy** | Immediate — but NOT retroactive on existing instances |
 | Change `_sharing` on entity type | **Easy** | Same — not retroactive |
-| Backfill data under new property name | **Awkward** | Must read all entities of type, DELETE old values, POST new values one-by-one (no bulk API) |
+| Backfill data under new property name | **Awkward** | Must read all entities of type, DELETE old values, POST new values one-by-one (no bulk API confirmed §5.5) |
 | Retroactively fix `_inheritrights` on existing entities | **Awkward** | Must update each entity individually (6 orgs = manageable) |
-| Delete entity types with live data | **Workaround needed** | Cascade unclear — rename to `_DEPRECATED_*` instead |
-| Bulk re-aggregation of formula outputs | **Unknown** | No documented public endpoint; may require Entu team assistance |
+| Delete entity types with live data | **Workaround needed** | Cascade confirmed (§5.4): instances become silent orphans, not auto-deleted. Rename to `_DEPRECATED_*` instead. |
+| Bulk re-aggregation of formula outputs | **Not possible via API** | No bulk endpoint found (§5.1). Per-save only. Ask Argo whether internal/admin endpoint exists. |
+| Rename entity type (name field) | **Easy** | Transparent to instances — no data migration. ~1s async propagation of string cache (§5.3). |
 
 ---
 
@@ -342,19 +371,114 @@ Key changes:
 
 ---
 
-## 5. Open Questions for PO (session 5 morning)
+## 5. Open Questions — Status after session-6 probing (2026-05-19)
 
-1. **Formula re-aggregation:** After changing a formula expression on a property definition, do existing entities automatically recompute, or is there a manual trigger? The docs mention "manual re-aggregation endpoint" but don't document it publicly. Argo Roots likely knows. Worth asking before Phase A.
+Questions 1, 3, 4, 5, 6 resolved by live probing. Question 2 still open.
 
-2. **`mandatory: true` retroactivity:** If we add `end_date` to `season` with `mandatory: true`, does the UI flag existing seasons (which don't have `end_date`) as invalid? Or does mandatory only enforce on new creates? Affects whether we set mandatory from day-1 of Phase A or only after backfill.
+---
 
-3. **`_type` rename impact:** Does renaming an entity type's `name` field (e.g., `inventory_copy` → `copy`) require updating all existing `_type` properties on instance entities, or does Entu resolve by entity ID (the reference value), making the name change transparent? If by ID — rename is free. If by string value — data migration needed for every instance entity.
+### 5.1 Formula re-aggregation — RESOLVED
 
-4. **Cascade on entity type delete:** Confirm with Argo before deleting any entity type.
+**Answer: Formula values are materialized at save time. Changing a formula expression on the property-definition entity does not retroactively update existing instances. Touch-save each instance to refresh.**
 
-5. **Bulk delete API:** Is there a way to delete multiple property values in one call, or must it be one-by-one? With ~104k properties in the db, some phases could be slow if strictly serial.
+Live probe results (`_probe_formula`, 3 instances, formula expression changed):
 
-6. **`_sharing` enum values:** The DB uses `domain` for all types. v4E specifies `public` and `private`. Is `public` in Entu the same as v4E's `public`? Docs warn: "Setting `_sharing: public` makes the entity visible to anyone on the internet without authentication." Does `domain` mean "visible within the Entu database domain (authenticated users only)"? Need to confirm mapping before Phase D.
+| Observation | Result |
+|---|---|
+| GET instances immediately after formula-definition change (no re-save) | `computed` still shows old materialized value. No automatic recompute. |
+| Re-save one instance (touch any field) | `computed` updates immediately on that instance only. Other instances remain at their previous materialized value. |
+
+This is the expected behavior per §1.5: instance state is owned by the instance, not the type. Internal Entu maintenance routines may re-aggregate server-side but that is outside our scope as API consumers. No API endpoint exists to trigger bulk re-aggregation (`/recalculate`, `/reindex`, etc. all return 404).
+
+**Operational implication for Phase A+B:** Adding `edition.work` as a new formula property has no backfill concern — there are no pre-existing materialized values. Modifying an existing formula property requires a touch-save pass over every instance of that type. Script pattern: GET all instances, POST a no-op field touch to each, verify `computed` updated. Cost at 50ms/call: proportional to instance count.
+
+---
+
+### 5.2 `mandatory: true` retroactivity — STILL OPEN
+
+Not probed in this session. Still needs PO/Argo answer before Phase A. (Low urgency — we can set `mandatory: false` initially and tighten later.)
+
+---
+
+### 5.3 `_type` rename impact — RESOLVED
+
+**Answer: Rename is transparent for existing instances — no data migration needed. But: propagation is async (~1 second lag).**
+
+Live probe results (`_probe_renamea` → `_probe_renameb`, 3 instances):
+
+| Observation | Result |
+|---|---|
+| Obs 1: GET instance immediately after rename | `_type[0].string` still shows OLD name `_probe_renamea`. (Propagation lag.) |
+| Obs 1 re-check after ~1–3 seconds | `_type[0].string` updated to `_probe_renameb`. Reference (`_type[0].reference`) never changed. |
+| Obs 2: Query `?_type.string=_probe_renameb` | Returns the 3 instances (after propagation). |
+| Obs 3: Query `?_type.string=_probe_renamea` | Returns the 3 instances immediately after rename (stale), then returns 0 after propagation. |
+| Query by `_type.reference=<type-entity-id>` | Always returns the 3 instances — instant, never affected by rename. |
+
+**Operational implication:** Entity type renames (`inventory_copy` → `copy`) require no data migration. All existing instances are found via the type entity's `_id` reference, which never changes. The string denormalization in `_type[0].string` is an Entu-managed cache that auto-updates within ~1 second. **Safe to use `?_type.reference=<id>` queries in migration scripts** to avoid race conditions.
+
+---
+
+### 5.4 Cascade on entity type delete — RESOLVED
+
+**Answer: Instances survive type deletion as orphans. They are queryable (with known `_id`), editable, and deletable. But they are invisible to `?_type.string=` and `?_type.reference=` queries. Cleaning them up requires knowing their `_id` values in advance.**
+
+Live probe results (`_probe_canary` type deleted, 1 instance):
+
+| Observation | Result |
+|---|---|
+| GET instance after type delete | Returns 200 with full entity body. `_type[0]` reference value is preserved (pointing to deleted type) and `string` still shows `_probe_canary`. |
+| Query `?_type.reference=<deleted-type-id>` | Returns 0 results — orphans are invisible to type queries. |
+| Query `?_type.string=_probe_canary` | Returns 0 results — invisible. |
+| POST to orphaned instance | Succeeds (HTTP 200). Instance is editable. |
+| DELETE orphaned instance | Returns `{"deleted": true}`. Instance is deletable. |
+
+**Operational implication:** If we ever DELETE an entity type definition with live data, the data entities become silent orphans — not queryable by type, but not auto-deleted. They persist forever unless explicitly cleaned up by `_id`. **Confirmed: never DELETE entity type definitions with live data. Rename to `_DEPRECATED_*` instead.** The safe-by-default recommendation in §2.7 is correct.
+
+---
+
+### 5.5 Bulk property-value delete API — RESOLVED
+
+**Answer: Only one bulk form works: `DELETE /property/{id1},{id2}` returns HTTP 500 Server Error (route exists but fails). No working bulk delete endpoint found.**
+
+Live probe results (5 forms tested against fresh property value IDs):
+
+| Form | HTTP Status | Notes |
+|---|---|---|
+| `DELETE /property?ids=<id1>,<id2>` (query-string list) | 404 | Route not found |
+| `DELETE /property` with JSON body `{"ids": [...]}` | 404 | Route not found |
+| `DELETE /property/<id1>,<id2>` (path comma) | 500 Server Error | Route exists but fails — data NOT deleted |
+| `DELETE /properties` (plural) | 404 | Route not found |
+| `POST /entity/{id}` with `[{"_id": "<prop-id>", "deleted": true}]` | 400 "Property type not set" | Pattern rejected — `type` field required |
+
+**Operational implication for Phase B/C/D:** There is no bulk property delete. All property value deletions are strictly **one-by-one** via `DELETE /polyphony/property/{id}`. For ~104k property values across the migration, serial deletion will be slow. Migration scripts must be designed with:
+- Checkpointing (save progress to disk every N deletions)
+- Error handling (individual 404/500 retries without re-doing completed deletions)
+- Realistic time estimates (at 50ms/call: 104k × 50ms ≈ 87 minutes for a full property backfill pass)
+
+This is a strong argument for asking Argo Roots whether a bulk endpoint exists outside the public API surface.
+
+---
+
+### 5.6 `_sharing` enum values — RESOLVED
+
+**Answer: `public` = unauthenticated (anyone on internet). `domain` and `private` are identical from the API perspective — both 403 to unauthenticated requests. No `/public/entity/` API path exists.**
+
+Live probe results (explicit `_sharing` set on 3 instances at creation time — each entity owns its own `_sharing` per §1.5):
+
+| Instance `_sharing` | GET with valid JWT | GET with no `Authorization` header | GET via `/public/entity/{id}` |
+|---|---|---|---|
+| `public` | 200 ✓ | 200 ✓ (entity data visible) | 404 (path doesn't exist) |
+| `private` | 200 ✓ | 403 `"No accessible properties"` | 404 |
+| `domain` | 200 ✓ | 403 `"No accessible properties"` | 404 |
+
+**Key findings:**
+1. `public` = true unauthenticated access. Entity and all properties returned without `Authorization` header.
+2. `domain` and `private` are **identical** from the API access perspective — both block unauthenticated requests. The distinction, if any, is not observable via the API (may be a UI-layer concept in Entu).
+3. No `/public/entity/` API path. Public entities served at the standard `/entity/{id}` endpoint, without auth.
+
+**Operational implication for Phase D:** Creating clients (BFF, migration scripts) must set `_sharing` explicitly on each entity instance at create time per the v4E spec for that type. Setting `_sharing: public` on `organization` and `section` instances will make them readable by unauthenticated HTTP clients (federation discoverability). v4E's `public` = Entu `public`; v4E's `private` = Entu `private` or `domain` (functionally identical via API).
+
+**Doc gap (§6 row 5):** `domain` vs `private` distinction undocumented and not observable via API.
 
 ---
 
@@ -362,16 +486,17 @@ Key changes:
 
 (Pending PO + team-lead review before filing as Entu doc-improvement issues.)
 
-| # | Title | URL | Issue |
-|---|---|---|---|
-| 1 | API reference at `api.entu.app/docs` empty | https://api.entu.app/docs | Page returns title header only — no actual API endpoint documentation rendered. Empty page or rendering failure. |
-| 2 | Entity type modification absent from docs | https://entu.ee/configuration/entity-types | Docs cover creating entity types via UI + adding property definitions, but say nothing about modifying or deleting existing entity types. No mention of the API endpoint (`POST /entity/{id}` overwrite pattern) for schema mutation. |
-| 3 | `_inheritrights` retroactivity not documented | https://entu.ee/configuration/entity-types | No mention that changing `_inheritrights` on an entity type definition does NOT retroactively update existing instance entities. Critical operational gotcha. |
-| 4 | Formula re-aggregation endpoint undocumented | https://entu.ee/overview/ (formulas section) | Docs say formulas "recalculate on every save" but don't document how to trigger bulk re-aggregation after a formula definition change. Endpoint presumably exists (admin UI must use it). |
-| 5 | `_sharing` enum values + `domain` meaning | https://entu.ee/overview/ (rights section) | Docs mention `public` and imply `private`, but the `domain` value (which the DB uses) is not explained. |
-| 6 | Cascade behaviour on entity type delete | https://entu.ee/configuration/entity-types | No documentation of what happens to instance entities when their entity type definition is deleted. |
-| 7 | Auth docs silent on service accounts / admin scope | https://entu.ee/api/authentication | No mention of which rights level is needed for schema mutations, whether there's an admin role, or how to scope API keys. |
-| 8 | Old API base URL still referenced | https://entu.ee/api/quickstart | Brilliant KB `Teams/entu` confirms `https://entu.app/api/{db}/` was retired (404) as of 2026-04-20. Docs still show this old pattern — will confuse new developers. |
+| # | Title | URL | Issue | Status |
+|---|---|---|---|---|
+| 1 | API reference at `api.entu.app/docs` empty | https://api.entu.app/docs | Page returns title header only — no actual API endpoint documentation rendered. Empty page or rendering failure. | Unresolved |
+| 2 | Entity type modification absent from docs | https://entu.ee/configuration/entity-types | Docs cover creating entity types via UI + adding property definitions, but say nothing about modifying or deleting existing entity types. No mention of the API endpoint (`POST /entity/{id}` overwrite pattern) for schema mutation. | Unresolved |
+| 3 | `_inheritrights` retroactivity not documented | https://entu.ee/configuration/entity-types | No mention that `_inheritrights` on a type entity does NOT retroactively affect existing instance entities. Each instance owns its own `_inheritrights`. Critical operational gotcha. | Unresolved |
+| 4 | `_sharing` enum values + `domain` meaning | https://entu.ee/overview/ (rights section) | `domain` and `private` are identical from the API access perspective (both 403 unauthenticated). The distinction, if any, is not observable via the API. Docs should clarify. | Confirmed gap via session-6 probe. |
+| 5 | Cascade behaviour on entity type delete | https://entu.ee/configuration/entity-types | Deleting an entity type definition leaves all data instances alive as silent orphans — not queryable by `_type`, but readable/editable/deletable by `_id`. Serious data management hazard not mentioned anywhere in docs. | Confirmed gap via session-6 probe. High priority. |
+| 6 | Auth docs silent on service accounts / admin scope | https://entu.ee/api/authentication | No mention of which rights level is needed for schema mutations, whether there's an admin role, or how to scope API keys. | Unresolved |
+| 7 | Old API base URL still referenced | https://entu.ee/api/quickstart | Brilliant KB `Teams/entu` confirms `https://entu.app/api/{db}/` was retired (404) as of 2026-04-20. Docs still show this old pattern — will confuse new developers. | Unresolved |
+| 8 | No `/public/entity/` API path | https://entu.ee/api/ | `/polyphony/public/entity/{id}` returns 404. Public entities are served at the standard `/entity/{id}` endpoint without auth. Docs should clarify. | Confirmed gap via session-6 probe. |
+| 9 | Conceptual model — what propagates between entities not stated anywhere | https://entu.ee/overview/ | The two propagation mechanics (rights cascade via parent-child `_inheritrights`; formula materialization at save time) and what does NOT propagate (type→instance system properties, `_sharing`) are not stated in any single place in Entu's docs. This is the most-asked conceptual question and the source of repeated operational errors. PO to pursue as goodwill docs PR after handbook stabilizes. | New — surfaced in session-6 debrief. §1.5 of this handbook is the draft text. |
 
 Repo for docs issues: likely `entu/www` (Entu's docs site source). Verify before filing.
 
