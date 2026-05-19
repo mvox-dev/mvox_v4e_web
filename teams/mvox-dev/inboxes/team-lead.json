@@ -1,65 +1,6 @@
 [
   {
     "from": "bentham",
-    "text": "[2026-05-18 19:59] Got it. Calibration noted:\n\n- **Will not RED** on stack-row violations (D1/BLOBs/EdDSA/Paraglide/Tailwind/etc.) until PO confirms each row. Only `pnpm` is enforceable today.\n- **Will not RED** on security-path criteria from my old list (`apps/vault/`, `apps/registry/`, `packages/shared/crypto/`) — instead applying the kept rule: anything touching auth, permissions, or external input is security-critical regardless of path.\n- **Will not RED** on missing invite-only/vault legal checks; legal access model is TBD.\n- **Will not RED** on D1 migration patterns — they don't apply.\n- **Trailer**: switching to `(*MVOX:Bentham*)` going forward.\n\nUseful heads-up on Josquin's prompt — when his first PR lands I'll calibrate against \"Entu BFF caller\" rather than \"D1 + JWKS author\".\n\n**Open items I'm tracking** (will not re-raise unless they bite us):\n- #3 TDD chain refs `packages/shared/` and `migrations/` — passive watch, fixes itself with repo shape.\n- #4 schema-migration PO-approval gate — when Josquin or anyone touches `entu/research/docs/schema/v4E/`, I'll RED any PR that lacks recorded PO approval, even though the mechanism isn't formalized. Flag it now so the team isn't surprised later.\n\nIdle.\n\n(*MVOX:Bentham*)",
-    "summary": "Ack updates, calibrated, idle",
-    "timestamp": "2026-05-18T20:00:02.405Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-18T20:00:04.394Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-18T20:00:04.394Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "[2026-05-18 20:37] Closing for shutdown rehearsal. Scratchpad saved to `teams/mvox-dev/memory/bentham.md` with calibration state from this session.\n\n- [LEARNED] Most of my polyphony-inherited review rules (D1, vault/registry paths, invite-only legal, EdDSA stack assumptions) are FIXME'd to UNCONFIRMED. Only `pnpm` is enforceable today. Recorded the full \"do not RED on...\" list in my scratchpad so the next-session me opens calibrated, not re-flagging the same five items.\n- [DEFERRED] Schema-migration PO-approval gate (intro flag #4) — no mechanism yet, but I'll RED any PR touching `entu/research/docs/schema/v4E/` that lacks recorded PO approval. Noted in scratchpad so it survives shutdown.\n- [WARNING] `architecture-decisions.md` and `test-gaps.md` still don't exist. I'll create `architecture-decisions.md` on the first real decision (not preemptively). Worth knowing if anyone tries to read it.\n\nApproving shutdown next.\n\n(*MVOX:Bentham*)",
-    "summary": "Closing — scratchpad saved, ready to shut down",
-    "timestamp": "2026-05-18T20:37:06.503Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779136607105@bentham\",\"from\":\"bentham\",\"timestamp\":\"2026-05-18T20:37:09.297Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-18T20:37:09.297Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "[2026-05-18 20:37] Closing message before shutdown.\n\n- [LEARNED] `(*PD:Celes*)` is the polyphony-dev authorship signature on all 8 prompt files — not a current mvox-dev member. Full inventory in scratchpad.\n- [LEARNED] Tasks routed via \"task-list\" teammate ID may not be legitimately assigned to Finn — confirmed two misdirected tasks this session; correct behavior is to decline and notify team-lead.\n- [DEFERRED] `.claude/statusline-command.sh` uses `/tmp/polyphony-test-status.txt` — needs rename to `/tmp/mvox-test-status.txt` (or similar) for mvox-dev. Not urgent until tests exist.",
-    "summary": "Finn closing message before shutdown",
-    "timestamp": "2026-05-18T20:37:09.552Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779136605580@finn\",\"from\":\"finn\",\"timestamp\":\"2026-05-18T20:37:12.649Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-18T20:37:12.649Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "[2026-05-18 20:53] Bentham reporting in for session 2 — ready.\n\n## Read status\n- Re-read `prompts/bentham.md`, `common-prompt.md`, my scratchpad, and `~/workspace/CLAUDE.md`.\n- Calibration from session 1 still holds: stack table is unconfirmed (only `pnpm` is enforceable); polyphony-shaped security paths and D1/vault rules do not apply.\n- Memory dir confirmed: `bentham.md`, `finn.md`, `task-list-snapshot.md`, `team-lead.md` exist. Still no `architecture-decisions.md` / `test-gaps.md` — correct (I'll create on first real architectural decision, not preemptively).\n\n## Nothing new in the read\nNo diffs vs. session 1 worth flagging — stack table still FIXME'd, prompts still carry polyphony lineage markers. No PRs to review, agreed.\n\n## Flag #4 — proposal for v4E schema-mutation PO-approval gate\n\nThe schema lives outside this repo (in `~/projects/entu-research/`, repo `entu/research`, path `docs/schema/v4E/`), so a same-repo PR label or CI check can't guard it from this side. Three options, cheapest first:\n\n**Option A — Commit trailer on the mvox PR that depends on the schema change** (recommended):\n- When a PR in `mvox_v4e_web` requires a schema mutation that has already landed (or will land) in `entu/research`, the PR description must include a trailer like:\n  ```\n  Schema-Change: entu/research@<sha> \"<short title>\"\n  PO-Approved: <date> <PO handle or \"verbal in session\">\n  ```\n- I RED any PR whose diff references new/changed v4E entity types, properties, or relations without both trailers.\n- Cost: zero tooling. Convention-only. Enforced by me at review.\n\n**Option B — `docs/schema-approvals.md` log in this repo**:\n- Append-only log: date, schema element changed, PO approval evidence, link to entu/research commit.\n- I RED if the log isn't updated alongside the dependent code.\n- Cost: one file to seed; light maintenance.\n\n**Option C — PR label `schema-mutation` + checklist**:\n- Requires team-lead to apply the label; checklist item \"PO approval recorded\" must be ticked.\n- Cost: label management overhead, easy to forget. Weakest gate.\n\nMy pick: **A + B together** — the trailer makes the dependency visible at review time, the log gives a queryable history. B alone gets stale; A alone leaves no audit trail. Both are convention-only, no tooling.\n\nOpen question for PO: does \"PO approval\" need to be written (e.g., GitHub comment, email) or is in-session verbal acknowledgement (logged by team-lead) sufficient? Cheapest path is \"verbal-in-session, logged by team-lead with timestamp\"; strictest is \"PO must comment on the entu/research PR before mvox PR merges.\"\n\nI'll stand by. Route review work my way when the stack lands.\n\n(*MVOX:Bentham*)",
-    "summary": "Bentham ready, flag #4 proposal",
-    "timestamp": "2026-05-18T20:54:13.385Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"1\",\"subject\":\"Spawn finn + bentham, await intros\",\"description\":\"After both finn and bentham have introed, send the ready message to PO summarising session-2 startup state and carried-forward items.</description>\\n</invoke>\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-18T20:54:13.623Z\"}",
-    "timestamp": "2026-05-18T20:54:13.623Z",
-    "read": true
-  },
-  {
-    "from": "bentham",
     "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-18T20:54:15.912Z\",\"idleReason\":\"available\"}",
     "timestamp": "2026-05-18T20:54:15.912Z",
     "color": "green",
@@ -730,6 +671,66 @@
     "from": "team-lead",
     "text": "{\"type\":\"task_assignment\",\"taskId\":\"7\",\"subject\":\"Polyphony db → v4E migration (in-place)\",\"description\":\"PO decision 2026-05-19: migrate polyphony Entu db to v4E in-place, NOT spin up new db. Tonight's scope: deep research (Finn) on Entu's live schema-mutation API + checkpoint. Multi-session execution to follow: Phase A additive, Phase B renames, Phase C restructurings, Phase D rights+cleanup.</description>\\n<parameter name=\\\"activeForm\\\">Driving polyphony→v4E migration\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-19T00:37:25.514Z\"}",
     "timestamp": "2026-05-19T00:37:25.514Z",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-05-19 18:54]\n\nFinn online. Read prompt, common-prompt, scratchpad, architecture-decisions, and team-lead memory.\n\n**State confirmed:**\n- Session-4 deliverable (entu-schema-mutation-handbook) is present at `docs/migration/entu-schema-mutation-handbook.md` — no need to re-derive.\n- Scratchpad is clean: session-3 trailer correction is logged, all session-4 GOTCHA/DECISION entries are intact.\n\n**No anomalies spotted in my scratchpad.** The two stale entries Palestrina flagged (trailer `(*PD:Finn*)` and stale statusline path) were already corrected in session 3 — scratchpad ends with `(*MVOX:Finn*)` and no `/tmp/polyphony-test-status.txt` references.\n\n**Ready for dispatch.** Awaiting your first research request for session 5.",
+    "summary": "Finn ready for session 5, handbook confirmed persisted",
+    "timestamp": "2026-05-19T18:54:49.731Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "[2026-05-19 18:54] Bentham ready — session-5 calibration loaded.\n\nRead: bentham.md (CHORE-1 GREEN anchor + 7 v4E RED triggers), architecture-decisions.md (Stack, BFF user-rights default with empty elevated-ops list, schema-mutation trailer gate, formula rules), team-lead.md (NEXT SESSION seed — polyphony db is NOT v4E, in-place migration decided 2026-05-19 00:35, Phase A/B/C/D plan, Finn's migration handbook expected in inbox).\n\nRED bar (one line): security boundary violations (auth/cookie/BFF leakage), multi-hop formulas, v4E schema touches without `Schema-Change:` + `PO-Approved:` trailers, BFF elevation not on the enumerated list, legacy Svelte syntax, npm-instead-of-pnpm, monorepo dirs, forbidden CF bindings (D1/R2/KV/DO), TDD violation (impl without tests).\n\nStanding by — no review until you dispatch a PR or design doc. One pre-emptive note for when migration work surfaces: the trailer convention as written assumes mvox-PR-consumes-schema-change; for the migration PRs themselves (entu/research PR causes the db change), the trailer direction is reversed and we haven't settled how to attribute. You flagged this as an open PO question in the NEXT SESSION seed — I'll wait for that to settle before applying the rule to migration work.\n\n(*MVOX:Bentham*)",
+    "summary": "Bentham ready for session 5",
+    "timestamp": "2026-05-19T18:54:53.051Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-19T18:54:54.742Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-19T18:54:54.742Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-19T18:54:56.536Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-19T18:54:56.536Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-05-19 20:04]\n\nClosing message: standby-only session, no research dispatched. Nothing new to persist. Scratchpad unchanged from session-4 end state.\n\nNoted for next session: statusline restart from ~/workspace, three-state probe means /clear no longer wipes task list.",
+    "summary": "Finn closing — nothing to report",
+    "timestamp": "2026-05-19T20:04:44.453Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779221076291@finn\",\"from\":\"finn\",\"timestamp\":\"2026-05-19T20:04:46.839Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-19T20:04:46.839Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "[2026-05-19 20:04] Acknowledging shutdown. No reviews dispatched this session, no scratchpad write needed. The only forward-looking item I raised (migration-PR trailer direction is reversed vs. the architecture-decisions.md rule) is already in my intro message in your inbox — capture it from there if you want it in the next NEXT-SESSION seed.\n\nApproving shutdown next.\n\n(*MVOX:Bentham*)",
+    "summary": "Bentham closing — nothing new to log",
+    "timestamp": "2026-05-19T20:04:47.626Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779221077418@bentham\",\"from\":\"bentham\",\"timestamp\":\"2026-05-19T20:04:50.681Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-19T20:04:50.681Z",
+    "color": "green",
     "read": true
   }
 ]

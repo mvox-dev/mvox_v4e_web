@@ -1,5 +1,50 @@
 # Palestrina — Team Lead Scratchpad
 
+### [NEXT SESSION] 2026-05-19 — session-5 → session-6
+
+**Launch this session from `~/workspace`, NOT from `~`.** The new convention pinned at the top of `~/.claude/CLAUDE.md`: `cd ~/workspace && claude`. Required so the statusline (`~/workspace/.claude/statusline-command.sh`) resolves via `CLAUDE_PROJECT_DIR`, and so the workspace-scoped permissions/hooks in `~/workspace/.claude/settings.json` activate. Verify by checking that you have a statusline at the bottom of the terminal — if not, you launched from the wrong dir.
+
+**Session 5 was a procedural-surgery session, not a migration session.** Migration path (the actual headline work from session-4 → session-5 seed) did NOT advance. Finn's handbook at `docs/migration/entu-schema-mutation-handbook.md` remains UNREAD. The 6 open questions for PO are still queued. Phase A design has not started. Session 6 picks up exactly where session 5 was supposed to start.
+
+**What landed in session 5:**
+- **`startup.md` repaired** — `mvox-dev/mvox_v4e_web@f58910d`. Old Phase 2 (`rm -rf`) removed; new Phase 2 ("Establish team") is a three-state probe (A: warm reconnect / B: fresh / C: inconsistent). Conditional new Phase 4 restores tasks from snapshot only in State C. Renumbering: 0 Orient, 1 Sync, 2 Establish, 3 Restore inboxes, 4 Restore tasks (conditional), 5 Spawn, 6 Ready. Phase 5/6 numbers unchanged.
+- **Brilliant article published** — `Patterns/team-startup-clear-soft-restart` (id `d6a33567-c5da-443b-b047-5303d3bea21d`), intelligence type, shared sensitivity. 4 `relates_to` links: `Methods/team-design`, `Teams/ai-teams/framework-research`, `Teams/ai-teams/mvox-dev`, `Projects/ai-teams`.
+- **FR issue comment** — `mitselek/ai-teams#62` got a comment with the mvox-dev three-state probe as an alternative to Schliemann's "always TeamDelete" proposal. Side-by-side trade-off table; FR picks the canonical template approach.
+- **Launch convention pinned** — `~/.claude/CLAUDE.md` top of file now mandates `cd ~/workspace` before launching Claude. Will be true for ALL future sessions of this assistant on this host.
+
+**Task ID disclaimer for session 6** — session-4's task IDs (#1–#7 incl. completed CHORE-1) were wiped at session-5 startup when the broken Phase 2 forced a `TeamDelete` recovery. I recreated active tasks with fresh IDs (#1–#6, all pending, no "completed CHORE-1" marker). Any agent message or commit message from session 4 or earlier that references "task #N" by number is now stale. The `task-list-snapshot.md` at end of session 5 reflects the fresh numbering; treat it as authoritative.
+
+**Don't trust the recovered task list as a faithful image of pre-session-5 state.** The migration work (current #6, was old #7) is still in_progress conceptually — Finn already delivered the handbook in session 4 — but the live task is `[pending]` because TaskCreate has no way to set partial-progress status. Treat it as a notional pointer; the real state of the migration work lives in the handbook itself + the open PO questions.
+
+**Expected first action session 6:**
+1. Verify statusline appears (sanity check on launch-dir convention).
+2. Read Finn's `docs/migration/entu-schema-mutation-handbook.md` end-to-end.
+3. Summarize the 6 open questions for PO + the 8 doc-improvement-issue candidates.
+4. Triage with PO: which questions need Argo input, which PO decides directly, which doc-improvement issues to file.
+5. Once questions are settled, design Phase A as a concrete sequence of API calls. PO and I previously agreed Phase A's first probe could be adding `event.capacity` (single property, no data backfill) — re-confirm or pick a smaller probe based on what the handbook reveals.
+
+**Carryforward from session-4 → session-5 seed (NOT yet processed):**
+All items in the next block ("[PROCESSED 2026-05-19] session-4 → session-5" after this entry) describe migration work that session 5 did not touch. That seed is still load-bearing for session-6 startup — read it after this one.
+
+**Mvox repo state at end of session 5:**
+- `main` HEAD: **f58910d** chore(mvox-dev): repair startup procedure for /clear soft-restart
+- Previous commits unchanged from end of session 4 (`8742ec7`, `d69186a`, `e7cf148`, ...)
+- All pushed to origin/main.
+- Working tree clean (after this shutdown commit lands).
+
+**Pending PO decisions (queued from session-4 seed, untouched):**
+- Migration commit attribution convention (`Schema-Change:` trailer direction reverses for migration PRs vs consumption PRs).
+- Where migration code lives — entu/research `scripts/migrations/...` is my instinct.
+- Backup strategy before Phase B/C/D (polyphony db has real ESL data: 6 choirs, 116 members at Kammerkoor Crede).
+- 8 Entu doc-improvement issue candidates queued for PO+team-lead review before filing against whichever Entu docs repo applies.
+
+**Brilliant entries created this session (for cross-reference next time):**
+- `Patterns/team-startup-clear-soft-restart` (d6a33567-c5da-443b-b047-5303d3bea21d) — startup-procedure gotcha. Linked from Methods/team-design, Teams/ai-teams/framework-research, Teams/ai-teams/mvox-dev, Projects/ai-teams.
+
+(*MVOX:Palestrina*)
+
+---
+
 ### [GOTCHA] 2026-05-19 (session 5) — `/clear` vs CLI exit; startup procedure rewritten
 
 `/clear` clears conversation context but does NOT exit the Claude Code CLI process. The harness keeps its in-memory team-lead tracking across `/clear`. If you then run the old "Phase 2: Clean" (`rm -rf ~/.claude/teams/mvox-dev/`), you land in:
@@ -26,6 +71,12 @@ Hit exactly this at session-5 startup. Session-4 task IDs #1–#7 got wiped at t
 (*MVOX:Palestrina*)
 
 ---
+
+### [PROCESSED 2026-05-19] session-4 → session-5 seed — NOT processed in session 5
+
+Session 5 was diverted to startup-procedure surgery; the migration work this seed describes did not advance. Read this entire section as session-6 startup material (it is the live state-of-play for the migration). Downgrade tag when session 6 actually executes against it.
+
+Original session-4 → session-5 seed text follows:
 
 ### [NEXT SESSION] 2026-05-19 — session-4 → session-5
 

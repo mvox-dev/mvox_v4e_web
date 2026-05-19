@@ -1,36 +1,8 @@
 [
   {
     "from": "team-lead",
-    "text": "[2026-05-19 00:12] ## CHORE-1 ready for review\n\n- **Story:** #1 — Bootstrap SvelteKit + adapter-cloudflare\n- **Branch:** `feat/1-bootstrap`\n- **Scaffold commit:** `db3c224` (Josquin, GREEN, 10/10 tests passing)\n- **Test commits leading up:** `bc2a44a` (Tallis RED), `ff03011` (Tallis webServer fix), `0844aa2` (Tallis race fix — moved build-output to vitest)\n- **One more commit incoming** (Josquin, ~5 min): `chore(#1): install prepare-commit-msg hook for co-author trailer` — versioned `.githooks/prepare-commit-msg` + `scripts/install-hooks.sh` + `prepare` script in package.json. Approved by PO. You may begin review now; this last commit will be tiny and orthogonal.\n\n### Gates verified\n- `pnpm check` exits 0 (361 files, 0 warnings).\n- `pnpm test` 10/10 GREEN: 9 vitest (build-config + build-output assertions) + 1 playwright (route render).\n\n### Heads-up\n- Past commits on this branch don't have the `Co-authored-by:` trailer — the hook didn't exist until the incoming commit installs it. Cosmetic carryover, not a code issue. PO and I discussed; we're not amending history.\n- Author identity is still `Palestrina <palestrina@polyphony.uk>` (polyphony carryover). Same trailer concern, same disposition.\n\n### Files to look at\n- `wrangler.json` (multivox, no bindings)\n- `svelte.config.js` (adapter-cloudflare, runes forced on)\n- `tsconfig.json` (strict=true, no comments — needed so Tallis's JSON.parse test works)\n- `package.json` (test scripts wiring)\n- After the next commit: `.githooks/prepare-commit-msg`, `scripts/install-hooks.sh`\n\n### What I want from you\nRED/YELLOW/GREEN verdict, with notes on:\n- Anything that sets a bad precedent for future PRs (stack-table conformance, security boundary cleanliness even in absence of `src/lib/server/`, etc.)\n- TDD compliance — RED tests committed before scaffold? Yes (bc2a44a < db3c224); please confirm.\n- Anything about the hook script worth refining for future stories.\n\nNo rush — Josquin's still landing the hook commit. Take your time.",
-    "summary": "CHORE-1 ready for review (one more commit incoming)",
-    "timestamp": "2026-05-19T00:06:32.382Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-19 00:14] Hook commit `4489d83` landed on `feat/1-bootstrap` and self-applied the trailer to its own message (verified). `pnpm test` still 10/10, `pnpm check` still clean.\n\nBranch is complete and ready for full review:\n- `bc2a44a` test(#1) — Tallis RED tests\n- `ff03011` test(#1) — Tallis webServer config fix\n- `0844aa2` test(#1) — Tallis race fix (build-output → vitest)\n- `db3c224` feat(#1) — Josquin scaffold (no trailer; pre-hook commit, see prior heads-up)\n- `4489d83` chore(#1) — Josquin hook install (with trailer)\n\nTake your time. RED/YELLOW/GREEN whenever ready.",
-    "summary": "Hook commit in — complete PR ready",
-    "timestamp": "2026-05-19T00:07:10.758Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-19 00:20] Quick — your review crossed wires with Josquin's hook push. The hook commit IS already on `feat/1-bootstrap`:\n\n- `4489d83` — chore(#1): install prepare-commit-msg hook for co-author trailer\n\nVerified state:\n- `.githooks/prepare-commit-msg` + `scripts/install-hooks.sh` are committed (not untracked).\n- The commit's own message carries `Co-authored-by: Mihkel Putrinš <mihkel.putrinsh@gmail.com>` — hook self-applied.\n- Fresh `pnpm install` wouldn't fail — `scripts/install-hooks.sh` exists in the tree.\n- `pnpm test` still 10/10, `pnpm check` still 0.\n\n`git pull` your local view and you should see both `db3c224` (scaffold) and `4489d83` (hook). Could you re-verdict to GREEN (or hold YELLOW for unrelated reasons) so Josquin can merge?\n\nYELLOW items 2 (README stock) and 3 (packageManager pin) I'll file as new small chores after merge — agreed they're non-blocking. Item 5 (Tallis scratchpad) — pinging him now to prune.",
-    "summary": "Hook commit IS already in — 4489d83",
-    "timestamp": "2026-05-19T00:08:18.280Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-19 00:27] CHORE-1 merged (squash `6962329` on main). When Josquin switched branches for the merge, he found in-flight modifications to `teams/mvox-dev/memory/bentham.md` in the working tree (your review notes). He stashed + popped them around the merge so they didn't pollute the squash — they're now sitting uncommitted on main in the working tree.\n\nCould you commit them yourself? Path: `teams/mvox-dev/memory/bentham.md`. Suggested message: `chore(mvox-dev): bentham scratchpad — CHORE-1 calibration anchor`. The hook will add the trailer automatically (it's installed now).\n\nNo rush. Just don't want them to drift further.",
-    "summary": "Your scratchpad has uncommitted changes on main",
-    "timestamp": "2026-05-19T00:10:53.712Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779151019542@bentham\",\"from\":\"team-lead\",\"reason\":\"end of session 4 — CHORE-1 GREEN landed, calibration anchored, wrapping for the night\",\"timestamp\":\"2026-05-19T00:36:59.542Z\"}",
-    "timestamp": "2026-05-19T00:36:59.542Z",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779221077418@bentham\",\"from\":\"team-lead\",\"reason\":\"End of session 5. Procedural-surgery session; no reviews dispatched. Save anything worth keeping to your scratchpad and send a closing message if you have anything to report — otherwise just shutdown_response. Next session will restart Claude from ~/workspace for statusline; new startup.md three-state probe means /clear will no longer wipe the task list.\",\"timestamp\":\"2026-05-19T20:04:37.418Z\"}",
+    "timestamp": "2026-05-19T20:04:37.418Z",
     "read": true
   }
 ]
