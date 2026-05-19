@@ -52,7 +52,7 @@ describe('formatJsonReport', () => {
 				{
 					kind: 'CREATE_TYPE',
 					typeName: 'voice',
-					label: 'Voice',
+					blurb: 'Vocal range taxonomy',
 					properties: []
 				}
 			],
@@ -84,5 +84,33 @@ describe('formatMarkdownReport', () => {
 		const dryResult: ExecutionResult = { ...baseResult, dryRun: true };
 		const md = formatMarkdownReport(dryResult, meta);
 		expect(md).toContain('**DRY-RUN** — no writes performed');
+	});
+
+	it('includes Would create / Would add sections on dry-run', () => {
+		const dryResult: ExecutionResult = {
+			dryRun: true,
+			createdTypes: [],
+			addedProperties: [],
+			wouldCreateTypes: [
+				{ kind: 'CREATE_TYPE', typeName: 'voice', blurb: 'Vocal range', properties: [] }
+			],
+			wouldAddProperties: [
+				{
+					kind: 'ADD_PROPERTY',
+					parentTypeName: 'season',
+					parentTypeId: 'season-id',
+					propertyName: 'end_date',
+					def: { name: 'end_date', type: 'date' }
+				}
+			],
+			skipped: [],
+			failed: [],
+			formulaTouchSaveDeferred: []
+		};
+		const md = formatMarkdownReport(dryResult, meta);
+		expect(md).toContain('## Would create entity types');
+		expect(md).toContain('`voice`');
+		expect(md).toContain('## Would add properties');
+		expect(md).toContain('`season.end_date`');
 	});
 });
