@@ -1,0 +1,21 @@
+{
+  "version": "v4E",
+  "sections": [],
+  "entities": [
+    {
+      "name": "season",
+      "label": "Season",
+      "properties": [
+        { "name": "start_date", "type": "date", "mandatory": true },
+        { "name": "end_date", "type": "date" }
+      ]
+    },
+    {
+      "name": "voice",
+      "label": "Voice",
+      "properties": [
+        { "name": "label", "type": "string" }
+      ]
+    }
+  ]
+}
