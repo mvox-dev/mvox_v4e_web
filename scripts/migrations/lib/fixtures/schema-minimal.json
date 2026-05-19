@@ -4,17 +4,18 @@
   "entities": [
     {
       "name": "season",
-      "label": "Season",
+      "blurb": "A choir's working year",
       "properties": [
-        { "name": "start_date", "type": "date", "mandatory": true },
-        { "name": "end_date", "type": "date" }
+        { "name": "start_date", "type": "date", "required": true },
+        { "name": "end_date", "type": "date" },
+        { "name": "description", "type": "text" }
       ]
     },
     {
       "name": "voice",
-      "label": "Voice",
+      "blurb": "Vocal range taxonomy",
       "properties": [
-        { "name": "label", "type": "string" }
+        { "name": "name", "type": "string" }
       ]
     }
   ]

@@ -10,7 +10,7 @@ describe('loadV4eSchema', () => {
 		expect(schema.version).toBe('v4E');
 		expect(schema.entities).toHaveLength(2);
 		expect(schema.entities[0].name).toBe('season');
-		expect(schema.entities[0].properties).toHaveLength(2);
+		expect(schema.entities[0].properties).toHaveLength(3);
 		expect(schema.entities[0].properties[0].name).toBe('start_date');
 		expect(schema.entities[1].name).toBe('voice');
 	});
