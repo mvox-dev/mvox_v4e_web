@@ -12,7 +12,9 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"test": "vitest run && playwright test",
 		"test:unit": "vitest run",
-		"test:e2e": "playwright test"
+		"test:e2e": "playwright test",
+		"migrate:phase-a": "tsx scripts/migrations/2026-05-19-phase-a.ts",
+		"migrate:phase-a:dry": "tsx scripts/migrations/2026-05-19-phase-a.ts --dry-run"
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.49.0",
@@ -22,6 +24,7 @@
 		"@types/node": "^25.9.0",
 		"svelte": "^5.55.2",
 		"svelte-check": "^4.4.6",
+		"tsx": "^4.22.3",
 		"typescript": "^6.0.2",
 		"vite": "^8.0.7",
 		"vitest": "^3.0.0"

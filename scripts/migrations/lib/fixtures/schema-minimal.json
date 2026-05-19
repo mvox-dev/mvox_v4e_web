@@ -1,0 +1,22 @@
+{
+  "version": "v4E",
+  "sections": [],
+  "entities": [
+    {
+      "name": "season",
+      "blurb": "A choir's working year",
+      "properties": [
+        { "name": "start_date", "type": "date", "required": true },
+        { "name": "end_date", "type": "date" },
+        { "name": "description", "type": "text" }
+      ]
+    },
+    {
+      "name": "voice",
+      "blurb": "Vocal range taxonomy",
+      "properties": [
+        { "name": "name", "type": "string" }
+      ]
+    }
+  ]
+}
