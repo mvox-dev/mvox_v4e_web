@@ -32,10 +32,20 @@ metadata:
 
 ## Open items I'm watching
 
-[DEFERRED] No `test-gaps.md` yet — Tallis appends as gaps emerge. Will read when it appears.
+[DEFERRED] First BFF-touching PR (CHORE-5 Entu skeleton) is the next real calibration test for the security-critical-paths rules. Watch for: missing `httpOnly`/`Secure`/`SameSite` on the JWT cookie, missing CSRF protection on POST endpoints, client-side env vars leaking secrets via `$env/dynamic/public`, and unsafe URL composition in BFF passthrough.
 
-[DEFERRED] No code in the repo yet. First PRs (likely auth/OAuth + first BFF endpoint) will be the calibration test for the security-critical-paths rules. Watch for: missing `httpOnly`/`Secure`/`SameSite` on the JWT cookie, missing CSRF protection on POST endpoints, client-side env vars leaking secrets via `$env/dynamic/public`, and unsafe URL composition in BFF passthrough.
+## 2026-05-19 — CHORE-1 review (issue #1, branch `feat/1-bootstrap`)
 
-[CHECKPOINT] Calibration state for session 3+: stack table enforceable; v4E RED triggers from case study Sections B + D encoded; flag #4 closed; per-value `_sharing` dropped; elevated-ops list empty; awaiting first PR.
+[DECISION] **Verdict: GREEN** (after hook commit `4489d83` landed; corrected from initial YELLOW). Stack-table conformance clean: SvelteKit 2 + Svelte 5 runes forced on, `@sveltejs/adapter-cloudflare`, TS strict, pnpm, flat layout (`src/lib/`, `src/routes/`, no `apps/`/`packages/`), no D1/R2/KV/DO bindings, wrangler names `multivox`. TDD ordering verified: RED `bc2a44a` (23:54) < GREEN `db3c224` (00:04). No legacy `export let` / `$:` anywhere. No security boundary touched (correct — that's CHORE-5 scope). Hook commit `4489d83` adds `.githooks/prepare-commit-msg` + `scripts/install-hooks.sh` + `prepare`-script reference ATOMICALLY (3-file diff). Trailer self-applied on its own message.
+
+[GOTCHA-CORRECTION] My first-pass review flagged the `prepare` script as referencing the uncommitted `scripts/install-hooks.sh` in `db3c224`. **That was wrong.** I read `package.json` from the working tree (post-WIP untracked state) instead of from the actual commit. `db3c224`'s `prepare` was `"svelte-kit sync || echo ''"` — self-contained, no broken reference. `4489d83` added the script AND the script reference atomically. **Pattern for future per-commit reviews: never trust the worktree state; always read source via `git show <sha>:<path>`.** Untracked WIP shadows the commit content invisibly.
+
+[PATTERN] **Test-flake hygiene** — Tallis correctly moved the build-output assertion out of Playwright into Vitest (`0844aa2`) to avoid racing the preview server. Encode for future: build-output / static-config assertions belong in Vitest; only assertions requiring a live SvelteKit server belong in Playwright. (Sidenote: `webServer.command` is now in `playwright.config.ts`, so the Playwright suite self-hosts — Tallis's scratchpad still says "intentionally omits webServer". Flag next session, not a blocker.)
+
+[PATTERN] **First-PR calibration precedent set:** GREEN end-state. Small precedent-setting non-blockers raised once so they don't recur: README still SvelteKit template (followup), no `packageManager` field pinning pnpm version (followup), author identity carryover (accepted). None RED-worthy.
+
+[PATTERN] **Author identity / co-author trailer carryover** flagged by team-lead and accepted as cosmetic. Logging here so I don't re-flag: pre-`db3c224` commits won't carry `Co-authored-by: Mihkel Putrinš <mihkel.putrinsh@gmail.com>` — accepted state, don't RED. Post-hook-install: missing trailer on a new commit is YELLOW (mechanical) unless deliberate, then RED.
+
+[DEFERRED] Stack-table column "Testing: Vitest + Playwright" is enforced from this PR forward. Any future PR that bypasses Vitest for static config assertions (e.g., shell scripts in CI doing JSON parsing) → YELLOW with note to colocate as `*.spec.ts`.
 
 (*MVOX:Bentham*)
