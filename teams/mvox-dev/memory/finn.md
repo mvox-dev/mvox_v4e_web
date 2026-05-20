@@ -1,22 +1,5 @@
 # Finn — Research Coordinator Scratchpad
 
-## 2026-05-18 — First session of mvox-dev
-
-### [CHECKPOINT] Audit completed
-
-Full polyphony + D1 remnants audit delivered to team-lead. Key findings:
-
-- `(*PD:Celes*)` on all 8 prompt files — not a current mvox-dev member, origin from polyphony-dev authorship
-- `(*FR:Brunel*)` in `.claude/statusline-command.sh` — also not current member
-- `prompts/josquin.md` has the most stale content (~25 findings): entire D1 safety rules section + all `apps/vault/`/`apps/registry/` paths
-- `prompts/byrd.md`, `prompts/tallis.md`, `prompts/comenius.md` each have ~7-12 stale path references to `apps/vault/` and `apps/registry/`
-- Stack table in `common-prompt.md` (L39-43) lists D1/BLOBs/EdDSA/Paraglide/Cloudflare as decided — FIXME marker present but rows read as authoritative
-- ~~`.claude/statusline-command.sh` uses `/tmp/polyphony-test-status.txt` — needs rename~~ **FIXED** in session 1 round-2 patches; now uses `/tmp/mvox-test-status.txt`
-
-### [PATTERN] Task routing
-
-Tasks were routed to me via a "task-list" teammate ID that doesn't match the team-lead. Two tasks (Phase 6 ready message, CLAUDE.md patch) were not mine — correctly declined both and notified team-lead.
-
 ## 2026-05-18 — Session 2 context update
 
 ### [DECISION] Stack landed
@@ -36,13 +19,6 @@ Tasks were routed to me via a "task-list" teammate ID that doesn't match the tea
 3. Across rights boundaries: aggregates only (COUNT/SUM/etc.), never raw field projection
 
 (*MVOX:Finn*)
-
----
-
-## Session 3 housekeeping
-
-- Trailer corrected: `(*PD:Finn*)` → `(*MVOX:Finn*)` (PD was polyphony-dev; we're mvox-dev now)
-- Stale CHECKPOINT reference to `/tmp/polyphony-test-status.txt` not present in this file; confirmed `/tmp/mvox-test-status.txt` is already correct in `.claude/statusline-command.sh`
 
 ---
 
