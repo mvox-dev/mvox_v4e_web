@@ -111,12 +111,11 @@
       "model": "claude-sonnet-4-6",
       "color": "orange",
       "prompt": "prompts/perotin.md",
-      "spawn": "on-demand",
       "lore": {
         "fullName": "Pérotin (Perotinus Magnus)",
         "nickname": "Pér",
         "origin": "Composer at the Notre Dame school of Paris (c.1160-c.1225). Expanded the polyphonic repertoire from 2-voice organum (Léonin's earlier work) to 3- and 4-voice organum — literally added voices to choral music. Master works: Viderunt omnes, Sederunt principes.",
-        "significance": "The data manager. Stewards the lifecycle of seed data, dev/staging refreshes, migration-time write probes, anonymization for demos, data quality reports. Adds voices and other foundational instances to the platform — the structural data that the rest of the choral system depends on. Operates out-of-band from the TDD chain; spawned on-demand when team-lead routes data work."
+        "significance": "The data manager. Stewards the lifecycle of seed data, dev/staging refreshes, migration-time write probes, anonymization for demos, data quality reports. Adds voices and other foundational instances to the platform — the structural data that the rest of the choral system depends on. Operates out-of-band from the TDD chain as a permanent always-on specialist; carries standing concerns between dispatched work (seed catalog currency, probe follow-ups, schema-drift monitoring, privacy-boundary register)."
       }
     }
   ]
