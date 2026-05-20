@@ -1,0 +1,1289 @@
+{
+  "phase": "A",
+  "executedAt": null,
+  "schemaSource": {
+    "path": "/home/michelek/projects/entu-research/docs/schema/v4E/schema.json",
+    "fileHash": "sha256:53a47fb9911b0a34ea48816f941e97420e7baed8eb14ab0f13228089b0859ed7"
+  },
+  "db": "polyphony",
+  "summary": {
+    "dryRun": true,
+    "createdTypes": 0,
+    "addedProperties": 0,
+    "wouldCreateTypes": 9,
+    "wouldAddProperties": 79,
+    "skipped": 0,
+    "failed": 0,
+    "formulaTouchSaveDeferred": 3
+  },
+  "createdTypes": [],
+  "addedProperties": [],
+  "wouldCreateTypes": [
+    {
+      "kind": "CREATE_TYPE",
+      "typeName": "voice",
+      "blurb": "Global vocal-range taxonomy (one source of truth referenced by person and section).",
+      "sharing": "public",
+      "inheritsRights": true,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "note": "e.g., \"Soprano\", \"Violin\", \"Trumpet\""
+        },
+        {
+          "name": "class",
+          "type": "string",
+          "required": true,
+          "note": "e.g., \"vocals\", \"strings\", \"brass\", \"woodwinds\", \"percussion\", \"keyboards\""
+        },
+        {
+          "name": "display_order",
+          "type": "number",
+          "note": "UI sort within class"
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "note": "for less-common voices (Countertenor, etc.)"
+        }
+      ]
+    },
+    {
+      "kind": "CREATE_TYPE",
+      "typeName": "library",
+      "blurb": "1:1 container for an org's catalog + lending. Root of the librarian-scoped subtree.",
+      "sharing": "private",
+      "inheritsRights": true,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "note": "typically \"<Org name> Library\" or just the org name"
+        }
+      ]
+    },
+    {
+      "kind": "CREATE_TYPE",
+      "typeName": "copy",
+      "blurb": "Physical copy of an edition (was `inventory_copy` in v3).",
+      "sharing": "private",
+      "inheritsRights": true,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "note": "e.g., \"Copy #3\""
+        },
+        {
+          "name": "copy_number",
+          "type": "number",
+          "required": true,
+          "note": "sequential within parent edition"
+        },
+        {
+          "name": "barcode",
+          "type": "string",
+          "note": "scannable; app-enforced uniqueness"
+        },
+        {
+          "name": "condition",
+          "type": "string",
+          "note": "good | fair | poor | lost"
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "note": "per-copy annotations"
+        }
+      ]
+    },
+    {
+      "kind": "CREATE_TYPE",
+      "typeName": "lending",
+      "blurb": "First-class loan record. Replaces v3 inline `inventory_copy.assigned_to`.",
+      "sharing": "private",
+      "inheritsRights": true,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "formula": "member.*.name copy.*.name ' — ' CONCAT_WS",
+          "note": "auto-formatted as \"Alice Smith — Copy #3\""
+        },
+        {
+          "name": "copy",
+          "type": "copy",
+          "ref": true,
+          "required": true
+        },
+        {
+          "name": "member",
+          "type": "member",
+          "ref": true,
+          "required": true
+        },
+        {
+          "name": "assigned_at",
+          "type": "date",
+          "required": true
+        },
+        {
+          "name": "assigned_until",
+          "type": "date",
+          "note": "due back"
+        },
+        {
+          "name": "returned_at",
+          "type": "date",
+          "note": "absent = still out"
+        },
+        {
+          "name": "renewed_at",
+          "type": "date",
+          "list": true,
+          "note": "each renewal extends assigned_until"
+        },
+        {
+          "name": "notes",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "kind": "CREATE_TYPE",
+      "typeName": "invitation",
+      "blurb": "Org's consent. Admin creates; user accepts → member created + invitation deleted.",
+      "sharing": "private",
+      "inheritsRights": true,
+      "properties": [
+        {
+          "name": "email",
+          "type": "string",
+          "required": true,
+          "note": "target address"
+        },
+        {
+          "name": "sections",
+          "type": "section",
+          "ref": true,
+          "list": true,
+          "note": "preset section parents for the new member at acceptance"
+        },
+        {
+          "name": "token",
+          "type": "string",
+          "required": true,
+          "note": "UUID for URL-based access"
+        },
+        {
+          "name": "expires_at",
+          "type": "date",
+          "required": true,
+          "note": "default 30 days from creation; admin-settable"
+        },
+        {
+          "name": "inviter",
+          "type": "person",
+          "ref": true,
+          "system": true,
+          "note": "who created the invitation"
+        },
+        {
+          "name": "message",
+          "type": "text",
+          "note": "personalised note"
+        }
+      ]
+    },
+    {
+      "kind": "CREATE_TYPE",
+      "typeName": "application",
+      "blurb": "Person's consent. Person creates; admin accepts → member created + application deleted.",
+      "sharing": "private",
+      "inheritsRights": true,
+      "properties": [
+        {
+          "name": "target_org",
+          "type": "organization",
+          "ref": true,
+          "required": true
+        },
+        {
+          "name": "message",
+          "type": "text",
+          "note": "applicant's note; can include voice/section preferences in free text"
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "required": true,
+          "note": "pending | rejected"
+        },
+        {
+          "name": "expires_at",
+          "type": "date",
+          "required": true,
+          "note": "default 30 days (both pending and rejected)"
+        }
+      ]
+    },
+    {
+      "kind": "CREATE_TYPE",
+      "typeName": "event_series",
+      "blurb": "Recurring pattern that materialises into events. Series defines defaults; events inherit + override.",
+      "sharing": "public",
+      "inheritsRights": true,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "note": "e.g., \"Tuesday Rehearsals 2025/2026\""
+        },
+        {
+          "name": "event_type",
+          "type": "string",
+          "required": true,
+          "note": "rehearsal | concert | festival | retreat | workshop | meeting | social | other"
+        },
+        {
+          "name": "interval_days",
+          "type": "number",
+          "required": true,
+          "note": "7 = weekly; 14 = biweekly; 30 ≈ monthly"
+        },
+        {
+          "name": "start_time",
+          "type": "string",
+          "required": true,
+          "note": "\"19:00\" (HH:MM)"
+        },
+        {
+          "name": "duration_minutes",
+          "type": "number",
+          "required": true
+        },
+        {
+          "name": "start_date",
+          "type": "date",
+          "required": true,
+          "note": "first occurrence (anchor)"
+        },
+        {
+          "name": "end_date",
+          "type": "date",
+          "required": true,
+          "note": "last occurrence"
+        },
+        {
+          "name": "default_location",
+          "type": "string",
+          "note": "inherited by child events"
+        },
+        {
+          "name": "default_description",
+          "type": "text",
+          "note": "inherited by child events"
+        }
+      ]
+    },
+    {
+      "kind": "CREATE_TYPE",
+      "typeName": "rsvp",
+      "blurb": "Member's pre-event commitment. Lives under person so member can create natively.",
+      "sharing": "private",
+      "inheritsRights": true,
+      "properties": [
+        {
+          "name": "event",
+          "type": "event",
+          "ref": true,
+          "required": true
+        },
+        {
+          "name": "member",
+          "type": "member",
+          "ref": true,
+          "required": true,
+          "note": "per-org context (same person may be member of multiple orgs)"
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "required": true,
+          "note": "going | not_going | maybe"
+        },
+        {
+          "name": "notes",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "kind": "CREATE_TYPE",
+      "typeName": "attendance",
+      "blurb": "Conductor's post-event record.",
+      "sharing": "private",
+      "inheritsRights": true,
+      "properties": [
+        {
+          "name": "member",
+          "type": "member",
+          "ref": true,
+          "required": true
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "required": true,
+          "note": "present | absent | late"
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "note": "\"left after intermission\" etc."
+        }
+      ]
+    }
+  ],
+  "wouldAddProperties": [
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "voice",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "name",
+      "def": {
+        "name": "name",
+        "type": "string",
+        "required": true,
+        "note": "e.g., \"Soprano\", \"Violin\", \"Trumpet\""
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "voice",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "class",
+      "def": {
+        "name": "class",
+        "type": "string",
+        "required": true,
+        "note": "e.g., \"vocals\", \"strings\", \"brass\", \"woodwinds\", \"percussion\", \"keyboards\""
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "voice",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "display_order",
+      "def": {
+        "name": "display_order",
+        "type": "number",
+        "note": "UI sort within class"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "voice",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "description",
+      "def": {
+        "name": "description",
+        "type": "text",
+        "note": "for less-common voices (Countertenor, etc.)"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "library",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "name",
+      "def": {
+        "name": "name",
+        "type": "string",
+        "required": true,
+        "note": "typically \"<Org name> Library\" or just the org name"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "copy",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "name",
+      "def": {
+        "name": "name",
+        "type": "string",
+        "required": true,
+        "note": "e.g., \"Copy #3\""
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "copy",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "copy_number",
+      "def": {
+        "name": "copy_number",
+        "type": "number",
+        "required": true,
+        "note": "sequential within parent edition"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "copy",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "barcode",
+      "def": {
+        "name": "barcode",
+        "type": "string",
+        "note": "scannable; app-enforced uniqueness"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "copy",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "condition",
+      "def": {
+        "name": "condition",
+        "type": "string",
+        "note": "good | fair | poor | lost"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "copy",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "notes",
+      "def": {
+        "name": "notes",
+        "type": "text",
+        "note": "per-copy annotations"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "lending",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "name",
+      "def": {
+        "name": "name",
+        "type": "string",
+        "formula": "member.*.name copy.*.name ' — ' CONCAT_WS",
+        "note": "auto-formatted as \"Alice Smith — Copy #3\""
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "lending",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "copy",
+      "def": {
+        "name": "copy",
+        "type": "copy",
+        "ref": true,
+        "required": true
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "lending",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "member",
+      "def": {
+        "name": "member",
+        "type": "member",
+        "ref": true,
+        "required": true
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "lending",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "assigned_at",
+      "def": {
+        "name": "assigned_at",
+        "type": "date",
+        "required": true
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "lending",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "assigned_until",
+      "def": {
+        "name": "assigned_until",
+        "type": "date",
+        "note": "due back"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "lending",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "returned_at",
+      "def": {
+        "name": "returned_at",
+        "type": "date",
+        "note": "absent = still out"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "lending",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "renewed_at",
+      "def": {
+        "name": "renewed_at",
+        "type": "date",
+        "list": true,
+        "note": "each renewal extends assigned_until"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "lending",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "notes",
+      "def": {
+        "name": "notes",
+        "type": "text"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "invitation",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "email",
+      "def": {
+        "name": "email",
+        "type": "string",
+        "required": true,
+        "note": "target address"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "invitation",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "sections",
+      "def": {
+        "name": "sections",
+        "type": "section",
+        "ref": true,
+        "list": true,
+        "note": "preset section parents for the new member at acceptance"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "invitation",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "token",
+      "def": {
+        "name": "token",
+        "type": "string",
+        "required": true,
+        "note": "UUID for URL-based access"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "invitation",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "expires_at",
+      "def": {
+        "name": "expires_at",
+        "type": "date",
+        "required": true,
+        "note": "default 30 days from creation; admin-settable"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "invitation",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "inviter",
+      "def": {
+        "name": "inviter",
+        "type": "person",
+        "ref": true,
+        "system": true,
+        "note": "who created the invitation"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "invitation",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "message",
+      "def": {
+        "name": "message",
+        "type": "text",
+        "note": "personalised note"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "application",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "target_org",
+      "def": {
+        "name": "target_org",
+        "type": "organization",
+        "ref": true,
+        "required": true
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "application",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "message",
+      "def": {
+        "name": "message",
+        "type": "text",
+        "note": "applicant's note; can include voice/section preferences in free text"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "application",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "status",
+      "def": {
+        "name": "status",
+        "type": "string",
+        "required": true,
+        "note": "pending | rejected"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "application",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "expires_at",
+      "def": {
+        "name": "expires_at",
+        "type": "date",
+        "required": true,
+        "note": "default 30 days (both pending and rejected)"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "event_series",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "name",
+      "def": {
+        "name": "name",
+        "type": "string",
+        "required": true,
+        "note": "e.g., \"Tuesday Rehearsals 2025/2026\""
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "event_series",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "event_type",
+      "def": {
+        "name": "event_type",
+        "type": "string",
+        "required": true,
+        "note": "rehearsal | concert | festival | retreat | workshop | meeting | social | other"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "event_series",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "interval_days",
+      "def": {
+        "name": "interval_days",
+        "type": "number",
+        "required": true,
+        "note": "7 = weekly; 14 = biweekly; 30 ≈ monthly"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "event_series",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "start_time",
+      "def": {
+        "name": "start_time",
+        "type": "string",
+        "required": true,
+        "note": "\"19:00\" (HH:MM)"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "event_series",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "duration_minutes",
+      "def": {
+        "name": "duration_minutes",
+        "type": "number",
+        "required": true
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "event_series",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "start_date",
+      "def": {
+        "name": "start_date",
+        "type": "date",
+        "required": true,
+        "note": "first occurrence (anchor)"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "event_series",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "end_date",
+      "def": {
+        "name": "end_date",
+        "type": "date",
+        "required": true,
+        "note": "last occurrence"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "event_series",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "default_location",
+      "def": {
+        "name": "default_location",
+        "type": "string",
+        "note": "inherited by child events"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "event_series",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "default_description",
+      "def": {
+        "name": "default_description",
+        "type": "text",
+        "note": "inherited by child events"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "rsvp",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "event",
+      "def": {
+        "name": "event",
+        "type": "event",
+        "ref": true,
+        "required": true
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "rsvp",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "member",
+      "def": {
+        "name": "member",
+        "type": "member",
+        "ref": true,
+        "required": true,
+        "note": "per-org context (same person may be member of multiple orgs)"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "rsvp",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "status",
+      "def": {
+        "name": "status",
+        "type": "string",
+        "required": true,
+        "note": "going | not_going | maybe"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "rsvp",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "notes",
+      "def": {
+        "name": "notes",
+        "type": "text"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "attendance",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "member",
+      "def": {
+        "name": "member",
+        "type": "member",
+        "ref": true,
+        "required": true
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "attendance",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "status",
+      "def": {
+        "name": "status",
+        "type": "string",
+        "required": true,
+        "note": "present | absent | late"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "attendance",
+      "parentTypeId": "(pending — type not yet created)",
+      "propertyName": "notes",
+      "def": {
+        "name": "notes",
+        "type": "text",
+        "note": "\"left after intermission\" etc."
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "person",
+      "parentTypeId": "69bcfd8e9c031ab8e6ce805f",
+      "propertyName": "bio",
+      "def": {
+        "name": "bio",
+        "type": "text",
+        "sharing": "public",
+        "note": "self-editable"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "person",
+      "parentTypeId": "69bcfd8e9c031ab8e6ce805f",
+      "propertyName": "preferred_contact_email",
+      "def": {
+        "name": "preferred_contact_email",
+        "type": "string",
+        "sharing": "private",
+        "note": "self-chosen from entu_user[*].email or custom; outbound only"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "person",
+      "parentTypeId": "69bcfd8e9c031ab8e6ce805f",
+      "propertyName": "preferences",
+      "def": {
+        "name": "preferences",
+        "type": "text",
+        "sharing": "private",
+        "note": "future"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "organization",
+      "parentTypeId": "69c7ea478489bfcb0e819e3d",
+      "propertyName": "founded",
+      "def": {
+        "name": "founded",
+        "type": "date",
+        "sharing": "public"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "organization",
+      "parentTypeId": "69c7ea478489bfcb0e819e3d",
+      "propertyName": "location",
+      "def": {
+        "name": "location",
+        "type": "string",
+        "sharing": "public",
+        "note": "e.g., \"Tallinn, Estonia\""
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "organization",
+      "parentTypeId": "69c7ea478489bfcb0e819e3d",
+      "propertyName": "website",
+      "def": {
+        "name": "website",
+        "type": "string",
+        "sharing": "public"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "organization",
+      "parentTypeId": "69c7ea478489bfcb0e819e3d",
+      "propertyName": "logo",
+      "def": {
+        "name": "logo",
+        "type": "file",
+        "sharing": "public"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "organization",
+      "parentTypeId": "69c7ea478489bfcb0e819e3d",
+      "propertyName": "social_links",
+      "def": {
+        "name": "social_links",
+        "type": "string",
+        "list": true,
+        "sharing": "public",
+        "note": "future — FB, IG, etc."
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "organization",
+      "parentTypeId": "69c7ea478489bfcb0e819e3d",
+      "propertyName": "rsvp_lockout_hours",
+      "def": {
+        "name": "rsvp_lockout_hours",
+        "type": "number",
+        "sharing": "private",
+        "note": "0 (default) = soft warning only, positive = hard block"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "organization",
+      "parentTypeId": "69c7ea478489bfcb0e819e3d",
+      "propertyName": "public_contact",
+      "def": {
+        "name": "public_contact",
+        "type": "member",
+        "list": true,
+        "ref": true,
+        "sharing": "public",
+        "note": "designated public contacts; default = owner + conductor"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "organization",
+      "parentTypeId": "69c7ea478489bfcb0e819e3d",
+      "propertyName": "member_count_per_section",
+      "def": {
+        "name": "member_count_per_section",
+        "type": "number",
+        "formula": "SUM(_child section.member_count)",
+        "sharing": "public",
+        "note": "aggregates across child sections; formula syntax provisional — FLAG"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "section",
+      "parentTypeId": "69c7ea498489bfcb0e819ea3",
+      "propertyName": "description",
+      "def": {
+        "name": "description",
+        "type": "text",
+        "sharing": "public"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "member",
+      "parentTypeId": "69c7ea4a8489bfcb0e819edd",
+      "propertyName": "current_section",
+      "def": {
+        "name": "current_section",
+        "type": "section",
+        "ref": true,
+        "note": "primary section pointer for multi-section members"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "member",
+      "parentTypeId": "69c7ea4a8489bfcb0e819edd",
+      "propertyName": "status",
+      "def": {
+        "name": "status",
+        "type": "string",
+        "required": true,
+        "note": "active | archived"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "work",
+      "parentTypeId": "69c7ea4c8489bfcb0e819f3e",
+      "propertyName": "catalog_id",
+      "def": {
+        "name": "catalog_id",
+        "type": "string",
+        "note": "e.g., \"243\""
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "work",
+      "parentTypeId": "69c7ea4c8489bfcb0e819f3e",
+      "propertyName": "catalog_system",
+      "def": {
+        "name": "catalog_system",
+        "type": "string",
+        "note": "e.g., \"BWV\""
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "work",
+      "parentTypeId": "69c7ea4c8489bfcb0e819f3e",
+      "propertyName": "part_of",
+      "def": {
+        "name": "part_of",
+        "type": "work",
+        "ref": true,
+        "note": "inline ref for movements (sub-works of a larger work)"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "edition",
+      "parentTypeId": "69c7ea4e8489bfcb0e819f9c",
+      "propertyName": "external_link",
+      "def": {
+        "name": "external_link",
+        "type": "string",
+        "list": true,
+        "note": "IMSLP, YouTube, publisher site; complements `file` for non-uploaded references"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "edition",
+      "parentTypeId": "69c7ea4e8489bfcb0e819f9c",
+      "propertyName": "work",
+      "def": {
+        "name": "work",
+        "type": "string",
+        "formula": "_parent",
+        "note": "denormalization — auto-derives work's name string; supports `program_item.name` single-hop chain"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "edition",
+      "parentTypeId": "69c7ea4e8489bfcb0e819f9c",
+      "propertyName": "arranger",
+      "def": {
+        "name": "arranger",
+        "type": "string",
+        "note": "for arrangements/transcriptions"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "edition",
+      "parentTypeId": "69c7ea4e8489bfcb0e819f9c",
+      "propertyName": "voicing",
+      "def": {
+        "name": "voicing",
+        "type": "string",
+        "note": "optional override of work.original_voicing"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "edition",
+      "parentTypeId": "69c7ea4e8489bfcb0e819f9c",
+      "propertyName": "duration",
+      "def": {
+        "name": "duration",
+        "type": "number",
+        "note": "optional override"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "edition",
+      "parentTypeId": "69c7ea4e8489bfcb0e819f9c",
+      "propertyName": "language",
+      "def": {
+        "name": "language",
+        "type": "string",
+        "list": true,
+        "note": "optional override"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "edition",
+      "parentTypeId": "69c7ea4e8489bfcb0e819f9c",
+      "propertyName": "acquired_at",
+      "def": {
+        "name": "acquired_at",
+        "type": "date"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "edition",
+      "parentTypeId": "69c7ea4e8489bfcb0e819f9c",
+      "propertyName": "source",
+      "def": {
+        "name": "source",
+        "type": "string",
+        "note": "donor / vendor / publisher"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "edition",
+      "parentTypeId": "69c7ea4e8489bfcb0e819f9c",
+      "propertyName": "cost",
+      "def": {
+        "name": "cost",
+        "type": "number"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "edition",
+      "parentTypeId": "69c7ea4e8489bfcb0e819f9c",
+      "propertyName": "license_note",
+      "def": {
+        "name": "license_note",
+        "type": "text"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "season",
+      "parentTypeId": "69c7ea528489bfcb0e81a044",
+      "propertyName": "end_date",
+      "def": {
+        "name": "end_date",
+        "type": "date",
+        "required": true,
+        "sharing": "public",
+        "note": "required — needed to know \"when does ongoing season end\""
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "season",
+      "parentTypeId": "69c7ea528489bfcb0e81a044",
+      "propertyName": "description",
+      "def": {
+        "name": "description",
+        "type": "text",
+        "sharing": "public"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "event",
+      "parentTypeId": "69c7ea548489bfcb0e81a0a2",
+      "propertyName": "start_datetime",
+      "def": {
+        "name": "start_datetime",
+        "type": "datetime",
+        "required": true
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "event",
+      "parentTypeId": "69c7ea548489bfcb0e81a0a2",
+      "propertyName": "duration_minutes",
+      "def": {
+        "name": "duration_minutes",
+        "type": "number",
+        "note": "inherited from series.duration_minutes if not set"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "event",
+      "parentTypeId": "69c7ea548489bfcb0e81a0a2",
+      "propertyName": "description",
+      "def": {
+        "name": "description",
+        "type": "text",
+        "note": "inherited from series.default_description if not set"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "event",
+      "parentTypeId": "69c7ea548489bfcb0e81a0a2",
+      "propertyName": "capacity",
+      "def": {
+        "name": "capacity",
+        "type": "number",
+        "note": "optional venue / attendance cap; UI surfaces for RSVP collection vs. limit"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "repertoire_item",
+      "parentTypeId": "69c7ea538489bfcb0e81a06e",
+      "propertyName": "status",
+      "def": {
+        "name": "status",
+        "type": "string",
+        "note": "learning | active | retired | dropped; default `active`"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "program_item",
+      "parentTypeId": "69c7ea568489bfcb0e81a103",
+      "propertyName": "notes",
+      "def": {
+        "name": "notes",
+        "type": "text",
+        "note": "soloists, dedications"
+      }
+    }
+  ],
+  "skipped": [],
+  "failed": [],
+  "formulaTouchSaveDeferred": [
+    {
+      "parentType": "lending",
+      "property": "name",
+      "formula": "member.*.name copy.*.name ' — ' CONCAT_WS"
+    },
+    {
+      "parentType": "organization",
+      "property": "member_count_per_section",
+      "formula": "SUM(_child section.member_count)"
+    },
+    {
+      "parentType": "edition",
+      "property": "work",
+      "formula": "_parent"
+    }
+  ]
+}
