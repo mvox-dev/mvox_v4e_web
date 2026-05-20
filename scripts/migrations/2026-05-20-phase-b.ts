@@ -5,6 +5,11 @@ import {
 	getJwt,
 	createEntity,
 	listEntities,
+	fetchEntity,
+	postProperties,
+	deletePropertyValue,
+	deleteEntity,
+	listInstancesByType,
 	POLYPHONY_META_TYPE_PROPERTY_ID,
 	type EntuClient
 } from './lib/entu-client';
@@ -319,40 +324,6 @@ interface EntuPropertyValue {
 	[key: string]: unknown;
 }
 
-async function fetchEntityJson(
-	client: EntuClient,
-	entityId: string
-): Promise<{ _id: string; [key: string]: unknown }> {
-	const url = `${client.apiBase}/${client.db}/entity/${entityId}`;
-	const res = await fetch(url, {
-		headers: { Authorization: `Bearer ${client.jwt}` }
-	});
-	if (!res.ok) {
-		throw new Error(`entity fetch failed: ${res.status} ${await res.text()}`);
-	}
-	const body = (await res.json()) as { entity: { _id: string; [key: string]: unknown } };
-	return body.entity;
-}
-
-async function postEntityProperty(
-	client: EntuClient,
-	entityId: string,
-	property: Record<string, unknown>
-): Promise<void> {
-	const url = `${client.apiBase}/${client.db}/entity/${entityId}`;
-	const res = await fetch(url, {
-		method: 'POST',
-		headers: {
-			Authorization: `Bearer ${client.jwt}`,
-			'Content-Type': 'application/json'
-		},
-		body: JSON.stringify([property])
-	});
-	if (!res.ok) {
-		throw new Error(`entity POST failed: ${res.status} ${await res.text()}`);
-	}
-}
-
 export function buildLiveCallbacks(client: EntuClient): PhaseBLiveCallbacks {
 	const addProperty: AddPropertyFn = async (_c, op: AddPropertyOp) => {
 		const payload = translatePropertyDef(op.def, op.parentTypeId, POLYPHONY_META_TYPE_PROPERTY_ID);
@@ -360,76 +331,33 @@ export function buildLiveCallbacks(client: EntuClient): PhaseBLiveCallbacks {
 		return { _id: created._id };
 	};
 
-	// Local list helper that uses /entity/ (trailing slash) so URLs contain /entity/ literally;
-	// this matches the URL substring check Tallis's RED-1 spec uses to verify the migrator did
-	// some entity work, while remaining a valid Entu query URL.
-	const listInstancesByType = async (parentType: string, props: string) => {
-		const qs = new URLSearchParams({
-			'_type.string': parentType,
-			props,
-			limit: '500'
-		}).toString();
-		const url = `${client.apiBase}/${client.db}/entity/?${qs}`;
-		const res = await fetch(url, {
-			headers: { Authorization: `Bearer ${client.jwt}` }
-		});
-		if (!res.ok) {
-			throw new Error(`list failed: ${res.status} ${await res.text()}`);
-		}
-		return (await res.json()) as { entities?: Array<Record<string, unknown> & { _id: string }>; count?: number };
-	};
-
-	// Helper: post a property value using the appropriate field shape per primitive type.
+	// Per-primitive writer for the data-migrator. Picks the right field shape for the value's
+	// primitive type. References are handled by writeReferencePropertyLive below.
 	const writePropertyLive = async (
 		_c: EntuClient,
 		entityId: string,
 		propertyName: string,
 		value: unknown
 	): Promise<{ _id: string }> => {
-		const property: Record<string, unknown> = { type: propertyName };
+		const property: { type: string; string?: string; number?: number } = { type: propertyName };
 		if (typeof value === 'string') property.string = value;
 		else if (typeof value === 'number') property.number = value;
-		// References look like strings but the migrator passes them as the _id; for the
-		// string_to_reference path the data-migrator hands us a string that's the entity _id —
-		// caller responsibility to know which form is wanted. The migrator's reference path
-		// passes the _id as `value`; we map that to `reference` for string_to_reference.
-		await postEntityProperty(client, entityId, property);
+		await postProperties(client, entityId, [property]);
 		return { _id: 'unknown' };
 	};
 
-	// Specialized writer for string_to_reference (data-migrator passes the looked-up _id as `value`).
-	// The data-migrator path POSTs the reference; we serialize as { type, reference } not { type, string }.
+	// Specialized writer for string_to_reference. data-migrator hands us the looked-up entity
+	// _id as `value`; serialize as { type, reference } rather than { type, string }.
 	const writeReferencePropertyLive = async (
 		_c: EntuClient,
 		entityId: string,
 		propertyName: string,
 		value: unknown
 	): Promise<{ _id: string }> => {
-		await postEntityProperty(client, entityId, { type: propertyName, reference: String(value) });
+		await postProperties(client, entityId, [{ type: propertyName, reference: String(value) }]);
 		return { _id: 'unknown' };
 	};
 
-	// DELETE /property/{id} — property-VALUE deletion. Callers: updateFormula's pre-delete
-	// loop (formula values on a prop-def) and migrateProperty injectables.deleteProperty
-	// (pruneExistingTarget path, stale target-property values on instances). Property
-	// VALUES are property records, not entities — /property/{id} is the correct endpoint.
-	//
-	// NOT for prop-def deletion. The op-level deleteProperty callback below has its own
-	// inline DELETE /entity/{propertyDefId} call (v12 Bug-1: property-def _ids are entity
-	// _ids; /property/{id} returns 404 for them).
-	const deletePropertyValueByIdLive = async (
-		_c: EntuClient,
-		propertyValueId: string
-	): Promise<void> => {
-		const url = `${client.apiBase}/${client.db}/property/${propertyValueId}`;
-		const res = await fetch(url, {
-			method: 'DELETE',
-			headers: { Authorization: `Bearer ${client.jwt}` }
-		});
-		if (!res.ok) {
-			throw new Error(`property-value DELETE failed: ${res.status} ${await res.text()}`);
-		}
-	};
 
 	// Live voice lookup: for string_to_reference, query by exact name.string=<NFC-value>.
 	const voiceLookupLive = async (sourceValue: string): Promise<string | undefined> => {
@@ -456,12 +384,12 @@ export function buildLiveCallbacks(client: EntuClient): PhaseBLiveCallbacks {
 		const parentLookup = new Map<string, string>();
 		const iterateType = (op as BackfillDataOp & { targetParentType?: string }).targetParentType
 			?? op.parentType;
-		const listResp = await listInstancesByType(iterateType, '_id');
+		const listResp = await listInstancesByType(client, iterateType, '_id');
 		for (const stub of listResp.entities ?? []) {
-			const child = await fetchEntityJson(client, stub._id);
+			const child = await fetchEntity(client, stub._id);
 			const parentRef = (child._parent as Array<{ reference?: string }> | undefined)?.[0]?.reference;
 			if (!parentRef) continue;
-			const parent = await fetchEntityJson(client, parentRef);
+			const parent = await fetchEntity(client, parentRef);
 			const sourceVal = (parent[op.sourceProperty] as EntuPropertyValue[] | undefined)?.[0];
 			const sourceStr = typeof sourceVal?.string === 'string' ? sourceVal.string : null;
 			if (sourceStr === null) continue;
@@ -474,6 +402,7 @@ export function buildLiveCallbacks(client: EntuClient): PhaseBLiveCallbacks {
 		const injectables: MigratePropertyInjectables = {
 			listInstances: async (_client, parentType) => {
 				const listResp = await listInstancesByType(
+					client,
 					parentType,
 					`_id,${op.sourceProperty},${op.targetProperty}`
 				);
@@ -481,7 +410,7 @@ export function buildLiveCallbacks(client: EntuClient): PhaseBLiveCallbacks {
 			},
 			writeProperty:
 				op.backfillKind === 'string_to_reference' ? writeReferencePropertyLive : writePropertyLive,
-			deleteProperty: deletePropertyValueByIdLive,
+			deleteProperty: deletePropertyValue,
 			voiceLookup: op.backfillKind === 'string_to_reference' ? voiceLookupLive : undefined,
 			parentLookup: op.backfillKind === 'parent_copy' ? await buildParentLookup(op) : undefined
 		};
@@ -489,17 +418,10 @@ export function buildLiveCallbacks(client: EntuClient): PhaseBLiveCallbacks {
 	};
 
 	const deleteProperty: DeletePropertyFn = async (_c, op: DeletePropertyOp) => {
-		// Prop-DEF deletion. v12 Bug-1: property-def _ids are entity _ids; Entu's
-		// /property/{id} returns 404 for them. DELETE /entity/{id} is the correct shape.
-		// Property-VALUE deletion uses /property/{id} via deletePropertyValueByIdLive.
-		const url = `${client.apiBase}/${client.db}/entity/${op.propertyDefId}`;
-		const res = await fetch(url, {
-			method: 'DELETE',
-			headers: { Authorization: `Bearer ${client.jwt}` }
-		});
-		if (!res.ok) {
-			throw new Error(`property DELETE failed: ${res.status} ${await res.text()}`);
-		}
+		// Prop-DEF deletion. Property-def _ids ARE entity _ids; /property/{id} returns 404
+		// for them, /entity/{id} is the correct shape (v12 Bug-1). Property-VALUE deletion
+		// uses /property/{id} via the lib's deletePropertyValue.
+		await deleteEntity(client, op.propertyDefId);
 		return { deleted: true };
 	};
 
@@ -598,17 +520,17 @@ export function buildLiveCallbacks(client: EntuClient): PhaseBLiveCallbacks {
 		// is an additive cleanup step; missing GET just means no stale values to remove.
 		let formulaValues: Array<{ _id?: string }> = [];
 		try {
-			const existing = await fetchEntityJson(client, op.propertyDefId);
+			const existing = await fetchEntity(client, op.propertyDefId);
 			formulaValues = (existing.formula as Array<{ _id?: string }> | undefined) ?? [];
 		} catch {
 			// GET failed → assume no stale formula values to clean
 		}
 		for (const v of formulaValues) {
 			if (typeof v._id === 'string') {
-				await deletePropertyValueByIdLive(client, v._id);
+				await deletePropertyValue(client, v._id);
 			}
 		}
-		await postEntityProperty(client, op.propertyDefId, { type: 'formula', string: op.newFormula });
+		await postProperties(client, op.propertyDefId, [{ type: 'formula', string: op.newFormula }]);
 		return { updated: true };
 	};
 
