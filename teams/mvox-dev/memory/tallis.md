@@ -61,4 +61,18 @@
 
 [OPEN] Phase B GREEN — Josquin implements: phase-b-scope.ts, snapshotter.ts, data-migrator.ts, touch-saver.ts, diff.ts additions, executor.ts additions, integration script. Branch `feat/phase-b-migration`.
 
+## [CHECKPOINT] 2026-05-20 — Session 8 RED dispatch batch
+
+[DECISION] RED tests for YELLOW carryforwards (#52, #54), v11 parent_copy delegation (#44), wire-shape fix (#56), toolkit extraction (#57), and YELLOW-14 extraQuery coverage (#58) — all written and committed this session. Total: 288 tests passing at session end.
+
+[PATTERN] When existing tests encode the wrong behavior (e.g., v12.2 asserting `/entity/` for formula-value DELETEs), update those assertions to assert the correct behavior in the same RED commit — don't leave contradictory tests. The updated test becomes RED until GREEN fixes the impl.
+
+[PATTERN] For `vi.mock` at module level: use the existing `live-wiring-delegation.spec.ts` file (already has the harness) when adding delegation-contract tests rather than creating a new file. Keeps `vi.mock` scope contained.
+
+[PATTERN] toolkit spec (`perotin-toolkit.spec.ts`): `vi.mock('node:fs')` + `vi.mock('./lib/entu-client')` at top so toolkit functions' composed calls (deletePropertyValue, postProperties, listInstancesByType, createEntity) are interceptable via `vi.fn()`. Import spies AFTER the mocks.
+
+[GOTCHA] Coverage-gap tests (YELLOW-14 pattern): test passes immediately — behavior already in lib. Commit anyway: the point is to prevent future regression in the union-arg discriminator, not to drive an impl. Send directly to Bentham for review (no RED-GREEN cycle needed).
+
+[PATTERN] `listInstancesByType` union-arg discriminator: `typeof arg4 === 'number'` → treat as limit; otherwise treat as extraQuery Record merged into params. Direct lib test: call with `{ '_parent.reference': 'org-1' }` as arg4 and assert both that filter AND `limit=500` appear in the URL.
+
 (*MVOX:Tallis*)

@@ -99,10 +99,32 @@ Result: scripts/migrations/seed-results/seed-voices-2026-05-20T08-14-58-992Z.jso
 [DECISION] Toolkit extraction confirmed viable (3 scripts share: JWT, dry-run guard, result artifact,
   idempotency check). Propose after this seed PR squash-merges as standalone follow-up.
 
+## Session 8 — toolkit extraction (#57/#59)
+
+[CHECKPOINT] perotin-toolkit.ts extraction complete. All 4 consumer PRs authored + handed to Bentham:
+  - PR A: toolkit creation — scripts/migrations/perotin-toolkit.ts (commit d72377a, main)
+  - PR B: probe-mutation-ops-2026-05-20.ts refactor (branch chore/toolkit-consumer-pr-b-probe, commit 222cea3)
+  - PR C: seed-voices.ts refactor (branch chore/toolkit-consumer-pr-c-voices, commit 68de164) — Bentham GREEN; awaiting Josquin merge
+  - PR D: phase-b-1-cleanup.ts refactor (branch chore/toolkit-consumer-pr-d-phase-b-1, commit 8372ac8) — Bentham verdict pending
+  - PR E: seed-collectives.ts refactor (branch chore/toolkit-consumer-pr-e-collectives, commit 1106ba5) — Bentham verdict pending
+
+[DECISION] Toolkit boundary: REST primitives in Josquin's lib/entu-client.ts; orchestration utils in perotin-toolkit.ts.
+  Exports: isDryRun(), writeResultArtifact(), replaceProperty(), findOrCreateByName()
+  New lib exports (Josquin): fetchEntity, postProperties, deletePropertyValue, deleteEntity, listInstancesByType
+
+[DECISION] listInstancesByType 4th-param union: limitOrExtraQuery?: number | Record<string,string>
+  number → sets limit; Record → merges as extra query filters. Discriminated by typeof.
+
+[DECISION] Dead import sweep is mandatory for all toolkit consumer PRs (Bentham carry-forward from PR C).
+  After routing through toolkit, remove any imports that are no longer directly called.
+
+[DEFERRED] YELLOW-14 (#58): direct lib-side test for listInstancesByType union-arg extraQuery — Tallis backlog.
+
+[DEFERRED] Live seed-collectives.ts execution — awaiting PO re-authorization (branch chore/toolkit-consumer-pr-e-collectives after Bentham GREEN + Josquin merge).
+
 ## Permanent role note
 
 Promoted from temporary specialist to permanent data-manager (session 7 end). Future seeding work:
-- Live seed-collectives.ts execution (after PO re-auth on chore/seed-collectives-v2)
+- Live seed-collectives.ts execution (after PR E merges + PO re-auth)
 - Phase C seeding needs (rsvp, attendance once those entities exist)
 - Dev/staging fresh-deploy seed choreography
-- perotin-toolkit.ts extraction (after seed PR merges)

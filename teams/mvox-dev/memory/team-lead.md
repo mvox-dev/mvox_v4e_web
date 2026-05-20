@@ -1,6 +1,80 @@
 # Palestrina — Team Lead Scratchpad
 
-### [NEXT SESSION] 2026-05-20 — session-7 → session-8
+### [NEXT SESSION] 2026-05-21 — session-8 → session-9
+
+**Session 8 outcome:** Phase B + B.1 fully complete on polyphony; toolkit extracted + applied across 4 scripts; all 3 session-8 Bentham YELLOWs (12/13/14) resolved. main HEAD: `6260ee7`. Working tree clean.
+
+**Session 8 commit chain (17 commits, all on main):**
+1. `612d3eb` FR audit cleanup (#55) — paths + drift + polyphony-isms
+2. `4bc1831` Phase A final dry-run report committed; 5 stale iterations dropped
+3. `c88487a` (#52 + #54) Phase B YELLOW carryforwards — bare-catch + limit undercount
+4. `296278e` (#44) v11 parent_copy delegation
+5. `d0ab9da` Pérotin toolkit-extraction standing concern (7th in his "Between dispatched work")
+6. `9fe6799` (#53) Phase B.1 — 4 blocked deletes cleared
+7. `a7b4774` (#56) wire-shape fix — `/property/{id}` vs `/entity/{id}` split
+8. `b7aad90` Phase B final re-run report — exit 0, `section.member_count` self-cleaned
+9. `a6ed6bb` (#47) seed-collectives + mutation-ops probe
+10. `43517ac` architecture-decisions session-8 entries (seed-data shape + Entu mutation wire shapes)
+11. `30a8847` wire-shapes findings doc
+12. `0cda89f` PR A — toolkit extraction (5 lib + 4 toolkit helpers)
+13. `db19ecf` PR B — probe-mutation-ops uses toolkit
+14. `8495883` PR C — seed-voices uses toolkit
+15. `9565363` PR D — phase-b-1-cleanup uses toolkit
+16. `1d8b562` PR E — seed-collectives uses toolkit (toolkit workstream complete)
+17. `6260ee7` (#58 YELLOW-14) lib extraQuery test pin
+
+**Live polyphony state at end of session 8:**
+- 6 orgs + 16 sections + 5 voices (unchanged from session 7)
+- 115 pre-v4E real members (was 116; Mait Vaher deleted as practice op)
+- 120 v4E-clean seed persons + 120 v4E-clean seed members (new, alongside the 115 real)
+- 0 obsolete prop values remaining for the 4 Phase B.1 blocked deletes
+- EFK Soprano section's residual `ordinal` value removed (practice REMOVE op)
+- `organization.member_count` prop-def deleted (practice + Phase B.1 op #4)
+- `section.member_count` formula clean (1 value: `(_child.member COUNT) (_child.section.member_count SUM) +`)
+
+**Carry-forward queue for session 9 (priority order):**
+
+1. **Phase C design** — biggest item, brainstorming session with PO. Structural migrations: inventory_copy → copy+lending (data migrate + retire inventory_copy); participation → rsvp+attendance split; affiliation → _parent links + retire affiliation; member.role → rights grants + retire role. **Probably a full session of work alone.**
+
+2. **Independent chores (unblocked):**
+   - CHORE-3 (#3) Paraglide i18n — open AC question: gitignore vs commit `src/lib/paraglide/`. Comenius will recommend on spawn.
+   - CHORE-4 (#4) Vitest + Playwright docs — ~90% done; needs CONTRIBUTING.md co-location section. Fast close.
+   - CHORE-6 (#6) Email Resend — blocked on PO SPF+DKIM DNS records.
+
+3. **Loose YELLOWs to fold into future PRs:**
+   - #19 CSRF gate — review-gate for next BFF cookie-authed mutation route PR
+   - #20 DRY DEFAULT_BASE_URL — 4-line cosmetic; fold into next `src/lib/server/entu/` PR
+   - #32 Tailwind OKLCH regex — relax on next Tailwind minor upgrade
+
+4. **Phase D — task #41 scope narrowed**: per Pérotin's session-8 schema read, v4E `person` ALREADY declares plain `name: string` (no forename/surname). Phase D scope is just: backfill `person.name` from polyphony's live `forename` + `surname`, delete those two props on instances + retire prop-defs. No `Schema-Change` trailer needed (no v4E modification). Also `_inheritrights: false` flip on 6 org instances + retire `_DEPRECATED_*` types.
+
+5. **Pérotin standing-concern follow-ups (low priority):**
+   - Result-artifact directory naming question (`seed-results/` vs `run-results/`) — deferred to a separate cosmetic PR per Bentham
+   - `findOrCreateByQuery` (custom lookup-key) — only if a third non-name-keyed seed entity surfaces
+
+**Expected first action session 9:**
+1. Verify statusline on launch (`cd ~/workspace && claude`).
+2. Read this seed + recent commits since `6260ee7`.
+3. Spawn finn + bentham + Pérotin per Phase 5.
+4. Confirm with PO: Phase C design? Or different starter?
+
+**Brilliant KB updates (deferred):**
+- Update `Projects/polyphony` body: Phase B + B.1 + toolkit complete; Phase C unstarted.
+- New: `Patterns/migration-toolkit-extraction` documenting PR A-E sequence (smallest-blast-radius-first; observations carry across PRs).
+- New: `Patterns/seed-data-v4e-clean` — schema-wins-when-conflicts-with-live rule.
+
+**Process lessons from session 8 (worth carrying forward):**
+- **L12 — Cross-fire on multi-agent handoffs (re-occurrence).** When Pérotin's revised proposal crossed my forwarding-to-Bentham message in flight, the workflow recovered cleanly because both messages were content-rich. Pattern: if both messages include their own context, order doesn't matter.
+- **L13 — Branch-checkout bug, team-lead variant.** I committed Pérotin's toolkit-extraction standing concern on his `chore/phase-b-1-cleanup` branch instead of main. Recovered via `git reset --soft HEAD~1` + stash + checkout main + commit. ~30 seconds; no work lost. **Rule:** verify `git branch --show-current` BEFORE every commit, not just before Bash writes generally.
+- **L14 — Notification pipeline gaps.** Two Pérotin handoffs + one Bentham verdict didn't surface to me during the session. Worked around by inspecting inbox JSONs directly. Build muscle memory: if an agent seems "idle" longer than expected, check their outbound queue manually.
+- **L15 — Agent context/token limits.** Bentham went silent ~16:57 (PR D review). PO suspected limit-hit; I poked at 17:02; Bentham came back at 19:12 with a full verdict 2h later. **Rule:** don't despair on silent agents. Poke after ~20-min idle window; expect possible long delays on long-context agents.
+- **L16 — Refactor-PR scope discipline + smallest-blast-radius sequencing works.** 5 toolkit PRs in ~5 hours total. Each successive PR carried forward observations from the prior (dead-import sweep from C; race-safety-on-non-name-keyed-entity from E). Reviewer observations compound across PRs without surprise re-design. Carry this pattern forward to Phase C/D structural migrations.
+
+(*MVOX:Palestrina*)
+
+---
+
+### [PROCESSED 2026-05-20 end-of-session-8] session-7 → session-8
 
 **Phase B landed substantially complete.** Polyphony Entu db is now v4E-aligned for additive + rename + most-obsolete-delete + formula-update + touch-save concerns. Live execution succeeded on the 2nd attempt (1st was 15/44 failures from 3 wire-shape bugs; v12 fixed all three; re-execution exit 0 + zero failures). Merge SHA on main: `e155cc9`.
 

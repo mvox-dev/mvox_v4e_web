@@ -4,6 +4,25 @@ Personal notes. Only Josquin writes here.
 
 ---
 
+## [LEARNED] 2026-05-20 — Squash-merge flow on this team
+
+Each PR landed on main via the same local squash-merge ritual (no PRs opened on GitHub; all feature branches stayed local). Steps that became muscle memory:
+
+1. **Stash unstaged scratchpads** (Bentham's and/or Pérotin's) before `git checkout main` — they routinely leave their `teams/mvox-dev/memory/*.md` dirty in the worktree between cycles. `git stash push -- <paths>`. Pop after push.
+2. **`git merge --squash <branch>` then commit with the team-lead-supplied message** verbatim (including the `(*MVOX:<author>*)` trailer, which is sometimes Tallis for test-only PRs not me). Co-author trailer auto-added by `prepare-commit-msg` hook.
+3. **`git branch -D` for local cleanup** — `-d` always fails because squash-merge doesn't update the merge graph. Expected.
+4. **`git push origin --delete <branch>` always errors** with "remote ref does not exist" because nobody pushed the feature branch — all GREEN/RED commits stayed local until squash. This is normal, not a failure mode.
+
+The 7 squash-merges I did across session 8 (3-2-2-3 grouping was wrong — actually 9 PRs: #44, #52+#54 bundle, #56, A, B, C, D, E, #58) all followed this exact pattern. If future me sees a remote feature branch actually exists, that's a sign someone pushed it (e.g., for a non-local review surface) and the cleanup step might do something — verify before the delete.
+
+## [LEARNED] 2026-05-20 — Toolkit lib union-arg discriminator pattern
+
+When two RED specs pin the same positional arg to different types (Tallis: `listInstancesByType(client, type, props, 50)` expects `limit` at position 3 as `number`; Pérotin: same position needs `Record<string,string>` for extraQuery), don't param-swap — union-type the arg and discriminate at runtime with `typeof === 'number'`. Position 4 becomes overflow for "I want both" cases (limit at 3, extraQuery at 4). The lib at `scripts/migrations/lib/entu-client.ts` has the production pattern; #58 added direct lib-side coverage so a regression in the discriminator surfaces directly rather than through the Pérotin-side spec.
+
+The principle is broader: when an existing GREEN spec pins a positional contract, prefer **type-level discrimination** over rearranging args. Adding a new branch to a union is non-breaking; reordering is.
+
+---
+
 ## [GOTCHA] 2026-05-19 — `pnpm dlx sv create` tsconfig has JSON-incompatible comments
 The minimal scaffold's `tsconfig.json` contains `//` line comments after the `compilerOptions` block. They are valid for TypeScript's JSONC parser but crash `JSON.parse`. Any AC test that does `JSON.parse(readFileSync('tsconfig.json'))` will fail until comments are stripped. Stripping is safe — TypeScript itself doesn't need them. Worth knowing for future scaffolds (sv may also drop similar comments in `package.json` derivatives).
 
