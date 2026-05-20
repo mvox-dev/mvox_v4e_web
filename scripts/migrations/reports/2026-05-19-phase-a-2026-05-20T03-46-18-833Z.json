@@ -1,0 +1,563 @@
+{
+  "phase": "A",
+  "executedAt": "2026-05-20T03:46:18.833Z",
+  "schemaSource": {
+    "path": "/home/michelek/projects/entu-research/docs/schema/v4E/schema.json",
+    "fileHash": "sha256:53a47fb9911b0a34ea48816f941e97420e7baed8eb14ab0f13228089b0859ed7"
+  },
+  "db": "polyphony",
+  "summary": {
+    "dryRun": false,
+    "createdTypes": 9,
+    "addedProperties": 79,
+    "wouldCreateTypes": 0,
+    "wouldAddProperties": 0,
+    "skipped": 0,
+    "failed": 0,
+    "formulaTouchSaveDeferred": 3
+  },
+  "createdTypes": [
+    {
+      "name": "voice",
+      "id": "6a0d2e8090c8df7a1cc7dd6a",
+      "createdAt": "2026-05-20T03:46:08.298Z"
+    },
+    {
+      "name": "library",
+      "id": "6a0d2e8090c8df7a1cc7dd9d",
+      "createdAt": "2026-05-20T03:46:08.917Z"
+    },
+    {
+      "name": "copy",
+      "id": "6a0d2e8190c8df7a1cc7ddb0",
+      "createdAt": "2026-05-20T03:46:09.156Z"
+    },
+    {
+      "name": "lending",
+      "id": "6a0d2e8190c8df7a1cc7dde8",
+      "createdAt": "2026-05-20T03:46:09.839Z"
+    },
+    {
+      "name": "invitation",
+      "id": "6a0d2e8290c8df7a1cc7de3e",
+      "createdAt": "2026-05-20T03:46:10.866Z"
+    },
+    {
+      "name": "application",
+      "id": "6a0d2e8390c8df7a1cc7de81",
+      "createdAt": "2026-05-20T03:46:11.828Z"
+    },
+    {
+      "name": "event_series",
+      "id": "6a0d2e8490c8df7a1cc7deb1",
+      "createdAt": "2026-05-20T03:46:12.393Z"
+    },
+    {
+      "name": "rsvp",
+      "id": "6a0d2e8590c8df7a1cc7df1b",
+      "createdAt": "2026-05-20T03:46:13.658Z"
+    },
+    {
+      "name": "attendance",
+      "id": "6a0d2e8690c8df7a1cc7df4b",
+      "createdAt": "2026-05-20T03:46:14.261Z"
+    }
+  ],
+  "addedProperties": [
+    {
+      "parentType": "voice",
+      "name": "name",
+      "id": "6a0d2e8090c8df7a1cc7dd73",
+      "createdAt": "2026-05-20T03:46:08.414Z"
+    },
+    {
+      "parentType": "voice",
+      "name": "class",
+      "id": "6a0d2e8090c8df7a1cc7dd7e",
+      "createdAt": "2026-05-20T03:46:08.553Z"
+    },
+    {
+      "parentType": "voice",
+      "name": "display_order",
+      "id": "6a0d2e8090c8df7a1cc7dd89",
+      "createdAt": "2026-05-20T03:46:08.661Z"
+    },
+    {
+      "parentType": "voice",
+      "name": "description",
+      "id": "6a0d2e8090c8df7a1cc7dd93",
+      "createdAt": "2026-05-20T03:46:08.804Z"
+    },
+    {
+      "parentType": "library",
+      "name": "name",
+      "id": "6a0d2e8090c8df7a1cc7dda6",
+      "createdAt": "2026-05-20T03:46:09.041Z"
+    },
+    {
+      "parentType": "copy",
+      "name": "name",
+      "id": "6a0d2e8190c8df7a1cc7ddb9",
+      "createdAt": "2026-05-20T03:46:09.288Z"
+    },
+    {
+      "parentType": "copy",
+      "name": "copy_number",
+      "id": "6a0d2e8190c8df7a1cc7ddc3",
+      "createdAt": "2026-05-20T03:46:09.400Z"
+    },
+    {
+      "parentType": "copy",
+      "name": "barcode",
+      "id": "6a0d2e8190c8df7a1cc7ddcd",
+      "createdAt": "2026-05-20T03:46:09.505Z"
+    },
+    {
+      "parentType": "copy",
+      "name": "condition",
+      "id": "6a0d2e8190c8df7a1cc7ddd6",
+      "createdAt": "2026-05-20T03:46:09.627Z"
+    },
+    {
+      "parentType": "copy",
+      "name": "notes",
+      "id": "6a0d2e8190c8df7a1cc7dddf",
+      "createdAt": "2026-05-20T03:46:09.723Z"
+    },
+    {
+      "parentType": "lending",
+      "name": "name",
+      "id": "6a0d2e8190c8df7a1cc7ddf1",
+      "createdAt": "2026-05-20T03:46:09.938Z"
+    },
+    {
+      "parentType": "lending",
+      "name": "copy",
+      "id": "6a0d2e8190c8df7a1cc7ddfb",
+      "createdAt": "2026-05-20T03:46:10.046Z"
+    },
+    {
+      "parentType": "lending",
+      "name": "member",
+      "id": "6a0d2e8290c8df7a1cc7de05",
+      "createdAt": "2026-05-20T03:46:10.214Z"
+    },
+    {
+      "parentType": "lending",
+      "name": "assigned_at",
+      "id": "6a0d2e8290c8df7a1cc7de0f",
+      "createdAt": "2026-05-20T03:46:10.327Z"
+    },
+    {
+      "parentType": "lending",
+      "name": "assigned_until",
+      "id": "6a0d2e8290c8df7a1cc7de19",
+      "createdAt": "2026-05-20T03:46:10.429Z"
+    },
+    {
+      "parentType": "lending",
+      "name": "returned_at",
+      "id": "6a0d2e8290c8df7a1cc7de22",
+      "createdAt": "2026-05-20T03:46:10.525Z"
+    },
+    {
+      "parentType": "lending",
+      "name": "renewed_at",
+      "id": "6a0d2e8290c8df7a1cc7de2b",
+      "createdAt": "2026-05-20T03:46:10.633Z"
+    },
+    {
+      "parentType": "lending",
+      "name": "notes",
+      "id": "6a0d2e8290c8df7a1cc7de35",
+      "createdAt": "2026-05-20T03:46:10.740Z"
+    },
+    {
+      "parentType": "invitation",
+      "name": "email",
+      "id": "6a0d2e8290c8df7a1cc7de47",
+      "createdAt": "2026-05-20T03:46:11.046Z"
+    },
+    {
+      "parentType": "invitation",
+      "name": "sections",
+      "id": "6a0d2e8390c8df7a1cc7de51",
+      "createdAt": "2026-05-20T03:46:11.148Z"
+    },
+    {
+      "parentType": "invitation",
+      "name": "token",
+      "id": "6a0d2e8390c8df7a1cc7de5b",
+      "createdAt": "2026-05-20T03:46:11.294Z"
+    },
+    {
+      "parentType": "invitation",
+      "name": "expires_at",
+      "id": "6a0d2e8390c8df7a1cc7de65",
+      "createdAt": "2026-05-20T03:46:11.399Z"
+    },
+    {
+      "parentType": "invitation",
+      "name": "inviter",
+      "id": "6a0d2e8390c8df7a1cc7de6f",
+      "createdAt": "2026-05-20T03:46:11.525Z"
+    },
+    {
+      "parentType": "invitation",
+      "name": "message",
+      "id": "6a0d2e8390c8df7a1cc7de78",
+      "createdAt": "2026-05-20T03:46:11.657Z"
+    },
+    {
+      "parentType": "application",
+      "name": "target_org",
+      "id": "6a0d2e8390c8df7a1cc7de8a",
+      "createdAt": "2026-05-20T03:46:11.946Z"
+    },
+    {
+      "parentType": "application",
+      "name": "message",
+      "id": "6a0d2e8390c8df7a1cc7de94",
+      "createdAt": "2026-05-20T03:46:12.051Z"
+    },
+    {
+      "parentType": "application",
+      "name": "status",
+      "id": "6a0d2e8490c8df7a1cc7de9d",
+      "createdAt": "2026-05-20T03:46:12.165Z"
+    },
+    {
+      "parentType": "application",
+      "name": "expires_at",
+      "id": "6a0d2e8490c8df7a1cc7dea7",
+      "createdAt": "2026-05-20T03:46:12.275Z"
+    },
+    {
+      "parentType": "event_series",
+      "name": "name",
+      "id": "6a0d2e8490c8df7a1cc7deba",
+      "createdAt": "2026-05-20T03:46:12.509Z"
+    },
+    {
+      "parentType": "event_series",
+      "name": "event_type",
+      "id": "6a0d2e8490c8df7a1cc7dec5",
+      "createdAt": "2026-05-20T03:46:12.656Z"
+    },
+    {
+      "parentType": "event_series",
+      "name": "interval_days",
+      "id": "6a0d2e8490c8df7a1cc7ded0",
+      "createdAt": "2026-05-20T03:46:12.798Z"
+    },
+    {
+      "parentType": "event_series",
+      "name": "start_time",
+      "id": "6a0d2e8490c8df7a1cc7dedb",
+      "createdAt": "2026-05-20T03:46:12.912Z"
+    },
+    {
+      "parentType": "event_series",
+      "name": "duration_minutes",
+      "id": "6a0d2e8490c8df7a1cc7dee6",
+      "createdAt": "2026-05-20T03:46:13.033Z"
+    },
+    {
+      "parentType": "event_series",
+      "name": "start_date",
+      "id": "6a0d2e8590c8df7a1cc7def1",
+      "createdAt": "2026-05-20T03:46:13.159Z"
+    },
+    {
+      "parentType": "event_series",
+      "name": "end_date",
+      "id": "6a0d2e8590c8df7a1cc7defc",
+      "createdAt": "2026-05-20T03:46:13.272Z"
+    },
+    {
+      "parentType": "event_series",
+      "name": "default_location",
+      "id": "6a0d2e8590c8df7a1cc7df07",
+      "createdAt": "2026-05-20T03:46:13.382Z"
+    },
+    {
+      "parentType": "event_series",
+      "name": "default_description",
+      "id": "6a0d2e8590c8df7a1cc7df11",
+      "createdAt": "2026-05-20T03:46:13.514Z"
+    },
+    {
+      "parentType": "rsvp",
+      "name": "event",
+      "id": "6a0d2e8590c8df7a1cc7df24",
+      "createdAt": "2026-05-20T03:46:13.784Z"
+    },
+    {
+      "parentType": "rsvp",
+      "name": "member",
+      "id": "6a0d2e8590c8df7a1cc7df2e",
+      "createdAt": "2026-05-20T03:46:13.911Z"
+    },
+    {
+      "parentType": "rsvp",
+      "name": "status",
+      "id": "6a0d2e8590c8df7a1cc7df38",
+      "createdAt": "2026-05-20T03:46:14.045Z"
+    },
+    {
+      "parentType": "rsvp",
+      "name": "notes",
+      "id": "6a0d2e8690c8df7a1cc7df42",
+      "createdAt": "2026-05-20T03:46:14.152Z"
+    },
+    {
+      "parentType": "attendance",
+      "name": "member",
+      "id": "6a0d2e8690c8df7a1cc7df54",
+      "createdAt": "2026-05-20T03:46:14.400Z"
+    },
+    {
+      "parentType": "attendance",
+      "name": "status",
+      "id": "6a0d2e8690c8df7a1cc7df5e",
+      "createdAt": "2026-05-20T03:46:14.516Z"
+    },
+    {
+      "parentType": "attendance",
+      "name": "notes",
+      "id": "6a0d2e8690c8df7a1cc7df68",
+      "createdAt": "2026-05-20T03:46:14.619Z"
+    },
+    {
+      "parentType": "person",
+      "name": "bio",
+      "id": "6a0d2e8690c8df7a1cc7df71",
+      "createdAt": "2026-05-20T03:46:14.724Z"
+    },
+    {
+      "parentType": "person",
+      "name": "preferred_contact_email",
+      "id": "6a0d2e8690c8df7a1cc7df7b",
+      "createdAt": "2026-05-20T03:46:14.860Z"
+    },
+    {
+      "parentType": "person",
+      "name": "preferences",
+      "id": "6a0d2e8690c8df7a1cc7df85",
+      "createdAt": "2026-05-20T03:46:14.968Z"
+    },
+    {
+      "parentType": "organization",
+      "name": "founded",
+      "id": "6a0d2e8690c8df7a1cc7df8f",
+      "createdAt": "2026-05-20T03:46:15.086Z"
+    },
+    {
+      "parentType": "organization",
+      "name": "location",
+      "id": "6a0d2e8790c8df7a1cc7df99",
+      "createdAt": "2026-05-20T03:46:15.192Z"
+    },
+    {
+      "parentType": "organization",
+      "name": "website",
+      "id": "6a0d2e8790c8df7a1cc7dfa3",
+      "createdAt": "2026-05-20T03:46:15.319Z"
+    },
+    {
+      "parentType": "organization",
+      "name": "logo",
+      "id": "6a0d2e8790c8df7a1cc7dfad",
+      "createdAt": "2026-05-20T03:46:15.454Z"
+    },
+    {
+      "parentType": "organization",
+      "name": "social_links",
+      "id": "6a0d2e8790c8df7a1cc7dfb7",
+      "createdAt": "2026-05-20T03:46:15.600Z"
+    },
+    {
+      "parentType": "organization",
+      "name": "rsvp_lockout_hours",
+      "id": "6a0d2e8790c8df7a1cc7dfc2",
+      "createdAt": "2026-05-20T03:46:15.711Z"
+    },
+    {
+      "parentType": "organization",
+      "name": "public_contact",
+      "id": "6a0d2e8790c8df7a1cc7dfcc",
+      "createdAt": "2026-05-20T03:46:15.816Z"
+    },
+    {
+      "parentType": "organization",
+      "name": "member_count_per_section",
+      "id": "6a0d2e8790c8df7a1cc7dfd7",
+      "createdAt": "2026-05-20T03:46:15.960Z"
+    },
+    {
+      "parentType": "section",
+      "name": "description",
+      "id": "6a0d2e8790c8df7a1cc7dfe2",
+      "createdAt": "2026-05-20T03:46:16.069Z"
+    },
+    {
+      "parentType": "member",
+      "name": "current_section",
+      "id": "6a0d2e8890c8df7a1cc7dfec",
+      "createdAt": "2026-05-20T03:46:16.190Z"
+    },
+    {
+      "parentType": "member",
+      "name": "status",
+      "id": "6a0d2e8890c8df7a1cc7dff6",
+      "createdAt": "2026-05-20T03:46:16.307Z"
+    },
+    {
+      "parentType": "work",
+      "name": "catalog_id",
+      "id": "6a0d2e8890c8df7a1cc7e001",
+      "createdAt": "2026-05-20T03:46:16.453Z"
+    },
+    {
+      "parentType": "work",
+      "name": "catalog_system",
+      "id": "6a0d2e8890c8df7a1cc7e00b",
+      "createdAt": "2026-05-20T03:46:16.646Z"
+    },
+    {
+      "parentType": "work",
+      "name": "part_of",
+      "id": "6a0d2e8890c8df7a1cc7e015",
+      "createdAt": "2026-05-20T03:46:16.743Z"
+    },
+    {
+      "parentType": "edition",
+      "name": "external_link",
+      "id": "6a0d2e8890c8df7a1cc7e01f",
+      "createdAt": "2026-05-20T03:46:16.863Z"
+    },
+    {
+      "parentType": "edition",
+      "name": "work",
+      "id": "6a0d2e8890c8df7a1cc7e02a",
+      "createdAt": "2026-05-20T03:46:16.972Z"
+    },
+    {
+      "parentType": "edition",
+      "name": "arranger",
+      "id": "6a0d2e8890c8df7a1cc7e035",
+      "createdAt": "2026-05-20T03:46:17.095Z"
+    },
+    {
+      "parentType": "edition",
+      "name": "voicing",
+      "id": "6a0d2e8990c8df7a1cc7e03f",
+      "createdAt": "2026-05-20T03:46:17.227Z"
+    },
+    {
+      "parentType": "edition",
+      "name": "duration",
+      "id": "6a0d2e8990c8df7a1cc7e049",
+      "createdAt": "2026-05-20T03:46:17.338Z"
+    },
+    {
+      "parentType": "edition",
+      "name": "language",
+      "id": "6a0d2e8990c8df7a1cc7e053",
+      "createdAt": "2026-05-20T03:46:17.454Z"
+    },
+    {
+      "parentType": "edition",
+      "name": "acquired_at",
+      "id": "6a0d2e8990c8df7a1cc7e05e",
+      "createdAt": "2026-05-20T03:46:17.581Z"
+    },
+    {
+      "parentType": "edition",
+      "name": "source",
+      "id": "6a0d2e8990c8df7a1cc7e068",
+      "createdAt": "2026-05-20T03:46:17.693Z"
+    },
+    {
+      "parentType": "edition",
+      "name": "cost",
+      "id": "6a0d2e8990c8df7a1cc7e072",
+      "createdAt": "2026-05-20T03:46:17.787Z"
+    },
+    {
+      "parentType": "edition",
+      "name": "license_note",
+      "id": "6a0d2e8990c8df7a1cc7e07c",
+      "createdAt": "2026-05-20T03:46:17.891Z"
+    },
+    {
+      "parentType": "season",
+      "name": "end_date",
+      "id": "6a0d2e8990c8df7a1cc7e086",
+      "createdAt": "2026-05-20T03:46:18.029Z"
+    },
+    {
+      "parentType": "season",
+      "name": "description",
+      "id": "6a0d2e8a90c8df7a1cc7e091",
+      "createdAt": "2026-05-20T03:46:18.170Z"
+    },
+    {
+      "parentType": "event",
+      "name": "start_datetime",
+      "id": "6a0d2e8a90c8df7a1cc7e09b",
+      "createdAt": "2026-05-20T03:46:18.296Z"
+    },
+    {
+      "parentType": "event",
+      "name": "duration_minutes",
+      "id": "6a0d2e8a90c8df7a1cc7e0a6",
+      "createdAt": "2026-05-20T03:46:18.401Z"
+    },
+    {
+      "parentType": "event",
+      "name": "description",
+      "id": "6a0d2e8a90c8df7a1cc7e0b0",
+      "createdAt": "2026-05-20T03:46:18.514Z"
+    },
+    {
+      "parentType": "event",
+      "name": "capacity",
+      "id": "6a0d2e8a90c8df7a1cc7e0ba",
+      "createdAt": "2026-05-20T03:46:18.633Z"
+    },
+    {
+      "parentType": "repertoire_item",
+      "name": "status",
+      "id": "6a0d2e8a90c8df7a1cc7e0c4",
+      "createdAt": "2026-05-20T03:46:18.735Z"
+    },
+    {
+      "parentType": "program_item",
+      "name": "notes",
+      "id": "6a0d2e8a90c8df7a1cc7e0ce",
+      "createdAt": "2026-05-20T03:46:18.833Z"
+    }
+  ],
+  "wouldCreateTypes": [],
+  "wouldAddProperties": [],
+  "skipped": [],
+  "failed": [],
+  "formulaTouchSaveDeferred": [
+    {
+      "parentType": "lending",
+      "property": "name",
+      "formula": "member.*.name copy.*.name ' — ' CONCAT_WS"
+    },
+    {
+      "parentType": "organization",
+      "property": "member_count_per_section",
+      "formula": "SUM(_child section.member_count)"
+    },
+    {
+      "parentType": "edition",
+      "property": "work",
+      "formula": "_parent"
+    }
+  ]
+}
