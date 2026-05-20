@@ -1,10 +1,15 @@
-import { getJwt, createEntity, listEntities, POLYPHONY_META_TYPE_ENTITY_ID } from './lib/entu-client.ts';
-import { writeFileSync, mkdirSync } from 'node:fs';
-import { join } from 'node:path';
+import {
+	getJwt,
+	listInstancesByType,
+	listEntities,
+	POLYPHONY_META_TYPE_ENTITY_ID,
+	type EntuClient,
+} from './lib/entu-client.ts';
+import { isDryRun, writeResultArtifact, findOrCreateByName } from './perotin-toolkit.ts';
 
 const VOICE_NAMES = ['alto', 'baritone', 'bass', 'soprano', 'tenor'] as const;
 
-const DRY_RUN = process.argv.includes('--dry-run');
+const DRY_RUN = isDryRun();
 
 const ENTU_API_BASE = process.env.ENTU_API_BASE ?? 'https://api.entu.app';
 const ENTU_DB = process.env.ENTU_DB ?? 'polyphony';
@@ -15,7 +20,7 @@ if (!ENTU_API_KEY) {
 	process.exit(1);
 }
 
-async function findVoiceTypeId(client: { apiBase: string; db: string; jwt: string }): Promise<string> {
+async function findVoiceTypeId(client: EntuClient): Promise<string> {
 	const resp = await listEntities(client, {
 		'_type.reference': POLYPHONY_META_TYPE_ENTITY_ID,
 		'name.string': 'voice',
@@ -31,7 +36,7 @@ async function main() {
 	console.log(`[seed-voices] mode=${DRY_RUN ? 'dry-run' : 'live'} db=${ENTU_DB}`);
 
 	const jwt = await getJwt({ apiBase: ENTU_API_BASE, db: ENTU_DB, apiKey: ENTU_API_KEY! });
-	const client = { apiBase: ENTU_API_BASE, db: ENTU_DB, jwt };
+	const client: EntuClient = { apiBase: ENTU_API_BASE, db: ENTU_DB, jwt };
 
 	const voiceTypeId = await findVoiceTypeId(client);
 	console.log(`[seed-voices] voice type-id: ${voiceTypeId}`);
@@ -41,13 +46,10 @@ async function main() {
 	const failed: Array<{ name: string; error: string }> = [];
 
 	for (const voiceName of VOICE_NAMES) {
-		const existing = await listEntities(client, {
-			'_type.string': 'voice',
-			'name.string': voiceName,
-			props: '_id',
-		});
+		// Inline check gates the dry-run path; findOrCreateByName re-checks on the live path.
+		const existing = await listInstancesByType(client, 'voice', '_id', { 'name.string': voiceName });
 
-		if (existing.count > 0) {
+		if (existing.entities.length > 0) {
 			const existingId = existing.entities[0]._id;
 			console.log(`[seed-voices] ${voiceName}: EXISTS (${existingId}) — skip`);
 			skipped.push({ name: voiceName, _id: existingId });
@@ -60,13 +62,19 @@ async function main() {
 		}
 
 		try {
-			const result = await createEntity(client, [
+			const result = await findOrCreateByName(client, 'voice', voiceName, undefined, [
 				{ type: '_type', reference: voiceTypeId },
 				{ type: 'name', string: voiceName },
 				{ type: '_sharing', string: 'public' },
 			]);
-			console.log(`[seed-voices] ${voiceName}: CREATED (${result._id})`);
-			created.push({ name: voiceName, _id: result._id });
+			if (result.created) {
+				console.log(`[seed-voices] ${voiceName}: CREATED (${result._id})`);
+				created.push({ name: voiceName, _id: result._id });
+			} else {
+				// Race: another process created between our check and findOrCreateByName's check.
+				console.log(`[seed-voices] ${voiceName}: EXISTS (${result._id}) — skip (race)`);
+				skipped.push({ name: voiceName, _id: result._id });
+			}
 		} catch (err) {
 			const msg = err instanceof Error ? err.message : String(err);
 			console.error(`[seed-voices] ${voiceName}: FAILED — ${msg}`);
@@ -74,23 +82,19 @@ async function main() {
 		}
 	}
 
-	const executedAt = new Date().toISOString();
-	const result = {
+	const at = new Date();
+	const payload = {
 		voices: VOICE_NAMES,
 		created,
 		skipped,
 		failed,
-		executedAt,
+		executedAt: at.toISOString(),
 		db: ENTU_DB,
 		dryRun: DRY_RUN,
 	};
 
 	if (!DRY_RUN) {
-		const resultsDir = join(import.meta.dirname ?? '', 'seed-results');
-		mkdirSync(resultsDir, { recursive: true });
-		const fileName = `seed-voices-${executedAt.replace(/[:.]/g, '-')}.json`;
-		const filePath = join(resultsDir, fileName);
-		writeFileSync(filePath, JSON.stringify(result, null, 2));
+		const filePath = await writeResultArtifact('seed-voices', payload, { at });
 		console.log(`[seed-voices] result artifact: ${filePath}`);
 	}
 
