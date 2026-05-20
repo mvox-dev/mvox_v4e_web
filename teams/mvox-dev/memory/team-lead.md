@@ -37,6 +37,16 @@
    - Task #20 (DRY DEFAULT_BASE_URL in BFF) — 4-line cosmetic; fold into next `src/lib/server/entu/` PR
    - Task #32 (CHORE-2 OKLCH brittleness) — relax regex on next Tailwind upgrade
 
+8. **[FROM FR-Aen, 2026-05-20]** — three structural decisions surfaced during FR-side audit (Medici + Celes) of mvox-dev, deferred to your judgment for session 8:
+
+   - **Path convention drift (substrate-invariant-mismatch shape).** `~/projects/entu-research/...` appears across 4 prompts (byrd L58, josquin L104-105, tallis L65, perotin L77) + memory files (finn L11-12, architecture-decisions L15+L71+L105). `~/workspace/...` appears in perotin's STARTUP + memory/team-lead L43+L213+L221. Neither resolves on Windows-dev. Both auditors recommend Option 3 (hybrid): declare `~/workspace` as substrate-convention (Linux container) in common-prompt or startup.md header; convert `~/projects/entu-research/...` to env-var or repo-relative form. Multi-file rolling change; pick the resolution at session-8 start.
+
+   - **CLAUDE.md drift (repo-root, neither prompts/ nor memory/ scope).** L25-26 still says "**8 members**" — factually wrong post-Pérotin promotion (9 in roster, all now permanent). L26 also says "still being adapted — see FIXME markers" — most FIXMEs are resolved (only palestrina.md L76 remains, see next bullet). L27 says "stack table marked TBD" — stack landed session 2. Likely a 5-minute direct edit by you or PO.
+
+   - **Polyphony-isms in 3 prompts (PO decision: scrub vs reframe vs keep).** `palestrina.md` L76 — FIXME on polyphony D1 remote-migration protocol (common-prompt's "v4E Schema Mutations" section at L181-192 supersedes it). `victoria.md` L46 — "Private Circle defense" in MUST Escalate (polyphony-specific copyright strategy; mvox legal stance is TBD per PO). `bentham.md` L123 — "legal framework" in MAY READ docs/ list (same polyphony-ism). All three are prompt-side surface; Medici cross-confirmed that `architecture-decisions.md` has 3 polyphony references which are correctly historical and were left alone in his audit. The prompt-side echoes are less defensible (imply ongoing concern for non-mvox concept). PO ruling needed before any edits land.
+
+   These are non-blocking for session 8 day-of-work, but worth surfacing to PO early so they don't fall off. (*FR:Aen*)
+
 **Pérotin promoted to permanent member (this session).** Roster entry added: `name: perotin, model: claude-sonnet-4-6, color: orange, prompt: prompts/perotin.md, spawn: on-demand`. Full prompt lives at `teams/mvox-dev/prompts/perotin.md`. Lore: Pérotin of Notre Dame (c.1160-c.1225, expanded organum from 2-voice to 3-4 voice). Role: data manager — seed scripts, migration-time write probes, dev/staging refreshes, anonymization, data quality reports. Operates out-of-band from the TDD chain. Common-prompt + startup.md updated to reflect.
 
 **Expected first action session 8:**
