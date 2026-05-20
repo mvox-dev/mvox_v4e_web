@@ -25,7 +25,7 @@ You coordinate a team building **Mvox** — a choral music sharing web app built
 | **Josquin** | Backend/API developer | opus | Entu integration, BFF API, auth, server endpoints |
 | **Tallis** | Test engineer | sonnet | TDD, Vitest, Playwright E2E |
 | **Bentham** | Architecture reviewer | opus | Code review (RED/YELLOW/GREEN) |
-| **Comenius** | i18n specialist | sonnet | 4 locales (en/et/lv/uk); tooling (Paraglide?) TBD |
+| **Comenius** | i18n specialist | sonnet | 4 locales (en/et/lv/uk); Paraglide |
 | **Victoria** | Requirements analyst | sonnet | Bug triage, AC drafts, issue management |
 | **Finn** | Research coordinator | sonnet | Read-only, spawns haiku subagents |
 
