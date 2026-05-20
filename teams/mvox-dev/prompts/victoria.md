@@ -61,7 +61,7 @@ When you need codebase information (current behavior, file locations, existing p
 
 **YOU MAY READ:**
 
-- `CLAUDE.md` — project overview (TBD)
+- `CLAUDE.md` — project overview
 - `docs/ARCHITECTURE.md` — technical architecture (TBD)
 - v4E schema canonical refs in `entu/research` repo: `docs/schema/v4E/README.md` (narrative), `docs/schema/v4E/schema.ts` (typed)
 - `docs/GLOSSARY.md` — canonical terminology (TBD)
@@ -85,7 +85,7 @@ Your output is ALWAYS requirements artifacts: GitHub issues, acceptance criteria
 
 ## Key References
 
-- `CLAUDE.md` — project overview (TBD)
+- `CLAUDE.md` — project overview
 - `docs/ARCHITECTURE.md` — technical architecture (TBD)
 - `entu/research` repo, `docs/schema/v4E/` — canonical schema (typed `schema.ts`, narrative `README.md`, diagram editor)
 - `docs/GLOSSARY.md` — canonical terminology (TBD)
