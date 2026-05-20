@@ -77,73 +77,9 @@ describe('RED-1: buildLiveCallbacks.migrateProperty — live wire shape', () => 
 		});
 	});
 
-	describe('parent_copy kind (iterate target type, look up parent source)', () => {
-		it('calls listInstances for the TARGET type (edition), not the source type (work)', async () => {
-			const fetchMock = vi.spyOn(globalThis, 'fetch');
-
-			// List edition instances
-			fetchMock.mockResolvedValueOnce(
-				new Response(
-					JSON.stringify({
-						entities: [{ _id: 'edition-1', _type: [{ string: 'edition' }] }],
-						count: 1
-					}),
-					{ status: 200 }
-				)
-			);
-			// GET parent work for edition-1
-			fetchMock.mockResolvedValueOnce(
-				new Response(
-					JSON.stringify({
-						entity: {
-							_id: 'edition-1',
-							_parent: [{ reference: 'work-1' }]
-						}
-					}),
-					{ status: 200 }
-				)
-			);
-			// GET parent work entity to read arranger
-			fetchMock.mockResolvedValueOnce(
-				new Response(
-					JSON.stringify({
-						entity: {
-							_id: 'work-1',
-							arranger: [{ type: 'string', string: 'Arvo Pärt' }]
-						}
-					}),
-					{ status: 200 }
-				)
-			);
-			// POST arranger to edition-1
-			fetchMock.mockResolvedValueOnce(
-				new Response(
-					JSON.stringify({
-						_id: 'edition-1',
-						properties: [{ _id: 'new-prop-id', type: 'arranger' }]
-					}),
-					{ status: 200 }
-				)
-			);
-
-			const cbs = buildLiveCallbacks(client);
-			const op: BackfillDataOp & { targetParentType?: string } = {
-				kind: 'BACKFILL_DATA',
-				parentType: 'work',
-				targetParentType: 'edition',
-				sourceProperty: 'arranger',
-				targetProperty: 'arranger',
-				backfillKind: 'parent_copy'
-			};
-
-			await expect(cbs.migrateProperty(client, op)).resolves.toBeDefined();
-
-			// First fetch must target edition (targetParentType), not work (parentType)
-			const firstFetchUrl = String(fetchMock.mock.calls[0][0]);
-			expect(firstFetchUrl).toContain('edition');
-			expect(firstFetchUrl).not.toMatch(/\bwork\b/);
-		});
-	});
+	// parent_copy delegation tests moved to live-wiring-delegation.spec.ts (RED v11).
+	// The old inline call-sequence test (list → GET child → GET parent → POST) is replaced
+	// by delegation contract tests that spy on dataMigratorMigrateProperty.
 
 	describe('string_to_reference kind (exact name.string= search)', () => {
 		it('uses name.string= exact-match query (not q=) to resolve voice entity', async () => {

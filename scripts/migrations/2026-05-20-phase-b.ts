@@ -437,38 +437,32 @@ export function buildLiveCallbacks(client: EntuClient): PhaseBLiveCallbacks {
 		return body.entities?.[0]?._id;
 	};
 
-	const migrateProperty: MigratePropertyFn = async (_c, op: BackfillDataOp) => {
-		// parent_copy retains its hand-rolled inline impl: building the parentLookup Map
-		// requires a per-instance pre-flight (list children → GET each child → GET parent →
-		// read source). The RED-1 parent_copy test asserts exactly that inline call sequence.
-		if (op.backfillKind === 'parent_copy') {
-			let migrated = 0;
-			let skipped = 0;
-			let failed = 0;
-			const iterateType = op.targetParentType ?? op.parentType;
-			const listResp = await listInstancesByType(iterateType, '_id');
-			for (const stub of listResp.entities ?? []) {
-				try {
-					const child = await fetchEntityJson(client, stub._id);
-					const parentRef = (child._parent as Array<{ reference?: string }> | undefined)?.[0]?.reference;
-					if (!parentRef) { skipped += 1; continue; }
-					const parent = await fetchEntityJson(client, parentRef);
-					const sourceVal = (parent[op.sourceProperty] as EntuPropertyValue[] | undefined)?.[0];
-					const sourceStr = typeof sourceVal?.string === 'string' ? sourceVal.string : null;
-					if (sourceStr === null) { skipped += 1; continue; }
-					const existing = (child[op.targetProperty] as EntuPropertyValue[] | undefined)?.[0]?.string;
-					if (existing === sourceStr) { skipped += 1; continue; }
-					await postEntityProperty(client, stub._id, { type: op.targetProperty, string: sourceStr });
-					migrated += 1;
-				} catch {
-					failed += 1;
-				}
-			}
-			return { migrated, skipped, failed };
+	// parent_copy pre-flight: build a childId → parentSourceValue Map by listing instances of
+	// the child type, GETting each child to read `_parent.reference`, then GETting that parent
+	// to read the source string. Children without a parent ref or without a source string are
+	// omitted from the Map (data-migrator treats absent entries as skipped). The materialized
+	// Map is then handed to dataMigratorMigrateProperty via the `parentLookup` injectable so
+	// the lib's migrate loop (idempotency + pruneExistingTarget + writeProperty) runs for
+	// parent_copy on the same code path as every other backfillKind.
+	const buildParentLookup = async (op: BackfillDataOp): Promise<Map<string, string>> => {
+		const parentLookup = new Map<string, string>();
+		const iterateType = (op as BackfillDataOp & { targetParentType?: string }).targetParentType
+			?? op.parentType;
+		const listResp = await listInstancesByType(iterateType, '_id');
+		for (const stub of listResp.entities ?? []) {
+			const child = await fetchEntityJson(client, stub._id);
+			const parentRef = (child._parent as Array<{ reference?: string }> | undefined)?.[0]?.reference;
+			if (!parentRef) continue;
+			const parent = await fetchEntityJson(client, parentRef);
+			const sourceVal = (parent[op.sourceProperty] as EntuPropertyValue[] | undefined)?.[0];
+			const sourceStr = typeof sourceVal?.string === 'string' ? sourceVal.string : null;
+			if (sourceStr === null) continue;
+			parentLookup.set(stub._id, sourceStr);
 		}
+		return parentLookup;
+	};
 
-		// All other backfillKinds delegate to data-migrator, where pruneExistingTarget (v9.2)
-		// runs before each writeProperty and the idempotency-skip preserves zero-op cleanliness.
+	const migrateProperty: MigratePropertyFn = async (_c, op: BackfillDataOp) => {
 		const injectables: MigratePropertyInjectables = {
 			listInstances: async (_client, parentType) => {
 				const listResp = await listInstancesByType(
@@ -480,7 +474,8 @@ export function buildLiveCallbacks(client: EntuClient): PhaseBLiveCallbacks {
 			writeProperty:
 				op.backfillKind === 'string_to_reference' ? writeReferencePropertyLive : writePropertyLive,
 			deleteProperty: deletePropertyByIdLive,
-			voiceLookup: op.backfillKind === 'string_to_reference' ? voiceLookupLive : undefined
+			voiceLookup: op.backfillKind === 'string_to_reference' ? voiceLookupLive : undefined,
+			parentLookup: op.backfillKind === 'parent_copy' ? await buildParentLookup(op) : undefined
 		};
 		return dataMigratorMigrateProperty(client, op, injectables);
 	};
