@@ -34,3 +34,19 @@ export const PHASE_A_PROPERTY_ADDITIONS: Record<string, Set<string>> = {
 export function isInPhaseAScope(parentType: string, propertyName: string): boolean {
 	return PHASE_A_PROPERTY_ADDITIONS[parentType]?.has(propertyName) ?? false;
 }
+
+export const PHASE_A_NEW_TYPES: Set<string> = new Set([
+	'voice',
+	'library',
+	'copy',
+	'lending',
+	'invitation',
+	'application',
+	'event_series',
+	'rsvp',
+	'attendance'
+]);
+
+export function isPhaseANewType(typeName: string): boolean {
+	return PHASE_A_NEW_TYPES.has(typeName);
+}

@@ -1,5 +1,5 @@
 import type { V4eSchema, V4ePropertyDef } from './schema-loader';
-import { isInPhaseAScope } from './phase-a-scope';
+import { isInPhaseAScope, isPhaseANewType } from './phase-a-scope';
 
 export interface DbTypeState {
 	typeId: string;
@@ -48,9 +48,10 @@ export function computeAdditiveDiff(
 			});
 		} else {
 			const existingProps = new Set(existing.propertyNames);
+			const bypassScope = isPhaseANewType(v4eType.name);
 			for (const prop of v4eType.properties) {
 				if (existingProps.has(prop.name)) continue;
-				if (!isInPhaseAScope(v4eType.name, prop.name)) continue;
+				if (!bypassScope && !isInPhaseAScope(v4eType.name, prop.name)) continue;
 				adds.push({
 					kind: 'ADD_PROPERTY',
 					parentTypeName: v4eType.name,
