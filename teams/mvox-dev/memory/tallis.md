@@ -28,4 +28,14 @@
 
 [WIP] Branch `feat/phase-a-migration` handed off to Josquin for GREEN. 24 tests total, all RED.
 
+## [CHECKPOINT] 2026-05-20 — CHORE-5 BFF skeleton RED phase
+
+[GOTCHA] SvelteKit reserves the `+` filename prefix for route files. A spec file named `+server.spec.ts` inside `src/routes/` causes `svelte-kit sync` (invoked by `pnpm build` via `vite`) to crash. Auth route specs must live in `src/tests/routes/auth/server.spec.ts` and import `'../../../routes/auth/+server.ts'` by relative path.
+
+[PATTERN] `event.locals.entuJwt` chosen as the name for the cookie-extracted JWT in hooks.server. Josquin: if you prefer `event.locals.entu = { jwt, client }`, update `src/hooks.server.spec.ts` accordingly (noted in-spec with a comment).
+
+[PATTERN] All three specs use dynamic `await import(...)` inside each `it()` body so `vi.stubGlobal('fetch', ...)` and `vi.stubEnv(...)` are in place before the module loads. This avoids module-caching issues with env-dependent code.
+
+[DECISION] 19 tests written, all RED ("Cannot find module"). Files: `src/lib/server/entu/client.spec.ts` (8), `src/hooks.server.spec.ts` (4), `src/tests/routes/auth/server.spec.ts` (7). Handed to Josquin for GREEN.
+
 (*MVOX:Tallis*)
