@@ -38,4 +38,18 @@
 
 [DECISION] 19 tests written, all RED ("Cannot find module"). Files: `src/lib/server/entu/client.spec.ts` (8), `src/hooks.server.spec.ts` (4), `src/tests/routes/auth/server.spec.ts` (7). Handed to Josquin for GREEN.
 
+## [CHECKPOINT] 2026-05-20 — Phase B migration RED phase
+
+[DECISION] 7 spec files written, all RED. 22 new failing tests (+ 6 file-level RED from integration spec). Held §1.3 voice_type fixtures pending Finn's probe. Branch: `feat/phase-b-migration`.
+
+[PATTERN] Phase B specs inject per-operation functions (`listInstances`, `writeProperty`, `updateEntity`, `migrateProperty`, `touchSaveFormula`, etc.) as options — same injection pattern as Phase A's `createEntity`. Josquin must preserve these injection points in GREEN.
+
+[PATTERN] `computePhaseBDiff` receives `DbTypeState[]` extended with optional `propertyIds: Record<string, string>` and `currentFormulas: Record<string, string>`. The `propertyIds` map is needed so DELETE_PROPERTY ops can carry the Entu property-def `_id`. The `currentFormulas` map enables UPDATE_FORMULA idempotency skip.
+
+[GOTCHA] Touch-save is intentionally NOT idempotent — `touchSaveFormula` always re-writes to force Entu re-eval. This is different from all other ops. Test explicitly encodes this: "must call updateEntity even if instance appears already correct."
+
+[OPEN] Q2 (touch-save update endpoint shape) and Q1 (Entu pagination cursor) pending team-lead reply. `snapshotter.spec.ts` and `touch-saver.spec.ts` encode assumptions; flagged in comments.
+
+[OPEN] §1.3 voice_type fixtures incomplete. When Finn's findings land, add a `data-migrator.spec.ts` test that iterates actual distinct values and verifies each maps to a `voice` entity name.
+
 (*MVOX:Tallis*)
