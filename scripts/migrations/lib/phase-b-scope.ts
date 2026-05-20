@@ -40,9 +40,12 @@ export const PHASE_B_RENAMES: PhaseBRenameOp[] = [
 	{ source: 'work.language', target: 'work.original_language', backfillKind: 'string_list' }
 ];
 
+// §2.8 person.forename+surname verify_then_delete deferred to Phase D (PO decision 2026-05-20).
+// Q5 probe established that POSTing forename/surname after deletion would freeze whitespace-only
+// materialized names. Keeping forename+surname as editable source-of-truth ships 95% of Phase B's
+// plan; the formula `person.name` remains a useful read-view.
 export const PHASE_B_MIGRATIONS: PhaseBMigrationOp[] = [
-	{ source: 'work.arranger', target: 'edition.arranger', backfillKind: 'parent_copy' },
-	{ source: 'person.forename+surname', action: 'verify_then_delete' }
+	{ source: 'work.arranger', target: 'edition.arranger', backfillKind: 'parent_copy' }
 ];
 
 export const PHASE_B_OBSOLETE_DELETES: PhaseBObsoleteDeleteOp[] = [

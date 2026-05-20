@@ -478,10 +478,67 @@ describe('computePhaseBDiff', () => {
 		});
 	});
 
-	// RED-A2: §2 migration — person.forename + person.surname verify_then_delete
-	// PHASE_B_MIGRATIONS[1] is dead code; computePhaseBDiff never processes it.
-	describe('§2 migration: person.forename + person.surname (verify_then_delete)', () => {
-		it('emits DELETE_PROPERTY for person.forename and person.surname', () => {
+	// RED-5: parent_copy op shape must carry targetParentType
+	// The executor's migrateProperty callback needs to iterate the TARGET type (editions),
+	// not the source type (works). Encoding targetParentType on BackfillDataOp makes the
+	// iteration target explicit, avoiding the latent bug where listInstances(work) fetches wrong entities.
+	describe('§2 parent_copy: BackfillDataOp carries targetParentType', () => {
+		it('BACKFILL_DATA(parent_copy) op for work.arranger carries targetParentType: "edition"', () => {
+			const dbState: MinimalDbState[] = [
+				{
+					typeId: 'work-type-id',
+					name: 'work',
+					propertyNames: ['arranger'],
+					propertyIds: { arranger: 'work-arranger-prop-id' }
+				},
+				{
+					typeId: 'edition-type-id',
+					name: 'edition',
+					propertyNames: ['arranger'],
+					propertyIds: { arranger: 'edition-arranger-prop-id' }
+				}
+			];
+			const ops = computePhaseBDiff(dbState);
+			const backfill = ops.find(
+				(o) =>
+					o.kind === 'BACKFILL_DATA' &&
+					(o as BackfillDataOp).backfillKind === 'parent_copy'
+			) as BackfillDataOp | undefined;
+			expect(backfill).toBeDefined();
+			// targetParentType must name the type to iterate (edition), not the source (work)
+			expect((backfill as BackfillDataOp & { targetParentType?: string }).targetParentType).toBe('edition');
+		});
+
+		it('parentType on parent_copy op remains the source type (work)', () => {
+			const dbState: MinimalDbState[] = [
+				{
+					typeId: 'work-type-id',
+					name: 'work',
+					propertyNames: ['arranger'],
+					propertyIds: { arranger: 'work-arranger-prop-id' }
+				},
+				{
+					typeId: 'edition-type-id',
+					name: 'edition',
+					propertyNames: ['arranger'],
+					propertyIds: { arranger: 'edition-arranger-prop-id' }
+				}
+			];
+			const ops = computePhaseBDiff(dbState);
+			const backfill = ops.find(
+				(o) =>
+					o.kind === 'BACKFILL_DATA' &&
+					(o as BackfillDataOp).backfillKind === 'parent_copy'
+			) as BackfillDataOp | undefined;
+			expect(backfill?.parentType).toBe('work');
+		});
+	});
+
+	// v9.1: §2.8 deferred to Phase D (PO decision 2026-05-20).
+	// person.forename+surname verify_then_delete removed from PHASE_B_MIGRATIONS.
+	// Q5 probe: freezing whitespace-only names is a UX commitment deferred to Phase D.
+	describe('§2 migration: person.forename + person.surname (verify_then_delete) — DEFERRED to Phase D', () => {
+		it('does NOT emit DELETE_PROPERTY for person.forename (§2.8 deferred)', () => {
 			const dbState: MinimalDbState[] = [
 				{
 					typeId: 'person-type-id',
@@ -499,20 +556,11 @@ describe('computePhaseBDiff', () => {
 					o.kind === 'DELETE_PROPERTY' &&
 					(o as DeletePropertyOp).parentType === 'person' &&
 					(o as DeletePropertyOp).propertyName === 'forename'
-			) as DeletePropertyOp | undefined;
-			const delSurname = ops.find(
-				(o) =>
-					o.kind === 'DELETE_PROPERTY' &&
-					(o as DeletePropertyOp).parentType === 'person' &&
-					(o as DeletePropertyOp).propertyName === 'surname'
-			) as DeletePropertyOp | undefined;
-			expect(delForename).toBeDefined();
-			expect(delForename?.propertyDefId).toBe('person-forename-prop-id');
-			expect(delSurname).toBeDefined();
-			expect(delSurname?.propertyDefId).toBe('person-surname-prop-id');
+			);
+			expect(delForename).toBeUndefined();
 		});
 
-		it('DELETE_PROPERTY for person.forename + person.surname carry verifyPreconditions flag', () => {
+		it('does NOT emit DELETE_PROPERTY for person.surname (§2.8 deferred)', () => {
 			const dbState: MinimalDbState[] = [
 				{
 					typeId: 'person-type-id',
@@ -525,13 +573,13 @@ describe('computePhaseBDiff', () => {
 				}
 			];
 			const ops = computePhaseBDiff(dbState);
-			const personDeletes = ops.filter(
+			const delSurname = ops.find(
 				(o) =>
 					o.kind === 'DELETE_PROPERTY' &&
-					(o as DeletePropertyOp).parentType === 'person'
-			) as DeletePropertyOp[];
-			expect(personDeletes).toHaveLength(2);
-			expect(personDeletes.every((d) => d.verifyPreconditions === true)).toBe(true);
+					(o as DeletePropertyOp).parentType === 'person' &&
+					(o as DeletePropertyOp).propertyName === 'surname'
+			);
+			expect(delSurname).toBeUndefined();
 		});
 
 		it('skips forename/surname delete when already absent (idempotency)', () => {

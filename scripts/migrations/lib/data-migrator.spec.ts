@@ -543,3 +543,198 @@ describe('migrateProperty — error handling', () => {
 		expect(result.migrated).toBe(1);
 	});
 });
+
+// RED v9.2 — multi-value pre-delete guard.
+// Q5 probe showed: POSTing a property to an entity that already has it APPENDS a second value
+// rather than replacing. migrateProperty must DELETE all existing target property values on
+// each instance BEFORE POSTing the new value, to avoid creating multi-value targets.
+//
+// MigratePropertyOptions gains a `deleteProperty` injectable:
+//   deleteProperty: (client: EntuClient, propertyId: string) => Promise<void>
+// All backfillKind branches must call it for each existing target value _id before writing.
+describe('migrateProperty — multi-value pre-delete guard (Q5 fix)', () => {
+	it('DELETEs existing target prop value before POSTing new value (string backfill)', async () => {
+		const instances = [
+			{
+				_id: 'work-1',
+				voicing: [{ type: 'string', string: 'SATB' }],
+				original_voicing: [{ _id: 'old-prop-1', type: 'string', string: 'StaleValue' }]
+			}
+		];
+
+		const mockListInstances = vi.fn().mockResolvedValue(instances);
+		const mockDeleteProperty = vi.fn().mockResolvedValue(undefined);
+		const mockWriteProperty = vi.fn().mockResolvedValue({ _id: 'new-prop-id' });
+
+		await migrateProperty(client, {
+			parentType: 'work',
+			sourceProperty: 'voicing',
+			targetProperty: 'original_voicing',
+			backfillKind: 'string',
+			listInstances: mockListInstances,
+			deleteProperty: mockDeleteProperty,
+			writeProperty: mockWriteProperty
+		});
+
+		// DELETE must be called before POST
+		expect(mockDeleteProperty).toHaveBeenCalledOnce();
+		expect(mockDeleteProperty).toHaveBeenCalledWith(client, 'old-prop-1');
+		expect(mockWriteProperty).toHaveBeenCalledOnce();
+
+		const deleteOrder = mockDeleteProperty.mock.invocationCallOrder[0];
+		const writeOrder = mockWriteProperty.mock.invocationCallOrder[0];
+		expect(deleteOrder).toBeLessThan(writeOrder);
+	});
+
+	it('DELETEs ALL existing target prop values when multiple stale values exist', async () => {
+		const instances = [
+			{
+				_id: 'work-1',
+				voicing: [{ type: 'string', string: 'SATB' }],
+				original_voicing: [
+					{ _id: 'stale-a', type: 'string', string: 'Old1' },
+					{ _id: 'stale-b', type: 'string', string: 'Old2' },
+					{ _id: 'stale-c', type: 'string', string: 'Old3' }
+				]
+			}
+		];
+
+		const mockListInstances = vi.fn().mockResolvedValue(instances);
+		const mockDeleteProperty = vi.fn().mockResolvedValue(undefined);
+		const mockWriteProperty = vi.fn().mockResolvedValue({ _id: 'new-prop-id' });
+
+		await migrateProperty(client, {
+			parentType: 'work',
+			sourceProperty: 'voicing',
+			targetProperty: 'original_voicing',
+			backfillKind: 'string',
+			listInstances: mockListInstances,
+			deleteProperty: mockDeleteProperty,
+			writeProperty: mockWriteProperty
+		});
+
+		expect(mockDeleteProperty).toHaveBeenCalledTimes(3);
+		expect(mockDeleteProperty).toHaveBeenCalledWith(client, 'stale-a');
+		expect(mockDeleteProperty).toHaveBeenCalledWith(client, 'stale-b');
+		expect(mockDeleteProperty).toHaveBeenCalledWith(client, 'stale-c');
+		expect(mockWriteProperty).toHaveBeenCalledOnce();
+	});
+
+	it('skips DELETE when target is empty (no existing values to remove)', async () => {
+		const instances = [
+			{
+				_id: 'work-1',
+				voicing: [{ type: 'string', string: 'SATB' }]
+				// original_voicing absent
+			}
+		];
+
+		const mockListInstances = vi.fn().mockResolvedValue(instances);
+		const mockDeleteProperty = vi.fn();
+		const mockWriteProperty = vi.fn().mockResolvedValue({ _id: 'new-prop-id' });
+
+		await migrateProperty(client, {
+			parentType: 'work',
+			sourceProperty: 'voicing',
+			targetProperty: 'original_voicing',
+			backfillKind: 'string',
+			listInstances: mockListInstances,
+			deleteProperty: mockDeleteProperty,
+			writeProperty: mockWriteProperty
+		});
+
+		expect(mockDeleteProperty).not.toHaveBeenCalled();
+		expect(mockWriteProperty).toHaveBeenCalledOnce();
+	});
+
+	it('skips DELETE+POST when target already matches source (idempotency preserved)', async () => {
+		const instances = [
+			{
+				_id: 'work-1',
+				voicing: [{ type: 'string', string: 'SATB' }],
+				original_voicing: [{ _id: 'match-prop', type: 'string', string: 'SATB' }]
+			}
+		];
+
+		const mockListInstances = vi.fn().mockResolvedValue(instances);
+		const mockDeleteProperty = vi.fn();
+		const mockWriteProperty = vi.fn();
+
+		const result = await migrateProperty(client, {
+			parentType: 'work',
+			sourceProperty: 'voicing',
+			targetProperty: 'original_voicing',
+			backfillKind: 'string',
+			listInstances: mockListInstances,
+			deleteProperty: mockDeleteProperty,
+			writeProperty: mockWriteProperty
+		});
+
+		expect(mockDeleteProperty).not.toHaveBeenCalled();
+		expect(mockWriteProperty).not.toHaveBeenCalled();
+		expect(result.skipped).toBe(1);
+	});
+
+	it('string_to_reference branch pre-deletes existing target reference before writing new one', async () => {
+		const voiceLookup = new Map([['soprano', 'voice-soprano-id']]);
+		const instances = [
+			{
+				_id: 'section-1',
+				voice_type: [{ type: 'string', string: 'soprano' }],
+				voice: [{ _id: 'old-voice-ref', type: 'reference', reference: 'voice-old-id' }]
+			}
+		];
+
+		const mockListInstances = vi.fn().mockResolvedValue(instances);
+		const mockDeleteProperty = vi.fn().mockResolvedValue(undefined);
+		const mockWriteProperty = vi.fn().mockResolvedValue({ _id: 'new-voice-prop' });
+
+		await migrateProperty(client, {
+			parentType: 'section',
+			sourceProperty: 'voice_type',
+			targetProperty: 'voice',
+			backfillKind: 'string_to_reference',
+			voiceLookup,
+			listInstances: mockListInstances,
+			deleteProperty: mockDeleteProperty,
+			writeProperty: mockWriteProperty
+		});
+
+		expect(mockDeleteProperty).toHaveBeenCalledOnce();
+		expect(mockDeleteProperty).toHaveBeenCalledWith(client, 'old-voice-ref');
+		const deleteOrder = mockDeleteProperty.mock.invocationCallOrder[0];
+		const writeOrder = mockWriteProperty.mock.invocationCallOrder[0];
+		expect(deleteOrder).toBeLessThan(writeOrder);
+	});
+
+	it('parent_copy branch pre-deletes existing target value before writing parent value', async () => {
+		const instances = [
+			{
+				_id: 'edition-1',
+				arranger: [{ _id: 'old-arranger-prop', type: 'string', string: 'OldArranger' }]
+			}
+		];
+		const parentLookup = new Map([['edition-1', 'Arvo Pärt']]);
+
+		const mockListInstances = vi.fn().mockResolvedValue(instances);
+		const mockDeleteProperty = vi.fn().mockResolvedValue(undefined);
+		const mockWriteProperty = vi.fn().mockResolvedValue({ _id: 'new-arranger-prop' });
+
+		await migrateProperty(client, {
+			parentType: 'edition',
+			sourceProperty: 'arranger',
+			targetProperty: 'arranger',
+			backfillKind: 'parent_copy',
+			parentLookup,
+			listInstances: mockListInstances,
+			deleteProperty: mockDeleteProperty,
+			writeProperty: mockWriteProperty
+		});
+
+		expect(mockDeleteProperty).toHaveBeenCalledOnce();
+		expect(mockDeleteProperty).toHaveBeenCalledWith(client, 'old-arranger-prop');
+		const deleteOrder = mockDeleteProperty.mock.invocationCallOrder[0];
+		const writeOrder = mockWriteProperty.mock.invocationCallOrder[0];
+		expect(deleteOrder).toBeLessThan(writeOrder);
+	});
+});

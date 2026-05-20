@@ -455,3 +455,162 @@ describe('buildLiveCallbacks', () => {
 		}
 	});
 });
+
+// RED v12.3 — buildJsonReport must serialize executionResult detail
+//
+// Bug 3 fix: current buildJsonReport writes only summary.failed COUNT.
+// Without failed[] records (with error strings), post-execution root-cause analysis
+// requires snapshot+live diff rather than reading the report. Fix: include full
+// executionResult arrays in the JSON output.
+//
+// (*MVOX:Tallis*)
+describe('RED v12.3: runPhaseB JSON report includes executionResult detail', () => {
+	it('JSON report includes failed[] records with kind, propertyName, and error string', async () => {
+		mockDbWithRenamesAndObsolete();
+
+		// deleteProperty throws — triggers a failed[] record
+		const mockAddProperty = vi.fn().mockResolvedValue({ _id: 'new-prop-id' });
+		const mockMigrateProperty = vi.fn().mockResolvedValue({ migrated: 0, skipped: 0, failed: 0 });
+		const mockDeleteProperty = vi.fn().mockRejectedValue(new Error('DELETE /entity/foo 404 not found'));
+		const mockVerifyDeleteSafe = vi.fn().mockResolvedValue({ safe: true });
+		const mockUpdateFormula = vi.fn().mockResolvedValue({ updated: true });
+		const mockTouchSaveFormula = vi.fn().mockResolvedValue({ touchSaveCount: 0, noInstances: false, failed: 0 });
+
+		const result = await runPhaseB({
+			apiBase: 'https://api.entu.app',
+			db: 'polyphony',
+			apiKey: 'key',
+			reportsDir: tempReportsDir,
+			snapshotDir: tempSnapshotDir,
+			dryRun: false,
+			skipSnapshot: true,
+			now: () => '2026-05-20T09:00:00Z',
+			addProperty: mockAddProperty,
+			migrateProperty: mockMigrateProperty,
+			deleteProperty: mockDeleteProperty,
+			verifyDeleteSafe: mockVerifyDeleteSafe,
+			updateFormula: mockUpdateFormula,
+			touchSaveFormula: mockTouchSaveFormula
+		});
+
+		const jsonContent = await readFile(result.reportPaths.json, 'utf8');
+		const parsed = JSON.parse(jsonContent);
+
+		// Must include failed[] with actual error records, not just a count
+		expect(Array.isArray(parsed.failed)).toBe(true);
+		expect(parsed.failed.length).toBeGreaterThan(0);
+		const failedRecord = parsed.failed[0];
+		expect(typeof failedRecord.error).toBe('string');
+		expect(failedRecord.error).toContain('404');
+	});
+
+	it('JSON report includes addedProperties[] detail', async () => {
+		mockDbWithRenamesAndObsolete();
+
+		const mockAddProperty = vi.fn().mockResolvedValue({ _id: 'added-prop-def-id' });
+		const mockMigrateProperty = vi.fn().mockResolvedValue({ migrated: 0, skipped: 0, failed: 0 });
+		const mockDeleteProperty = vi.fn().mockResolvedValue({ deleted: true });
+		const mockVerifyDeleteSafe = vi.fn().mockResolvedValue({ safe: true });
+		const mockUpdateFormula = vi.fn().mockResolvedValue({ updated: true });
+		const mockTouchSaveFormula = vi.fn().mockResolvedValue({ touchSaveCount: 0, noInstances: false, failed: 0 });
+
+		const result = await runPhaseB({
+			apiBase: 'https://api.entu.app',
+			db: 'polyphony',
+			apiKey: 'key',
+			reportsDir: tempReportsDir,
+			snapshotDir: tempSnapshotDir,
+			dryRun: false,
+			skipSnapshot: true,
+			now: () => '2026-05-20T09:00:00Z',
+			addProperty: mockAddProperty,
+			migrateProperty: mockMigrateProperty,
+			deleteProperty: mockDeleteProperty,
+			verifyDeleteSafe: mockVerifyDeleteSafe,
+			updateFormula: mockUpdateFormula,
+			touchSaveFormula: mockTouchSaveFormula
+		});
+
+		const jsonContent = await readFile(result.reportPaths.json, 'utf8');
+		const parsed = JSON.parse(jsonContent);
+
+		// Must include addedProperties[] with the prop-def IDs
+		expect(Array.isArray(parsed.addedProperties)).toBe(true);
+		expect(parsed.addedProperties.length).toBeGreaterThan(0);
+		const addedRecord = parsed.addedProperties[0];
+		expect(typeof addedRecord.parentType).toBe('string');
+		expect(typeof addedRecord.propertyName).toBe('string');
+		expect(typeof addedRecord.propertyDefId).toBe('string');
+	});
+
+	it('JSON report includes blockedDeletes[] and backfilled[] arrays', async () => {
+		mockDbWithRenamesAndObsolete();
+
+		// verifyDeleteSafe returns unsafe → goes to blockedDeletes
+		// migrateProperty returns migrated=1 → goes to backfilled
+		const mockAddProperty = vi.fn().mockResolvedValue({ _id: 'new-prop-id' });
+		const mockMigrateProperty = vi.fn().mockResolvedValue({ migrated: 1, skipped: 0, failed: 0 });
+		const mockDeleteProperty = vi.fn().mockResolvedValue({ deleted: true });
+		const mockVerifyDeleteSafe = vi.fn().mockResolvedValue({ safe: false, reason: 'instances have values' });
+		const mockUpdateFormula = vi.fn().mockResolvedValue({ updated: true });
+		const mockTouchSaveFormula = vi.fn().mockResolvedValue({ touchSaveCount: 0, noInstances: false, failed: 0 });
+
+		const result = await runPhaseB({
+			apiBase: 'https://api.entu.app',
+			db: 'polyphony',
+			apiKey: 'key',
+			reportsDir: tempReportsDir,
+			snapshotDir: tempSnapshotDir,
+			dryRun: false,
+			skipSnapshot: true,
+			now: () => '2026-05-20T09:00:00Z',
+			addProperty: mockAddProperty,
+			migrateProperty: mockMigrateProperty,
+			deleteProperty: mockDeleteProperty,
+			verifyDeleteSafe: mockVerifyDeleteSafe,
+			updateFormula: mockUpdateFormula,
+			touchSaveFormula: mockTouchSaveFormula
+		});
+
+		const jsonContent = await readFile(result.reportPaths.json, 'utf8');
+		const parsed = JSON.parse(jsonContent);
+
+		expect(Array.isArray(parsed.blockedDeletes)).toBe(true);
+		expect(Array.isArray(parsed.backfilled)).toBe(true);
+		expect(parsed.blockedDeletes.length).toBeGreaterThan(0);
+		expect(parsed.backfilled.length).toBeGreaterThan(0);
+	});
+
+	it('markdown report includes a Failures section when failed records exist', async () => {
+		mockDbWithRenamesAndObsolete();
+
+		const mockAddProperty = vi.fn().mockResolvedValue({ _id: 'new-prop-id' });
+		const mockMigrateProperty = vi.fn().mockResolvedValue({ migrated: 0, skipped: 0, failed: 0 });
+		const mockDeleteProperty = vi.fn().mockRejectedValue(new Error('status 404 entity not found'));
+		const mockVerifyDeleteSafe = vi.fn().mockResolvedValue({ safe: true });
+		const mockUpdateFormula = vi.fn().mockResolvedValue({ updated: true });
+		const mockTouchSaveFormula = vi.fn().mockResolvedValue({ touchSaveCount: 0, noInstances: false, failed: 0 });
+
+		const result = await runPhaseB({
+			apiBase: 'https://api.entu.app',
+			db: 'polyphony',
+			apiKey: 'key',
+			reportsDir: tempReportsDir,
+			snapshotDir: tempSnapshotDir,
+			dryRun: false,
+			skipSnapshot: true,
+			now: () => '2026-05-20T09:00:00Z',
+			addProperty: mockAddProperty,
+			migrateProperty: mockMigrateProperty,
+			deleteProperty: mockDeleteProperty,
+			verifyDeleteSafe: mockVerifyDeleteSafe,
+			updateFormula: mockUpdateFormula,
+			touchSaveFormula: mockTouchSaveFormula
+		});
+
+		const mdContent = await readFile(result.reportPaths.md, 'utf8');
+
+		// Markdown must surface a "Failures" section with error detail
+		expect(mdContent).toMatch(/##\s*Failures/i);
+	});
+});

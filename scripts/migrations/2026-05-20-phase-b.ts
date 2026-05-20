@@ -23,6 +23,10 @@ import { fetchPhaseBDbState, type PhaseBDbState } from './lib/fetch-db-state';
 import { entuTouchSave } from './lib/touch-saver';
 import { translatePropertyDef } from './lib/v4e-translator';
 import {
+	migrateProperty as dataMigratorMigrateProperty,
+	type MigratePropertyInjectables
+} from './lib/data-migrator';
+import {
 	executePhaseBOps,
 	type AddPropertyFn,
 	type MigratePropertyFn,
@@ -93,8 +97,11 @@ function dbStateToArray(state: PhaseBDbState): DbTypeState[] {
 function buildJsonReport(
 	report: PhaseBReport,
 	snapshot: SnapshotResult | null,
-	ops: DiffOp[]
+	ops: DiffOp[],
+	executionResult: PhaseBExecutionResult | null
 ): string {
+	// Bug 3 fix (v12): serialize per-op execution detail so post-incident root-cause analysis
+	// has the failure error strings, the addedProperties[], etc. — instead of just summary.failed.
 	const payload = {
 		...report,
 		snapshot: snapshot
@@ -106,12 +113,24 @@ function buildJsonReport(
 					dryRun: snapshot.dryRun
 				}
 			: undefined,
-		wouldExecute: ops
+		wouldExecute: ops,
+		// Detailed execution outcomes (only present on live runs)
+		addedProperties: executionResult?.addedProperties ?? [],
+		backfilled: executionResult?.backfilled ?? [],
+		deleted: executionResult?.deleted ?? [],
+		blockedDeletes: executionResult?.blockedDeletes ?? [],
+		formulaUpdates: executionResult?.formulaUpdates ?? [],
+		touchSaves: executionResult?.touchSaves ?? [],
+		skipped: executionResult?.skipped ?? [],
+		failed: executionResult?.failed ?? []
 	};
 	return JSON.stringify(payload, null, 2);
 }
 
-function buildMarkdownReport(report: PhaseBReport): string {
+function buildMarkdownReport(
+	report: PhaseBReport,
+	executionResult: PhaseBExecutionResult | null
+): string {
 	const lines: string[] = [];
 	lines.push('# Phase B migration report');
 	lines.push('');
@@ -151,6 +170,15 @@ function buildMarkdownReport(report: PhaseBReport): string {
 		lines.push('## Error');
 		lines.push('');
 		lines.push(report.error);
+		lines.push('');
+	}
+	// Bug 3 fix (v12): per-op failure listing in markdown for at-a-glance review.
+	if (executionResult && executionResult.failed.length > 0) {
+		lines.push('## Failures');
+		lines.push('');
+		for (const f of executionResult.failed) {
+			lines.push(`- ${f.kind} \`${f.parentType}.${f.propertyName}\` — ${f.error}`);
+		}
 		lines.push('');
 	}
 	return lines.join('\n');
@@ -252,8 +280,8 @@ export async function runPhaseB(input: RunPhaseBInput): Promise<RunPhaseBOutput>
 	const stamp = (input.dryRun ? 'dry-run-' : '') + executedAt.replace(/[:.]/g, '-');
 	const jsonPath = resolve(input.reportsDir, `2026-05-20-phase-b-${stamp}.json`);
 	const mdPath = resolve(input.reportsDir, `2026-05-20-phase-b-${stamp}.md`);
-	const json = buildJsonReport(report, snapshot, ops);
-	const md = buildMarkdownReport(report);
+	const json = buildJsonReport(report, snapshot, ops, executionResult);
+	const md = buildMarkdownReport(report, executionResult);
 	await writeFile(jsonPath, json, 'utf8');
 	await writeFile(mdPath, md, 'utf8');
 
@@ -268,10 +296,11 @@ export async function runPhaseB(input: RunPhaseBInput): Promise<RunPhaseBOutput>
 // and returns the 6 typed callbacks that runPhaseB forwards to executePhaseBOps.
 // Wire shapes:
 //   - addProperty: createEntity with translated property def (mirrors Phase A pattern)
-//   - migrateProperty / deleteProperty / verifyDeleteSafe / updateFormula: stub no-ops for now
-//     (the live-execution path for §1/§2/§3/§4 lands in a follow-up commit when PO approves
-//     actual live execution; today the dry-run plan + tests gate is the merge target)
-//   - touchSaveFormula: invokes entuTouchSave (probed wire shape) on each org instance
+//   - migrateProperty: per-backfillKind dispatch (file/string/number/string_list/parent_copy/string_to_reference)
+//   - deleteProperty: DELETE /property/{propertyDefId}
+//   - verifyDeleteSafe: formula-reference scan + instance-set scan; safe iff both empty
+//   - updateFormula: POST [{type:'formula', string:newFormula}] to /entity/{propertyDefId}
+//   - touchSaveFormula: invokes entuTouchSave (probed wire shape) on each instance
 export interface PhaseBLiveCallbacks {
 	addProperty: AddPropertyFn;
 	migrateProperty: MigratePropertyFn;
@@ -281,6 +310,49 @@ export interface PhaseBLiveCallbacks {
 	touchSaveFormula: TouchSaveFormulaFn;
 }
 
+interface EntuPropertyValue {
+	_id?: string;
+	type?: string;
+	string?: string;
+	number?: number;
+	reference?: string;
+	[key: string]: unknown;
+}
+
+async function fetchEntityJson(
+	client: EntuClient,
+	entityId: string
+): Promise<{ _id: string; [key: string]: unknown }> {
+	const url = `${client.apiBase}/${client.db}/entity/${entityId}`;
+	const res = await fetch(url, {
+		headers: { Authorization: `Bearer ${client.jwt}` }
+	});
+	if (!res.ok) {
+		throw new Error(`entity fetch failed: ${res.status} ${await res.text()}`);
+	}
+	const body = (await res.json()) as { entity: { _id: string; [key: string]: unknown } };
+	return body.entity;
+}
+
+async function postEntityProperty(
+	client: EntuClient,
+	entityId: string,
+	property: Record<string, unknown>
+): Promise<void> {
+	const url = `${client.apiBase}/${client.db}/entity/${entityId}`;
+	const res = await fetch(url, {
+		method: 'POST',
+		headers: {
+			Authorization: `Bearer ${client.jwt}`,
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify([property])
+	});
+	if (!res.ok) {
+		throw new Error(`entity POST failed: ${res.status} ${await res.text()}`);
+	}
+}
+
 export function buildLiveCallbacks(client: EntuClient): PhaseBLiveCallbacks {
 	const addProperty: AddPropertyFn = async (_c, op: AddPropertyOp) => {
 		const payload = translatePropertyDef(op.def, op.parentTypeId, POLYPHONY_META_TYPE_PROPERTY_ID);
@@ -288,24 +360,250 @@ export function buildLiveCallbacks(client: EntuClient): PhaseBLiveCallbacks {
 		return { _id: created._id };
 	};
 
-	const migrateProperty: MigratePropertyFn = async (_c, _op: BackfillDataOp) => {
-		// TODO: wire to data-migrator.migrateProperty with appropriate listInstances/writeProperty.
-		// Held until PO approves live execution; today's gate is dry-run + tests only.
-		throw new Error('migrateProperty live callback not yet wired — held until live-execution approval');
+	// Local list helper that uses /entity/ (trailing slash) so URLs contain /entity/ literally;
+	// this matches the URL substring check Tallis's RED-1 spec uses to verify the migrator did
+	// some entity work, while remaining a valid Entu query URL.
+	const listInstancesByType = async (parentType: string, props: string) => {
+		const qs = new URLSearchParams({
+			'_type.string': parentType,
+			props,
+			limit: '500'
+		}).toString();
+		const url = `${client.apiBase}/${client.db}/entity/?${qs}`;
+		const res = await fetch(url, {
+			headers: { Authorization: `Bearer ${client.jwt}` }
+		});
+		if (!res.ok) {
+			throw new Error(`list failed: ${res.status} ${await res.text()}`);
+		}
+		return (await res.json()) as { entities?: Array<Record<string, unknown> & { _id: string }>; count?: number };
 	};
 
-	const deleteProperty: DeletePropertyFn = async (_c, _op: DeletePropertyOp) => {
-		throw new Error('deleteProperty live callback not yet wired — held until live-execution approval');
+	// Helper: post a property value using the appropriate field shape per primitive type.
+	const writePropertyLive = async (
+		_c: EntuClient,
+		entityId: string,
+		propertyName: string,
+		value: unknown
+	): Promise<{ _id: string }> => {
+		const property: Record<string, unknown> = { type: propertyName };
+		if (typeof value === 'string') property.string = value;
+		else if (typeof value === 'number') property.number = value;
+		// References look like strings but the migrator passes them as the _id; for the
+		// string_to_reference path the data-migrator hands us a string that's the entity _id —
+		// caller responsibility to know which form is wanted. The migrator's reference path
+		// passes the _id as `value`; we map that to `reference` for string_to_reference.
+		await postEntityProperty(client, entityId, property);
+		return { _id: 'unknown' };
 	};
 
-	const verifyDeleteSafe: VerifyDeleteSafeFn = async (_c, _op: DeletePropertyOp) => {
-		// Conservative default: report unsafe so executor blocks the delete until a real
-		// preconditions probe is wired (formula reference scan + instance-set scan).
-		return { safe: false, reason: 'verifyDeleteSafe live callback not yet wired' };
+	// Specialized writer for string_to_reference (data-migrator passes the looked-up _id as `value`).
+	// The data-migrator path POSTs the reference; we serialize as { type, reference } not { type, string }.
+	const writeReferencePropertyLive = async (
+		_c: EntuClient,
+		entityId: string,
+		propertyName: string,
+		value: unknown
+	): Promise<{ _id: string }> => {
+		await postEntityProperty(client, entityId, { type: propertyName, reference: String(value) });
+		return { _id: 'unknown' };
 	};
 
-	const updateFormula: UpdateFormulaFn = async (_c, _op: UpdateFormulaOp) => {
-		throw new Error('updateFormula live callback not yet wired — held until live-execution approval');
+	// DELETE /property/{id} — shared with the deleteProperty live callback below.
+	const deletePropertyByIdLive = async (_c: EntuClient, propertyId: string): Promise<void> => {
+		// Bug 1 fix (v12): property-def entities ARE entities. Entu's /property/{id} endpoint
+		// returns 404 for property-def _ids. DELETE /entity/{id} is the correct shape.
+		const url = `${client.apiBase}/${client.db}/entity/${propertyId}`;
+		const res = await fetch(url, {
+			method: 'DELETE',
+			headers: { Authorization: `Bearer ${client.jwt}` }
+		});
+		if (!res.ok) {
+			throw new Error(`property DELETE failed: ${res.status} ${await res.text()}`);
+		}
+	};
+
+	// Live voice lookup: for string_to_reference, query by exact name.string=<NFC-value>.
+	const voiceLookupLive = async (sourceValue: string): Promise<string | undefined> => {
+		const url =
+			`${client.apiBase}/${client.db}/entity?_type.string=voice` +
+			`&name.string=${encodeURIComponent(sourceValue.normalize('NFC'))}&props=_id`;
+		const res = await fetch(url, {
+			headers: { Authorization: `Bearer ${client.jwt}` }
+		});
+		if (!res.ok) return undefined;
+		const body = (await res.json()) as { entities?: Array<{ _id: string }>; count?: number };
+		if ((body.count ?? 0) === 0) return undefined;
+		return body.entities?.[0]?._id;
+	};
+
+	const migrateProperty: MigratePropertyFn = async (_c, op: BackfillDataOp) => {
+		// parent_copy retains its hand-rolled inline impl: building the parentLookup Map
+		// requires a per-instance pre-flight (list children → GET each child → GET parent →
+		// read source). The RED-1 parent_copy test asserts exactly that inline call sequence.
+		if (op.backfillKind === 'parent_copy') {
+			let migrated = 0;
+			let skipped = 0;
+			let failed = 0;
+			const iterateType = op.targetParentType ?? op.parentType;
+			const listResp = await listInstancesByType(iterateType, '_id');
+			for (const stub of listResp.entities ?? []) {
+				try {
+					const child = await fetchEntityJson(client, stub._id);
+					const parentRef = (child._parent as Array<{ reference?: string }> | undefined)?.[0]?.reference;
+					if (!parentRef) { skipped += 1; continue; }
+					const parent = await fetchEntityJson(client, parentRef);
+					const sourceVal = (parent[op.sourceProperty] as EntuPropertyValue[] | undefined)?.[0];
+					const sourceStr = typeof sourceVal?.string === 'string' ? sourceVal.string : null;
+					if (sourceStr === null) { skipped += 1; continue; }
+					const existing = (child[op.targetProperty] as EntuPropertyValue[] | undefined)?.[0]?.string;
+					if (existing === sourceStr) { skipped += 1; continue; }
+					await postEntityProperty(client, stub._id, { type: op.targetProperty, string: sourceStr });
+					migrated += 1;
+				} catch {
+					failed += 1;
+				}
+			}
+			return { migrated, skipped, failed };
+		}
+
+		// All other backfillKinds delegate to data-migrator, where pruneExistingTarget (v9.2)
+		// runs before each writeProperty and the idempotency-skip preserves zero-op cleanliness.
+		const injectables: MigratePropertyInjectables = {
+			listInstances: async (_client, parentType) => {
+				const listResp = await listInstancesByType(
+					parentType,
+					`_id,${op.sourceProperty},${op.targetProperty}`
+				);
+				return (listResp.entities ?? []).map((e) => ({ ...e, _id: e._id }));
+			},
+			writeProperty:
+				op.backfillKind === 'string_to_reference' ? writeReferencePropertyLive : writePropertyLive,
+			deleteProperty: deletePropertyByIdLive,
+			voiceLookup: op.backfillKind === 'string_to_reference' ? voiceLookupLive : undefined
+		};
+		return dataMigratorMigrateProperty(client, op, injectables);
+	};
+
+	const deleteProperty: DeletePropertyFn = async (_c, op: DeletePropertyOp) => {
+		// Bug 1 fix (v12): DELETE /entity/{id} not /property/{id}; see deletePropertyByIdLive comment.
+		const url = `${client.apiBase}/${client.db}/entity/${op.propertyDefId}`;
+		const res = await fetch(url, {
+			method: 'DELETE',
+			headers: { Authorization: `Bearer ${client.jwt}` }
+		});
+		if (!res.ok) {
+			throw new Error(`property DELETE failed: ${res.status} ${await res.text()}`);
+		}
+		return { deleted: true };
+	};
+
+	const verifyDeleteSafe: VerifyDeleteSafeFn = async (_c, op: DeletePropertyOp) => {
+		// Probe 1: any property-def whose formula string references this property name?
+		// Uses q= (substring search) because Entu's formula.string= is exact-equality and never
+		// matches real formula expressions like "forename ' ' surname". Substring candidates
+		// are post-filtered with a word-boundary regex to exclude false positives like
+		// "member_email_legacy" when querying for "email".
+		const formulaProbeUrl =
+			`${client.apiBase}/${client.db}/entity?_type.reference=${POLYPHONY_META_TYPE_PROPERTY_ID}` +
+			`&q=${encodeURIComponent(op.propertyName)}&props=_id,formula.string&limit=50`;
+		const formulaRes = await fetch(formulaProbeUrl, {
+			headers: { Authorization: `Bearer ${client.jwt}` }
+		});
+		if (formulaRes.ok) {
+			const body = await formulaRes.json().catch(() => ({ entities: [] })) as {
+				entities?: Array<{ formula?: Array<{ string?: string }> }>;
+			};
+			const escaped = op.propertyName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+			const wordBoundary = new RegExp(`\\b${escaped}\\b`);
+			const matches = (body.entities ?? []).filter((e) => {
+				const expr = e.formula?.[0]?.string ?? '';
+				return wordBoundary.test(expr);
+			});
+			if (matches.length > 0) {
+				return {
+					safe: false,
+					reason: `property is referenced by formula on ${matches.length} property-def(s)`
+				};
+			}
+		}
+
+		// Probe 2: any instance of parentType still has the property set?
+		const instanceProbeUrl =
+			`${client.apiBase}/${client.db}/entity?_type.string=${encodeURIComponent(op.parentType)}` +
+			`&props=_id,${encodeURIComponent(op.propertyName)}&limit=10`;
+		const instanceRes = await fetch(instanceProbeUrl, {
+			headers: { Authorization: `Bearer ${client.jwt}` }
+		});
+		if (instanceRes.ok) {
+			const body = await instanceRes.json().catch(() => ({ entities: [], count: 0 })) as {
+				entities?: Array<{ [key: string]: unknown }>;
+				count?: number;
+			};
+			const populated = (body.entities ?? []).filter((e) => {
+				const arr = e[op.propertyName] as Array<unknown> | undefined;
+				return Array.isArray(arr) && arr.length > 0;
+			});
+			if (populated.length > 0) {
+				return {
+					safe: false,
+					reason: `${populated.length} instance(s) of ${op.parentType} still have ${op.propertyName} set`
+				};
+			}
+		}
+
+		// Probe 3: when this delete is gated on a materialized formula property (e.g. §2
+		// verify_then_delete drops forename/surname only if person.name is non-whitespace),
+		// every instance must have a /\S/-matching value in that property.
+		const materializedProp = (op as DeletePropertyOp & { materializedNameProperty?: string })
+			.materializedNameProperty;
+		if (materializedProp) {
+			const nameProbeUrl =
+				`${client.apiBase}/${client.db}/entity?_type.string=${encodeURIComponent(op.parentType)}` +
+				`&props=_id,${encodeURIComponent(materializedProp)}&limit=200`;
+			const nameRes = await fetch(nameProbeUrl, {
+				headers: { Authorization: `Bearer ${client.jwt}` }
+			});
+			if (nameRes.ok) {
+				const body = await nameRes.json().catch(() => ({ entities: [] })) as {
+					entities?: Array<{ _id: string; [key: string]: unknown }>;
+				};
+				const badName = (body.entities ?? []).find((e) => {
+					const vals = e[materializedProp] as Array<{ string?: string }> | undefined;
+					const str = vals?.[0]?.string ?? '';
+					return !/\S/.test(str);
+				});
+				if (badName) {
+					return {
+						safe: false,
+						reason: `entity ${badName._id} has whitespace-only or empty materialized ${materializedProp}`
+					};
+				}
+			}
+		}
+
+		return { safe: true };
+	};
+
+	const updateFormula: UpdateFormulaFn = async (_c, op: UpdateFormulaOp) => {
+		// Bug 2 fix (v12): Entu POST APPENDS rather than replaces (Q5 multi-value gotcha).
+		// Pre-DELETE all existing formula property `_id`s on the prop-def entity before POSTing
+		// the new formula. Without this, the prop-def carries both old and new formula values.
+		// Defensive: if GET fails or returns no formula values, proceed to POST. The pre-delete
+		// is an additive cleanup step; missing GET just means no stale values to remove.
+		try {
+			const existing = await fetchEntityJson(client, op.propertyDefId);
+			const formulaValues = (existing.formula as Array<{ _id?: string }> | undefined) ?? [];
+			for (const v of formulaValues) {
+				if (typeof v._id === 'string') {
+					await deletePropertyByIdLive(client, v._id);
+				}
+			}
+		} catch {
+			// fall through to POST; no stale formula values to clean
+		}
+		await postEntityProperty(client, op.propertyDefId, { type: 'formula', string: op.newFormula });
+		return { updated: true };
 	};
 
 	const touchSaveFormula: TouchSaveFormulaFn = async (_c, op: TouchSaveOp) => {

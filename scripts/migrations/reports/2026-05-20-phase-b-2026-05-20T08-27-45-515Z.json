@@ -1,20 +1,19 @@
 {
   "phase": "B",
-  "executedAt": null,
+  "executedAt": "2026-05-20T08:27:45.515Z",
   "db": "polyphony",
   "summary": {
-    "dryRun": true,
+    "dryRun": false,
     "wouldRenames": 6,
-    "wouldObsoleteDeletes": 12,
+    "wouldObsoleteDeletes": 10,
     "wouldFormulaUpdates": 3,
     "wouldTouchSaves": 3,
-    "failed": 0
+    "failed": 15
   },
   "snapshot": {
-    "path": null,
-    "sha256": "866b2f08603f549a81e0f200391ea6f1969c60f41b890cb7735b7e204a5a5c99",
-    "entityCount": 452,
-    "dryRun": true
+    "path": "/home/michelek/workspace/scripts/migrations/snapshots/polyphony-pre-phase-b-2026-05-20T08-28-08-344Z.json",
+    "sha256": "b3b13d08d12fb46143a876ac39392ce3f078fecde8bcddd2f3a78bb6619974d6",
+    "entityCount": 457
   },
   "wouldExecute": [
     {
@@ -203,27 +202,14 @@
       "parentType": "work",
       "sourceProperty": "arranger",
       "targetProperty": "arranger",
-      "backfillKind": "parent_copy"
+      "backfillKind": "parent_copy",
+      "targetParentType": "edition"
     },
     {
       "kind": "DELETE_PROPERTY",
       "parentType": "work",
       "propertyName": "arranger",
       "propertyDefId": "69c7ea4d8489bfcb0e819f5c"
-    },
-    {
-      "kind": "DELETE_PROPERTY",
-      "parentType": "person",
-      "propertyName": "forename",
-      "propertyDefId": "69bcfd8e9c031ab8e6ce8065",
-      "verifyPreconditions": true
-    },
-    {
-      "kind": "DELETE_PROPERTY",
-      "parentType": "person",
-      "propertyName": "surname",
-      "propertyDefId": "69bcfd8e9c031ab8e6ce806d",
-      "verifyPreconditions": true
     },
     {
       "kind": "DELETE_PROPERTY",

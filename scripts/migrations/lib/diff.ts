@@ -49,6 +49,9 @@ export interface BackfillDataOp {
 	sourceProperty: string;
 	targetProperty: string;
 	backfillKind: BackfillKind;
+	// For parent_copy: which type to iterate. parentType remains the source type;
+	// targetParentType names the target type whose instances are written to.
+	targetParentType?: string;
 }
 
 export interface DeletePropertyOp {
@@ -57,6 +60,10 @@ export interface DeletePropertyOp {
 	propertyName: string;
 	propertyDefId: string;
 	verifyPreconditions?: boolean;
+	// When set, verifyDeleteSafe runs Probe 3: every instance of parentType must have
+	// a non-whitespace value at this property (typically a formula prop like person.name)
+	// before deletion is allowed. Used for §2 verify_then_delete (forename/surname).
+	materializedNameProperty?: string;
 }
 
 export interface UpdateFormulaOp {
@@ -233,12 +240,13 @@ export function computePhaseBDiff(dbState: DbTypeState[]): DiffOp[] {
 					parentType,
 					propertyName: propName,
 					propertyDefId,
-					verifyPreconditions: true
+					verifyPreconditions: true,
+					materializedNameProperty: 'name'
 				});
 			}
 		} else if (mig.backfillKind === 'parent_copy' && mig.target) {
 			const [sourceParent, sourceProp] = splitDotted(mig.source);
-			const [, targetProp] = splitDotted(mig.target);
+			const [targetParent, targetProp] = splitDotted(mig.target);
 			const existing = dbByName.get(sourceParent);
 			if (!existing) continue;
 			if (!existing.propertyNames.includes(sourceProp)) continue;
@@ -247,7 +255,8 @@ export function computePhaseBDiff(dbState: DbTypeState[]): DiffOp[] {
 				parentType: sourceParent,
 				sourceProperty: sourceProp,
 				targetProperty: targetProp,
-				backfillKind: 'parent_copy'
+				backfillKind: 'parent_copy',
+				targetParentType: targetParent
 			});
 			const sourceId = existing.propertyIds?.[sourceProp];
 			if (sourceId) {

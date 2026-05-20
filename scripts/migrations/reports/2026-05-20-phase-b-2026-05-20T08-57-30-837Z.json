@@ -1,0 +1,449 @@
+{
+  "phase": "B",
+  "executedAt": "2026-05-20T08:57:30.837Z",
+  "db": "polyphony",
+  "summary": {
+    "dryRun": false,
+    "wouldRenames": 6,
+    "wouldObsoleteDeletes": 10,
+    "wouldFormulaUpdates": 1,
+    "wouldTouchSaves": 3,
+    "failed": 0
+  },
+  "snapshot": {
+    "path": "/home/michelek/workspace/scripts/migrations/snapshots/polyphony-pre-phase-b-2026-05-20T08-58-08-137Z.json",
+    "sha256": "f179abcbfcd07ec86ee36253aced54d07b087fe7d617ed72679c3fbc9a117af9",
+    "entityCount": 462
+  },
+  "wouldExecute": [
+    {
+      "kind": "RENAME",
+      "parentType": "person",
+      "source": "photo",
+      "target": "avatar"
+    },
+    {
+      "kind": "RENAME",
+      "parentType": "section",
+      "source": "ordinal",
+      "target": "display_order"
+    },
+    {
+      "kind": "RENAME",
+      "parentType": "section",
+      "source": "voice_type",
+      "target": "voice"
+    },
+    {
+      "kind": "RENAME",
+      "parentType": "work",
+      "source": "voicing",
+      "target": "original_voicing"
+    },
+    {
+      "kind": "RENAME",
+      "parentType": "work",
+      "source": "duration",
+      "target": "original_duration"
+    },
+    {
+      "kind": "RENAME",
+      "parentType": "work",
+      "source": "language",
+      "target": "original_language"
+    },
+    {
+      "kind": "BACKFILL_DATA",
+      "parentType": "person",
+      "sourceProperty": "photo",
+      "targetProperty": "avatar",
+      "backfillKind": "file"
+    },
+    {
+      "kind": "BACKFILL_DATA",
+      "parentType": "section",
+      "sourceProperty": "ordinal",
+      "targetProperty": "display_order",
+      "backfillKind": "number"
+    },
+    {
+      "kind": "BACKFILL_DATA",
+      "parentType": "section",
+      "sourceProperty": "voice_type",
+      "targetProperty": "voice",
+      "backfillKind": "string_to_reference"
+    },
+    {
+      "kind": "BACKFILL_DATA",
+      "parentType": "work",
+      "sourceProperty": "voicing",
+      "targetProperty": "original_voicing",
+      "backfillKind": "string"
+    },
+    {
+      "kind": "BACKFILL_DATA",
+      "parentType": "work",
+      "sourceProperty": "duration",
+      "targetProperty": "original_duration",
+      "backfillKind": "number"
+    },
+    {
+      "kind": "BACKFILL_DATA",
+      "parentType": "work",
+      "sourceProperty": "language",
+      "targetProperty": "original_language",
+      "backfillKind": "string_list"
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "person",
+      "propertyName": "photo",
+      "propertyDefId": "69bcfd8e9c031ab8e6ce806b"
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "section",
+      "propertyName": "ordinal",
+      "propertyDefId": "69c7ea4a8489bfcb0e819ec7"
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "section",
+      "propertyName": "voice_type",
+      "propertyDefId": "69c7ea498489bfcb0e819eb6"
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "work",
+      "propertyName": "voicing",
+      "propertyDefId": "69c7ea4e8489bfcb0e819f7c"
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "work",
+      "propertyName": "duration",
+      "propertyDefId": "69c7ea4e8489bfcb0e819f86"
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "work",
+      "propertyName": "language",
+      "propertyDefId": "69c7ea4d8489bfcb0e819f71"
+    },
+    {
+      "kind": "BACKFILL_DATA",
+      "parentType": "work",
+      "sourceProperty": "arranger",
+      "targetProperty": "arranger",
+      "backfillKind": "parent_copy",
+      "targetParentType": "edition"
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "work",
+      "propertyName": "arranger",
+      "propertyDefId": "69c7ea4d8489bfcb0e819f5c"
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "organization",
+      "propertyName": "contact_email",
+      "propertyDefId": "69c7ea488489bfcb0e819e5e",
+      "verifyPreconditions": true
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "organization",
+      "propertyName": "language",
+      "propertyDefId": "69c7ea488489bfcb0e819e75",
+      "verifyPreconditions": true
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "organization",
+      "propertyName": "locale",
+      "propertyDefId": "69c7ea488489bfcb0e819e80",
+      "verifyPreconditions": true
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "organization",
+      "propertyName": "org_type",
+      "propertyDefId": "69c7ea478489bfcb0e819e50",
+      "verifyPreconditions": true
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "organization",
+      "propertyName": "timezone",
+      "propertyDefId": "69c7ea498489bfcb0e819e8b",
+      "verifyPreconditions": true
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "organization",
+      "propertyName": "member_count",
+      "propertyDefId": "69c7ea498489bfcb0e819e96",
+      "verifyPreconditions": true
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "member",
+      "propertyName": "email",
+      "propertyDefId": "69c7ea4b8489bfcb0e819ef0",
+      "verifyPreconditions": true
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "member",
+      "propertyName": "invited_by",
+      "propertyDefId": "69c7ea4c8489bfcb0e819f33",
+      "verifyPreconditions": true
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "member",
+      "propertyName": "joined_at",
+      "propertyDefId": "69c7ea4c8489bfcb0e819f1d",
+      "verifyPreconditions": true
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "member",
+      "propertyName": "nickname",
+      "propertyDefId": "69c7ea4b8489bfcb0e819efb",
+      "verifyPreconditions": true
+    },
+    {
+      "kind": "UPDATE_FORMULA",
+      "parentType": "section",
+      "propertyName": "member_count",
+      "propertyDefId": "69c7ea4a8489bfcb0e819ed1",
+      "newFormula": "(_child.member COUNT) (_child.section.member_count SUM) +"
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "work",
+      "propertyName": "edition_count",
+      "propertyDefId": "69c7ea4e8489bfcb0e819f90"
+    },
+    {
+      "kind": "TOUCH_SAVE",
+      "parentType": "lending",
+      "propertyName": "name",
+      "formulaExpression": "member.*.name copy.*.name ' — ' CONCAT_WS"
+    },
+    {
+      "kind": "TOUCH_SAVE",
+      "parentType": "organization",
+      "propertyName": "member_count_per_section",
+      "formulaExpression": "(_child.member COUNT) (_child.section.member_count SUM) +"
+    },
+    {
+      "kind": "TOUCH_SAVE",
+      "parentType": "edition",
+      "propertyName": "work",
+      "formulaExpression": "_parent"
+    }
+  ],
+  "addedProperties": [],
+  "backfilled": [
+    {
+      "parentType": "person",
+      "sourceProperty": "photo",
+      "targetProperty": "avatar",
+      "migrated": 0,
+      "skipped": 2,
+      "failed": 0
+    },
+    {
+      "parentType": "section",
+      "sourceProperty": "ordinal",
+      "targetProperty": "display_order",
+      "migrated": 0,
+      "skipped": 16,
+      "failed": 0
+    },
+    {
+      "parentType": "section",
+      "sourceProperty": "voice_type",
+      "targetProperty": "voice",
+      "migrated": 0,
+      "skipped": 16,
+      "failed": 0
+    },
+    {
+      "parentType": "work",
+      "sourceProperty": "voicing",
+      "targetProperty": "original_voicing",
+      "migrated": 0,
+      "skipped": 0,
+      "failed": 0
+    },
+    {
+      "parentType": "work",
+      "sourceProperty": "duration",
+      "targetProperty": "original_duration",
+      "migrated": 0,
+      "skipped": 0,
+      "failed": 0
+    },
+    {
+      "parentType": "work",
+      "sourceProperty": "language",
+      "targetProperty": "original_language",
+      "migrated": 0,
+      "skipped": 0,
+      "failed": 0
+    },
+    {
+      "parentType": "work",
+      "sourceProperty": "arranger",
+      "targetProperty": "arranger",
+      "migrated": 0,
+      "skipped": 0,
+      "failed": 0
+    }
+  ],
+  "deleted": [
+    {
+      "parentType": "person",
+      "propertyName": "photo",
+      "propertyDefId": "69bcfd8e9c031ab8e6ce806b",
+      "deletedAt": "2026-05-20T08:58:09.638Z"
+    },
+    {
+      "parentType": "section",
+      "propertyName": "ordinal",
+      "propertyDefId": "69c7ea4a8489bfcb0e819ec7",
+      "deletedAt": "2026-05-20T08:58:09.682Z"
+    },
+    {
+      "parentType": "section",
+      "propertyName": "voice_type",
+      "propertyDefId": "69c7ea498489bfcb0e819eb6",
+      "deletedAt": "2026-05-20T08:58:09.725Z"
+    },
+    {
+      "parentType": "work",
+      "propertyName": "voicing",
+      "propertyDefId": "69c7ea4e8489bfcb0e819f7c",
+      "deletedAt": "2026-05-20T08:58:09.768Z"
+    },
+    {
+      "parentType": "work",
+      "propertyName": "duration",
+      "propertyDefId": "69c7ea4e8489bfcb0e819f86",
+      "deletedAt": "2026-05-20T08:58:09.812Z"
+    },
+    {
+      "parentType": "work",
+      "propertyName": "language",
+      "propertyDefId": "69c7ea4d8489bfcb0e819f71",
+      "deletedAt": "2026-05-20T08:58:09.868Z"
+    },
+    {
+      "parentType": "work",
+      "propertyName": "arranger",
+      "propertyDefId": "69c7ea4d8489bfcb0e819f5c",
+      "deletedAt": "2026-05-20T08:58:10.067Z"
+    },
+    {
+      "parentType": "organization",
+      "propertyName": "language",
+      "propertyDefId": "69c7ea488489bfcb0e819e75",
+      "deletedAt": "2026-05-20T08:58:10.350Z"
+    },
+    {
+      "parentType": "organization",
+      "propertyName": "locale",
+      "propertyDefId": "69c7ea488489bfcb0e819e80",
+      "deletedAt": "2026-05-20T08:58:10.564Z"
+    },
+    {
+      "parentType": "organization",
+      "propertyName": "timezone",
+      "propertyDefId": "69c7ea498489bfcb0e819e8b",
+      "deletedAt": "2026-05-20T08:58:10.922Z"
+    },
+    {
+      "parentType": "member",
+      "propertyName": "email",
+      "propertyDefId": "69c7ea4b8489bfcb0e819ef0",
+      "deletedAt": "2026-05-20T08:58:11.122Z"
+    },
+    {
+      "parentType": "member",
+      "propertyName": "invited_by",
+      "propertyDefId": "69c7ea4c8489bfcb0e819f33",
+      "deletedAt": "2026-05-20T08:58:11.262Z"
+    },
+    {
+      "parentType": "member",
+      "propertyName": "nickname",
+      "propertyDefId": "69c7ea4b8489bfcb0e819efb",
+      "deletedAt": "2026-05-20T08:58:11.414Z"
+    },
+    {
+      "parentType": "work",
+      "propertyName": "edition_count",
+      "propertyDefId": "69c7ea4e8489bfcb0e819f90",
+      "deletedAt": "2026-05-20T08:58:11.550Z"
+    }
+  ],
+  "blockedDeletes": [
+    {
+      "parentType": "organization",
+      "propertyName": "contact_email",
+      "reason": "6 instance(s) of organization still have contact_email set"
+    },
+    {
+      "parentType": "organization",
+      "propertyName": "org_type",
+      "reason": "6 instance(s) of organization still have org_type set"
+    },
+    {
+      "parentType": "organization",
+      "propertyName": "member_count",
+      "reason": "property is referenced by formula on 2 property-def(s)"
+    },
+    {
+      "parentType": "member",
+      "propertyName": "joined_at",
+      "reason": "10 instance(s) of member still have joined_at set"
+    }
+  ],
+  "formulaUpdates": [
+    {
+      "parentType": "section",
+      "propertyName": "member_count",
+      "propertyDefId": "69c7ea4a8489bfcb0e819ed1",
+      "updatedAt": "2026-05-20T08:58:11.511Z"
+    }
+  ],
+  "touchSaves": [
+    {
+      "parentType": "lending",
+      "propertyName": "name",
+      "count": 0,
+      "noInstances": true,
+      "failed": 0
+    },
+    {
+      "parentType": "organization",
+      "propertyName": "member_count_per_section",
+      "count": 6,
+      "noInstances": false,
+      "failed": 0
+    },
+    {
+      "parentType": "edition",
+      "propertyName": "work",
+      "count": 0,
+      "noInstances": true,
+      "failed": 0
+    }
+  ],
+  "skipped": [],
+  "failed": []
+}

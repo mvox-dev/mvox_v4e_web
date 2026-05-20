@@ -58,10 +58,10 @@ describe('PHASE_B_RENAMES', () => {
 	});
 });
 
-// §2 migrations
+// §2 migrations (v9.1: person.forename+surname removed, deferred to Phase D)
 describe('PHASE_B_MIGRATIONS', () => {
-	it('contains exactly 2 migration operations', () => {
-		expect(PHASE_B_MIGRATIONS).toHaveLength(2);
+	it('contains exactly 1 migration operation (§2.8 person.forename+surname deferred)', () => {
+		expect(PHASE_B_MIGRATIONS).toHaveLength(1);
 	});
 
 	it('includes work.arranger → edition.arranger', () => {
@@ -71,10 +71,9 @@ describe('PHASE_B_MIGRATIONS', () => {
 		expect(op?.backfillKind).toBe('parent_copy');
 	});
 
-	it('includes person.forename+surname → delete (verify formula first)', () => {
+	it('does NOT include person.forename+surname (deferred to Phase D)', () => {
 		const op = PHASE_B_MIGRATIONS.find(m => m.source === 'person.forename+surname');
-		expect(op).toBeDefined();
-		expect(op?.action).toBe('verify_then_delete');
+		expect(op).toBeUndefined();
 	});
 });
 

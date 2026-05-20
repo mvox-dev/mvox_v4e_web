@@ -1,12 +1,19 @@
 import type { EntuClient } from './entu-client';
 import type { BackfillKind } from './phase-b-scope';
+import type { BackfillDataOp } from './diff';
+
+// voiceLookup can be a pre-built Map (test convenience) or an async resolver fn (live
+// per-source lookup). Resolver returns undefined when no voice entity matches.
+export type VoiceLookup =
+	| Map<string, string>
+	| ((sourceValue: string) => Promise<string | undefined>);
 
 export interface MigratePropertyOptions {
 	parentType: string;
 	sourceProperty: string;
 	targetProperty: string;
 	backfillKind: BackfillKind;
-	voiceLookup?: Map<string, string>;
+	voiceLookup?: VoiceLookup;
 	parentLookup?: Map<string, string>;
 	listInstances: (client: EntuClient, parentType: string) => Promise<EntuInstance[]>;
 	writeProperty: (
@@ -15,6 +22,11 @@ export interface MigratePropertyOptions {
 		propertyName: string,
 		value: unknown
 	) => Promise<{ _id: string }>;
+	// Q5 multi-value gotcha: POSTing to a property that already has values APPENDS rather
+	// than replacing. The migrator must DELETE all existing target property `_id`s before
+	// writing the new value. Idempotency check (target already matches source) runs first
+	// so a matching value never triggers a DELETE+POST cycle.
+	deleteProperty?: (client: EntuClient, propertyId: string) => Promise<void>;
 }
 
 export interface MigrationResult {
@@ -25,6 +37,7 @@ export interface MigrationResult {
 }
 
 type PropertyValue = {
+	_id?: string;
 	type?: string;
 	string?: string;
 	number?: number;
@@ -69,10 +82,65 @@ function listsMatch(a: string[], b: string[]): boolean {
 	return sortedA.every((v, i) => v === sortedB[i]);
 }
 
+// Pre-delete all existing target property values to avoid Q5's multi-value POST gotcha.
+// Caller MUST run the idempotency-skip check first; this is for the "target diverges from
+// source, replace it cleanly" path.
+async function pruneExistingTarget(
+	client: EntuClient,
+	targetValues: PropertyValue[] | null,
+	deleteProperty: MigratePropertyOptions['deleteProperty']
+): Promise<void> {
+	if (!targetValues || !deleteProperty) return;
+	for (const v of targetValues) {
+		if (typeof v._id === 'string') {
+			await deleteProperty(client, v._id);
+		}
+	}
+}
+
+// Injectables-only options for the 3-arg call shape (op carries parentType/sourceProperty/etc.).
+// Used by buildLiveCallbacks to delegate: dataMigrator.migrateProperty(client, op, injectables).
+export interface MigratePropertyInjectables {
+	voiceLookup?: VoiceLookup;
+	parentLookup?: Map<string, string>;
+	listInstances: (client: EntuClient, parentType: string) => Promise<EntuInstance[]>;
+	writeProperty: (
+		client: EntuClient,
+		entityId: string,
+		propertyName: string,
+		value: unknown
+	) => Promise<{ _id: string }>;
+	deleteProperty?: (client: EntuClient, propertyId: string) => Promise<void>;
+}
+
 export async function migrateProperty(
 	client: EntuClient,
 	opts: MigratePropertyOptions
+): Promise<MigrationResult>;
+export async function migrateProperty(
+	client: EntuClient,
+	op: BackfillDataOp,
+	injectables: MigratePropertyInjectables
+): Promise<MigrationResult>;
+export async function migrateProperty(
+	client: EntuClient,
+	optsOrOp: MigratePropertyOptions | BackfillDataOp,
+	injectables?: MigratePropertyInjectables
 ): Promise<MigrationResult> {
+	const opts: MigratePropertyOptions = injectables
+		? {
+				parentType: (optsOrOp as BackfillDataOp).parentType,
+				sourceProperty: (optsOrOp as BackfillDataOp).sourceProperty,
+				targetProperty: (optsOrOp as BackfillDataOp).targetProperty,
+				backfillKind: (optsOrOp as BackfillDataOp).backfillKind,
+				voiceLookup: injectables.voiceLookup,
+				parentLookup: injectables.parentLookup,
+				listInstances: injectables.listInstances,
+				writeProperty: injectables.writeProperty,
+				deleteProperty: injectables.deleteProperty
+			}
+		: (optsOrOp as MigratePropertyOptions);
+
 	if (opts.backfillKind === 'parent_copy' && !opts.parentLookup) {
 		throw new Error(
 			"migrateProperty: backfillKind='parent_copy' requires a parentLookup Map injection (source values live on the parent entity, not the same instance)"
@@ -98,6 +166,7 @@ export async function migrateProperty(
 					result.skipped += 1;
 					continue;
 				}
+				await pruneExistingTarget(client, targetValues, opts.deleteProperty);
 				await opts.writeProperty(client, instance._id, opts.targetProperty, parentValue);
 				result.migrated += 1;
 			} catch {
@@ -125,6 +194,7 @@ export async function migrateProperty(
 					result.skipped += 1;
 					continue;
 				}
+				await pruneExistingTarget(client, targetValues, opts.deleteProperty);
 				await opts.writeProperty(client, instance._id, opts.targetProperty, sourceRef);
 				result.migrated += 1;
 			} else if (opts.backfillKind === 'string') {
@@ -138,6 +208,7 @@ export async function migrateProperty(
 					result.skipped += 1;
 					continue;
 				}
+				await pruneExistingTarget(client, targetValues, opts.deleteProperty);
 				await opts.writeProperty(client, instance._id, opts.targetProperty, sourceStr);
 				result.migrated += 1;
 			} else if (opts.backfillKind === 'number') {
@@ -151,6 +222,7 @@ export async function migrateProperty(
 					result.skipped += 1;
 					continue;
 				}
+				await pruneExistingTarget(client, targetValues, opts.deleteProperty);
 				await opts.writeProperty(client, instance._id, opts.targetProperty, sourceNum);
 				result.migrated += 1;
 			} else if (opts.backfillKind === 'string_list') {
@@ -160,6 +232,7 @@ export async function migrateProperty(
 					result.skipped += 1;
 					continue;
 				}
+				await pruneExistingTarget(client, targetValues, opts.deleteProperty);
 				for (const value of sourceList) {
 					await opts.writeProperty(client, instance._id, opts.targetProperty, value);
 				}
@@ -170,7 +243,11 @@ export async function migrateProperty(
 					result.skipped += 1;
 					continue;
 				}
-				const lookupId = opts.voiceLookup?.get(sourceStr);
+				const lookup = opts.voiceLookup;
+				const lookupId =
+					typeof lookup === 'function'
+						? await lookup(sourceStr)
+						: lookup?.get(sourceStr);
 				if (!lookupId) {
 					result.failed += 1;
 					unmatched.add(sourceStr);
@@ -181,6 +258,7 @@ export async function migrateProperty(
 					result.skipped += 1;
 					continue;
 				}
+				await pruneExistingTarget(client, targetValues, opts.deleteProperty);
 				await opts.writeProperty(client, instance._id, opts.targetProperty, lookupId);
 				result.migrated += 1;
 			}
