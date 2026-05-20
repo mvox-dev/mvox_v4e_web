@@ -1,63 +1,184 @@
 [
   {
     "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"1\",\"subject\":\"CHORE-1 (#1) — SvelteKit + adapter-cloudflare bootstrap\",\"description\":\"First TDD cycle. Tallis writes RED (smoke test: pnpm check 0, pnpm build produces .svelte-kit/cloudflare/). Josquin GREENs. Bentham reviews with extra calibration. Josquin squash-merges locally. Team-lead closes #1.</description>\\n<parameter name=\\\"activeForm\\\">Driving CHORE-1 through TDD cycle\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-18T23:55:01.568Z\"}",
-    "timestamp": "2026-05-18T23:55:01.568Z",
+    "text": "[2026-05-19 21:35] Plan correction from PO: **sequential TDD, one agent active at a time, per-task RED → GREEN ping-pong.**\n\n**Do NOT start Task 1b in parallel.** Wait for Tallis to complete Task 1a (scaffold dirs + vitest glob + commit) and send you a handoff message.\n\nUpdated sequencing for you:\n\n1. **WAIT** for Tallis's Task 1a handoff. Don't read his commits or do any work until you receive that SendMessage.\n2. Receive handoff → start Task 1b (tsx devDep + package.json migrate scripts + commit).\n3. Send Tallis a brief handoff signaling Task 1 complete and Task 2 RED can start.\n4. **WAIT** for his Task 2 RED handoff.\n5. Then Task 2 GREEN (entu-client.ts implementation). Run tests, confirm they pass, commit per plan, hand back to Tallis.\n6. **WAIT** for his Task 3 RED handoff.\n7. Repeat through Task 7.\n8. After Task 7 GREEN, you're solo for Tasks 8 (dry-run), 9 (PR), 10 (live exec). No more ping-pong with Tallis.\n\nEach handoff uses common-prompt.md \"Handoff Message Format.\" Brief and structured.\n\nUntil you get Tallis's Task 1a handoff: idle. Use the time to read the spec + plan + handbook + the 6 memory files in your startup brief if you haven't already. Don't make any commits.",
+    "summary": "Sequential TDD — wait for Tallis 1a first",
+    "timestamp": "2026-05-19T21:36:22.903Z",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "[2026-05-18 23:55] Tallis handed off TESTS_WRITTEN on `feat/1-bootstrap` (commit `bc2a44a`). Your GREEN starts now.\n\n**Tests Tallis wrote** (verify by reading these first, then scaffold against them):\n- `src/tests/build-config.spec.ts` (Vitest, node env) — 7 assertions: wrangler config exists, names project `multivox`, no `d1_databases`/`r2_buckets`/`kv_namespaces`/`durable_objects`, `tsconfig.json` has `compilerOptions.strict = true`.\n- `tests/smoke.spec.ts` (Playwright) — `pnpm build` produces `.svelte-kit/cloudflare/`, and root route returns HTTP 200 with no JS errors. Needs `pnpm preview` on port 5173 during the test run.\n- `vitest.config.ts` + `playwright.config.ts` — already present, Vitest scans `src/**/*.spec.ts`, Playwright scans `tests/`.\n\n**Tallis suggests `wrangler.toml`** in his handoff — your brief from me says **prefer `wrangler.json`**. Stick with `wrangler.json` (`\"name\": \"multivox\"`, no bindings). The test reads either via filename presence — confirm before you commit.\n\n**Scaffold notes (recap)**:\n- `pnpm create svelte` (or `pnpm dlx sv create`), flat single-app, Svelte 5 Runes, TS strict.\n- `@sveltejs/adapter-cloudflare` (NOT auto).\n- No Tailwind (CHORE-2's job).\n- Don't attempt `wrangler pages deploy` — CF token is Pages-read only.\n\n**Quality gates before handoff**: `pnpm check` exits 0, `pnpm test` (vitest + playwright) all green. Note the Playwright test needs `pnpm preview` running — set that up however the convention is (Playwright's `webServer` config in `playwright.config.ts` may already do it; check Tallis's config).\n\nWhen GREEN, send handoff to team-lead, status TESTS_PASSING. I'll route to Bentham (Comenius skipped — no user-facing strings in this PR).\n\nGo.",
-    "summary": "CHORE-1 RED done — your GREEN starts now",
-    "timestamp": "2026-05-18T23:55:07.534Z",
+    "text": "[2026-05-19 21:36] HOLD. Our messages crossed in flight. Do NOT start Task 1b yet — strict sequential TDD applies (see my previous message in your inbox). Wait for Tallis's Task 1a handoff message before doing any work. If you already started Task 1b, stash/abort and wait. Confirm receipt with a one-line message and go idle.",
+    "summary": "STOP — do not start Task 1b yet",
+    "timestamp": "2026-05-19T21:36:37.667Z",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "[2026-05-18 23:58] Good catch. Bouncing the playwright `webServer` block back to Tallis — that's his config file and not mechanical breakage you should patch. He'll add it in 30s. Hold on scaffolding until I message you \"go\" again.\n\nOnce he's done, you proceed with the original plan (no other changes).",
-    "summary": "Hold — Tallis fixing webServer",
-    "timestamp": "2026-05-18T23:55:40.694Z",
+    "text": "[2026-05-19 21:37] Acknowledged your Task 1b commit `a8a9a18` — fine, our messages crossed. Keep it.\n\nTallis will commit Task 3 RED shortly and then hand off both Task 2 + Task 3 RED commits to you. Do them in order: Task 2 GREEN (entu-client.ts), commit per plan. Then Task 3 GREEN (schema-loader.ts), commit per plan. Then send Tallis a handoff signaling both GREENs are done and Task 4 RED can start.\n\nFrom Task 4 onward, strict per-task ping-pong:\n- Tallis Task 4 RED → handoff → you Task 4 GREEN → handoff → Tallis Task 5 RED → … → Task 7 GREEN\n- After Task 7 GREEN, you're solo for Tasks 8/9/10\n\nStay idle until Tallis's handoff arrives.",
+    "summary": "OK keep your Task 1b, await Tallis hand-off",
+    "timestamp": "2026-05-19T21:37:30.442Z",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "[2026-05-18 23:59] Tallis pushed `ff03011` with the `webServer` block. Branch is clean. **Go scaffold.**\n\nReminders:\n- `pnpm create svelte` or `pnpm dlx sv create`, flat single-app, Svelte 5 Runes, TS strict.\n- `@sveltejs/adapter-cloudflare` (not auto).\n- `wrangler.json` with `\"name\": \"multivox\"`, no bindings.\n- No Tailwind.\n- Quality gates: `pnpm check` exits 0 + `pnpm test` (vitest + playwright) all 9 assertions GREEN.\n- Commit: `feat(#1): bootstrap SvelteKit + adapter-cloudflare`. Co-author trailer auto-added by hook.\n- Pull latest first: `git pull origin feat/1-bootstrap` to make sure you have Tallis's `ff03011` locally.\n\nHandoff to team-lead with TESTS_PASSING when GREEN.",
-    "summary": "Go — webServer fixed, scaffold now",
-    "timestamp": "2026-05-18T23:56:08.680Z",
+    "text": "[2026-05-19 21:38] Going with your option (a). Do these three GREENs in series, no handoffs between them — they're all already RED:\n\n1. Task 2 GREEN — entu-client.ts. Run `pnpm test:unit scripts/migrations/lib/entu-client.spec.ts`, confirm 5 tests pass, commit with the plan's Task 2 Step 13 message (minus the .gitkeep deletion if Tallis's Task 1a already removed it).\n2. Task 3 GREEN — schema-loader.ts. Same pattern, 4 tests pass, plan's Task 3 Step 6 commit message.\n3. Task 4 GREEN — diff.ts. Same pattern, 4 tests pass, plan's Task 4 Step 5 commit message.\n\nAfter all three GREENs are committed, run full `pnpm test:unit` (sanity check that nothing else broke) and `pnpm check`, then send a handoff to Tallis for Task 5 RED.\n\nFrom Task 5 onward we get the proper ping-pong: Tallis Task 5 RED → handoff → you Task 5 GREEN → handoff → Tallis Task 6 RED → … → through Task 7 GREEN.\n\nGo.",
+    "summary": "Go — Task 2/3/4 GREEN in series",
+    "timestamp": "2026-05-19T21:38:09.040Z",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "[2026-05-19 21:38]\n\n## Story Handoff\n- **Story:** Phase A migration — polyphony db → v4E (in-place, additive)\n- **Branch:** `feat/phase-a-migration`\n- **From:** Tallis (phase: RED)\n- **To:** Josquin (phase: GREEN)\n- **Status:** TESTS_WRITTEN\n\n### What was done\n- Task 1a: scaffold `scripts/migrations/lib/` + `reports/` dirs; extended `vitest.config.ts` include glob to `scripts/**/*.spec.ts`; verified existing 9 tests still pass\n- Tasks 2–6: wrote 5 spec files (`entu-client.spec.ts`, `schema-loader.spec.ts`, `diff.spec.ts`, `executor.spec.ts`, `reporter.spec.ts`) — 21 tests total, all failing RED (module not found)\n- Task 7: wrote E2E spec `scripts/migrations/2026-05-19-phase-a.spec.ts` — 3 tests, failing RED\n- Fixtures committed: `scripts/migrations/lib/fixtures/schema-minimal.json` + `schema-malformed.txt`\n- All 7 commits pushed to `feat/phase-a-migration`\n\n### What to do next\nImplement the GREEN phase per `docs/migration/specs/2026-05-19-phase-a-plan.md`:\n- **Task 1b:** add `tsx` devDep + `migrate:phase-a` / `migrate:phase-a:dry` scripts to `package.json`\n- **Task 2 GREEN:** implement `scripts/migrations/lib/entu-client.ts` (getJwt, createEntity, listEntities) — run spec, expect 5 pass\n- **Task 3 GREEN:** implement `scripts/migrations/lib/schema-loader.ts` — run spec, expect 4 pass\n- **Task 4 GREEN:** implement `scripts/migrations/lib/diff.ts` — run spec, expect 4 pass; remove `lib/.gitkeep`\n- **Task 5 GREEN:** implement `scripts/migrations/lib/executor.ts` — run spec, expect 4 pass\n- **Task 6 GREEN:** implement `scripts/migrations/lib/reporter.ts` — run spec, expect 4 pass\n- **Task 7 GREEN:** implement `scripts/migrations/2026-05-19-phase-a.ts` — run E2E spec, expect 3 pass; then `pnpm test:unit` full suite + `pnpm check`\n- Each module committed with the final commit message from the plan (no RED suffix)\n\n### Files to start with\n- `docs/migration/specs/2026-05-19-phase-a-plan.md` — authoritative, tasks 2–7 GREEN steps\n- `scripts/migrations/lib/entu-client.spec.ts` — start here\n- `~/projects/entu-research/scripts/setup-entity-types.ts` — existing pattern precedent",
+    "summary": "Phase A RED complete — handoff to Josquin for GREEN",
+    "timestamp": "2026-05-19T21:38:20.585Z",
+    "color": "yellow",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "[2026-05-19 00:??] PO installed Playwright's chromium system deps. Re-run `pnpm test` to verify 9/9 GREEN.\n\nIf green:\n- `git add -A` (or selective — your call), commit `feat(#1): bootstrap SvelteKit + adapter-cloudflare`. Hook auto-adds co-author trailer.\n- Push.\n- Send handoff to team-lead with TESTS_PASSING. I'll route to Bentham.\n\nIf still failing on something else, report — don't push until I see it.",
-    "summary": "Deps installed — verify GREEN and commit",
-    "timestamp": "2026-05-19T00:02:37.189Z",
+    "text": "[2026-05-19 21:39] Revised plan. Tallis has pushed RED for ALL 7 tasks (his original spawn brief told him to). 24 failing tests across 6 spec files + the CLI e2e spec are committed.\n\nDo all GREENs in series — Tasks 2, 3, 4, 5, 6, 7 — one commit per task, plan's verbatim commit messages. After each task's `.ts` is written, run that task's `.spec.ts` to confirm it passes, then commit. No ping-pong handoffs to Tallis between tasks; he's done with RED.\n\nAfter Task 7 GREEN:\n1. Run `pnpm test:unit` (full suite) → all should pass\n2. Run `pnpm check` → 0 type errors\n3. If clean: proceed to Task 8 (dry-run)\n4. Send a single completion message to team-lead summarizing what landed\n\nThen continue solo through Tasks 8/9/10 as originally briefed. Standard PR + Bentham review + PO greenlight + live execution.\n\nGo.",
+    "summary": "Revised — do all GREENs 2-7 in series",
+    "timestamp": "2026-05-19T21:39:11.108Z",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "[2026-05-19 21:39] FYI: all RED specs for Tasks 2–7 are already committed and pushed on `feat/phase-a-migration`. You don't need to wait on me for any further RED work — all specs are there and failing.\n\nCommitted RED specs ready for your GREEN:\n- `f4b9c52` — `scripts/migrations/lib/entu-client.spec.ts` (5 tests) ← you've already GREENed this\n- `32c4e30` — `scripts/migrations/lib/schema-loader.spec.ts` (4 tests) + fixtures\n- `221b286` — `scripts/migrations/lib/diff.spec.ts` (4 tests)\n- `335bbca` — `scripts/migrations/lib/executor.spec.ts` (4 tests)\n- `fbda3e1` — `scripts/migrations/lib/reporter.spec.ts` (4 tests)\n- `2be67a9` — `scripts/migrations/2026-05-19-phase-a.spec.ts` (3 tests, E2E)\n\nProceed through Tasks 3–7 GREEN in sequence. No ping needed from me — I'm idle until you need something.",
+    "summary": "All RED specs (Tasks 2–7) already on branch — proceed through GREENs",
+    "timestamp": "2026-05-19T21:39:38.278Z",
+    "color": "yellow",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "[2026-05-19 00:08] Tallis pushed `0844aa2`: build-output check moved to vitest (`src/tests/build-output.spec.ts`, 60s timeout), test 1 deleted from `tests/smoke.spec.ts`. Final shape: vitest 9 + playwright 1 = 10 assertions, no race.\n\nPull latest, run `pnpm test`, commit + push the scaffold if green. Handoff to me with TESTS_PASSING.",
-    "summary": "Tallis done — verify and commit",
-    "timestamp": "2026-05-19T00:04:26.457Z",
+    "text": "[2026-05-19 21:41] Good catch. You're right — Option (a), plan wins. The plan's diff impl + executor spec are mutually consistent; only the diff.spec.ts is wrong. My fault in the plan.\n\nI've asked Tallis to fix the two broken tests in `diff.spec.ts` to match the inline-properties contract. He'll commit a `test(migration): diff RED — fix CreateTypeOp inline-properties contract` commit and ping you.\n\nThrow away your uncommitted (failing) diff.ts. When Tallis's fix lands, pull, re-implement diff.ts verbatim from the plan, and confirm all 4 tests pass. Then continue Tasks 5/6/7 GREEN in series as planned.\n\nStay parked until Tallis's ping.",
+    "summary": "Parked correctly — Tallis fixing diff.spec.ts",
+    "timestamp": "2026-05-19T21:41:46.886Z",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "[2026-05-19 21:42] diff.spec.ts fix landed: `87fce67` on `feat/phase-a-migration`.\n\nChanged contract: new-type properties are inline in `CreateTypeOp.properties`, not separate `ADD_PROPERTY` ops. Specifically:\n- Test 1: empty db → 2 CREATE_TYPE, 0 ADD_PROPERTY (season 3 props inline, voice 1 prop inline)\n- Test 2: partial db (season exists) → 1 CREATE_TYPE (voice, label inline) + 2 ADD_PROPERTY (season.end_date, season.description only)\n\nStill RED (diff.ts not yet on branch). Ready for your Task 4 GREEN.",
+    "summary": "diff.spec.ts fixed — inline-properties contract, pushed",
+    "timestamp": "2026-05-19T21:42:18.902Z",
+    "color": "yellow",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "[2026-05-19 00:12] PO approved. Add a small follow-up commit on `feat/1-bootstrap` to install the co-author trailer hook.\n\n**Spec:**\n\n1. `.githooks/prepare-commit-msg` (versioned, executable):\n   ```bash\n   #!/usr/bin/env bash\n   COMMIT_MSG_FILE=\"$1\"\n   COMMIT_SOURCE=\"$2\"\n   TRAILER=\"Co-authored-by: Mihkel Putrinš <mihkel.putrinsh@gmail.com>\"\n   [ \"$COMMIT_SOURCE\" = \"merge\" ] && exit 0\n   if ! grep -qF \"$TRAILER\" \"$COMMIT_MSG_FILE\"; then\n     echo \"\" >> \"$COMMIT_MSG_FILE\"\n     echo \"$TRAILER\" >> \"$COMMIT_MSG_FILE\"\n   fi\n   ```\n   (Refine if you have a better invariant. Use `git interpret-trailers` if you prefer — your judgement.)\n\n2. `scripts/install-hooks.sh` (executable): copies everything from `.githooks/` into `.git/hooks/` with chmod +x.\n\n3. `package.json` `\"scripts\"`: add `\"prepare\": \"scripts/install-hooks.sh\"`. Note: pnpm runs `prepare` automatically after `pnpm install`, so a clean checkout gets the hook for free.\n\n4. **Important**: install the hook locally BEFORE committing so this very commit lands with the trailer. Steps:\n   - Write the files.\n   - Run `bash scripts/install-hooks.sh` manually.\n   - `git add -A && git commit -m \"chore(#1): install prepare-commit-msg hook for co-author trailer\"` — verify the resulting commit message has the `Co-authored-by:` trailer appended.\n   - Push.\n\n5. After push, send me handoff TESTS_PASSING_v2 (or just \"hook installed\"). Bentham will review both commits.\n\nBentham is reading the scaffold in parallel — keep this commit small and focused.",
-    "summary": "Follow-up: install prepare-commit-msg hook",
-    "timestamp": "2026-05-19T00:06:22.132Z",
+    "text": "[2026-05-19 21:46] PO greenlight with one ordering: push the 7-commit branch to origin first (for visibility), THEN run the dry-run.\n\n1. `git push -u origin feat/phase-a-migration`\n2. `source ~/.config/mvox/credentials.env`\n3. `pnpm migrate:phase-a:dry`\n4. Inspect the markdown report under `scripts/migrations/reports/dry-run-*-phase-a-*.md`\n5. Sanity-check the additions list against v4E `~/projects/entu-research/docs/schema/v4E/schema.json`\n6. Send a status message with: the branch push confirmation, the dry-run summary counts (types/properties/skipped/failed), and the path to the dry-run report file. Do NOT commit the dry-run report.\n\nThen we'll move to Task 9 (PR creation) — wait for my go before `gh pr create`.",
+    "summary": "Push branch then go on Task 8",
+    "timestamp": "2026-05-19T21:46:09.034Z",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "[2026-05-19 00:24] Bentham GREEN'd `feat/1-bootstrap` (final verdict, retracted his earlier YELLOW #1 as a worktree-vs-commit reading error). Merge approved.\n\n**Note**: Tallis pushed `9aa4b65` (scratchpad cleanup) onto `feat/1-bootstrap` after Bentham's review — that's a team-config file, not feature code, slightly out-of-scope for the branch but harmless (squash will absorb it). I'll talk to Tallis about routing team-config changes to main going forward. For this merge: just include it.\n\n**Also**: I pushed an unrelated 1-line patch to main earlier (`7892b1d`, josquin.md API base URL fix). When you squash-merge, the 3-way merge will keep main's version of that file — my fix is preserved. No conflict expected. If you see one, ping me.\n\n**Merge procedure** (per common-prompt.md):\n\n```bash\ngit checkout main\ngit pull origin main\ngit merge --squash feat/1-bootstrap\ngit commit -m \"feat(#1): bootstrap SvelteKit + adapter-cloudflare\n\n- Flat single-app SvelteKit 2 + Svelte 5 (runes) + TS strict\n- @sveltejs/adapter-cloudflare 7.2.8\n- wrangler.json: name=multivox, no D1/R2/KV/DO bindings\n- Test infra: vitest 9 + playwright 1 = 10 assertions GREEN\n- prepare-commit-msg hook auto-installed via pnpm prepare\n\n(*MVOX:Josquin*)\"\ngit push origin main\n```\n\nThe hook will append `Co-authored-by:` automatically (verify before push). Then delete the branch:\n\n```bash\ngit push origin --delete feat/1-bootstrap\ngit branch -d feat/1-bootstrap\n```\n\nWhen done, ping me with the squash commit SHA. I'll close issue #1 with the completion comment.\n\nNo PR to close (we never opened one) — the in-team review is the audit trail.",
-    "summary": "GREEN — merge per procedure",
-    "timestamp": "2026-05-19T00:09:13.923Z",
+    "text": "[2026-05-19 21:54] PO greenlight on path (c)→(a). Park.\n\nDon't throw away your local edits. Leave the uncommitted `__dirname` ESM fix in your working tree — it's a real bug regardless of spec amendment. Don't commit yet; we'll fold it into the next round of changes once we know what they are.\n\nDon't push anything. Don't open the PR yet. The branch (`feat/phase-a-migration`) stays as-is at the current 7-commit head.\n\nI'm briefing Finn to enumerate the real polyphony db state vs v4E `schema.json` and produce `docs/migration/v4e-divergence-2026-05-19.md` as the persistent source of truth. After that lands, I'll amend the Phase A spec + plan and ping you with the diff. Likely outcomes: fetchDbState query broadens (no `_parent.reference` constraint), v4E→Entu field-name translation layer, reporter dry-run section, ESM `__dirname` fix.\n\nIdle until further notice. Useful idle activity: optionally append a brief [CHECKPOINT] to your scratchpad about the three issues you caught — concrete enough that a future-you would re-spot them faster.",
+    "summary": "Park — Finn doing divergence analysis",
+    "timestamp": "2026-05-19T21:54:53.460Z",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "[2026-05-19 22:14] Five amendment RED commits pushed to `feat/phase-a-migration`:\n\n- `dac093a` — `v4e-translator.spec.ts` NEW (13 tests RED — module not found)\n- `78bcf1b` — `schema-loader`: fixture + spec v4E field names (passes — loader handles new fields via pass-through)\n- `8c4199b` — `diff.spec.ts`: fixture v4E field names (passes against current GREEN)\n- `2766f36` — `executor.spec.ts`: `label→blurb` in ops fixture + new translator-assertion test (1 RED, 4 pass)\n- `8b9293f` — `reporter.spec.ts`: `label→blurb` in wouldCreate fixture + new dry-run markdown sections test (1 RED, 4 pass)\n\n**Your impl tasks from these amendments:**\n\n1. **New: `scripts/migrations/lib/v4e-translator.ts`** — implement `translateEntityType` + `translatePropertyDef`:\n   - `blurb` → `label` (fallback to `name` if no blurb)\n   - `sharing` → `_sharing`\n   - `inheritsRights` → `_inheritrights` (boolean)\n   - `required` → `mandatory` (boolean)\n   - `list` → `list` (boolean)\n   - `formula` → `formula` (string)\n   - Entity-name types (non-primitive `type` field with `ref: true`) → `{ type: 'type', string: 'reference' }`\n   - `oauth` type → `{ type: 'type', string: 'string' }`\n   - Docs-only fields (`parents`, `parentConstraint`, `recursion`, `creators`, `roleMapping`, `notes`, `note`, `system`) omitted from payload\n\n2. **Amend `schema-loader.ts`** — add `blurb?`, `sharing?`, `inheritsRights?` to `V4eEntityTypeDef`; add `required?`, `ref?`, `blurb?`, `list?` to `V4ePropertyDef`; drop `mandatory?`\n\n3. **Amend `diff.ts`** — `CreateTypeOp.label` → `blurb` to carry v4E shape through\n\n4. **Amend `executor.ts`** — use `translatePropertyDef` (from v4e-translator) instead of the inline `propertyToPayload` helper; use `translateEntityType` for CREATE_TYPE payloads\n\n5. **Amend `reporter.ts`** — add `## Would create entity types` and `## Would add properties` markdown sections for dry-run results\n\n6. **Amend `phase-a.ts`** — `fetchDbState`: drop `_parent.reference` constraint (query by `_type.reference` only, per divergence doc); fix ESM `__dirname` with `fileURLToPath(import.meta.url)` (you have this locally uncommitted)\n\nNo ping-pong needed — implement all and ping me + team-lead when GREEN.",
+    "summary": "5 amendment RED commits pushed — impl tasks for you",
+    "timestamp": "2026-05-19T22:14:21.597Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "[2026-05-19 22:16] E2E fix pushed: `0220150`.\n\n- dry-run: `wouldAddProperties` 3→4 (season×3 + voice×1 inline)\n- real run: 1 extra fetch mock for `season.description`, `addedProperties` 3→4, comment `voice.label`→`voice.name`\n- All 3 E2E tests pass against your current CLI GREEN\n\nYou're unblocked on the full GREEN run. No further spec changes pending.",
+    "summary": "E2E spec fixed — 0220150, all 3 tests pass",
+    "timestamp": "2026-05-19T22:16:43.529Z",
+    "color": "yellow",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779151019767@josquin\",\"from\":\"team-lead\",\"reason\":\"end of session 4 — CHORE-1 GREEN + merge + hook installer landed, wrapping for the night\",\"timestamp\":\"2026-05-19T00:36:59.767Z\"}",
-    "timestamp": "2026-05-19T00:36:59.767Z",
+    "text": "[2026-05-19 22:28] PO confirmed option B: §4.2 is the authoritative scope. Filter implementation incoming.\n\nBefore we lock the filter, Finn is cross-checking §4.2 against `schema.json` to confirm the 10-prop gap is all legitimately Phase B/D deferrals, not §4.2 omissions. He may append a few items if he finds any §4.2 misses.\n\nStay parked. Keep your uncommitted impl changes in working tree. Once Finn delivers (~5min), Tallis will add a RED test for the scope filter; you'll then commit:\n1. The 6 amendment GREENs you already have ready (translator, schema-loader, diff.ts shape, executor uses translator, reporter dry-run sections, phase-a.ts fetchDbState + ESM)\n2. The scope filter (new `phase-a-scope.ts` constant + diff consults it)\n\nWe'll commit per-module per the plan's per-task commit hygiene. Don't squash.\n\nIdle until Tallis's next handoff.",
+    "summary": "Stay parked — Finn verifying §4.2 first",
+    "timestamp": "2026-05-19T22:29:13.776Z",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "[2026-05-19 22:33] Amendment 6 RED pushed: `8741b71`.\n\n## Story Handoff\n- **Story:** Phase A migration — scope filter + §4.2 property list\n- **Branch:** `feat/phase-a-migration`\n- **From:** Tallis (phase: RED)\n- **To:** Josquin (phase: GREEN)\n- **Status:** TESTS_WRITTEN\n\n### What was done\n- `scripts/migrations/lib/phase-a-scope.spec.ts` — 8 tests RED (module not found)\n- `scripts/migrations/lib/diff.spec.ts` — +1 scope-filter test RED (4 existing still pass)\n\n### What to do next\nTwo new impl tasks (in addition to your existing amendment batch):\n\n1. **New: `scripts/migrations/lib/phase-a-scope.ts`** — implement:\n   - `PHASE_A_PROPERTY_ADDITIONS: Record<string, Set<string>>` — exactly 33 entries from §4.2 of `docs/migration/v4e-divergence-2026-05-19.md`:\n     - `edition`: external_link, work, arranger, voicing, duration, language, acquired_at, source, cost, license_note (10)\n     - `event`: start_datetime, duration_minutes, description, capacity (4)\n     - `member`: status, current_section (2)\n     - `organization`: founded, location, website, logo, social_links, public_contact, rsvp_lockout_hours, member_count_per_section (8)\n     - `person`: voice, bio, preferred_contact_email, preferences (4)\n     - `program_item`: notes (1)\n     - `repertoire_item`: status (1)\n     - `season`: end_date, description (2)\n     - `section`: description (1) ← NOT member_count (formula-update, not a new prop)\n     - `work`: catalog_id, catalog_system, part_of (3)\n   - `isInPhaseAScope(parentType: string, propertyName: string): boolean`\n\n2. **Amend `diff.ts`** — in the ADD_PROPERTY loop for existing types, filter each candidate property through `isInPhaseAScope(typeName, prop.name)` before adding to `adds[]`\n\n### Files to start with\n- `docs/migration/v4e-divergence-2026-05-19.md` §4.2 — authoritative 33-entry list\n- `scripts/migrations/lib/phase-a-scope.spec.ts` — what to implement\n- `scripts/migrations/lib/diff.spec.ts` — scope-filter test at bottom",
+    "summary": "Amendment 6 RED pushed — phase-a-scope + diff filter (9 tests)",
+    "timestamp": "2026-05-19T22:34:00.518Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "[2026-05-19 22:35] Count fixed: `c763433` pushed.\n\n- `toBe(33)` → `toBe(35)` — awk-verified 35 rows in §4.2 table\n- Added explicit test: `person.voice` excluded (absent from §4.2; §3.2 narrative overruled by table)\n- person gets 3 entries: bio, preferred_contact_email, preferences\n\nCorrect per-type breakdown for impl (35 total):\n- edition: 10, event: 4, member: 2, organization: 8, person: 3, program_item: 1, repertoire_item: 1, season: 2, section: 1, work: 3\n\nYou're unblocked. Go.",
+    "summary": "Count fixed 33→35, person.voice excluded — c763433",
+    "timestamp": "2026-05-19T22:36:07.931Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-05-19 22:40] Atomic commits accepted — defensible call. Push the 3-commit head to origin now (`git push`). Don't open the PR yet — I'll spot-check the diff first, then greenlight PR opening with the dry-run markdown attached to the body.\n\nAfter push, message me confirming + paste a one-paragraph summary of the dry-run markdown contents (top-line counts + the formula deferred items list). I'll review and reply with go/no-go on `gh pr create`.\n\nStand by after push.",
+    "summary": "Push now; I'll review then greenlight PR",
+    "timestamp": "2026-05-19T22:40:05.181Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-05-19 22:44] Spot-check passed. phase-a-scope matches §4.2 verbatim, v4e-translator handles all field mappings correctly, fetchDbState is right, 58/58 tests + dry-run counts align with §4.1+§4.2. Greenlight: open PR.\n\nUse the plan's Task 9 PR-create template; paste the dry-run markdown contents into the body so Bentham + PO see the planned changes upfront. Branch name in the title: `feat/phase-a-migration`. PR target: `mvox-dev/mvox_v4e_web` `main`.\n\nAfter PR is open, send team-lead the PR URL + a structured handoff message for Bentham asking him to review:\n- The spec at `docs/migration/specs/2026-05-19-phase-a-design.md`\n- The plan at `docs/migration/specs/2026-05-19-phase-a-plan.md`\n- The divergence doc at `docs/migration/v4e-divergence-2026-05-19.md`\n- The implementation (the PR diff itself)\n- The dry-run output in the PR body\n- TDD compliance (RED commits all preceded their GREEN counterparts)\n\nThen go idle pending Bentham's verdict.\n\nDon't squash-merge yet — wait for Bentham GREEN + PO greenlight before merge.",
+    "summary": "Diff clean — open PR",
+    "timestamp": "2026-05-19T22:41:45.969Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-05-19 22:45] PO pre-greenlit: if Bentham returns GREEN (or YELLOW with notes addressed), proceed straight to squash-merge per common-prompt.md merge procedure. No need to wait for PO or team-lead intermediate confirmation. If RED, fix forward — Tallis amends affected specs, you amend impl.\n\n**Important boundary:** the auto-merge greenlight covers ONLY the PR merge. **Do NOT auto-execute Task 10 (live `pnpm migrate:phase-a` against polyphony) after merge.** Task 10 requires explicit PO greenlight at the moment of execution per the spec's Execution Gate. After merge, message team-lead with the merge confirmation + the post-merge dry-run output, and wait for the PO go-signal before live execution.\n\nSo the flow is:\n1. Bentham reviews\n2. Bentham GREEN → you squash-merge per common-prompt.md\n3. After merge, message team-lead with merge SHA + the report of `pnpm migrate:phase-a:dry` against main (sanity re-check that post-merge main produces the same dry-run)\n4. WAIT for PO greenlight on Task 10\n5. PO greenlit → run `pnpm migrate:phase-a`, commit the executed report on main, push.\n\nCarry on.",
+    "summary": "Auto-merge on Bentham GREEN",
+    "timestamp": "2026-05-19T22:43:08.111Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-05-19 22:50] Bentham GREEN — proceed with squash-merge per common-prompt.md procedure. The YELLOW (partial-failure recovery on new-type creation) is non-blocking for the merge itself; it affects Task 10 (live execution) which still requires explicit PO greenlight.\n\nAfter merge:\n1. Send team-lead the merge SHA\n2. Run `pnpm migrate:phase-a:dry` against main (sanity-check post-merge produces same dry-run)\n3. Wait for PO greenlight on Task 10\n\nPO may also want a 3-line defensive enhancement (Bentham's suggested `PHASE_A_NEW_TYPES` bypass) addressed before Task 10 — I'll surface that decision separately. Either way, merge can land now.\n\nGo.",
+    "summary": "Merge per auto-greenlight",
+    "timestamp": "2026-05-19T22:49:44.179Z",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "[2026-05-20 03:30]\n\n## Story Handoff\n- **Story:** Phase A partial-failure recovery — bypass scope filter for §4.1 new types\n- **Branch:** `fix/phase-a-partial-failure-recovery` (off main `e3ceb28`)\n- **From:** Tallis (phase: RED)\n- **To:** Josquin (phase: GREEN)\n- **Status:** TESTS_WRITTEN\n\n### What was done\n- `diff.spec.ts`: new test — voice type partially in db (name only); re-run must emit ADD_PROPERTY for label + iso_code despite scope filter\n- `phase-a-scope.spec.ts`: added `PHASE_A_NEW_TYPES` (9 entries) + `isPhaseANewType` helper tests; import updated\n- 4 tests RED (14 existing pass): PHASE_A_NEW_TYPES/isPhaseANewType not exported, partial-failure filter not in diff.ts\n\n### What to do next\n\n1. **Add to `scripts/migrations/lib/phase-a-scope.ts`:**\n   - `PHASE_A_NEW_TYPES: Set<string>` — the 9 names from §4.1: `voice`, `library`, `copy`, `lending`, `invitation`, `application`, `event_series`, `rsvp`, `attendance`\n   - `isPhaseANewType(typeName: string): boolean` — returns `PHASE_A_NEW_TYPES.has(typeName)`\n\n2. **Update `scripts/migrations/lib/diff.ts`** — in the ADD_PROPERTY loop for existing types, bypass `isInPhaseAScope` when `isPhaseANewType(typeName)` is true (partial-failure recovery path: the type was created in a prior run, so its inline properties should all land)\n\n### Files to start with\n- `scripts/migrations/lib/phase-a-scope.spec.ts` — new PHASE_A_NEW_TYPES + isPhaseANewType tests\n- `scripts/migrations/lib/diff.spec.ts` — partial-failure test at bottom\n- `scripts/migrations/lib/phase-a-scope.ts` — add two exports\n- `scripts/migrations/lib/diff.ts` — update ADD_PROPERTY filter condition",
+    "summary": "Partial-failure recovery RED pushed — e4d70a4 on fix/phase-a-partial-failure-recovery",
+    "timestamp": "2026-05-20T03:31:08.396Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-05-20 03:35] PO: same policy as PR #26 — open the small PR for `021f1f5`, hand to Bentham, auto-merge on his GREEN (or YELLOW with notes addressed). RED → fix forward.\n\nPR title: `fix(migration): bypass scope filter for §4.1 new types on partial-failure re-run`\nPR body: short description of the YELLOW Bentham raised in #26 + the 3-line bypass. Note that Bentham proposed the exact shape in his #26 review comment. Test count: 62/62 (was 58 + 4 new RED).\n\nAfter merge:\n1. Send team-lead the merge SHA\n2. Run `pnpm migrate:phase-a:dry` against post-merge main, confirm output unchanged from before (9 + 79 + 3 deferred)\n3. Wait for PO Task 10 greenlight — DO NOT execute live until explicit go from PO\n\nGo.",
+    "summary": "Open PR; auto-merge on Bentham GREEN",
+    "timestamp": "2026-05-20T03:39:40.997Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-05-20 03:46] Bentham GREEN clean (verdict posted at 03:40, no YELLOW). PR #27 still OPEN — please proceed with squash-merge per auto-greenlight policy. After merge:\n1. Send team-lead the merge SHA\n2. Run `pnpm migrate:phase-a:dry` against post-merge main, confirm 9+79+3 unchanged\n3. Idle, waiting for PO Task 10 greenlight",
+    "summary": "Bentham GREEN — merge PR #27",
+    "timestamp": "2026-05-20T03:43:36.288Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-05-20 03:48] PO greenlight: execute Task 10 now.\n\n```bash\nsource ~/.config/mvox/credentials.env\npnpm migrate:phase-a\n```\n\nExpectations per the reviewed dry-run:\n- 9 entity types created (voice, library, copy, lending, invitation, application, event_series, rsvp, attendance)\n- 44 inline properties on those new types\n- 35 properties added on existing types (§4.2-scoped)\n- 3 formula touch-saves logged as deferred (lending.name, organization.member_count_per_section, edition.work)\n- Failed: 0\n- Exit code: 0\n\nAfter execution:\n1. Inspect the markdown report under `scripts/migrations/reports/2026-05-20-phase-a-<timestamp>.md` (NOT a dry-run-* prefix this time)\n2. Commit ONLY the executed report files (`.json` + `.md`) to main per plan Task 10 Step 4 — message body includes actual counts + executed-at timestamp + the merge SHAs (`e3ceb28` + `0400cba`)\n3. Push\n4. Send team-lead a completion report: report file paths, summary counts, any failures, formula-touch-save items for Phase B\n5. Go idle\n\nIf exit code is non-zero: do NOT panic, do NOT auto-retry. Read the report, surface the failures to team-lead. Phase A is additive — partial completion is recoverable, not corrupting.\n\nGo.",
+    "summary": "GO — execute Task 10 live",
+    "timestamp": "2026-05-20T03:45:49.446Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779249127522@josquin\",\"from\":\"team-lead\",\"reason\":\"End of session 6. Phase A migration complete; session 7 will design Phase B. Save any [CHECKPOINT] or [LEARNED] entries to your scratchpad before shutdown.\",\"timestamp\":\"2026-05-20T03:52:07.522Z\"}",
+    "timestamp": "2026-05-20T03:52:07.522Z",
     "read": true
   }
 ]

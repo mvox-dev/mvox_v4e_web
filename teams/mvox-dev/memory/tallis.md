@@ -14,4 +14,18 @@
 
 [PROCESS] Team-config / memory files (`teams/mvox-dev/**`) belong on `main`, not on story branches. Commit scratchpad and test-gaps updates directly to `main` so team state lands immediately and feature PRs stay focused on AC code only. 2026-05-19.
 
+## [CHECKPOINT] 2026-05-19 — Phase A migration RED phase (session 6)
+
+[DECISION] Migration scripts live under `scripts/migrations/` with colocated `.spec.ts` files. Vitest glob extended to `scripts/**/*.spec.ts` in `vitest.config.ts`.
+
+[PATTERN] All 5 lib module specs + 1 E2E spec use "module not found" as the RED signal — no source files exist yet. Each spec committed separately with `(RED)` intent in commit message.
+
+[PATTERN] E2E spec (`2026-05-19-phase-a.spec.ts`) uses `vi.spyOn(globalThis, 'fetch')` to mock the full Entu API call sequence (auth → list → create×N) in sequence. `beforeEach` creates a temp reports dir; `afterEach` removes it.
+
+[PATTERN] `executor.spec.ts` injects `createEntity` and `now` via `ExecuteOptions` to isolate from real fetch. This is the injection pattern Josquin must preserve in the GREEN implementation.
+
+[GOTCHA] Task 1a scope excludes tsx devDep + package.json scripts — Josquin owns Task 1b. Scaffold commit only touches `scripts/migrations/` dirs and `vitest.config.ts`.
+
+[WIP] Branch `feat/phase-a-migration` handed off to Josquin for GREEN. 24 tests total, all RED.
+
 (*MVOX:Tallis*)

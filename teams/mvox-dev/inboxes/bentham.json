@@ -1,8 +1,87 @@
 [
   {
+    "from": "josquin",
+    "text": "[2026-05-19 22:42]\n\n## Story Handoff\n- **Story:** Phase A polyphony→v4E migration script\n- **Branch:** `feat/phase-a-migration`\n- **From:** Josquin (phase: GREEN, merge agent)\n- **To:** Bentham (phase: REVIEW)\n- **Status:** TESTS_PASSING — 58/58 unit + E2E pass, `pnpm check` clean, dry-run executed against live polyphony\n\n### PR\n**https://github.com/mvox-dev/mvox_v4e_web/pull/26** — `feat(migration): Phase A additive migration script`\n\n### What to review\n\n1. **Spec:** `docs/migration/specs/2026-05-19-phase-a-design.md` — original PO-approved design\n2. **Plan:** `docs/migration/specs/2026-05-19-phase-a-plan.md` — implementation plan derived from spec (note: plan was amended mid-flight after dry-run surfaced v4E shape mismatches; the divergence doc below codifies the resolution)\n3. **Divergence audit:** `docs/migration/v4e-divergence-2026-05-19.md` — Finn's source-of-truth comparison of polyphony db vs v4E `schema.json`. §4.1 (9 new types) and §4.2 (35 prop additions on existing types) are now the authoritative scope.\n4. **Implementation:** the PR diff. Two impl commits on top of Tallis's RED commits:\n   - `0aaa94d` v4E translator + schema-shape alignment + Phase A scope filter\n   - `a73f273` broaden fetchDbState + ESM __dirname fix\n5. **Dry-run output:** embedded in the PR body (the full markdown report; 9 wouldCreates + 79 wouldAdds = 44 inline-on-new + 35 on-existing). Cross-check against divergence §4.1 + §4.2 directly.\n\n### TDD compliance\nEvery GREEN commit follows a RED counterpart on the same branch. Order on the branch:\n- 1ec01b4 Tallis Task 1a scaffold (RED-equivalent: dirs only)\n- f4b9c52 Tallis Task 2 RED (entu-client) → 38608e0 my GREEN\n- a8a9a18 my Task 1b (tsx + scripts; out-of-band, no RED needed)\n- 32c4e30 Tallis Task 3 RED → 9f4a501 my GREEN\n- 221b286 Tallis Task 4 RED → 87fce67 Tallis fix-up (contract correction) → 22d6076 my GREEN\n- 335bbca Tallis Task 5 RED → 0e5f3a6 my GREEN\n- fbda3e1 Tallis Task 6 RED → 46bb632 my GREEN\n- 2be67a9 Tallis Task 7 RED → 41dd2ad my GREEN\n- 0c44830 divergence doc lands\n- dac093a / 78bcf1b / 8c4199b / 2766f36 / 8b9293f Tallis amendment REDs (5 modules) + 0220150 E2E count fix\n- 8741b71 Tallis phase-a-scope RED → c763433 Tallis count fix-up (35 not 33) → cfa013e team-lead/Tallis divergence doc §4.2 fix → my GREEN bundle `0aaa94d`\n- 17efe42 mid-flight divergence doc fix-up\n- a73f273 my final GREEN (fetchDbState + ESM)\n\nEvery spec inconsistency I hit (4-3 diff/executor contract conflict, 33-vs-35 count, person.voice scope) was surfaced to team-lead BEFORE writing impl code, and Tallis pushed RED amendments to reconcile. No silent contract decisions on my side.\n\n### What to verify particularly\n- v4E→Entu field translation (`scripts/migrations/lib/v4e-translator.ts`) — 13 tests cover the named mappings (blurb→label, required→mandatory, sharing→_sharing, inheritsRights→_inheritrights, oauth→string, ref:true→reference, docs-only fields omitted)\n- Phase A scope filter (`scripts/migrations/lib/phase-a-scope.ts`) — 35 entries match divergence §4.2 verbatim; 9 tests cover inclusion + exclusion (avatar, voice, display_order, original_*, _inheritrights all excluded)\n- fetchDbState query (`scripts/migrations/2026-05-19-phase-a.ts:35-58`) — dropped the `_parent.reference=<db-id>` filter since polyphony's 13 app types are root-level (divergence doc §1)\n- Schema-Change trailer convention: this PR does NOT touch v4E schema (it consumes v4E and writes to polyphony's db only) → no `Schema-Change:` trailer needed, no entu/research PR needed\n- ESM `__dirname` fix in `phase-a.ts` — runtime-only; tests didn't catch it because they don't exercise `main()`\n\nLooking for your verdict: RED / YELLOW / GREEN. Post on the PR or message back here. After GREEN + PO greenlight, I'll squash-merge locally per common-prompt.md merge procedure, then run live execution (Task 10).",
+    "summary": "Phase A migration PR — review request",
+    "timestamp": "2026-05-19T22:43:27.461Z",
+    "color": "purple",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"7\",\"subject\":\"Read PR #26 spec + plan + divergence doc\",\"description\":\"Read docs/migration/specs/2026-05-19-phase-a-design.md, docs/migration/specs/2026-05-19-phase-a-plan.md, and docs/migration/v4e-divergence-2026-05-19.md to anchor review against authoritative scope.\",\"assignedBy\":\"bentham\",\"timestamp\":\"2026-05-19T22:43:56.106Z\"}",
+    "timestamp": "2026-05-19T22:43:56.106Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"8\",\"subject\":\"Verify Schema-Change trailer requirement\",\"description\":\"Confirm Josquin's claim that this PR doesn't touch v4E schema (only consumes it + writes to polyphony db). If so, no Schema-Change/PO-Approved trailers needed. If schema is modified, RED.\",\"assignedBy\":\"bentham\",\"timestamp\":\"2026-05-19T22:44:22.591Z\"}",
+    "timestamp": "2026-05-19T22:44:22.591Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"9\",\"subject\":\"Review v4e-translator.ts + tests\",\"description\":\"Verify field name translations are correct against v4E schema.json reality (blurb→label, required→mandatory, sharing→_sharing, inheritsRights→_inheritrights, oauth→string, ref:true→reference, docs-only fields omitted).\",\"assignedBy\":\"bentham\",\"timestamp\":\"2026-05-19T22:44:29.988Z\"}",
+    "timestamp": "2026-05-19T22:44:29.988Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"10\",\"subject\":\"Review phase-a-scope.ts vs divergence §4.1+§4.2\",\"description\":\"Confirm the 9 new types and 35 prop additions match divergence doc verbatim. Verify exclusions (avatar, voice, display_order, original_*, _inheritrights) are correct.\",\"assignedBy\":\"bentham\",\"timestamp\":\"2026-05-19T22:44:43.000Z\"}",
+    "timestamp": "2026-05-19T22:44:43.000Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"11\",\"subject\":\"Review fetchDbState + ESM fix in phase-a.ts\",\"description\":\"Verify dropping the _parent.reference filter is correct (polyphony's 13 app types are root-level per divergence §1). Check ESM __dirname fix is clean.\",\"assignedBy\":\"bentham\",\"timestamp\":\"2026-05-19T22:44:59.382Z\"}",
+    "timestamp": "2026-05-19T22:44:59.382Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"12\",\"subject\":\"Review entu-client (auth, error handling, dry-run safety)\",\"description\":\"Security-critical path. Verify JWT/cookie handling, no leaks, idempotency, and that dry-run mode cannot accidentally mutate.\",\"assignedBy\":\"bentham\",\"timestamp\":\"2026-05-19T22:45:21.260Z\"}",
+    "timestamp": "2026-05-19T22:45:21.260Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"13\",\"subject\":\"Verify TDD ordering on branch\",\"description\":\"Each GREEN commit must follow a RED counterpart. Walk git log on feat/phase-a-migration to confirm RED-before-GREEN per task. Flag any GREEN-without-RED that isn't Task 1b (Josquin's out-of-band tsx setup).\",\"assignedBy\":\"bentham\",\"timestamp\":\"2026-05-19T22:46:04.081Z\"}",
+    "timestamp": "2026-05-19T22:46:04.081Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"14\",\"subject\":\"Verify rollback/idempotency story for live execution\",\"description\":\"Phase A is additive on a live polyphony db. Verify the script can be re-run safely if interrupted, and that there's a rollback path documented (or at minimum that operations are idempotent).\",\"assignedBy\":\"bentham\",\"timestamp\":\"2026-05-19T22:46:31.150Z\"}",
+    "timestamp": "2026-05-19T22:46:31.150Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"15\",\"subject\":\"Post verdict to team-lead + PR\",\"description\":\"Render RED/YELLOW/GREEN verdict with rationale. Post to PR per common-prompt.md and message team-lead.\",\"assignedBy\":\"bentham\",\"timestamp\":\"2026-05-19T22:47:08.618Z\"}",
+    "timestamp": "2026-05-19T22:47:08.618Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "[2026-05-20 03:35]\n\n## Story Handoff\n- **Story:** Phase A partial-failure recovery — bypass scope filter for §4.1 new types\n- **Branch:** `fix/phase-a-partial-failure-recovery`\n- **From:** Josquin (phase: GREEN)\n- **To:** Bentham (phase: REVIEW)\n- **Status:** TESTS_PASSING — 62/62, `pnpm check` clean, dry-run output unchanged from post-merge main\n\n### PR\n**https://github.com/mvox-dev/mvox_v4e_web/pull/27** — `fix(migration): bypass scope filter for §4.1 new types on partial-failure re-run`\n\nThis is the small 3-line bypass you proposed in your PR #26 YELLOW verdict. Implemented exactly as you described:\n- `phase-a-scope.ts`: `PHASE_A_NEW_TYPES: Set<string>` (the 9 §4.1 names) + `isPhaseANewType(name)` helper\n- `diff.ts`: `bypassScope = isPhaseANewType(typeName)` computed once per existing type; skips `isInPhaseAScope` filter when true\n\n### Diff (4 lines of real change)\n- `phase-a-scope.ts`: +14 lines (Set definition + helper function)\n- `diff.ts`: import addition + `bypassScope` line + condition change `if (!isInPhaseAScope(...))` → `if (!bypassScope && !isInPhaseAScope(...))`\n\n### Verification\n- Tests: 62/62 pass (was 58; Tallis's `e4d70a4` RED adds 4: PHASE_A_NEW_TYPES.size + member assertions, isPhaseANewType true/false, diff partial-failure scenario)\n- pnpm check: 0 errors / 0 warnings / 363 files\n- Live dry-run against polyphony: identical to post-merge main (9 wouldCreate + 79 wouldAdd + 3 formula deferred) — confirms bypass is silent on a clean db\n\n### TDD compliance\n- `e4d70a4` Tallis RED — partial-failure recovery + PHASE_A_NEW_TYPES tests\n- `021f1f5` my GREEN — bypass impl\n\n### What to verify particularly\n- The bypass condition is `if (!bypassScope && !isInPhaseAScope(...))`, evaluated AFTER the existing-property short-circuit `if (existingProps.has(prop.name)) continue;`. Meaning: still skips props the db already has; still respects scope on existing types; only bypasses scope when a §4.1 type is \"in progress\" and missing inline props.\n- `PHASE_A_NEW_TYPES` is a Set of 9 strings, exported alongside (not replacing) `PHASE_A_PROPERTY_ADDITIONS` and `isInPhaseAScope`. No existing surface changed.\n- No v4E schema change → no `Schema-Change:` trailer needed.\n\nLooking for RED/YELLOW/GREEN. Post on the PR or message back. After GREEN + PO Task-10 greenlight, I'll squash-merge per common-prompt.md.",
+    "summary": "PR #27 — partial-failure recovery for review",
+    "timestamp": "2026-05-20T03:40:41.549Z",
+    "color": "purple",
+    "read": true
+  },
+  {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779221077418@bentham\",\"from\":\"team-lead\",\"reason\":\"End of session 5. Procedural-surgery session; no reviews dispatched. Save anything worth keeping to your scratchpad and send a closing message if you have anything to report — otherwise just shutdown_response. Next session will restart Claude from ~/workspace for statusline; new startup.md three-state probe means /clear will no longer wipe the task list.\",\"timestamp\":\"2026-05-19T20:04:37.418Z\"}",
-    "timestamp": "2026-05-19T20:04:37.418Z",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779249125447@bentham\",\"from\":\"team-lead\",\"reason\":\"End of session 6. Phase A migration complete; session 7 will design Phase B. Save any [CHECKPOINT] or [LEARNED] entries to your scratchpad before shutdown.\",\"timestamp\":\"2026-05-20T03:52:05.447Z\"}",
+    "timestamp": "2026-05-20T03:52:05.447Z",
     "read": true
   }
 ]

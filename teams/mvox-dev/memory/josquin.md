@@ -31,4 +31,47 @@ Minimal Pages-targeted config that we landed in `feat(#1)`:
 
 If/when we need bindings for a later story (e.g., a KV cache for Entu responses), add them here — and remember to revisit Bentham's review checklist for the "no extra bindings" AC.
 
+## [LEARNED] 2026-05-20 — Phase A shipped (live execution successful, exit 0)
+
+Phase A executed against polyphony at 2026-05-20T03:46:18Z. **9 entity types created + 79 properties added + 0 failures.** Report committed on main as `a127729`. PR #26 (impl, merged at `e3ceb28`) + PR #27 (Bentham's partial-failure-recovery bypass, merged at `0400cba`). The session-6 [CHECKPOINT] issues (fetchDbState filter, v4E field-name mismatch, missing dry-run markdown sections, ESM `__dirname`) are all resolved in code — no future-session value in keeping the list of bugs; this entry captures the durable patterns instead.
+
+### Patterns worth keeping (for Phases B/C/D)
+
+**Probe-then-implement when the spec disagrees with reality.** The first live dry-run revealed three spec-vs-real-db mismatches that unit tests (mocked fetch + 2-type fixture) could not catch. Always run at least one live dry-run before claiming Phase X impl is "done" — and structure the dry-run report so it's directly diff-able against the divergence audit. The 22:18 → 22:37 dry-run delta caught the §4.2-vs-actual gap before any write hit the db.
+
+**v4E → Entu field name translation lives in its own module.** `scripts/migrations/lib/v4e-translator.ts` maps blurb→label, sharing→_sharing, inheritsRights→_inheritrights, required→mandatory, oauth→string, ref:true→reference. Phase B/C/D scripts should reuse it (or its successor) rather than re-derive these mappings. Spec field naming is **not** API field naming.
+
+**Phase scope filter as a hard whitelist.** `scripts/migrations/lib/phase-a-scope.ts` is the source of truth for what Phase A touches — encoded as `PHASE_A_PROPERTY_ADDITIONS: Record<string, Set<string>>` (35 entries from divergence §4.2) + `PHASE_A_NEW_TYPES: Set<string>` (9 entries from §4.1) with `isInPhaseAScope` / `isPhaseANewType` helpers. Pattern for Phase B/C/D: same shape, derived from the divergence audit's per-phase tables. Without it, an additive diff over-creates (Phase B renames get spuriously added as Phase A new properties).
+
+**Partial-failure recovery via PHASE_X_NEW_TYPES bypass.** Bentham caught this YELLOW in PR #26: if `createEntity(<§4.1 type>)` succeeds but the inline-property loop crashes mid-iteration, a naive re-run hits the scope filter and silently skips the missing inline props. Bypass = `isPhaseANewType(parent) || isInPhaseAScope(parent, prop)`. Phase B/C/D scripts that batch inline operations should ship the same recovery path before the first live run.
+
+**Squash-merge while peers are editing scratchpads.** `git stash push -- teams/mvox-dev/memory/*.md` before `git merge --squash`, then `git stash pop` after. Keeps the squash diff clean and doesn't drop in-flight WIP from other agents. Used twice this session.
+
+### Polyphony db layout gotcha (still relevant for Phases B/C/D)
+
+App entity types in polyphony's Entu db are **root-level** (no `_parent` set on the type-definition entity), NOT children of the polyphony db entity `69bcfd8e9c031ab8e6ce807a`. Only the 6 system meta-types (database/entity/menu/plugin/property + the original `person`) are parented under it. Filter to enumerate entity types: `_type.reference=69bcfd8e9c031ab8e6ce8034` with NO `_parent` constraint. Documented in `docs/migration/v4e-divergence-2026-05-19.md` §1 and now in the handbook's lesson-learned column.
+
+### Three formula touch-saves pending for Phase B prep
+
+After Phase A, these three properties exist with formulas but their existing instances haven't been touch-saved to materialize the computed values:
+
+1. `lending.name` — formula `member.*.name copy.*.name ' — ' CONCAT_WS` — 0 existing instances; touch-save is a no-op until lending instances start being created.
+2. `organization.member_count_per_section` — formula `SUM(_child section.member_count)` — 6 existing org instances; inner `section.member_count` formula itself is Phase B work, so values will be stale until Phase B fixes both layers.
+3. `edition.work` — formula `_parent` — unblocks `program_item.name` chain in Phase B.
+
+Touch-save = POST any field on the instance to re-trigger formula evaluation (see handbook §5.1). Phase B's first task should batch these.
+
+### Per-entity IDs from the live execution
+
+Full ID listing in `scripts/migrations/reports/2026-05-19-phase-a-2026-05-20T03-46-18-833Z.{md,json}`. Top-level type IDs to bookmark for Phase B referencing:
+- voice `6a0d2e8090c8df7a1cc7dd6a`
+- library `6a0d2e8090c8df7a1cc7dd9d`
+- copy `6a0d2e8190c8df7a1cc7ddb0`
+- lending `6a0d2e8190c8df7a1cc7dde8`
+- invitation `6a0d2e8290c8df7a1cc7de3e`
+- application `6a0d2e8390c8df7a1cc7de81`
+- event_series `6a0d2e8490c8df7a1cc7deb1`
+- rsvp `6a0d2e8590c8df7a1cc7df1b`
+- attendance `6a0d2e8690c8df7a1cc7df4b`
+
 (*MVOX:Josquin*)
