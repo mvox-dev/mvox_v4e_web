@@ -26,11 +26,18 @@
  * Result artifact: scripts/migrations/seed-results/probe-mutation-ops-<ISO>.json
  */
 
-import { getJwt, listEntities, type EntuClient } from '../lib/entu-client.ts';
-import { writeFileSync, mkdirSync } from 'node:fs';
-import { join } from 'node:path';
+import {
+	getJwt,
+	fetchEntity,
+	postProperties,
+	deletePropertyValue,
+	deleteEntity,
+	listEntities,
+	type EntuClient,
+} from '../lib/entu-client.ts';
+import { isDryRun, writeResultArtifact, replaceProperty } from '../perotin-toolkit.ts';
 
-const DRY_RUN = process.argv.includes('--dry-run');
+const DRY_RUN = isDryRun();
 const ENTU_API_BASE = process.env.ENTU_API_BASE ?? 'https://api.entu.app';
 const ENTU_DB = process.env.ENTU_DB ?? 'polyphony';
 const ENTU_API_KEY = process.env.ENTU_API_KEY;
@@ -70,49 +77,6 @@ const TARGETS = {
 		rationale: 'Last-created pre-v4E member (highest _id among 116); will be replaced by v4E-clean seed members',
 	},
 } as const;
-
-// ---------------------------------------------------------------------------
-// API helpers
-// ---------------------------------------------------------------------------
-
-async function getEntityProps(client: EntuClient, entityId: string): Promise<Record<string, unknown>> {
-	const url = `${client.apiBase}/${client.db}/entity/${entityId}`;
-	const res = await fetch(url, { headers: { Authorization: `Bearer ${client.jwt}` } });
-	if (!res.ok) throw new Error(`GET entity ${entityId} failed: ${res.status} ${await res.text()}`);
-	const body = await res.json() as { entity: Record<string, unknown> };
-	return body.entity;
-}
-
-async function deleteProperty(client: EntuClient, propValueId: string): Promise<void> {
-	const url = `${client.apiBase}/${client.db}/property/${propValueId}`;
-	const res = await fetch(url, {
-		method: 'DELETE',
-		headers: { Authorization: `Bearer ${client.jwt}` },
-	});
-	if (!res.ok) throw new Error(`DELETE /property/${propValueId} failed: ${res.status} ${await res.text()}`);
-}
-
-async function postProperty(client: EntuClient, entityId: string, properties: Array<{ type: string; number?: number; string?: string }>): Promise<void> {
-	const url = `${client.apiBase}/${client.db}/entity/${entityId}`;
-	const res = await fetch(url, {
-		method: 'POST',
-		headers: {
-			Authorization: `Bearer ${client.jwt}`,
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify(properties),
-	});
-	if (!res.ok) throw new Error(`POST entity ${entityId} failed: ${res.status} ${await res.text()}`);
-}
-
-async function deleteEntity(client: EntuClient, entityId: string): Promise<void> {
-	const url = `${client.apiBase}/${client.db}/entity/${entityId}`;
-	const res = await fetch(url, {
-		method: 'DELETE',
-		headers: { Authorization: `Bearer ${client.jwt}` },
-	});
-	if (!res.ok) throw new Error(`DELETE /entity/${entityId} failed: ${res.status} ${await res.text()}`);
-}
 
 // ---------------------------------------------------------------------------
 // Helpers: find property value _id by name on an entity
@@ -174,7 +138,7 @@ async function main() {
 	} else {
 		try {
 			// Pre-state
-			const preBefore = await getEntityProps(client, TARGETS.update.entityId);
+			const preBefore = await fetchEntity(client, TARGETS.update.entityId);
 			const preValue = extractPropValue(preBefore, 'display_order');
 			const prePropId = extractPropValueId(preBefore, 'display_order');
 			console.log(`  Pre-state: display_order=${preValue}, prop_value_id=${prePropId}`);
@@ -184,31 +148,23 @@ async function main() {
 			}
 			const actualPropId = prePropId ?? TARGETS.update.existingPropValueId;
 
-			// Step A: delete old value
-			await deleteProperty(client, actualPropId);
-			console.log(`  Step A: DELETE /property/${actualPropId} — OK`);
+			// Steps A+B: replace current value with intermediate
+			await replaceProperty(client, TARGETS.update.entityId, 'display_order', [actualPropId], TARGETS.update.intermediateValue);
+			console.log(`  Steps A+B: replaceProperty display_order → ${TARGETS.update.intermediateValue} — OK`);
 
-			// Step B: post intermediate value
-			await postProperty(client, TARGETS.update.entityId, [{ type: 'display_order', number: TARGETS.update.intermediateValue }]);
-			console.log(`  Step B: POST display_order=${TARGETS.update.intermediateValue} — OK`);
-
-			// Step C: verify
-			const afterIntermediate = await getEntityProps(client, TARGETS.update.entityId);
+			// Step C: verify intermediate
+			const afterIntermediate = await fetchEntity(client, TARGETS.update.entityId);
 			const midValue = extractPropValue(afterIntermediate, 'display_order');
 			const midPropId = extractPropValueId(afterIntermediate, 'display_order');
 			console.log(`  Step C: verify display_order=${midValue} (expected ${TARGETS.update.intermediateValue}) — ${midValue === TARGETS.update.intermediateValue ? 'PASS' : 'FAIL'}`);
 
-			// Step D: delete intermediate
+			// Steps D+E: replace intermediate with final (restore)
 			if (!midPropId) throw new Error('Could not find intermediate prop value _id for cleanup');
-			await deleteProperty(client, midPropId);
-			console.log(`  Step D: DELETE /property/${midPropId} — OK`);
-
-			// Step E: restore original value
-			await postProperty(client, TARGETS.update.entityId, [{ type: 'display_order', number: TARGETS.update.finalValue }]);
-			console.log(`  Step E: POST display_order=${TARGETS.update.finalValue} (restore) — OK`);
+			await replaceProperty(client, TARGETS.update.entityId, 'display_order', [midPropId], TARGETS.update.finalValue);
+			console.log(`  Steps D+E: replaceProperty display_order → ${TARGETS.update.finalValue} (restore) — OK`);
 
 			// Step F: verify restored
-			const afterFinal = await getEntityProps(client, TARGETS.update.entityId);
+			const afterFinal = await fetchEntity(client, TARGETS.update.entityId);
 			const finalValue = extractPropValue(afterFinal, 'display_order');
 			console.log(`  Step F: verify display_order=${finalValue} (expected ${TARGETS.update.finalValue}) — ${finalValue === TARGETS.update.finalValue ? 'PASS' : 'FAIL'}`);
 
@@ -246,7 +202,7 @@ async function main() {
 	} else {
 		try {
 			// Pre-state
-			const pre = await getEntityProps(client, TARGETS.remove.entityId);
+			const pre = await fetchEntity(client, TARGETS.remove.entityId);
 			const ordinalBefore = pre['ordinal'];
 			const actualPropId = extractPropValueId(pre, 'ordinal');
 			console.log(`  Pre-state: ordinal=${JSON.stringify(ordinalBefore)}, prop_value_id=${actualPropId}`);
@@ -255,11 +211,11 @@ async function main() {
 				console.log(`  ordinal already absent — SKIPPED (idempotent)`);
 				ops.push({ op: 'REMOVE', target: TARGETS.remove.entityName, status: 'skipped', detail: { reason: 'ordinal already absent' } });
 			} else {
-				await deleteProperty(client, actualPropId);
+				await deletePropertyValue(client, actualPropId);
 				console.log(`  DELETE /property/${actualPropId} — OK`);
 
 				// Verify absent
-				const post = await getEntityProps(client, TARGETS.remove.entityId);
+				const post = await fetchEntity(client, TARGETS.remove.entityId);
 				const ordinalAfter = post['ordinal'];
 				const absent = !ordinalAfter || (Array.isArray(ordinalAfter) && ordinalAfter.length === 0);
 				console.log(`  Post-verify: ordinal absent=${absent} — ${absent ? 'PASS' : 'FAIL'}`);
@@ -298,14 +254,14 @@ async function main() {
 	} else {
 		try {
 			// Pre-state: verify entity exists
-			const pre = await getEntityProps(client, TARGETS.deleteEntity.entityId);
+			const pre = await fetchEntity(client, TARGETS.deleteEntity.entityId);
 			const nameBefore = extractPropValue(pre, 'name');
 			console.log(`  Pre-state: entity exists, name=${JSON.stringify(nameBefore)}`);
 
 			await deleteEntity(client, TARGETS.deleteEntity.entityId);
 			console.log(`  DELETE /entity/${TARGETS.deleteEntity.entityId} — OK`);
 
-			// Verify deleted: GET should return error or deleted entity
+			// Verify deleted: GET should return 404
 			let postState: string;
 			try {
 				const postRes = await fetch(`${client.apiBase}/${client.db}/entity/${TARGETS.deleteEntity.entityId}`, {
@@ -354,13 +310,9 @@ async function main() {
 	}
 
 	if (!DRY_RUN) {
-		const executedAt = new Date().toISOString();
-		const artifact = { executedAt, db: ENTU_DB, dryRun: false, ops };
-		const resultsDir = join(import.meta.dirname ?? '', '..', 'seed-results');
-		mkdirSync(resultsDir, { recursive: true });
-		const fileName = `probe-mutation-ops-${executedAt.replace(/[:.]/g, '-')}.json`;
-		const filePath = join(resultsDir, fileName);
-		writeFileSync(filePath, JSON.stringify(artifact, null, 2));
+		const at = new Date();
+		const payload = { executedAt: at.toISOString(), db: ENTU_DB, dryRun: false, ops };
+		const filePath = await writeResultArtifact('probe-mutation-ops-2026-05-20', payload, { at });
 		console.log(`[probe-mutation-ops] result artifact: ${filePath}`);
 	}
 
