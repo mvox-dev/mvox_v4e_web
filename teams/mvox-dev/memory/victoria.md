@@ -42,5 +42,4 @@ PO approved F2, resolved F1+F3. Revised clean draft sent. Awaiting explicit PO g
 
 All 23 issues open on mvox-dev/mvox_v4e_web (#1–#23). Session ended cleanly after PO go-ahead.
 
-**[DEFERRED]** Path B onboarding (singer-initiated application) — not in current issue set. Raise with PO if needed for v1.
 **[DEFERRED]** A4 + C4 (attendance history, programme history) — parked ⚪, deferred to v2.
