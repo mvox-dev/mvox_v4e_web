@@ -1,0 +1,86 @@
+{
+  "phase": "B",
+  "executedAt": "2026-05-20T14:23:55.884Z",
+  "db": "polyphony",
+  "summary": {
+    "dryRun": false,
+    "wouldRenames": 0,
+    "wouldObsoleteDeletes": 0,
+    "wouldFormulaUpdates": 1,
+    "wouldTouchSaves": 3,
+    "failed": 0
+  },
+  "snapshot": {
+    "path": null,
+    "sha256": null,
+    "entityCount": 0,
+    "skipped": true
+  },
+  "wouldExecute": [
+    {
+      "kind": "UPDATE_FORMULA",
+      "parentType": "section",
+      "propertyName": "member_count",
+      "propertyDefId": "69c7ea4a8489bfcb0e819ed1",
+      "newFormula": "(_child.member COUNT) (_child.section.member_count SUM) +"
+    },
+    {
+      "kind": "TOUCH_SAVE",
+      "parentType": "lending",
+      "propertyName": "name",
+      "formulaExpression": "member.*.name copy.*.name ' — ' CONCAT_WS"
+    },
+    {
+      "kind": "TOUCH_SAVE",
+      "parentType": "organization",
+      "propertyName": "member_count_per_section",
+      "formulaExpression": "(_child.member COUNT) (_child.section.member_count SUM) +"
+    },
+    {
+      "kind": "TOUCH_SAVE",
+      "parentType": "edition",
+      "propertyName": "work",
+      "formulaExpression": "_parent"
+    }
+  ],
+  "warnings": [
+    "snapshot skipped via --skip-snapshot flag"
+  ],
+  "addedProperties": [],
+  "backfilled": [],
+  "deleted": [],
+  "blockedDeletes": [],
+  "formulaUpdates": [
+    {
+      "parentType": "section",
+      "propertyName": "member_count",
+      "propertyDefId": "69c7ea4a8489bfcb0e819ed1",
+      "updatedAt": "2026-05-20T14:23:58.000Z"
+    }
+  ],
+  "touchSaves": [
+    {
+      "parentType": "lending",
+      "propertyName": "name",
+      "count": 0,
+      "noInstances": true,
+      "failed": 0
+    },
+    {
+      "parentType": "organization",
+      "propertyName": "member_count_per_section",
+      "count": 6,
+      "noInstances": false,
+      "failed": 0
+    },
+    {
+      "parentType": "edition",
+      "propertyName": "work",
+      "count": 0,
+      "noInstances": true,
+      "failed": 0
+    }
+  ],
+  "skipped": [],
+  "failed": []
+}

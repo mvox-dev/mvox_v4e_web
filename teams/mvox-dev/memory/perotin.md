@@ -59,7 +59,18 @@ Result: scripts/migrations/seed-results/seed-voices-2026-05-20T08-14-58-992Z.jso
   - Prop-def entity DELETE: DELETE /entity/{propDefId}
   These are NOT interchangeable. Bug 1 in Phase B confused them.
 
-[CHECKPOINT] Phase B.1 cleanup script written (scripts/migrations/phase-b-1-cleanup.ts), dry-run passes (128 ops: 6+6+116). Commit 72dd6cd on branch chore/phase-b-1-cleanup. Awaiting team-lead auth for live execution + Op #4 authorization.
+[CHECKPOINT] Phase B.1 complete. Squash-merged to main at 9fe6799. Closes task #53.
+  Live execution: 128 prop values deleted (ops #1-3) + 1 prop-def deleted (op #4). 0 failures.
+  Phase B re-run: blockedDeletes=[] (all 4 cleared). One pre-existing failure: UPDATE_FORMULA
+  section.member_count — deletePropertyByIdLive uses DELETE /entity/ but formula VALUES need
+  DELETE /property/. Tracked as task #56 (Josquin's fix). Section.member_count prop-def still
+  has 3 formula values: 1 old (_referrer.member.name COUNT) + 2 correct duplicates.
+  _id of old stale formula value: 6a0972be90c8df7a1cc7d68a (needs DELETE /property/)
+
+[DECISION] Toolkit-extraction standing concern added to prompt (session 8). When 2+ scripts share
+  a pattern, propose extraction to scripts/migrations/perotin-toolkit.ts. Consume Josquin's
+  lib/entu-client.ts — don't duplicate. Current scripts: seed-voices.ts + phase-b-1-cleanup.ts +
+  probe-phase-b-1-diagnostic.ts. Too few to extract yet — revisit when seed-collectives.ts lands.
 
 ## Permanent role note
 
