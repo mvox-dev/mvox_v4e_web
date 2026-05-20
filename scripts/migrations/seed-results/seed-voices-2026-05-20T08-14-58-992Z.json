@@ -1,0 +1,36 @@
+{
+  "voices": [
+    "alto",
+    "baritone",
+    "bass",
+    "soprano",
+    "tenor"
+  ],
+  "created": [
+    {
+      "name": "alto",
+      "_id": "6a0d6d8290c8df7a1cc7e10e"
+    },
+    {
+      "name": "baritone",
+      "_id": "6a0d6d8290c8df7a1cc7e114"
+    },
+    {
+      "name": "bass",
+      "_id": "6a0d6d8290c8df7a1cc7e11a"
+    },
+    {
+      "name": "soprano",
+      "_id": "6a0d6d8290c8df7a1cc7e120"
+    },
+    {
+      "name": "tenor",
+      "_id": "6a0d6d8290c8df7a1cc7e126"
+    }
+  ],
+  "skipped": [],
+  "failed": [],
+  "executedAt": "2026-05-20T08:14:58.992Z",
+  "db": "polyphony",
+  "dryRun": false
+}
