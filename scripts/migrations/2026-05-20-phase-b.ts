@@ -531,7 +531,7 @@ export function buildLiveCallbacks(client: EntuClient): PhaseBLiveCallbacks {
 		// Probe 2: any instance of parentType still has the property set?
 		const instanceProbeUrl =
 			`${client.apiBase}/${client.db}/entity?_type.string=${encodeURIComponent(op.parentType)}` +
-			`&props=_id,${encodeURIComponent(op.propertyName)}&limit=10`;
+			`&props=_id,${encodeURIComponent(op.propertyName)}&limit=500`;
 		const instanceRes = await fetch(instanceProbeUrl, {
 			headers: { Authorization: `Bearer ${client.jwt}` }
 		});
@@ -591,16 +591,17 @@ export function buildLiveCallbacks(client: EntuClient): PhaseBLiveCallbacks {
 		// the new formula. Without this, the prop-def carries both old and new formula values.
 		// Defensive: if GET fails or returns no formula values, proceed to POST. The pre-delete
 		// is an additive cleanup step; missing GET just means no stale values to remove.
+		let formulaValues: Array<{ _id?: string }> = [];
 		try {
 			const existing = await fetchEntityJson(client, op.propertyDefId);
-			const formulaValues = (existing.formula as Array<{ _id?: string }> | undefined) ?? [];
-			for (const v of formulaValues) {
-				if (typeof v._id === 'string') {
-					await deletePropertyByIdLive(client, v._id);
-				}
-			}
+			formulaValues = (existing.formula as Array<{ _id?: string }> | undefined) ?? [];
 		} catch {
-			// fall through to POST; no stale formula values to clean
+			// GET failed → assume no stale formula values to clean
+		}
+		for (const v of formulaValues) {
+			if (typeof v._id === 'string') {
+				await deletePropertyByIdLive(client, v._id);
+			}
 		}
 		await postEntityProperty(client, op.propertyDefId, { type: 'formula', string: op.newFormula });
 		return { updated: true };

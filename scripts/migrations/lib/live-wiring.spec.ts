@@ -1024,3 +1024,100 @@ describe('RED v10 integration: live-mode multi-value pre-delete guard', () => {
 		expect(postCall).toBeUndefined();
 	});
 });
+
+// ── RED YELLOW-13 (#54): verifyDeleteSafe Probe 2 limit undercount ────────────
+//
+// polyphony has 116 member instances; limit=10 means only 10 are checked.
+// Probe 2 URL must use limit=500 so all instances are scanned.
+//
+// (*MVOX:Tallis*)
+
+describe('RED YELLOW-13: verifyDeleteSafe Probe 2 must use limit=500 (not limit=10)', () => {
+	it('Probe 2 instance URL contains limit=500', async () => {
+		const fetchMock = vi.spyOn(globalThis, 'fetch');
+
+		// Probe 1: no formula references the property
+		fetchMock.mockResolvedValueOnce(
+			new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 })
+		);
+		// Probe 2: instance scan — return empty (safe)
+		fetchMock.mockResolvedValueOnce(
+			new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 })
+		);
+
+		const cbs = buildLiveCallbacks(client);
+		const op: DeletePropertyOp = {
+			kind: 'DELETE_PROPERTY',
+			parentType: 'member',
+			propertyName: 'joined_at',
+			propertyDefId: 'member-joined-at-prop-id',
+			verifyPreconditions: true
+		};
+
+		await cbs.verifyDeleteSafe(client, op);
+
+		// Probe 2 is the second fetch call — it must include limit=500
+		const probe2Url = String(fetchMock.mock.calls[1][0]);
+		expect(probe2Url).toContain('limit=500');
+		expect(probe2Url).not.toContain('limit=10');
+	});
+});
+
+// ── RED YELLOW-12 (#52): updateFormula bare-catch swallows DELETE failures ────
+//
+// Current: try/catch wraps BOTH fetchEntityJson (GET) and the DELETE loop.
+// Bug: if GET succeeds but DELETE throws mid-loop, the catch absorbs it.
+// The subsequent POST then appends the new formula alongside the un-deleted old
+// value — re-introducing Q5 multi-value pollution.
+//
+// Required: try/catch scopes only the GET. DELETE failures must propagate.
+//
+// (*MVOX:Tallis*)
+
+describe('RED YELLOW-12: updateFormula must propagate DELETE failures (not swallow them)', () => {
+	it('rejects and does not call postEntityProperty when a pre-delete DELETE throws', async () => {
+		const fetchMock = vi.spyOn(globalThis, 'fetch');
+
+		// GET: prop-def has 2 existing formula values
+		fetchMock.mockResolvedValueOnce(
+			new Response(
+				JSON.stringify({
+					entity: {
+						_id: 'section-member-count-prop-id',
+						formula: [
+							{ _id: 'f1', string: 'old-formula-a' },
+							{ _id: 'f2', string: 'old-formula-b' }
+						]
+					}
+				}),
+				{ status: 200 }
+			)
+		);
+		// DELETE f1: succeeds
+		fetchMock.mockResolvedValueOnce(
+			new Response(JSON.stringify({ deleted: true }), { status: 200 })
+		);
+		// DELETE f2: fails (non-2xx triggers throw inside deletePropertyByIdLive)
+		fetchMock.mockResolvedValueOnce(
+			new Response('Internal Server Error', { status: 500 })
+		);
+
+		const cbs = buildLiveCallbacks(client);
+		const op: UpdateFormulaOp = {
+			kind: 'UPDATE_FORMULA',
+			parentType: 'section',
+			propertyName: 'member_count',
+			propertyDefId: 'section-member-count-prop-id',
+			newFormula: '(_child.member COUNT) (_child.section.member_count SUM) +'
+		};
+
+		// The DELETE failure must propagate — updateFormula must reject
+		await expect(cbs.updateFormula(client, op)).rejects.toThrow();
+
+		// POST must NOT be called — no formula appended over stale values
+		const postCall = fetchMock.mock.calls.find(
+			([, init]) => (init as RequestInit)?.method === 'POST'
+		);
+		expect(postCall).toBeUndefined();
+	});
+});
