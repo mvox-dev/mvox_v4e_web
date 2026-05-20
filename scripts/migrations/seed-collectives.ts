@@ -16,15 +16,25 @@
  * forename/surname as pre-Phase-D artifacts — this script does not touch those.
  */
 
-import { getJwt, createEntity, listEntities, POLYPHONY_META_TYPE_ENTITY_ID, type EntuClient, type EntuProperty } from './lib/entu-client.ts';
-import { writeFileSync, mkdirSync, readFileSync } from 'node:fs';
+import {
+	getJwt,
+	listEntities,
+	listInstancesByType,
+	fetchEntity,
+	postProperties,
+	POLYPHONY_META_TYPE_ENTITY_ID,
+	type EntuClient,
+	type EntuProperty,
+} from './lib/entu-client.ts';
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { isDryRun, writeResultArtifact, findOrCreateByName } from './perotin-toolkit.ts';
 
 // ---------------------------------------------------------------------------
 // Config
 // ---------------------------------------------------------------------------
 
-const DRY_RUN = process.argv.includes('--dry-run');
+const DRY_RUN = isDryRun();
 const ENTU_API_BASE = process.env.ENTU_API_BASE ?? 'https://api.entu.app';
 const ENTU_DB = process.env.ENTU_DB ?? 'polyphony';
 const ENTU_API_KEY = process.env.ENTU_API_KEY;
@@ -65,26 +75,6 @@ interface Manifest {
 }
 
 // ---------------------------------------------------------------------------
-// API helpers (addProperties — not yet in entu-client.ts; toolkit candidate)
-// ---------------------------------------------------------------------------
-
-async function addProperties(client: EntuClient, entityId: string, properties: EntuProperty[], dryRun: boolean): Promise<void> {
-	if (dryRun) return;
-	const url = `${client.apiBase}/${client.db}/entity/${entityId}`;
-	const res = await fetch(url, {
-		method: 'POST',
-		headers: {
-			Authorization: `Bearer ${client.jwt}`,
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify(properties),
-	});
-	if (!res.ok) {
-		throw new Error(`addProperties(${entityId}) failed: ${res.status} ${await res.text()}`);
-	}
-}
-
-// ---------------------------------------------------------------------------
 // Type-id resolution
 // ---------------------------------------------------------------------------
 
@@ -99,28 +89,16 @@ async function resolveTypeId(client: EntuClient, typeName: string): Promise<stri
 }
 
 // ---------------------------------------------------------------------------
-// Idempotency: find existing entity by type + name
-// ---------------------------------------------------------------------------
-
-async function findByName(client: EntuClient, typeName: string, name: string): Promise<string | null> {
-	const resp = await listEntities(client, {
-		'_type.string': typeName,
-		'name.string': name,
-		props: '_id',
-	});
-	return resp.count > 0 ? resp.entities[0]._id : null;
-}
-
-// ---------------------------------------------------------------------------
 // Step 1: Seed voice lookup map
 // ---------------------------------------------------------------------------
 
 async function buildVoiceMap(client: EntuClient, voiceNames: string[]): Promise<Map<string, string>> {
 	const map = new Map<string, string>();
 	for (const name of voiceNames) {
-		const id = await findByName(client, 'voice', name);
-		if (!id) throw new Error(`voice "${name}" not found — run seed-voices.ts first`);
-		map.set(name, id);
+		// Inline check gates the dry-run path; findOrCreateByName re-checks on the live path.
+		const existing = await listInstancesByType(client, 'voice', '_id', { 'name.string': name });
+		if (existing.entities.length === 0) throw new Error(`voice "${name}" not found — run seed-voices.ts first`);
+		map.set(name, existing.entities[0]._id);
 	}
 	return map;
 }
@@ -136,11 +114,13 @@ async function seedPerson(
 	dryRun: boolean,
 	result: SeedResult
 ): Promise<string | null> {
-	const existing = await findByName(client, 'person', name);
-	if (existing) {
-		console.log(`  [person] "${name}": EXISTS (${existing}) — skip`);
-		result.persons.skipped.push({ name, _id: existing });
-		return existing;
+	// Inline check gates the dry-run path; findOrCreateByName re-checks on the live path.
+	const existing = await listInstancesByType(client, 'person', '_id', { 'name.string': name });
+	if (existing.entities.length > 0) {
+		const id = existing.entities[0]._id;
+		console.log(`  [person] "${name}": EXISTS (${id}) — skip`);
+		result.persons.skipped.push({ name, _id: id });
+		return id;
 	}
 
 	if (dryRun) {
@@ -149,14 +129,19 @@ async function seedPerson(
 		return null;
 	}
 
-	const entity = await createEntity(client, [
+	const r = await findOrCreateByName(client, 'person', name, undefined, [
 		{ type: '_type', reference: personTypeId },
 		{ type: 'name', string: name },
 		{ type: '_sharing', string: 'public' },
 	]);
-	console.log(`  [person] "${name}": CREATED (${entity._id})`);
-	result.persons.created.push({ name, _id: entity._id });
-	return entity._id;
+	if (r.created) {
+		console.log(`  [person] "${name}": CREATED (${r._id})`);
+		result.persons.created.push({ name, _id: r._id });
+	} else {
+		console.log(`  [person] "${name}": EXISTS (${r._id}) — skip (race)`);
+		result.persons.skipped.push({ name, _id: r._id });
+	}
+	return r._id;
 }
 
 // ---------------------------------------------------------------------------
@@ -172,11 +157,13 @@ async function seedOrg(
 	result: SeedResult,
 	kind: 'umbrella' | 'collective'
 ): Promise<string | null> {
-	const existing = await findByName(client, 'organization', spec.name);
-	if (existing) {
-		console.log(`  [${kind}] "${spec.name}": EXISTS (${existing}) — skip`);
-		result.orgs.skipped.push({ name: spec.name, _id: existing, kind });
-		return existing;
+	// Inline check gates the dry-run path; findOrCreateByName re-checks on the live path.
+	const existing = await listInstancesByType(client, 'organization', '_id', { 'name.string': spec.name });
+	if (existing.entities.length > 0) {
+		const id = existing.entities[0]._id;
+		console.log(`  [${kind}] "${spec.name}": EXISTS (${id}) — skip`);
+		result.orgs.skipped.push({ name: spec.name, _id: id, kind });
+		return id;
 	}
 
 	if (dryRun) {
@@ -185,7 +172,7 @@ async function seedOrg(
 		return null;
 	}
 
-	const entity = await createEntity(client, [
+	const r = await findOrCreateByName(client, 'organization', spec.name, founderPersonId, [
 		{ type: '_type', reference: orgTypeId },
 		{ type: '_parent', reference: founderPersonId },
 		{ type: 'name', string: spec.name },
@@ -193,9 +180,14 @@ async function seedOrg(
 		{ type: '_sharing', string: 'public' },
 		{ type: '_inheritrights', boolean: false },
 	]);
-	console.log(`  [${kind}] "${spec.name}": CREATED (${entity._id})`);
-	result.orgs.created.push({ name: spec.name, _id: entity._id, kind, founder: spec.founder });
-	return entity._id;
+	if (r.created) {
+		console.log(`  [${kind}] "${spec.name}": CREATED (${r._id})`);
+		result.orgs.created.push({ name: spec.name, _id: r._id, kind, founder: spec.founder });
+	} else {
+		console.log(`  [${kind}] "${spec.name}": EXISTS (${r._id}) — skip (race)`);
+		result.orgs.skipped.push({ name: spec.name, _id: r._id, kind });
+	}
+	return r._id;
 }
 
 // ---------------------------------------------------------------------------
@@ -219,13 +211,11 @@ async function seedSection(
 		return null;
 	}
 
-	const existingResp = await listEntities(client, {
-		'_type.string': 'section',
+	const existingResp = await listInstancesByType(client, 'section', '_id', {
 		'name.string': spec.name,
 		'_parent.reference': collective._id,
-		props: '_id',
 	});
-	if (existingResp.count > 0) {
+	if (existingResp.entities.length > 0) {
 		const existingId = existingResp.entities[0]._id;
 		console.log(`  [section] "${spec.name}" under "${collective.name}": EXISTS (${existingId}) — skip`);
 		result.sections.skipped.push({ name: spec.name, collective: collective.name, _id: existingId });
@@ -250,10 +240,15 @@ async function seedSection(
 		{ type: '_sharing', string: 'public' },
 	];
 
-	const entity = await createEntity(client, props);
-	console.log(`  [section] "${spec.name}" under "${collective.name}": CREATED (${entity._id})`);
-	result.sections.created.push({ name: spec.name, collective: collective.name, _id: entity._id });
-	return entity._id;
+	const r = await findOrCreateByName(client, 'section', spec.name, collective._id, props);
+	if (r.created) {
+		console.log(`  [section] "${spec.name}" under "${collective.name}": CREATED (${r._id})`);
+		result.sections.created.push({ name: spec.name, collective: collective.name, _id: r._id });
+	} else {
+		console.log(`  [section] "${spec.name}" under "${collective.name}": EXISTS (${r._id}) — skip (race)`);
+		result.sections.skipped.push({ name: spec.name, collective: collective.name, _id: r._id });
+	}
+	return r._id;
 }
 
 // ---------------------------------------------------------------------------
@@ -280,21 +275,19 @@ async function seedMember(
 	}
 
 	// Idempotency: check if a member with this person ref already exists under this org.
-	const existing = await listEntities(client, {
-		'_type.string': 'member',
+	const existing = await listInstancesByType(client, 'member', '_id', {
 		'person.reference': personId,
 		'_parent.reference': orgId,
-		props: '_id',
 	});
 
-	if (existing.count > 0) {
+	if (existing.entities.length > 0) {
 		const existingId = existing.entities[0]._id;
 		console.log(`  [member] "${personName}" in "${collectiveName}/${sectionName}": EXISTS (${existingId}) — skip`);
 		result.members.skipped.push({ person: personName, collective: collectiveName, section: sectionName, _id: existingId });
 		return;
 	}
 
-	const entity = await createEntity(client, [
+	const r = await findOrCreateByName(client, 'member', personName, orgId, [
 		{ type: '_type', reference: memberTypeId },
 		{ type: '_parent', reference: orgId },
 		{ type: '_parent', reference: sectionId },
@@ -302,8 +295,13 @@ async function seedMember(
 		{ type: 'status', string: 'active' },
 		{ type: '_sharing', string: 'private' },
 	]);
-	console.log(`  [member] "${personName}" in "${collectiveName}/${sectionName}": CREATED (${entity._id})`);
-	result.members.created.push({ person: personName, collective: collectiveName, section: sectionName, _id: entity._id });
+	if (r.created) {
+		console.log(`  [member] "${personName}" in "${collectiveName}/${sectionName}": CREATED (${r._id})`);
+		result.members.created.push({ person: personName, collective: collectiveName, section: sectionName, _id: r._id });
+	} else {
+		console.log(`  [member] "${personName}" in "${collectiveName}/${sectionName}": EXISTS (${r._id}) — skip (race)`);
+		result.members.skipped.push({ person: personName, collective: collectiveName, section: sectionName, _id: r._id });
+	}
 }
 
 // ---------------------------------------------------------------------------
@@ -384,7 +382,6 @@ async function main() {
 			for (const p of s.persons) allPersonNames.add(p);
 		}
 	}
-	// Also include founders from umbrellas and collectives (already in section person lists)
 
 	const result = emptyResult();
 
@@ -446,21 +443,16 @@ async function main() {
 			if (id) {
 				collectiveIdMap.set(collective.name, id);
 
-				// Add umbrella parent as second POST (idempotent: check before adding)
+				// Add umbrella parent as second POST (idempotent: check before adding).
 				const umbrellaId = umbrellaIdMap.get(collective.umbrella);
 				if (umbrellaId) {
 					if (DRY_RUN) {
 						console.log(`  [collective] "${collective.name}": WOULD CHECK umbrella parent "${collective.umbrella}" (skip add if already present)`);
 					} else {
-						// Fetch current parents; only add if not already present.
-						const parentResp = await listEntities(client, {
-							'_type.string': 'organization',
-							'_id': id,
-							props: '_parent',
-						});
+						// fetchEntity throws on non-200; umbrella-parent check uses the entity's _parent array.
+						const entity = await fetchEntity(client, id);
 						const existingParentIds: string[] = [];
-						const raw = parentResp.entities[0] as Record<string, unknown>;
-						const parents = raw['_parent'];
+						const parents = entity['_parent'];
 						if (Array.isArray(parents)) {
 							for (const p of parents as Array<{ reference?: string }>) {
 								if (p.reference) existingParentIds.push(p.reference);
@@ -469,7 +461,7 @@ async function main() {
 						if (existingParentIds.includes(umbrellaId)) {
 							console.log(`  [collective] "${collective.name}": umbrella parent already present — skip`);
 						} else {
-							await addProperties(client, id, [{ type: '_parent', reference: umbrellaId }], false);
+							await postProperties(client, id, [{ type: '_parent', reference: umbrellaId }]);
 							console.log(`  [collective] "${collective.name}": umbrella parent "${collective.umbrella}" (${umbrellaId}) added`);
 						}
 					}
@@ -487,8 +479,7 @@ async function main() {
 	// -------------------------------------------------------------------------
 	const totalSections = manifest.collectives.reduce((n, c) => n + c.sections.length, 0);
 	console.log(`\n[seed-collectives] Phase 4: seeding ${totalSections} sections...`);
-	// section key = "collectiveName/sectionName" → _id
-	const sectionIdMap = new Map<string, string>();
+	const sectionIdMap = new Map<string, string>(); // "collectiveName/sectionName" → _id
 
 	for (const collective of manifest.collectives) {
 		const collectiveId = collectiveIdMap.get(collective.name);
@@ -569,8 +560,6 @@ async function main() {
 	// -------------------------------------------------------------------------
 	// Summary + artifact
 	// -------------------------------------------------------------------------
-	const executedAt = new Date().toISOString();
-
 	const totalFailed =
 		result.persons.failed.length +
 		result.orgs.failed.length +
@@ -591,17 +580,14 @@ async function main() {
 	}
 
 	if (!DRY_RUN) {
+		const at = new Date();
 		const artifact = {
-			executedAt,
+			executedAt: at.toISOString(),
 			db: ENTU_DB,
 			dryRun: false,
 			result,
 		};
-		const resultsDir = join(import.meta.dirname ?? '', 'seed-results');
-		mkdirSync(resultsDir, { recursive: true });
-		const fileName = `seed-collectives-${executedAt.replace(/[:.]/g, '-')}.json`;
-		const filePath = join(resultsDir, fileName);
-		writeFileSync(filePath, JSON.stringify(artifact, null, 2));
+		const filePath = await writeResultArtifact('seed-collectives', artifact, { at });
 		console.log(`[seed-collectives] result artifact: ${filePath}`);
 	}
 
