@@ -201,13 +201,14 @@ Same as above — Celes-authored prompt; not a defect, but conspicuous.
 
 ## 8. Commit log
 
-Atomic commits staged locally on branch `main` (no push). Hashes filled in after each git commit completes.
+Atomic commits staged locally on `main`. **Not pushed** per assignment scope — PO/Aen review then PO pushes.
 
 | # | Subject | Hash | Files |
 |---|---|---|---|
-| 1 | `chore(mvox-dev): seed comenius scratchpad stub` | TBD | `teams/mvox-dev/memory/comenius.md` (new) |
-| 2 | `chore(mvox-dev): prune finn scratchpad — remediated session-1 audit` | TBD | `teams/mvox-dev/memory/finn.md` |
-| 3 | `chore(mvox-dev): dedupe victoria Path B DEFERRED entry` | TBD | `teams/mvox-dev/memory/victoria.md` |
+| 0 | `docs(mvox-dev): health-report 2026-05-20 by Medici (FR)` | `d9ecdde` | `teams/mvox-dev/docs/health-report-mvox-dev-2026-05-20.md` (new) |
+| 1 | `chore(mvox-dev): seed comenius scratchpad stub` | `d52cac7` | `teams/mvox-dev/memory/comenius.md` (new) |
+| 2 | `chore(mvox-dev): prune finn scratchpad — remediated session-1 audit history` | `e49ced8` | `teams/mvox-dev/memory/finn.md` (-24 lines) |
+| 3 | `chore(mvox-dev): dedupe victoria Path B DEFERRED entry` | `2945111` | `teams/mvox-dev/memory/victoria.md` (-1 line) |
 
 ## 9. Closing notes
 
