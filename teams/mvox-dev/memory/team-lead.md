@@ -1,8 +1,78 @@
 # Palestrina — Team Lead Scratchpad
 
-### [CHECKPOINT] 2026-05-20 — session-7 lessons in flight
+### [NEXT SESSION] 2026-05-20 — session-7 → session-8
 
-Captured mid-session so future-Palestrina doesn't re-discover the same things.
+**Phase B landed substantially complete.** Polyphony Entu db is now v4E-aligned for additive + rename + most-obsolete-delete + formula-update + touch-save concerns. Live execution succeeded on the 2nd attempt (1st was 15/44 failures from 3 wire-shape bugs; v12 fixed all three; re-execution exit 0 + zero failures). Merge SHA on main: `e155cc9`.
+
+**Session-7 merge train (origin/main HEAD = `e155cc9`):**
+- `87191de` chore(tallis): CHORE-5 RED checkpoint
+- `a08f15b` feat(#5): Entu BFF skeleton (CHORE-5 merge)
+- `6a7964c` feat(#2): Tailwind CSS v4 setup (CHORE-2 merge)
+- `963bbfa` feat(migration): Phase B scaffolding + dry-run plan + 214 tests
+- `e5e84a0` docs(migration): land Entu API key expiry findings
+- `91c890a` docs(migration): update API key findings with Argo's authoritative answer
+- `b76f9de` chore(seed): seed 5 voice instances on polyphony
+- `e155cc9` **feat(migration): Phase B complete — renames + backfills + obsolete deletes + formula cleanup + touch-saves**
+
+**Carry-forward task queue for session 8 (in priority order):**
+
+1. **Phase B.1 — 4 blocked deletes** (task #53). Pérotin scripts to clear instance data for `organization.contact_email`, `organization.org_type`, `member.joined_at`; manual targeted DELETE on `organization.member_count` prop-def (Probe 1 false positive — prop-def `_id` is `69c7ea498489bfcb0e819e96` per pre-execution snapshot). Then re-run Phase B; the 4 ops succeed. **Phase B becomes 100% complete.** ETA ~30-60 min.
+
+2. **Pre-Phase-C hardening:**
+   - **v11 parent_copy delegation** (task #44) — refactor `buildLiveCallbacks.migrateProperty` parent_copy branch to delegate to `data-migrator.migrateProperty` (last remaining hand-rolled branch from v10 carve-out). Needs `parent_copy_lookup` pre-flight pattern. ~30 min.
+   - **YELLOW-12 updateFormula bare-catch** (task #52) — split try/catch in updateFormula pre-delete loop; ~5 lines.
+   - **YELLOW-13 Probe 2 limit=10 undercount** (task #54) — raise to 500; ~1 line.
+
+3. **Pérotin's collectives manifest** — on `chore/seeding-source-plan` branch (HEAD `c15df7a`); 4 collectives, 120 members, 38% with `@example.ee`, all orphan. PO reviewed approach + answered 5 questions but final review of the JSON manifest pending. May need `seed-collectives.ts` script written before merge (or merge as proposal artifact only and write script later).
+
+4. **Phase C design** — structural migrations: `inventory_copy → copy+lending` (data migrate; retire inventory_copy), `participation → rsvp+attendance` split, `affiliation → _parent links` (retire affiliation), `member.role → rights grants` (retire role). Riskier than B — touches existing instance data + rights model. **Recommend brainstorming skill** with PO to design spec; then RED/GREEN/REVIEW cycle. Probably a full session of work alone.
+
+5. **Phase D design** — rights/sharing flips: `organization._inheritrights: false` on type + 6 org instances + retire `_DEPRECATED_*` types + §2.8 person.forename/surname deletion (task #41 from session 7). PO-decision-heavy.
+
+6. **CHORE-3 Paraglide i18n, CHORE-4 Vitest+Playwright docs, CHORE-6 Email Resend** — still pending. #6 awaits PO's SPF/DKIM DNS action. #3 and #4 are unblocked.
+
+7. **Session-7 deferrals to track:**
+   - `bentham.md` scratchpad has 11+ unwritten review entries (v2/v3/v5/v6/v7/v9/v10/dry-run-RED/dry-run-GREEN/v12/post-exec). Bentham deferred per his [GOTCHA-CORRECTION-2] cross-branch checkout concern. Team-lead can write them via Edit at any convenient session-8 start — or leave for Bentham to handle now that branches are no longer in flight.
+   - Task #19 (CSRF gate at first cookie-authed mutation route) — review-gate for next BFF PR
+   - Task #20 (DRY DEFAULT_BASE_URL in BFF) — 4-line cosmetic; fold into next `src/lib/server/entu/` PR
+   - Task #32 (CHORE-2 OKLCH brittleness) — relax regex on next Tailwind upgrade
+
+**Pérotin promoted to permanent member (this session).** Roster entry added: `name: perotin, model: claude-sonnet-4-6, color: orange, prompt: prompts/perotin.md, spawn: on-demand`. Full prompt lives at `teams/mvox-dev/prompts/perotin.md`. Lore: Pérotin of Notre Dame (c.1160-c.1225, expanded organum from 2-voice to 3-4 voice). Role: data manager — seed scripts, migration-time write probes, dev/staging refreshes, anonymization, data quality reports. Operates out-of-band from the TDD chain. Common-prompt + startup.md updated to reflect.
+
+**Expected first action session 8:**
+1. Verify statusline on launch (`cd ~/workspace && claude` is the convention)
+2. Read this seed + the carry-forward task queue
+3. Check the chore/seeding-source-plan branch (Pérotin's manifest) — decide merge vs continue
+4. Spawn finn + bentham per Phase 5 (always-on)
+5. Make a call with PO: Phase B.1 → v11 hardening → Phase C? Or different priority?
+
+**Brilliant KB updates needed (deferred):**
+- Update `Projects/polyphony` body: "v4E migration Phase B complete at scaffolding + live execution; Phase B.1 cleanup pending; Phase C/D unstarted"
+- Update `Decisions/mvox/polyphony-v4e-divergence` with Phase B executed outcome
+- Possibly: new entry `Patterns/entu-data-migration` consolidating Phase A + B learnings
+- New entry `Patterns/seeder-role-out-of-band` documenting Pérotin pattern
+
+(*MVOX:Palestrina*)
+
+---
+
+### [PROCESSED 2026-05-20 end-of-session-7] session-6 → session-7 seed
+
+Session 7 executed against the prior seed. Headline outcomes:
+- Phase B design spec landed ✓
+- Phase B scaffolding merged ✓
+- Phase B live executed (with mid-session partial-failure recovery) ✓
+- Pérotin permanent role landed ✓
+- 13 RED/GREEN cycles on Phase B (more than 2x estimate)
+- 8+ new memory entries (entu mechanics: api-key, formula-mechanics, post-appends-multi-value)
+
+Old seed text follows for archival reference, downgraded tag.
+
+---
+
+### [CHECKPOINT] 2026-05-20 — session-7 lessons
+
+Captured at session end so future-Palestrina doesn't re-discover the same things.
 
 **L1 — Shared working-tree coordination.** Local-mode teams share ONE git working tree. When team-lead `git checkout main`s to commit a docs/finding while an implementer agent is mid-edit on a feat branch, the implementer's branch context switches under them. First time I bit on this (2026-05-20 04:25 — committing voice_type findings to main during Tallis's RED): saved by stash + switch-back, but caused needless confusion. Second time (committing Finn's Q1+Q3 findings 04:48): chose to commit on feat branch instead, deferring main landing until squash-merge. **Rule:** mid-session doc commits go on whichever feat branch is active, OR wait for "team idle" to switch. Don't `git checkout main` while an implementer's working files are uncommitted — period.
 
@@ -17,7 +87,17 @@ Captured mid-session so future-Palestrina doesn't re-discover the same things.
 
 **L5 — Implementer agents pre-ship between checkpoints.** Tallis's RED v1 at 04:28 included full impls of phase-b-scope.ts, snapshotter.ts, data-migrator.ts, diff.ts. Josquin came online expecting stubs, found working impls, re-implemented them anyway to verify (the Write calls produced byte-identical content). **Rule:** when spec-driven impls land in a RED commit, the commit message MUST flag them ("stub impls" vs "full impls"). Otherwise the receiving agent burns cycles. Add to Tallis's prompt: if you write impl alongside the test, label it as such in the commit.
 
-**L6 — Phase B is bigger than estimated.** Spec said "~14 operations, ~43-87 API writes." Tallis-Josquin reality at GREEN v1 needed: 22 RED tests → 168 passing total. Bentham RED'd with 4 blockers. Tallis RED v2: 15 more tests → 188 expected GREEN total. Plus the Q2 probe + live dry-run + likely a YELLOW round. **Estimate revision:** Phase B is closer to "2-3 hours of session time" than the implicit "1 hour Phase A pace." Note this for Phase C/D planning.
+**L6 — Phase B is bigger than estimated.** Spec said "~14 operations, ~43-87 API writes." Reality: 13 RED/GREEN cycles + a partial-failure recovery cycle + 4 empirical probes (Q1+Q2+Q3+Q4+Q5) + ~2.7k lines test+impl change. Phase B alone consumed ~80% of session 7 (~4 hours of 5+). **Estimate revision for Phase C/D:** assume each phase is similar (3-5 hours of session time minimum). They probably can't both fit in one session alongside any other work. Plan accordingly.
+
+**L7 — Reporter detail must persist failure records (or diagnostics cost 10x).** Phase B's first live execution at 08:27 had 15/44 ops fail. The reporter wrote `summary.failed: 15` but NOT the per-op `failed[].error` records. Net: ~40 min of diagnostics needed (snapshot+live diff) to identify the 3 root-cause bugs. If the reporter had serialized `executionResult.failed[]`, diagnostics would have been ~5 min (read the report). Bug 3 in v12 fixed this. **Rule for migration scripts (or any orchestration with continue-on-failure):** reporter MUST persist per-op detail, not just summary counts. Otherwise post-incident diagnostics turns into archaeology. Bake this into the design spec template for Phase C/D.
+
+**L8 — Wire-shape tests can verify request, not response acceptance.** Bentham v6 false-GREEN on `deletePropertyByIdLive` (approved `/property/{id}` because the mock test verified the URL substring matched). Reality: live Entu returns 404 for that endpoint; correct shape is `/entity/{id}`. **Bentham's calibration lesson** (logged in his post-execution review): for any callback that hits Entu with a verb+path not already exercised against live Entu, demand either (a) an empirical probe documented in findings, or (b) explicit "wire shape unverified — will surface at first live execution" YELLOW. Don't approve GREEN on test-passing alone for unverified wire shapes. Applies to Phase C/D where new write paths land.
+
+**L9 — Three+ agent shared-working-tree problem recurs.** Beyond L1, with Pérotin added (now 4+ active agents including team-lead), the harness's branch-auto-switch behavior bit Josquin specifically: he committed Phase B execution artifacts to `chore/seeding-source-plan` (Pérotin's branch) instead of `feat/phase-b-live-wiring`. Recovery: cherry-pick to correct branch; stray commit left on Pérotin's branch as carryforward cleanup. **Rule reinforced:** every Bash call that writes (commit, push, branch ops) must `git branch --show-current` first AND explicitly checkout if wrong. Inline it into the per-agent prompt as a checkpoint discipline.
+
+**L10 — `verifyDeleteSafe` is doing its job (the SAFE-halt is the design intent, not a failure).** Phase B re-execution had 4 "blockedDeletes" that the team initially read as gaps. On analysis: they were the system correctly preventing data destruction. `organization.contact_email` 6/6 still hold values → blocked. `member.joined_at` instances hold values → blocked. `organization.member_count` formula-ref Probe 1 hit (false positive on word-boundary regex). These aren't failures; they're the safety contract working. **Rule:** "blockedDeletes" in reports is a signal that data cleanup is needed before the delete is safe — not a bug. Plan a Phase B.1-style follow-up pattern in Phase C/D specs for blocked deletes (data cleanup → re-run).
+
+**L11 — Out-of-band specialist (Pérotin pattern) saves cycles.** PO's suggestion to spawn a temporary seeder role (which became permanent Pérotin) avoided the need for a CREATE_INSTANCE op kind + executor branch + live wiring + RED/GREEN cycle in Phase B. ~30 min cycle replaced with a 5-line idempotent script + 1 live run. **Pattern applies broadly:** for tactical one-off live ops (seeding, probes, cleanup), out-of-band specialist is cheaper than baking-into-orchestrator. Use Pérotin for Phase B.1 cleanup + future Phase C/D seeding.
 
 **Session 7 state at this checkpoint (~05:07):**
 - `feat/chore-5-bff-skeleton` merged (`a08f15b`); issue #5 closed
@@ -31,7 +111,7 @@ Captured mid-session so future-Palestrina doesn't re-discover the same things.
 
 ---
 
-### [NEXT SESSION] 2026-05-20 — session-6 → session-7
+### [PROCESSED 2026-05-20] session-6 → session-7 — text archived, see top-of-file for end-of-session-7 status
 
 **Phase A landed live.** Polyphony Entu db is now v4E-additive-aligned. 9 new entity types + 79 property additions committed against the live db at 03:46 UTC. Exit 0, zero failures. Full execution report at `scripts/migrations/reports/2026-05-19-phase-a-2026-05-20T03-46-18-833Z.{md,json}` (committed as `a127729`).
 

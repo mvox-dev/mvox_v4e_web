@@ -114,6 +114,7 @@ Spawn order:
 2. **tallis** + **byrd** + **josquin** (parallel if working on independent issues)
 3. **comenius** (only if i18n work is needed this session)
 4. **victoria** (only if requirements analysis is needed this session)
+5. **perotin** (only if seeding / data refresh / write-probe / data-quality work is needed this session — on-demand specialist)
 
 Phase 1 is a gate: do not spawn implementer agents until finn + bentham have introed (research and review infrastructure must be ready).
 

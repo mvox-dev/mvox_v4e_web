@@ -92,4 +92,82 @@ metadata:
 
 [CHECKPOINT] Reviewed scope of CHORE-5: 4 production files (~110 lines net), 3 test files (~377 lines), 19 tests passing. `pnpm check` clean (per Josquin). Author identity carryover (Palestrina commits) — accepted per `2026-05-19 — CHORE-1 review` policy.
 
+## 2026-05-20 — Phase B v1 review (branch `feat/phase-b-migration`)
+
+[DECISION] **Verdict: RED — 4 blockers.** Phase B v1 (Josquin's `67e4b92`) had 4 RED items: (1) `runPhaseB` never called `executePhaseBOps` in live mode — dispatcher was dead code from CLI; (2) `fetchTypesOnly` returned empty `propertyNames: []`, causing all §1 source-prop checks and §3/§4/§5 ops to short-circuit; (3) integration spec asserted against static `PHASE_B_*` constants instead of computed diff (vacuous tests); (4) snapshotter returned list-endpoint stubs, not full per-entity payloads — backup unrecoverable. Plus YELLOW-1: `parent_copy` read from same instance, not parent.
+
+[PATTERN] **Worktree-contamination self-incident** (logged here as [GOTCHA-CORRECTION-2]): During this review, ran `git checkout f19f798 -- scripts/migrations/ docs/` while cwd was `feat/chore-2-tailwind-v4` (Byrd's WIP). Materialized Phase B v2 files onto Byrd's branch index. Cleanup: `git checkout HEAD --` on 4 tracked files + `rm` of 11 untracked files I introduced. **Rule for future cross-branch reviews:** never `git checkout <sha> -- <paths>` for a review on a non-target branch; always use `git show <sha>:<path>` for read-only inspection. Same rule as session-1 [GOTCHA] — "never trust the worktree state; always read via `git show`" — extended to never CREATE worktree state via foreign-sha checkout.
+
+## 2026-05-20 — Phase B v3 re-review (branch `feat/phase-b-migration` @ `30e20fc`)
+
+[DECISION] **Verdict: GREEN.** All 4 v1 RED items + v2's RED-5 (`executePhaseBOps` missing ADD_PROPERTY handler — silently dropped §1 rename targets) closed cleanly. v3 added `addProperty?` injectable + dispatch branch in `executePhaseBOps`; snapshotter switched to unconditional per-entity `fetchEntity` (removed `isStubEntity` heuristic per my v2 YELLOW); orchestrator wires real implementations. 194/194 tests, pnpm check clean.
+
+[PATTERN] **The `executePhaseBOps` op switch must handle every op kind the diff emits.** v2 missed ADD_PROPERTY because the diff emitted it for §1 renames but the executor only handled BACKFILL/DELETE/UPDATE/TOUCH. Integration test asserted callbacks-were-called but not which-ops-were-handled. Encode for Phase C/D: any new DiffOp kind needs an explicit dispatch branch + an "every op kind reaches a handler" assertion in the integration spec.
+
+## 2026-05-20 — Phase B v5 + dry-run review (branch `feat/phase-b-migration` @ `cc1b116`)
+
+[DECISION] **v5 GREEN + dry-run RED.** v5 closed my v4 dry-run RED-A1-A4 + RED-B: `PHASE_B_MIGRATIONS` now iterated (§2 work.arranger + verify_then_delete forename/surname); work.edition_count and organization.member_count added to scope; `buildLiveCallbacks` exported; `main()` pre-auths and passes injectables. Regen dry-run produced 46 ops correctly. Then RED on YELLOW-A1-followup: `parent_copy` diff op shape didn't encode target type — `parentType: 'work'` would make migrator iterate works not editions. Latent bug hidden by stub callbacks; called out for v6.
+
+[PATTERN] **Diff op shape must encode iteration target when it differs from source.** For `parent_copy` (work.arranger → edition.arranger), the executor needs to know to iterate editions, not works. Added `targetParentType?: string` field on `BackfillDataOp` in v6/v10. Carry forward to any future cross-type migration.
+
+## 2026-05-20 — Phase B v6 live-wiring review (RETRACTED — v12 found wire-shape bug)
+
+[GOTCHA-CORRECTION] **v6 false-GREEN on `deleteProperty` wire shape.** I approved `DELETE /[db]/property/{propertyDefId}` based on Tallis's RED-2 test asserting the URL substring matched `/property/`. That URL returns 404 universally on real Entu — property-def entities ARE entities; the correct shape is `DELETE /[db]/entity/{id}`. Discovered during v12 diagnostics: 18/19 §1+§3+§4 deletes failed silently on the first live execution.
+
+**Pattern for future reviews**: for any callback that hits Entu with a verb+path not already exercised against live Entu, demand either (a) an empirical probe documented in `findings/`, or (b) explicit YELLOW with "unverified wire shape; needs probe before merge". Test-passing-only is not GREEN-worthy for new wire shapes. Logged in MEMORY.md as a candidate review-pattern memory.
+
+## 2026-05-20 — Phase B v7 verifyDeleteSafe review (branch `feat/phase-b-live-wiring` @ `a766abd`)
+
+[DECISION] **GREEN.** Probe 1 switched from `formula.string=<name>` (exact-equal per Q3, returns 0 because no formula's full text equals just the prop name) to `q=<name>` (substring) + JS-side word-boundary regex post-filter with proper metachar escaping. Discriminating mock at Tallis's RED v7 Test 1 returns count=0 for the wrong query and count=2 for the right query — any impl using the wrong mechanism fails. Test 2 validates the post-filter excludes `member_email_legacy` substring while accepting `person.email` word-bound. ~2-minute RED-then-GREEN cycle.
+
+[PATTERN] **Word-boundary regex is type-blind.** Probe 1 matches `\b<propName>\b` against any formula's text — doesn't distinguish "member_count on section" from "member_count on organization". This produced a false positive on org.member_count delete in post-execution (matched section.member_count's formula expression). Conservative behavior (false positive blocks delete; manual override required) is the right safety posture. Type-aware refinement deferred to a future hardening PR.
+
+## 2026-05-20 — Phase B v9 review (branch `feat/phase-b-live-wiring` @ `9b352c2`)
+
+[DECISION] **YELLOW (conditional GREEN).** v9.1 deferred §2.8 person.forename/surname to Phase D per Q4/Q5 findings (Q4: Entu RETAINS materialized formula values post-source-delete; Q5: formula prop is not directly writable — POST-to-name is dropped). Right call. v9.2 added `pruneExistingTarget` helper to data-migrator for the Q5 multi-value-append gotcha. **Structural gap:** `buildLiveCallbacks.migrateProperty` was hand-rolled, didn't delegate to `data-migrator.migrateProperty` — the helper was unreachable from live mode. First-run safe (§1 targets empty); re-run after partial failure NOT safe (multi-value append on already-set targets).
+
+## 2026-05-20 — Phase B v10 review (branch `feat/phase-b-live-wiring` @ `a8527f5`)
+
+[DECISION] **GREEN.** v10 closed v9 YELLOW for 5/6 backfillKinds via proper delegation. Data-migrator gained dual-signature `(client, op, injectables)`; voiceLookup widened to `Map | (sourceValue) => Promise<string | undefined>`; injectables wire concrete `deletePropertyByIdLive` (DELETE /property/{id} — at this point still pre-Bug-1-discovery wire). `parent_copy` retained inline impl with documented justification: the RED-1 parent_copy test mocks an exact 4-fetch sequence that pre-flighting parentLookup would break. Acceptable carve-out — Phase B has exactly 1 parent_copy op (work.arranger → edition.arranger) with target empty per dry-run. v11 hardening (task #44) deferred to before Phase C.
+
+## 2026-05-20 — Phase B dry-run reviews (RED → GREEN cycle)
+
+[DECISION] **First dry-run regen (44 ops): RED** — voice-instance seeding missing. Design spec §1.3 calls for creating 5 voice instances (alto/baritone/bass/soprano/tenor) before the `string_to_reference` backfill, but the diff had no CREATE_INSTANCE op kind. Live execution would have produced 16 sections losing voice association (DELETE_PROPERTY(voice_type) runs without verifyPreconditions; backfill fails as unmatchedVoiceTypes; source data destroyed).
+
+**Resolution: out-of-band Pérotin script** (`chore/seed-voices`) — idempotent check-then-create per voice; `_sharing: 'public'` per architecture decisions memory; getJwt + JWT-only ops; commits result artifact; no credential leaks. Ran live, 5 instances created. **GREEN on the script.**
+
+[DECISION] **Second dry-run regen (44 ops + 5 new voice instances in snapshot): GREEN.** Same op composition, entityCount 452→457, sha256 `883c3a9e…→ba7b12cd…`. Cleared for live execution.
+
+## 2026-05-20 — Phase B v12 review (branch `feat/phase-b-live-wiring` @ `2f1e33c`)
+
+[DECISION] **GREEN with 1 carryforward YELLOW.** v12 fixed 3 bugs from the partial-failure incident (15/44 ops failed on first live execution):
+
+- **Bug 1 (CRITICAL):** `deleteProperty` URL switched to `/entity/{id}` from `/property/{id}` (the source of all 15 DELETE failures). Empirically verified by Josquin's probe — oracle-confirmed, not a guess.
+- **Bug 2 (HIGH):** `updateFormula` now pre-deletes existing formula `_id`s before POST (Q5 multi-value gotcha that polluted section.member_count's formula expression).
+- **Bug 3 (HIGH):** `buildJsonReport` now serializes full `executionResult` (addedProperties, backfilled, deleted, blockedDeletes, formulaUpdates, touchSaves, skipped, failed). Markdown gains `## Failures` section.
+
+[YELLOW-12] **Bare `catch {}` in updateFormula pre-delete** swallows DELETE-mid-loop failures, leaving stale formula values silent. Probability low; mitigation present (next run's Probe 1 would catch); but worth refactoring to split-catch (catch only GET failure; let DELETE failures bubble to executor.failed[]). Track for v13/follow-up. ~5-line change.
+
+## 2026-05-20 — Phase B post-execution review (branch `feat/phase-b-live-wiring` @ `e8002e5`)
+
+[DECISION] **GREEN to squash-merge Phase B as complete-at-substantial-scope.** Re-execution: exit 0, failed[] empty, no `## Failures` markdown. 14 fresh deletes + 4 blockedDeletes + 1 probe-deleted = 19 planned ops accounted for. 1 formula update freshly cleaned (section.member_count: 2 polluted values → 1 canonical); 2 idempotent-skip. 3 touch-saves dispatched (6 orgs touched).
+
+**4 blockedDeletes — all SAFE halts, all carryforward to Phase B.1:**
+- `organization.contact_email` (Probe 2: 6 orgs still hold value) — needs Pérotin instance-clear, then re-run
+- `organization.org_type` (Probe 2: 6/6) — same pattern
+- `organization.member_count` (Probe 1: 2 prop-defs) — **confirmed false positive** (Probe 1 type-blind; matched `section.member_count` formulas not `organization.member_count`). Manual override DELETE on prop-def `_id` `69c7ea498489bfcb0e819e96`.
+- `member.joined_at` (Probe 2: 10 instances per response — but Probe 2 has `limit=10`, true count likely higher). Pérotin instance-clear.
+
+[YELLOW-13] **Probe 2 limit=10 undercounts.** If used to drive cleanup script ("just clear these 10"), instances beyond the cap stay. Raise to 500 (matches `listInstancesByType` limit elsewhere). ~1-line change.
+
+[LEARNED] **`verifyDeleteSafe` Probe 1 type-blindness is acceptable safety posture, not a bug.** False positives block legitimate deletes (recoverable: manual override) — far better than false negatives that destroy formula dependencies (unrecoverable without snapshot restore). Type-aware refinement is non-trivial (~50 lines + formula parser); accept the limitation; document the manual-override pattern.
+
+[CHECKPOINT] **End of session 7. Phase B substantially complete on live polyphony db:**
+- 6 v4E rename targets added; 34 instance-level backfills complete; 14 obsolete/source prop-def deletes; 1 fresh formula update; 6 organizations touch-saved; 5 voice instances seeded (out-of-band)
+- 4 deletes carry forward to Phase B.1 (Pérotin instance-cleanup + 1 manual override)
+- §2.8 (forename/surname) deferred to Phase D
+- 3 hardening items: v11 parent_copy delegation; YELLOW-12 updateFormula split-catch; YELLOW-13 Probe 2 limit raise
+
+[DEFERRED] **Session 8 focus expected:** Phase B.1 follow-up (Pérotin scripts for instance cleanup), v11 parent_copy hardening, then Phase C planning (structural restructuring: inventory_copy → copy+lending; participation → rsvp+attendance; affiliation retirement; role retirement). Phase D after C (rights flips + sharing alignment + DEPRECATED cleanup).
+
 (*MVOX:Bentham*)

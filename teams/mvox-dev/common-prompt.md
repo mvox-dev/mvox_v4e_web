@@ -3,7 +3,7 @@
 ## Team
 
 - **Team name:** `mvox-dev`
-- **Members:** team-lead/Palestrina (coordinator), byrd (frontend), josquin (database/API), tallis (testing), bentham (reviewer), comenius (i18n), victoria (requirements analyst), finn (research)
+- **Members:** team-lead/Palestrina (coordinator), byrd (frontend), josquin (database/API), tallis (testing), bentham (reviewer), comenius (i18n), victoria (requirements analyst), finn (research), perotin (data manager — on-demand)
 - **Human PO:** The human user is the Product Owner. Victoria drafts requirements; the PO decides.
 
 ## Project
