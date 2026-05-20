@@ -97,4 +97,36 @@ describe('computeAdditiveDiff', () => {
 		// person.avatar should not appear
 		expect(adds.some((a) => a.propertyName === 'avatar')).toBe(false);
 	});
+
+	it('processes §4.1 new-type properties even if type already exists in db (partial-failure recovery)', () => {
+		// Scenario: a previous run crashed after creating the `voice` type entity but
+		// before all its inline properties landed. The db now has `voice` with only
+		// some of its v4E properties. Re-run must complete the missing inline props
+		// despite the scope filter normally excluding §4.1 type props.
+		const v4e: V4eSchema = {
+			version: 'v4E',
+			sections: [],
+			entities: [
+				{
+					name: 'voice',
+					blurb: 'Vocal range taxonomy',
+					properties: [
+						{ name: 'name', type: 'string' },
+						{ name: 'label', type: 'string' },
+						{ name: 'iso_code', type: 'string' }
+					]
+				}
+			]
+		};
+		const dbState: DbTypeState[] = [
+			{ typeId: 'voice-id', name: 'voice', propertyNames: ['name'] } // partial — only `name` landed
+		];
+		const ops = computeAdditiveDiff(v4e, dbState);
+		const adds = ops.filter((o) => o.kind === 'ADD_PROPERTY') as AddPropertyOp[];
+		expect(adds).toHaveLength(2);
+		expect(adds.map((a) => `${a.parentTypeName}.${a.propertyName}`).sort()).toEqual([
+			'voice.iso_code',
+			'voice.label'
+		]);
+	});
 });
