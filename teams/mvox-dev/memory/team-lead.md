@@ -1,5 +1,36 @@
 # Palestrina — Team Lead Scratchpad
 
+### [CHECKPOINT] 2026-05-20 — session-7 lessons in flight
+
+Captured mid-session so future-Palestrina doesn't re-discover the same things.
+
+**L1 — Shared working-tree coordination.** Local-mode teams share ONE git working tree. When team-lead `git checkout main`s to commit a docs/finding while an implementer agent is mid-edit on a feat branch, the implementer's branch context switches under them. First time I bit on this (2026-05-20 04:25 — committing voice_type findings to main during Tallis's RED): saved by stash + switch-back, but caused needless confusion. Second time (committing Finn's Q1+Q3 findings 04:48): chose to commit on feat branch instead, deferring main landing until squash-merge. **Rule:** mid-session doc commits go on whichever feat branch is active, OR wait for "team idle" to switch. Don't `git checkout main` while an implementer's working files are uncommitted — period.
+
+**L2 — Message cross-fire (sub-genre of session-6 lesson 1).** Two patterns observed in session 7:
+- Tallis 04:32 "3 questions" message went out BEFORE my 04:26 answers landed in his inbox — he resolved them by reading the messages on next wake; no harm. But his summary read stale.
+- Josquin 04:55 "two issues blocking" message crossed with my 04:59 GREEN v2 dispatch. Each was operating on the other's pre-message state. Net: I had to send a 05:00 "to synchronize" message clarifying the message ordering.
+- **Mitigation:** When briefing an agent that's in flight, lead with one line: "this updates / supersedes message X from time Y". Saves the agent a state-reconciliation step. Also: be explicit about what's superseded vs. what's additive.
+
+**L3 — Verify-before-rotate (auth-investigation pattern).** When an agent reports an external system anomaly (e.g., "key returns anonymous"), my instinct was to ask PO to rotate. PO pushed back: "you trying the same key Phase A used?". Forced a 30-sec investigation: same file, same mtime, same key. The bug was almost certainly in the agent's probe flow (raw API key as Bearer vs. JWT exchange). Then PO added "Entu might have some troubles with auth ATM" — third possibility I hadn't considered. **Rule:** before recommending external-system mitigation (key rotation, retries, escalations), verify locally first. The cheap investigation often resolves it; the expensive mitigation rarely needs to fire.
+
+**L4 — Bentham proposing the GREEN spec mid-RED is a smell.** When I sent Josquin "Step 1: Richer fetchDbState" at 04:50 — that's TEAM-LEAD proposing the implementation shape, which is Tallis's territory (he writes the RED contract that specifies what GREEN must do). I should have written "Tallis: write RED for richer fetchDbState contract" and let Tallis specify the shape. Bentham later RED'd the orchestrator's `fetchTypesOnly` for the exact same reason — and his recommendation was the same (have Tallis write RED). Net effect: zero (Tallis ended up writing the RED), but the process bypass was telegraphed.
+
+**L5 — Implementer agents pre-ship between checkpoints.** Tallis's RED v1 at 04:28 included full impls of phase-b-scope.ts, snapshotter.ts, data-migrator.ts, diff.ts. Josquin came online expecting stubs, found working impls, re-implemented them anyway to verify (the Write calls produced byte-identical content). **Rule:** when spec-driven impls land in a RED commit, the commit message MUST flag them ("stub impls" vs "full impls"). Otherwise the receiving agent burns cycles. Add to Tallis's prompt: if you write impl alongside the test, label it as such in the commit.
+
+**L6 — Phase B is bigger than estimated.** Spec said "~14 operations, ~43-87 API writes." Tallis-Josquin reality at GREEN v1 needed: 22 RED tests → 168 passing total. Bentham RED'd with 4 blockers. Tallis RED v2: 15 more tests → 188 expected GREEN total. Plus the Q2 probe + live dry-run + likely a YELLOW round. **Estimate revision:** Phase B is closer to "2-3 hours of session time" than the implicit "1 hour Phase A pace." Note this for Phase C/D planning.
+
+**Session 7 state at this checkpoint (~05:07):**
+- `feat/chore-5-bff-skeleton` merged (`a08f15b`); issue #5 closed
+- Phase B spec on main (`6daf1e6`); voice_type findings on main (`a063135`); Q1+Q3 findings on feat branch (`c37bb66`)
+- Phase B GREEN v2 in flight (Josquin closing Bentham's 4 blockers + YELLOW-1)
+- Entu auth issues (PO-reported) — Q2 touch-save probe + live --dry-run held until recovery
+- Tasks #19 (CSRF gate), #20 (DRY base URL) carried forward from CHORE-5 review
+- About to dispatch CHORE-2 (#2) Tailwind v4 in parallel — Tallis RED + Byrd GREEN
+
+(*MVOX:Palestrina*)
+
+---
+
 ### [NEXT SESSION] 2026-05-20 — session-6 → session-7
 
 **Phase A landed live.** Polyphony Entu db is now v4E-additive-aligned. 9 new entity types + 79 property additions committed against the live db at 03:46 UTC. Exit 0, zero failures. Full execution report at `scripts/migrations/reports/2026-05-19-phase-a-2026-05-20T03-46-18-833Z.{md,json}` (committed as `a127729`).

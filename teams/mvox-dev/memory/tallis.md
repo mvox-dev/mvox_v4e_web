@@ -40,16 +40,25 @@
 
 ## [CHECKPOINT] 2026-05-20 — Phase B migration RED phase
 
-[DECISION] 7 spec files written, all RED. 22 new failing tests (+ 6 file-level RED from integration spec). Held §1.3 voice_type fixtures pending Finn's probe. Branch: `feat/phase-b-migration`.
+[DECISION] 7 spec files written on `feat/phase-b-migration`. All RED. HEAD: `eaf1005`.
+- `phase-b-scope.spec.ts` — PHASE_B_RENAMES(6), PHASE_B_MIGRATIONS(2), PHASE_B_OBSOLETE_DELETES(9), PHASE_B_FORMULA_UPDATES(4), PHASE_B_TOUCH_SAVES(3), guard functions
+- `snapshotter.spec.ts` — single-page, multi-page pagination (skip+limit+count), sha256, dry-run, skip-snapshot, errors
+- `data-migrator.spec.ts` — file→file, string→string, number→number, string_list, string→reference (full §1.3 fixtures), errors
+- `touch-saver.spec.ts` — abstract `touchSave(entityId, propertyName, formulaExpression)` interface; wire shape deferred to Josquin GREEN
+- `diff.spec.ts` additions — BACKFILL_DATA/DELETE_PROPERTY/UPDATE_FORMULA/TOUCH_SAVE ops, §1→§3 ordering invariant
+- `executor.spec.ts` additions — executePhaseBOps with all op kinds, partial recovery, dry-run
+- `2026-05-20-phase-b.spec.ts` — E2E integration: dry-run report shape, §4→§5 ordering, exit 1 on failure
 
-[PATTERN] Phase B specs inject per-operation functions (`listInstances`, `writeProperty`, `updateEntity`, `migrateProperty`, `touchSaveFormula`, etc.) as options — same injection pattern as Phase A's `createEntity`. Josquin must preserve these injection points in GREEN.
+[PATTERN] Minimal stub source files added alongside specs (data-migrator.ts, phase-b-scope.ts, snapshotter.ts, touch-saver.ts) so RED = "not implemented" not "module not found". Stub files export the expected interfaces with `throw new Error('not implemented')` bodies.
 
 [PATTERN] `computePhaseBDiff` receives `DbTypeState[]` extended with optional `propertyIds: Record<string, string>` and `currentFormulas: Record<string, string>`. The `propertyIds` map is needed so DELETE_PROPERTY ops can carry the Entu property-def `_id`. The `currentFormulas` map enables UPDATE_FORMULA idempotency skip.
 
-[GOTCHA] Touch-save is intentionally NOT idempotent — `touchSaveFormula` always re-writes to force Entu re-eval. This is different from all other ops. Test explicitly encodes this: "must call updateEntity even if instance appears already correct."
+[GOTCHA] Touch-save is intentionally NOT idempotent — always re-writes to force Entu re-eval. This is different from all other ops.
 
-[OPEN] Q2 (touch-save update endpoint shape) and Q1 (Entu pagination cursor) pending team-lead reply. `snapshotter.spec.ts` and `touch-saver.spec.ts` encode assumptions; flagged in comments.
+[DECISION] §1.3 voice_type fixtures based on Finn's probe (section-voice-types-2026-05-20.md): 5 values (alto/baritone/bass/soprano/tenor), 16 sections, zero anomalies. LIVE_VOICE_LOOKUP in data-migrator.spec.ts mirrors the real db distribution.
 
-[OPEN] §1.3 voice_type fixtures incomplete. When Finn's findings land, add a `data-migrator.spec.ts` test that iterates actual distinct values and verifies each maps to a `voice` entity name.
+[DECISION] touch-saver.spec.ts uses abstract `touchSave` injectable (not `updateEntity` with wire-shape assertions). Wire shape (POST endpoint, payload, how Entu re-evals) is empirical — Josquin determined via Q2 probe + dry-run in GREEN (see docs/migration/findings/phase-b-api-probes-2026-05-20.md §Q2).
+
+[OPEN] Phase B GREEN — Josquin implements: phase-b-scope.ts, snapshotter.ts, data-migrator.ts, touch-saver.ts, diff.ts additions, executor.ts additions, integration script. Branch `feat/phase-b-migration`.
 
 (*MVOX:Tallis*)

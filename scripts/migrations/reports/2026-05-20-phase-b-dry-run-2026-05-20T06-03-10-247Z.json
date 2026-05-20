@@ -1,0 +1,350 @@
+{
+  "phase": "B",
+  "executedAt": null,
+  "db": "polyphony",
+  "summary": {
+    "dryRun": true,
+    "wouldRenames": 6,
+    "wouldObsoleteDeletes": 12,
+    "wouldFormulaUpdates": 3,
+    "wouldTouchSaves": 3,
+    "failed": 0
+  },
+  "snapshot": {
+    "path": null,
+    "sha256": "866b2f08603f549a81e0f200391ea6f1969c60f41b890cb7735b7e204a5a5c99",
+    "entityCount": 452,
+    "dryRun": true
+  },
+  "wouldExecute": [
+    {
+      "kind": "RENAME",
+      "parentType": "person",
+      "source": "photo",
+      "target": "avatar"
+    },
+    {
+      "kind": "RENAME",
+      "parentType": "section",
+      "source": "ordinal",
+      "target": "display_order"
+    },
+    {
+      "kind": "RENAME",
+      "parentType": "section",
+      "source": "voice_type",
+      "target": "voice"
+    },
+    {
+      "kind": "RENAME",
+      "parentType": "work",
+      "source": "voicing",
+      "target": "original_voicing"
+    },
+    {
+      "kind": "RENAME",
+      "parentType": "work",
+      "source": "duration",
+      "target": "original_duration"
+    },
+    {
+      "kind": "RENAME",
+      "parentType": "work",
+      "source": "language",
+      "target": "original_language"
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "person",
+      "parentTypeId": "69bcfd8e9c031ab8e6ce805f",
+      "parentType": "person",
+      "propertyName": "avatar",
+      "def": {
+        "name": "avatar",
+        "type": "file"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "section",
+      "parentTypeId": "69c7ea498489bfcb0e819ea3",
+      "parentType": "section",
+      "propertyName": "display_order",
+      "def": {
+        "name": "display_order",
+        "type": "number"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "section",
+      "parentTypeId": "69c7ea498489bfcb0e819ea3",
+      "parentType": "section",
+      "propertyName": "voice",
+      "def": {
+        "name": "voice",
+        "type": "reference"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "work",
+      "parentTypeId": "69c7ea4c8489bfcb0e819f3e",
+      "parentType": "work",
+      "propertyName": "original_voicing",
+      "def": {
+        "name": "original_voicing",
+        "type": "string"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "work",
+      "parentTypeId": "69c7ea4c8489bfcb0e819f3e",
+      "parentType": "work",
+      "propertyName": "original_duration",
+      "def": {
+        "name": "original_duration",
+        "type": "number"
+      }
+    },
+    {
+      "kind": "ADD_PROPERTY",
+      "parentTypeName": "work",
+      "parentTypeId": "69c7ea4c8489bfcb0e819f3e",
+      "parentType": "work",
+      "propertyName": "original_language",
+      "def": {
+        "name": "original_language",
+        "type": "string",
+        "list": true
+      }
+    },
+    {
+      "kind": "BACKFILL_DATA",
+      "parentType": "person",
+      "sourceProperty": "photo",
+      "targetProperty": "avatar",
+      "backfillKind": "file"
+    },
+    {
+      "kind": "BACKFILL_DATA",
+      "parentType": "section",
+      "sourceProperty": "ordinal",
+      "targetProperty": "display_order",
+      "backfillKind": "number"
+    },
+    {
+      "kind": "BACKFILL_DATA",
+      "parentType": "section",
+      "sourceProperty": "voice_type",
+      "targetProperty": "voice",
+      "backfillKind": "string_to_reference"
+    },
+    {
+      "kind": "BACKFILL_DATA",
+      "parentType": "work",
+      "sourceProperty": "voicing",
+      "targetProperty": "original_voicing",
+      "backfillKind": "string"
+    },
+    {
+      "kind": "BACKFILL_DATA",
+      "parentType": "work",
+      "sourceProperty": "duration",
+      "targetProperty": "original_duration",
+      "backfillKind": "number"
+    },
+    {
+      "kind": "BACKFILL_DATA",
+      "parentType": "work",
+      "sourceProperty": "language",
+      "targetProperty": "original_language",
+      "backfillKind": "string_list"
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "person",
+      "propertyName": "photo",
+      "propertyDefId": "69bcfd8e9c031ab8e6ce806b"
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "section",
+      "propertyName": "ordinal",
+      "propertyDefId": "69c7ea4a8489bfcb0e819ec7"
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "section",
+      "propertyName": "voice_type",
+      "propertyDefId": "69c7ea498489bfcb0e819eb6"
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "work",
+      "propertyName": "voicing",
+      "propertyDefId": "69c7ea4e8489bfcb0e819f7c"
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "work",
+      "propertyName": "duration",
+      "propertyDefId": "69c7ea4e8489bfcb0e819f86"
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "work",
+      "propertyName": "language",
+      "propertyDefId": "69c7ea4d8489bfcb0e819f71"
+    },
+    {
+      "kind": "BACKFILL_DATA",
+      "parentType": "work",
+      "sourceProperty": "arranger",
+      "targetProperty": "arranger",
+      "backfillKind": "parent_copy"
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "work",
+      "propertyName": "arranger",
+      "propertyDefId": "69c7ea4d8489bfcb0e819f5c"
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "person",
+      "propertyName": "forename",
+      "propertyDefId": "69bcfd8e9c031ab8e6ce8065",
+      "verifyPreconditions": true
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "person",
+      "propertyName": "surname",
+      "propertyDefId": "69bcfd8e9c031ab8e6ce806d",
+      "verifyPreconditions": true
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "organization",
+      "propertyName": "contact_email",
+      "propertyDefId": "69c7ea488489bfcb0e819e5e",
+      "verifyPreconditions": true
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "organization",
+      "propertyName": "language",
+      "propertyDefId": "69c7ea488489bfcb0e819e75",
+      "verifyPreconditions": true
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "organization",
+      "propertyName": "locale",
+      "propertyDefId": "69c7ea488489bfcb0e819e80",
+      "verifyPreconditions": true
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "organization",
+      "propertyName": "org_type",
+      "propertyDefId": "69c7ea478489bfcb0e819e50",
+      "verifyPreconditions": true
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "organization",
+      "propertyName": "timezone",
+      "propertyDefId": "69c7ea498489bfcb0e819e8b",
+      "verifyPreconditions": true
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "organization",
+      "propertyName": "member_count",
+      "propertyDefId": "69c7ea498489bfcb0e819e96",
+      "verifyPreconditions": true
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "member",
+      "propertyName": "email",
+      "propertyDefId": "69c7ea4b8489bfcb0e819ef0",
+      "verifyPreconditions": true
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "member",
+      "propertyName": "invited_by",
+      "propertyDefId": "69c7ea4c8489bfcb0e819f33",
+      "verifyPreconditions": true
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "member",
+      "propertyName": "joined_at",
+      "propertyDefId": "69c7ea4c8489bfcb0e819f1d",
+      "verifyPreconditions": true
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "member",
+      "propertyName": "nickname",
+      "propertyDefId": "69c7ea4b8489bfcb0e819efb",
+      "verifyPreconditions": true
+    },
+    {
+      "kind": "UPDATE_FORMULA",
+      "parentType": "section",
+      "propertyName": "member_count",
+      "propertyDefId": "69c7ea4a8489bfcb0e819ed1",
+      "newFormula": "(_child.member COUNT) (_child.section.member_count SUM) +"
+    },
+    {
+      "kind": "UPDATE_FORMULA",
+      "parentType": "program_item",
+      "propertyName": "name",
+      "propertyDefId": "69c7ea578489bfcb0e81a10a",
+      "newFormula": "edition.*.work CONCAT"
+    },
+    {
+      "kind": "UPDATE_FORMULA",
+      "parentType": "repertoire_item",
+      "propertyName": "name",
+      "propertyDefId": "69c7ea538489bfcb0e81a075",
+      "newFormula": "work.*.name CONCAT"
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "season",
+      "propertyName": "work_count",
+      "propertyDefId": "69c7ea538489bfcb0e81a062"
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "work",
+      "propertyName": "edition_count",
+      "propertyDefId": "69c7ea4e8489bfcb0e819f90"
+    },
+    {
+      "kind": "TOUCH_SAVE",
+      "parentType": "lending",
+      "propertyName": "name",
+      "formulaExpression": "member.*.name copy.*.name ' — ' CONCAT_WS"
+    },
+    {
+      "kind": "TOUCH_SAVE",
+      "parentType": "organization",
+      "propertyName": "member_count_per_section",
+      "formulaExpression": "(_child.member COUNT) (_child.section.member_count SUM) +"
+    },
+    {
+      "kind": "TOUCH_SAVE",
+      "parentType": "edition",
+      "propertyName": "work",
+      "formulaExpression": "_parent"
+    }
+  ]
+}

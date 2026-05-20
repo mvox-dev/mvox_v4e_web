@@ -78,4 +78,18 @@ metadata:
 
 [DEFERRED] **Session 7 focus expected:** Phase B (renames + data backfill) design. Phase B is significantly higher-risk than Phase A — first phase touching live data instances, first phase needing backup strategy (per design spec §"Out of scope"). My review posture for Phase B will need to add: (i) data-loss risk checklist (backup taken before run; instances of renamed-type-prop properly migrated; old prop deleted only after migration verified); (ii) re-affirm the `PHASE_X_NEW_TYPES + bypassScope` precedent from PR #27 if any new types are introduced; (iii) per-instance idempotency story (Phase A idempotency was at the type/prop-definition level; Phase B will need per-instance idempotency because renames touch data).
 
+## 2026-05-20 — CHORE-5 review (issue #5, branch `feat/chore-5-bff-skeleton`)
+
+[DECISION] **Verdict: YELLOW** — two YELLOW items, neither blocking. Implementation is functionally correct; TDD ordering clean. RED commits `ce96e33`/`f13cf28`/`535c24c` (04:08 UTC) all precede GREEN commits `cce3703`/`1931c2c`/`0f34db8`/`d6663df` (04:11 UTC). No legacy `export let` / `$:`. Server-only code correctly under `src/lib/server/`. No client-side `entu.app` calls or `$env/dynamic/public` leakage. Cookie attributes correct: `httpOnly: true`, `secure: true`, `sameSite: 'lax'`, `maxAge: 48*3600`, `path: '/'`. 401 short-circuit on missing Authorization header. No v4E schema mutation in diff — Schema-Change trailer correctly not required. No elevated-ops introduced (BFF correctly forwards user JWT — matches `architecture-decisions.md` "BFF user-rights default").
+
+[YELLOW-1] **CSRF posture on `POST /auth` is "implicit-by-api-key".** The handler requires `Authorization: Bearer <api-key>` and returns 401 otherwise. That's effectively CSRF-safe today because a same-origin malicious page can't read the user's API key out of nothing (no cookie holds it). However: once cookie-authed endpoints exist, `POST` with JSON body bypasses SvelteKit's default form-CSRF check. Flag for next-PR review: when the first cookie-authed POST/PUT/DELETE lands, demand explicit Origin check or token-pair CSRF.
+
+[YELLOW-2] **`DEFAULT_BASE_URL = 'https://entu.app/api/'` duplicated** in `client.ts:1` and `+server.ts:4`. Two sources of truth; drift risk later. Lift to `src/lib/server/entu/config.ts` (or similar). Cosmetic 4-line followup — does not block merge.
+
+[NOTE-on-Josquin's-notes] Josquin flagged that `setProperty` (POST /property with `{ entity, type, string }`) and `GET /auth` with Bearer may need adjustment when we have a live integration test. Both shapes align with the polyphony migration script (`scripts/migrations/lib/entu-client.ts`) — so not blind guesses, but unverified by integration test in this PR. Acceptable as scaffolding; first BFF route that exercises EntuClient against live db is the real calibration moment.
+
+[PATTERN] **`process.env` direct read in server-only modules** is the chosen convention here (not `$env/dynamic/private`). Works in Node and CF Workers (where bindings are injected as env). Encode for future: server modules under `src/lib/server/` may use `process.env` directly. Client-side modules must NOT — but the file-location boundary makes this a soft RED only if it ever leaks.
+
+[CHECKPOINT] Reviewed scope of CHORE-5: 4 production files (~110 lines net), 3 test files (~377 lines), 19 tests passing. `pnpm check` clean (per Josquin). Author identity carryover (Palestrina commits) — accepted per `2026-05-19 — CHORE-1 review` policy.
+
 (*MVOX:Bentham*)
