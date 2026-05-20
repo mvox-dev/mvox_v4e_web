@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { PHASE_A_PROPERTY_ADDITIONS, isInPhaseAScope } from './phase-a-scope';
+import { PHASE_A_PROPERTY_ADDITIONS, isInPhaseAScope, PHASE_A_NEW_TYPES, isPhaseANewType } from './phase-a-scope';
 
 describe('PHASE_A_PROPERTY_ADDITIONS', () => {
 	it('contains the 35 properties from divergence §4.2 (excluding section.member_count formula-update)', () => {
@@ -38,6 +38,30 @@ describe('PHASE_A_PROPERTY_ADDITIONS', () => {
 
 	it('excludes the section.member_count formula-update (Phase B)', () => {
 		expect(PHASE_A_PROPERTY_ADDITIONS.section?.has('member_count') ?? false).toBe(false);
+	});
+});
+
+describe('PHASE_A_NEW_TYPES', () => {
+	it('contains the 9 new types from divergence §4.1', () => {
+		expect(PHASE_A_NEW_TYPES.size).toBe(9);
+		expect(PHASE_A_NEW_TYPES.has('voice')).toBe(true);
+		expect(PHASE_A_NEW_TYPES.has('library')).toBe(true);
+		expect(PHASE_A_NEW_TYPES.has('copy')).toBe(true);
+		expect(PHASE_A_NEW_TYPES.has('lending')).toBe(true);
+		expect(PHASE_A_NEW_TYPES.has('invitation')).toBe(true);
+		expect(PHASE_A_NEW_TYPES.has('application')).toBe(true);
+		expect(PHASE_A_NEW_TYPES.has('event_series')).toBe(true);
+		expect(PHASE_A_NEW_TYPES.has('rsvp')).toBe(true);
+		expect(PHASE_A_NEW_TYPES.has('attendance')).toBe(true);
+	});
+});
+
+describe('isPhaseANewType', () => {
+	it('returns true for §4.1 names', () => {
+		expect(isPhaseANewType('voice')).toBe(true);
+	});
+	it('returns false for existing types', () => {
+		expect(isPhaseANewType('organization')).toBe(false);
 	});
 });
 
