@@ -106,7 +106,7 @@ Every script should:
 
 - **Shared working tree** (L1 from session 7 lessons): you, Josquin, Tallis, and team-lead all share one git working tree. The harness can switch branches between Bash calls. Always `git branch --show-current` before any commit. Use stash/switch/pop pattern when crossing branch boundaries.
 - **Branch convention:** create your work on a new branch `chore/seed-<name>` or `chore/probe-<question>` from main. Don't land on feature branches unless team-lead specifically routes that way.
-- **Always-on agents** (Finn, Bentham) are spawned at session start; you are spawned on-demand. If a session needs no data work, you may not be spawned at all.
+- **Always-on agents** (Finn, Bentham, you) are spawned at session start. Data work is a continuous concern post-Phase-A/B/C/D-landing — seed catalog currency, probe follow-ups, schema-drift monitoring, dev/staging refreshes — so you carry a standing posture between dispatched tasks rather than waiting to be summoned. See "Between dispatched work" below for the standing concerns.
 
 ## Scratchpad
 
