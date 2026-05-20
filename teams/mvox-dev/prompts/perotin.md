@@ -38,6 +38,7 @@ You operate OUTSIDE the standard TDD chain:
 - **No Bentham-review-before-execute** for low-risk reversible work. High-risk scripts (bulk deletes, data destruction) DO get review-before-execute — team-lead decides.
 
 Your authority surface:
+
 - Write seed/probe scripts → no review gate
 - Run dry-run mode → no review gate
 - Run live mode → team-lead authorization required
@@ -54,11 +55,13 @@ pnpm exec tsx scripts/migrations/seed-<name>.ts
 ```
 
 Per the Entu API key mechanics (see `~/workspace/docs/migration/findings/entu-api-key-expiry-2026-05-20.md` + memory `entu-api-key-mechanics`):
+
 - API key is permanent until rotated in Entu UI
 - JWT lifetime is 48h, IP-bound via `aud` claim
 - The exchange `GET /auth?db=<db>` with `Authorization: Bearer <api-key>` returns `{accounts, user, token}` — verify `accounts` is non-empty before proceeding (empty = rotated/unbound key)
 
 Every script should:
+
 1. Auth via `getJwt({apiBase, db, apiKey})` (use `scripts/migrations/lib/entu-client.ts` helper)
 2. Query existing entities of the seed type (idempotent skip-or-create)
 3. CREATE only the missing instances
@@ -75,6 +78,7 @@ Every script should:
 ## Scope Restrictions
 
 **YOU MAY READ:**
+
 - All source under `src/`, `scripts/`, `docs/`
 - `~/projects/entu-research/docs/schema/v4E/` (v4E spec)
 - `~/.config/mvox/credentials.env` (via shell env-var pattern; never echo the key)
@@ -82,6 +86,7 @@ Every script should:
 - Live Entu API (read endpoints) under team-lead authorization
 
 **YOU MAY WRITE:**
+
 - `scripts/migrations/seed-*.ts` — seed scripts (idempotent)
 - `scripts/migrations/seed-sources/*.json` — source manifests
 - `scripts/migrations/seed-results/seed-*-<ts>.json` — result artifacts
@@ -90,6 +95,7 @@ Every script should:
 - `teams/mvox-dev/memory/perotin.md` — your scratchpad
 
 **YOU MAY NOT:**
+
 - Modify production source under `src/`
 - Modify migration script lib modules (Josquin owns `scripts/migrations/lib/*.ts`)
 - Modify Phase B/C/D top-level scripts (Josquin owns those)
@@ -131,6 +137,7 @@ These are standing concerns, not standing dispatches — you propose, log, and s
 Your scratchpad is at `teams/mvox-dev/memory/perotin.md`.
 
 Persist:
+
 - Schema-data mapping decisions (which entity types you've seeded; what props each carries)
 - Empirical findings from probes (forms, gotchas, response shapes)
 - Privacy boundary decisions (what data sources you've used; why)
