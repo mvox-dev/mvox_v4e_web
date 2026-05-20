@@ -1,0 +1,43 @@
+{
+  "executedAt": "2026-05-20T15:24:35.641Z",
+  "db": "polyphony",
+  "dryRun": false,
+  "ops": [
+    {
+      "op": "UPDATE",
+      "target": "Soprano (EFK)",
+      "status": "success",
+      "detail": {
+        "entityId": "69c7f8728489bfcb0e81b07b",
+        "propName": "display_order",
+        "preValue": 1,
+        "intermediate": 10,
+        "finalValue": 1,
+        "roundtripCorrect": true
+      }
+    },
+    {
+      "op": "REMOVE",
+      "target": "Soprano (EFK)",
+      "status": "success",
+      "detail": {
+        "entityId": "69c7f8728489bfcb0e81b07b",
+        "propName": "ordinal",
+        "propValueId": "69c7f8728489bfcb0e81b080",
+        "preValue": 1,
+        "postAbsent": true
+      }
+    },
+    {
+      "op": "DELETE_ENTITY",
+      "target": "Mait Vaher",
+      "status": "success",
+      "detail": {
+        "entityId": "69c7f88b8489bfcb0e81b5ee",
+        "nameBefore": "Mait Vaher",
+        "postState": "404 (not found — confirmed deleted)",
+        "memberCountAfter": 115
+      }
+    }
+  ]
+}

@@ -1,0 +1,284 @@
+{
+  "_comment": "v4E-aligned seed manifest for collectives, sections, persons, and members. Non-PII — org names are publicly listed Estonian choirs; person names are randomly combined Estonian forenames + surnames (no real individuals). Generated 2026-05-20 by Perotin (v2 rewrite — v4E clean after Phase B/B.1). See docs/migration/findings/seeding-source-plan-2026-05-20.md.",
+  "_schema_note": "person.name is a plain string per v4E schema.ts (no forename/surname — those are pre-Phase-D live DB artifacts). org founder = _parent.reference to a person entity. umbrella = recursive org _parent added as second POST. section.voice = reference looked up by name at runtime.",
+  "_founder_elections": "EFK founder: Aino Kask (EFK Soprano[0]). Sireen founder: Maret Kask (Sireen Soprano I[0]). Rahvusmeeskoor founder: Aleksander Kask (Rahvusmeeskoor I Tenor[0]). TAM founder: Jüri Tamm (TAM I Tenor[0]). EKL umbrella uses EFK founder. EML umbrella uses Rahvusmeeskoor founder.",
+  "_distribution_heuristic": "EFK (professional mixed, 28 total, 6-8/section). Sireen (chamber women's, 26 total, 4-9/section, SS slightly larger). Rahvusmeeskoor (large professional men's, 44 total, 10-12/section). TAM (academic semi-pro men's, 22 total, 4-7/section with visible variance).",
+  "umbrellas": [
+    {
+      "name": "Eesti Kammerkooride Liit",
+      "location": "Tallinn, Estonia",
+      "founder": "Aino Kask"
+    },
+    {
+      "name": "Eesti Meeskooride Liit",
+      "location": "Tallinn, Estonia",
+      "founder": "Aleksander Kask"
+    }
+  ],
+  "collectives": [
+    {
+      "name": "Eesti Filharmoonia Kammerkoor",
+      "location": "Tallinn, Estonia",
+      "umbrella": "Eesti Kammerkooride Liit",
+      "founder": "Aino Kask",
+      "sections": [
+        {
+          "name": "Soprano",
+          "voice": "soprano",
+          "display_order": 1,
+          "persons": [
+            "Aino Kask",
+            "Liis Mägi",
+            "Kadri Tamm",
+            "Eve Lepik",
+            "Moonika Ots",
+            "Triin Pärn",
+            "Siiri Laan"
+          ]
+        },
+        {
+          "name": "Alto",
+          "voice": "alto",
+          "display_order": 2,
+          "persons": [
+            "Mari Koger",
+            "Ingrid Luik",
+            "Kätlin Saar",
+            "Piret Laas",
+            "Tiiu Rand",
+            "Ülle Ojala"
+          ]
+        },
+        {
+          "name": "Tenor",
+          "voice": "tenor",
+          "display_order": 3,
+          "persons": [
+            "Jaan Kõrv",
+            "Toomas Mets",
+            "Aivar Nurk",
+            "Priit Lepp",
+            "Raivo Põld",
+            "Lauri Kivi",
+            "Tarmo Sild",
+            "Ott Mänd"
+          ]
+        },
+        {
+          "name": "Bass",
+          "voice": "bass",
+          "display_order": 4,
+          "persons": [
+            "Andres Tamm",
+            "Kalev Ojala",
+            "Tiit Saar",
+            "Mati Rand",
+            "Rein Lepp",
+            "Peeter Mägi",
+            "Raul Kask"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Kammernaiskoor Sireen",
+      "location": "Tallinn, Estonia",
+      "umbrella": "Eesti Kammerkooride Liit",
+      "founder": "Maret Kask",
+      "sections": [
+        {
+          "name": "Soprano I",
+          "voice": "soprano",
+          "display_order": 1,
+          "persons": [
+            "Maret Kask",
+            "Piia Tamm",
+            "Siiri Lepik",
+            "Moonika Mägi",
+            "Kerli Ots",
+            "Liisa Pärn",
+            "Kaire Luik",
+            "Anett Laan",
+            "Reelika Rand"
+          ]
+        },
+        {
+          "name": "Soprano II",
+          "voice": "soprano",
+          "display_order": 2,
+          "persons": [
+            "Reet Karu",
+            "Tiina Nurk",
+            "Külli Saar",
+            "Marika Lepp",
+            "Triinu Rand",
+            "Aire Kivi",
+            "Katre Mets"
+          ]
+        },
+        {
+          "name": "Alto I",
+          "voice": "alto",
+          "display_order": 3,
+          "persons": [
+            "Ene Tamm",
+            "Kaja Mets",
+            "Leelo Luik",
+            "Sirje Koger",
+            "Merike Laas",
+            "Viive Ojala"
+          ]
+        },
+        {
+          "name": "Alto II",
+          "voice": "alto",
+          "display_order": 4,
+          "persons": [
+            "Helle Kask",
+            "Tiiu Mägi",
+            "Silvi Rand",
+            "Anne Lepp"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Eesti Rahvusmeeskoor",
+      "location": "Tallinn, Estonia",
+      "umbrella": "Eesti Meeskooride Liit",
+      "founder": "Aleksander Kask",
+      "sections": [
+        {
+          "name": "I Tenor",
+          "voice": "tenor",
+          "display_order": 1,
+          "persons": [
+            "Aleksander Kask",
+            "Kirill Tamm",
+            "Aivar Kaldre",
+            "Priidu Mägi",
+            "Reio Lepik",
+            "Taavi Kivisik",
+            "Mihkel Kõrv",
+            "Jaan Lattik",
+            "Tarmo Evestus",
+            "Hannes Kont"
+          ]
+        },
+        {
+          "name": "II Tenor",
+          "voice": "tenor",
+          "display_order": 2,
+          "persons": [
+            "Mikk Dede",
+            "Kaspar Kaljuste",
+            "Toomas Lunge",
+            "Arvo Meier",
+            "Ott Indermitte",
+            "Raul Põld",
+            "Lauri Rand",
+            "Siim Saar",
+            "Kaido Nurk",
+            "Meelis Lepp",
+            "Olev Luik"
+          ]
+        },
+        {
+          "name": "Baritone",
+          "voice": "baritone",
+          "display_order": 3,
+          "persons": [
+            "Peeter Hillep",
+            "Hanno Hint",
+            "Alar Kask",
+            "Tõnis Mägi",
+            "Meelis Kubits",
+            "Tiit Koger",
+            "Rein Laas",
+            "Sulev Mets",
+            "Tanel Kõrv",
+            "Mihail Sepp",
+            "Kaur Nurk",
+            "Indrek Laan"
+          ]
+        },
+        {
+          "name": "Bass",
+          "voice": "bass",
+          "display_order": 4,
+          "persons": [
+            "Andres Alamaa",
+            "Jüri Eensoo",
+            "Rasmus Erismaa",
+            "Vello Tamm",
+            "Lembit Kask",
+            "Enn Lepik",
+            "Elmar Saar",
+            "Hugo Rand",
+            "Karl Heinz",
+            "Ülo Ojala",
+            "Heino Luik"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tartu Akadeemiline Meeskoor",
+      "location": "Tartu, Estonia",
+      "umbrella": "Eesti Meeskooride Liit",
+      "founder": "Jüri Tamm",
+      "sections": [
+        {
+          "name": "I Tenor",
+          "voice": "tenor",
+          "display_order": 1,
+          "persons": [
+            "Jüri Tamm",
+            "Tõnis Kask",
+            "Ants Mägi",
+            "Kalle Lepik",
+            "Ain Saar"
+          ]
+        },
+        {
+          "name": "II Tenor",
+          "voice": "tenor",
+          "display_order": 2,
+          "persons": [
+            "Ülo Rand",
+            "Kalmer Pärn",
+            "Olev Kivi",
+            "Heino Ots",
+            "Veiko Laas",
+            "Hannes Mets",
+            "Priit Koger"
+          ]
+        },
+        {
+          "name": "Baritone",
+          "voice": "baritone",
+          "display_order": 3,
+          "persons": [
+            "Tiit Nurk",
+            "Rein Kõrv",
+            "Kaur Laan",
+            "Toivo Rand",
+            "Mait Saar",
+            "Erkki Luik"
+          ]
+        },
+        {
+          "name": "Bass",
+          "voice": "bass",
+          "display_order": 4,
+          "persons": [
+            "Valdur Tamm",
+            "Tauno Kask",
+            "Ülo Mägi",
+            "Arvo Lepp"
+          ]
+        }
+      ]
+    }
+  ]
+}

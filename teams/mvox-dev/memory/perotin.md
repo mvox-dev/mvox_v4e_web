@@ -30,10 +30,10 @@ Result: scripts/migrations/seed-results/seed-voices-2026-05-20T08-14-58-992Z.jso
 - Sireen (chamber women's): 4-9/section, SS larger than AA → 26 total
 - Rahvusmeeskoor (large professional men's): 10-12/section → 44 total
 - TAM (academic semi-pro men's): 4-7/section with visible variance → 22 total
-- Grand total: 120 members, 16 sections, 4 collectives + 2 umbrellas, ~38% with contact_email
-[DECISION] Seed members are orphan (no linked person) — matches polyphony pre-Phase-C shape.
-[CHECKPOINT] Manifest at scripts/migrations/seed-sources/collectives.json (c15df7a, branch chore/seeding-source-plan).
-[DEFERRED] seed-collectives.ts — next session after PO final review of manifest.
+- Grand total: 120 persons + 120 members, 16 sections, 4 collectives + 2 umbrellas
+[SUPERSEDED] Old manifest (c15df7a, chore/seeding-source-plan) used orphan members + deleted properties.
+  v2 rewrite: members are v4E-clean (person ref required + status: active). See chore/seed-collectives-v2.
+[CHECKPOINT] Manifest at scripts/migrations/seed-sources/collectives.json (chore/seed-collectives-v2).
 
 ## Session 8 — 2026-05-20
 
@@ -72,9 +72,37 @@ Result: scripts/migrations/seed-results/seed-voices-2026-05-20T08-14-58-992Z.jso
   lib/entu-client.ts — don't duplicate. Current scripts: seed-voices.ts + phase-b-1-cleanup.ts +
   probe-phase-b-1-diagnostic.ts. Too few to extract yet — revisit when seed-collectives.ts lands.
 
+## Session 8 — seed-collectives v2 (task #47)
+
+[DECISION] v4E-wins-over-polyphony-current rule: when polyphony live DB and v4E schema.ts diverge,
+  v4E schema.ts wins for forward-looking work (seeds, new features, BFF contracts). Polyphony's
+  divergence is Phase B/C/D's job to close. Do NOT match the transitional DB state.
+
+[DECISION] person.name = plain string per v4E schema.ts (no forename/surname in v4E).
+  polyphony live DB still has forename/surname — pre-Phase-D artifact. Seed targets v4E-clean shape.
+
+[DECISION] Org multi-parent (founder + umbrella): two-POST sequence.
+  Step 1: POST create with _parent.reference = <founder-person-id>
+  Step 2: POST _parent.reference = <umbrella-org-id> to same entity
+  Idempotency: GET org, check if umbrella ref already in _parent[]; skip step 2 if present.
+
+[DECISION] Section idempotency must scope by _parent.reference (collective id), not just name.
+  Sections with the same name exist in multiple collectives (e.g., "Bass" in EFK and Rahvusmeeskoor).
+
+[DECISION] Member idempotency check must be gated behind dry-run guard. In dry-run, personIdMap
+  is empty (WOULD CREATE returns null). Querying person.reference='' causes HTTP 500.
+
+[CHECKPOINT] Phases 1–4 complete. Branch chore/seed-collectives-v2 at 33df8f3.
+  Dry-run exit 0: 120 persons WOULD CREATE, 120 members WOULD CREATE, 6 orgs + 16 sections EXIST.
+  Stopped per dispatch — live seeding awaits PO re-authorization.
+
+[DECISION] Toolkit extraction confirmed viable (3 scripts share: JWT, dry-run guard, result artifact,
+  idempotency check). Propose after this seed PR squash-merges as standalone follow-up.
+
 ## Permanent role note
 
 Promoted from temporary specialist to permanent data-manager (session 7 end). Future seeding work:
-- seed-collectives.ts (next priority after PO greenlight on manifest)
-- Phase C seeding needs (participation, affiliation, member.role → rights)
+- Live seed-collectives.ts execution (after PO re-auth on chore/seed-collectives-v2)
+- Phase C seeding needs (rsvp, attendance once those entities exist)
 - Dev/staging fresh-deploy seed choreography
+- perotin-toolkit.ts extraction (after seed PR merges)

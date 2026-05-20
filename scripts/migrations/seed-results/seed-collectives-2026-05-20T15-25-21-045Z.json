@@ -1,0 +1,1345 @@
+{
+  "executedAt": "2026-05-20T15:25:21.045Z",
+  "db": "polyphony",
+  "dryRun": false,
+  "result": {
+    "persons": {
+      "created": [
+        {
+          "name": "Aino Kask",
+          "_id": "6a0dd2384ff8277cd4305e9e"
+        },
+        {
+          "name": "Liis Mägi",
+          "_id": "6a0dd2384ff8277cd4305ea4"
+        },
+        {
+          "name": "Kadri Tamm",
+          "_id": "6a0dd2384ff8277cd4305eaa"
+        },
+        {
+          "name": "Eve Lepik",
+          "_id": "6a0dd2384ff8277cd4305eb0"
+        },
+        {
+          "name": "Moonika Ots",
+          "_id": "6a0dd2384ff8277cd4305eb6"
+        },
+        {
+          "name": "Triin Pärn",
+          "_id": "6a0dd2384ff8277cd4305ebc"
+        },
+        {
+          "name": "Siiri Laan",
+          "_id": "6a0dd2384ff8277cd4305ec2"
+        },
+        {
+          "name": "Mari Koger",
+          "_id": "6a0dd2394ff8277cd4305ec8"
+        },
+        {
+          "name": "Ingrid Luik",
+          "_id": "6a0dd2394ff8277cd4305ece"
+        },
+        {
+          "name": "Kätlin Saar",
+          "_id": "6a0dd2394ff8277cd4305ed4"
+        },
+        {
+          "name": "Piret Laas",
+          "_id": "6a0dd2394ff8277cd4305eda"
+        },
+        {
+          "name": "Tiiu Rand",
+          "_id": "6a0dd2394ff8277cd4305ee0"
+        },
+        {
+          "name": "Ülle Ojala",
+          "_id": "6a0dd2394ff8277cd4305ee6"
+        },
+        {
+          "name": "Jaan Kõrv",
+          "_id": "6a0dd2394ff8277cd4305eec"
+        },
+        {
+          "name": "Toomas Mets",
+          "_id": "6a0dd23a4ff8277cd4305ef2"
+        },
+        {
+          "name": "Aivar Nurk",
+          "_id": "6a0dd23a4ff8277cd4305ef8"
+        },
+        {
+          "name": "Priit Lepp",
+          "_id": "6a0dd23a4ff8277cd4305efe"
+        },
+        {
+          "name": "Raivo Põld",
+          "_id": "6a0dd23a4ff8277cd4305f04"
+        },
+        {
+          "name": "Lauri Kivi",
+          "_id": "6a0dd23a4ff8277cd4305f0a"
+        },
+        {
+          "name": "Tarmo Sild",
+          "_id": "6a0dd23a4ff8277cd4305f10"
+        },
+        {
+          "name": "Ott Mänd",
+          "_id": "6a0dd23b4ff8277cd4305f16"
+        },
+        {
+          "name": "Andres Tamm",
+          "_id": "6a0dd23b4ff8277cd4305f1c"
+        },
+        {
+          "name": "Kalev Ojala",
+          "_id": "6a0dd23b4ff8277cd4305f22"
+        },
+        {
+          "name": "Tiit Saar",
+          "_id": "6a0dd23b4ff8277cd4305f28"
+        },
+        {
+          "name": "Mati Rand",
+          "_id": "6a0dd23b4ff8277cd4305f2e"
+        },
+        {
+          "name": "Rein Lepp",
+          "_id": "6a0dd23b4ff8277cd4305f34"
+        },
+        {
+          "name": "Peeter Mägi",
+          "_id": "6a0dd23b4ff8277cd4305f3a"
+        },
+        {
+          "name": "Raul Kask",
+          "_id": "6a0dd23c4ff8277cd4305f40"
+        },
+        {
+          "name": "Maret Kask",
+          "_id": "6a0dd23c4ff8277cd4305f46"
+        },
+        {
+          "name": "Piia Tamm",
+          "_id": "6a0dd23c4ff8277cd4305f4c"
+        },
+        {
+          "name": "Siiri Lepik",
+          "_id": "6a0dd23c4ff8277cd4305f52"
+        },
+        {
+          "name": "Moonika Mägi",
+          "_id": "6a0dd23c4ff8277cd4305f58"
+        },
+        {
+          "name": "Kerli Ots",
+          "_id": "6a0dd23c4ff8277cd4305f5e"
+        },
+        {
+          "name": "Liisa Pärn",
+          "_id": "6a0dd23c4ff8277cd4305f64"
+        },
+        {
+          "name": "Kaire Luik",
+          "_id": "6a0dd23d4ff8277cd4305f6a"
+        },
+        {
+          "name": "Anett Laan",
+          "_id": "6a0dd23d4ff8277cd4305f70"
+        },
+        {
+          "name": "Reelika Rand",
+          "_id": "6a0dd23d4ff8277cd4305f76"
+        },
+        {
+          "name": "Reet Karu",
+          "_id": "6a0dd23d4ff8277cd4305f7c"
+        },
+        {
+          "name": "Tiina Nurk",
+          "_id": "6a0dd23d4ff8277cd4305f82"
+        },
+        {
+          "name": "Külli Saar",
+          "_id": "6a0dd23d4ff8277cd4305f88"
+        },
+        {
+          "name": "Marika Lepp",
+          "_id": "6a0dd23d4ff8277cd4305f8e"
+        },
+        {
+          "name": "Triinu Rand",
+          "_id": "6a0dd23e4ff8277cd4305f94"
+        },
+        {
+          "name": "Aire Kivi",
+          "_id": "6a0dd23e4ff8277cd4305f9a"
+        },
+        {
+          "name": "Katre Mets",
+          "_id": "6a0dd23e4ff8277cd4305fa0"
+        },
+        {
+          "name": "Ene Tamm",
+          "_id": "6a0dd23e4ff8277cd4305fa6"
+        },
+        {
+          "name": "Kaja Mets",
+          "_id": "6a0dd23e4ff8277cd4305fac"
+        },
+        {
+          "name": "Leelo Luik",
+          "_id": "6a0dd23e4ff8277cd4305fb2"
+        },
+        {
+          "name": "Sirje Koger",
+          "_id": "6a0dd23f4ff8277cd4305fb8"
+        },
+        {
+          "name": "Merike Laas",
+          "_id": "6a0dd23f4ff8277cd4305fbe"
+        },
+        {
+          "name": "Viive Ojala",
+          "_id": "6a0dd23f4ff8277cd4305fc4"
+        },
+        {
+          "name": "Helle Kask",
+          "_id": "6a0dd23f4ff8277cd4305fca"
+        },
+        {
+          "name": "Tiiu Mägi",
+          "_id": "6a0dd23f4ff8277cd4305fd0"
+        },
+        {
+          "name": "Silvi Rand",
+          "_id": "6a0dd23f4ff8277cd4305fd6"
+        },
+        {
+          "name": "Anne Lepp",
+          "_id": "6a0dd23f4ff8277cd4305fdc"
+        },
+        {
+          "name": "Aleksander Kask",
+          "_id": "6a0dd23f4ff8277cd4305fe2"
+        },
+        {
+          "name": "Kirill Tamm",
+          "_id": "6a0dd2404ff8277cd4305fe8"
+        },
+        {
+          "name": "Aivar Kaldre",
+          "_id": "6a0dd2404ff8277cd4305fee"
+        },
+        {
+          "name": "Priidu Mägi",
+          "_id": "6a0dd2404ff8277cd4305ff4"
+        },
+        {
+          "name": "Reio Lepik",
+          "_id": "6a0dd2404ff8277cd4305ffa"
+        },
+        {
+          "name": "Taavi Kivisik",
+          "_id": "6a0dd2404ff8277cd4306000"
+        },
+        {
+          "name": "Mihkel Kõrv",
+          "_id": "6a0dd2404ff8277cd4306006"
+        },
+        {
+          "name": "Jaan Lattik",
+          "_id": "6a0dd2404ff8277cd430600c"
+        },
+        {
+          "name": "Tarmo Evestus",
+          "_id": "6a0dd2414ff8277cd4306012"
+        },
+        {
+          "name": "Hannes Kont",
+          "_id": "6a0dd2414ff8277cd4306018"
+        },
+        {
+          "name": "Mikk Dede",
+          "_id": "6a0dd2414ff8277cd430601e"
+        },
+        {
+          "name": "Kaspar Kaljuste",
+          "_id": "6a0dd2414ff8277cd4306024"
+        },
+        {
+          "name": "Toomas Lunge",
+          "_id": "6a0dd2414ff8277cd430602a"
+        },
+        {
+          "name": "Arvo Meier",
+          "_id": "6a0dd2414ff8277cd4306030"
+        },
+        {
+          "name": "Ott Indermitte",
+          "_id": "6a0dd2414ff8277cd4306036"
+        },
+        {
+          "name": "Raul Põld",
+          "_id": "6a0dd2424ff8277cd430603c"
+        },
+        {
+          "name": "Lauri Rand",
+          "_id": "6a0dd2424ff8277cd4306042"
+        },
+        {
+          "name": "Siim Saar",
+          "_id": "6a0dd2424ff8277cd4306048"
+        },
+        {
+          "name": "Kaido Nurk",
+          "_id": "6a0dd2424ff8277cd430604e"
+        },
+        {
+          "name": "Meelis Lepp",
+          "_id": "6a0dd2424ff8277cd4306054"
+        },
+        {
+          "name": "Olev Luik",
+          "_id": "6a0dd2424ff8277cd430605a"
+        },
+        {
+          "name": "Peeter Hillep",
+          "_id": "6a0dd2424ff8277cd4306060"
+        },
+        {
+          "name": "Hanno Hint",
+          "_id": "6a0dd2434ff8277cd4306066"
+        },
+        {
+          "name": "Alar Kask",
+          "_id": "6a0dd2434ff8277cd430606c"
+        },
+        {
+          "name": "Tõnis Mägi",
+          "_id": "6a0dd2434ff8277cd4306072"
+        },
+        {
+          "name": "Meelis Kubits",
+          "_id": "6a0dd2434ff8277cd4306078"
+        },
+        {
+          "name": "Tiit Koger",
+          "_id": "6a0dd2434ff8277cd430607e"
+        },
+        {
+          "name": "Rein Laas",
+          "_id": "6a0dd2434ff8277cd4306084"
+        },
+        {
+          "name": "Sulev Mets",
+          "_id": "6a0dd2444ff8277cd430608a"
+        },
+        {
+          "name": "Tanel Kõrv",
+          "_id": "6a0dd2444ff8277cd4306090"
+        },
+        {
+          "name": "Mihail Sepp",
+          "_id": "6a0dd2444ff8277cd4306096"
+        },
+        {
+          "name": "Kaur Nurk",
+          "_id": "6a0dd2444ff8277cd430609c"
+        },
+        {
+          "name": "Indrek Laan",
+          "_id": "6a0dd2444ff8277cd43060a2"
+        },
+        {
+          "name": "Andres Alamaa",
+          "_id": "6a0dd2444ff8277cd43060a8"
+        },
+        {
+          "name": "Jüri Eensoo",
+          "_id": "6a0dd2444ff8277cd43060ae"
+        },
+        {
+          "name": "Rasmus Erismaa",
+          "_id": "6a0dd2444ff8277cd43060b4"
+        },
+        {
+          "name": "Vello Tamm",
+          "_id": "6a0dd2454ff8277cd43060ba"
+        },
+        {
+          "name": "Lembit Kask",
+          "_id": "6a0dd2454ff8277cd43060c0"
+        },
+        {
+          "name": "Enn Lepik",
+          "_id": "6a0dd2454ff8277cd43060c6"
+        },
+        {
+          "name": "Elmar Saar",
+          "_id": "6a0dd2454ff8277cd43060cc"
+        },
+        {
+          "name": "Hugo Rand",
+          "_id": "6a0dd2454ff8277cd43060d2"
+        },
+        {
+          "name": "Karl Heinz",
+          "_id": "6a0dd2454ff8277cd43060d8"
+        },
+        {
+          "name": "Ülo Ojala",
+          "_id": "6a0dd2454ff8277cd43060de"
+        },
+        {
+          "name": "Heino Luik",
+          "_id": "6a0dd2454ff8277cd43060e4"
+        },
+        {
+          "name": "Jüri Tamm",
+          "_id": "6a0dd2464ff8277cd43060ea"
+        },
+        {
+          "name": "Tõnis Kask",
+          "_id": "6a0dd2464ff8277cd43060f0"
+        },
+        {
+          "name": "Ants Mägi",
+          "_id": "6a0dd2464ff8277cd43060f6"
+        },
+        {
+          "name": "Kalle Lepik",
+          "_id": "6a0dd2464ff8277cd43060fc"
+        },
+        {
+          "name": "Ain Saar",
+          "_id": "6a0dd2464ff8277cd4306102"
+        },
+        {
+          "name": "Ülo Rand",
+          "_id": "6a0dd2464ff8277cd4306108"
+        },
+        {
+          "name": "Kalmer Pärn",
+          "_id": "6a0dd2464ff8277cd430610e"
+        },
+        {
+          "name": "Olev Kivi",
+          "_id": "6a0dd2474ff8277cd4306114"
+        },
+        {
+          "name": "Heino Ots",
+          "_id": "6a0dd2474ff8277cd430611a"
+        },
+        {
+          "name": "Veiko Laas",
+          "_id": "6a0dd2474ff8277cd4306120"
+        },
+        {
+          "name": "Hannes Mets",
+          "_id": "6a0dd2474ff8277cd4306126"
+        },
+        {
+          "name": "Priit Koger",
+          "_id": "6a0dd2474ff8277cd430612c"
+        },
+        {
+          "name": "Tiit Nurk",
+          "_id": "6a0dd2474ff8277cd4306132"
+        },
+        {
+          "name": "Rein Kõrv",
+          "_id": "6a0dd2484ff8277cd4306138"
+        },
+        {
+          "name": "Kaur Laan",
+          "_id": "6a0dd2484ff8277cd430613e"
+        },
+        {
+          "name": "Toivo Rand",
+          "_id": "6a0dd2484ff8277cd4306144"
+        },
+        {
+          "name": "Mait Saar",
+          "_id": "6a0dd2484ff8277cd430614a"
+        },
+        {
+          "name": "Erkki Luik",
+          "_id": "6a0dd2484ff8277cd4306150"
+        },
+        {
+          "name": "Valdur Tamm",
+          "_id": "6a0dd2484ff8277cd4306156"
+        },
+        {
+          "name": "Tauno Kask",
+          "_id": "6a0dd2494ff8277cd430615c"
+        },
+        {
+          "name": "Ülo Mägi",
+          "_id": "6a0dd2494ff8277cd4306162"
+        },
+        {
+          "name": "Arvo Lepp",
+          "_id": "6a0dd2494ff8277cd4306168"
+        }
+      ],
+      "skipped": [],
+      "wouldCreate": [],
+      "failed": []
+    },
+    "orgs": {
+      "created": [],
+      "skipped": [
+        {
+          "name": "Eesti Kammerkooride Liit",
+          "_id": "69c7f8718489bfcb0e81b05a",
+          "kind": "umbrella"
+        },
+        {
+          "name": "Eesti Meeskooride Liit",
+          "_id": "69c7f87d8489bfcb0e81b2d9",
+          "kind": "umbrella"
+        },
+        {
+          "name": "Eesti Filharmoonia Kammerkoor",
+          "_id": "69c7f8718489bfcb0e81b065",
+          "kind": "collective"
+        },
+        {
+          "name": "Kammernaiskoor Sireen",
+          "_id": "69c7f8788489bfcb0e81b1a9",
+          "kind": "collective"
+        },
+        {
+          "name": "Eesti Rahvusmeeskoor",
+          "_id": "69c7f87d8489bfcb0e81b2e4",
+          "kind": "collective"
+        },
+        {
+          "name": "Tartu Akadeemiline Meeskoor",
+          "_id": "69c7f8868489bfcb0e81b4f0",
+          "kind": "collective"
+        }
+      ],
+      "wouldCreate": [],
+      "failed": []
+    },
+    "sections": {
+      "created": [],
+      "skipped": [
+        {
+          "name": "Soprano",
+          "collective": "Eesti Filharmoonia Kammerkoor",
+          "_id": "69c7f8728489bfcb0e81b07b"
+        },
+        {
+          "name": "Alto",
+          "collective": "Eesti Filharmoonia Kammerkoor",
+          "_id": "69c7f8748489bfcb0e81b0cd"
+        },
+        {
+          "name": "Tenor",
+          "collective": "Eesti Filharmoonia Kammerkoor",
+          "_id": "69c7f8758489bfcb0e81b113"
+        },
+        {
+          "name": "Bass",
+          "collective": "Eesti Filharmoonia Kammerkoor",
+          "_id": "69c7f8768489bfcb0e81b163"
+        },
+        {
+          "name": "Soprano I",
+          "collective": "Kammernaiskoor Sireen",
+          "_id": "69c7f8788489bfcb0e81b1bf"
+        },
+        {
+          "name": "Soprano II",
+          "collective": "Kammernaiskoor Sireen",
+          "_id": "69c7f8798489bfcb0e81b207"
+        },
+        {
+          "name": "Alto I",
+          "collective": "Kammernaiskoor Sireen",
+          "_id": "69c7f87b8489bfcb0e81b257"
+        },
+        {
+          "name": "Alto II",
+          "collective": "Kammernaiskoor Sireen",
+          "_id": "69c7f87c8489bfcb0e81b2a7"
+        },
+        {
+          "name": "I Tenor",
+          "collective": "Eesti Rahvusmeeskoor",
+          "_id": "69c7f87e8489bfcb0e81b2fa"
+        },
+        {
+          "name": "II Tenor",
+          "collective": "Eesti Rahvusmeeskoor",
+          "_id": "69c7f8808489bfcb0e81b374"
+        },
+        {
+          "name": "Baritone",
+          "collective": "Eesti Rahvusmeeskoor",
+          "_id": "69c7f8828489bfcb0e81b3ec"
+        },
+        {
+          "name": "Bass",
+          "collective": "Eesti Rahvusmeeskoor",
+          "_id": "69c7f8848489bfcb0e81b46e"
+        },
+        {
+          "name": "I Tenor",
+          "collective": "Tartu Akadeemiline Meeskoor",
+          "_id": "69c7f8878489bfcb0e81b506"
+        },
+        {
+          "name": "II Tenor",
+          "collective": "Tartu Akadeemiline Meeskoor",
+          "_id": "69c7f8888489bfcb0e81b544"
+        },
+        {
+          "name": "Baritone",
+          "collective": "Tartu Akadeemiline Meeskoor",
+          "_id": "69c7f8898489bfcb0e81b580"
+        },
+        {
+          "name": "Bass",
+          "collective": "Tartu Akadeemiline Meeskoor",
+          "_id": "69c7f88a8489bfcb0e81b5bc"
+        }
+      ],
+      "wouldCreate": [],
+      "failed": []
+    },
+    "members": {
+      "created": [
+        {
+          "person": "Aino Kask",
+          "collective": "Eesti Filharmoonia Kammerkoor",
+          "section": "Soprano",
+          "_id": "6a0dd24b4ff8277cd4306172"
+        },
+        {
+          "person": "Liis Mägi",
+          "collective": "Eesti Filharmoonia Kammerkoor",
+          "section": "Soprano",
+          "_id": "6a0dd24b4ff8277cd430617c"
+        },
+        {
+          "person": "Kadri Tamm",
+          "collective": "Eesti Filharmoonia Kammerkoor",
+          "section": "Soprano",
+          "_id": "6a0dd24b4ff8277cd4306186"
+        },
+        {
+          "person": "Eve Lepik",
+          "collective": "Eesti Filharmoonia Kammerkoor",
+          "section": "Soprano",
+          "_id": "6a0dd24c4ff8277cd4306190"
+        },
+        {
+          "person": "Moonika Ots",
+          "collective": "Eesti Filharmoonia Kammerkoor",
+          "section": "Soprano",
+          "_id": "6a0dd24c4ff8277cd430619a"
+        },
+        {
+          "person": "Triin Pärn",
+          "collective": "Eesti Filharmoonia Kammerkoor",
+          "section": "Soprano",
+          "_id": "6a0dd24c4ff8277cd43061a4"
+        },
+        {
+          "person": "Siiri Laan",
+          "collective": "Eesti Filharmoonia Kammerkoor",
+          "section": "Soprano",
+          "_id": "6a0dd24c4ff8277cd43061ae"
+        },
+        {
+          "person": "Mari Koger",
+          "collective": "Eesti Filharmoonia Kammerkoor",
+          "section": "Alto",
+          "_id": "6a0dd24c4ff8277cd43061b8"
+        },
+        {
+          "person": "Ingrid Luik",
+          "collective": "Eesti Filharmoonia Kammerkoor",
+          "section": "Alto",
+          "_id": "6a0dd24d4ff8277cd43061c2"
+        },
+        {
+          "person": "Kätlin Saar",
+          "collective": "Eesti Filharmoonia Kammerkoor",
+          "section": "Alto",
+          "_id": "6a0dd24d4ff8277cd43061cc"
+        },
+        {
+          "person": "Piret Laas",
+          "collective": "Eesti Filharmoonia Kammerkoor",
+          "section": "Alto",
+          "_id": "6a0dd24d4ff8277cd43061d6"
+        },
+        {
+          "person": "Tiiu Rand",
+          "collective": "Eesti Filharmoonia Kammerkoor",
+          "section": "Alto",
+          "_id": "6a0dd24d4ff8277cd43061e0"
+        },
+        {
+          "person": "Ülle Ojala",
+          "collective": "Eesti Filharmoonia Kammerkoor",
+          "section": "Alto",
+          "_id": "6a0dd24d4ff8277cd43061ea"
+        },
+        {
+          "person": "Jaan Kõrv",
+          "collective": "Eesti Filharmoonia Kammerkoor",
+          "section": "Tenor",
+          "_id": "6a0dd24d4ff8277cd43061f4"
+        },
+        {
+          "person": "Toomas Mets",
+          "collective": "Eesti Filharmoonia Kammerkoor",
+          "section": "Tenor",
+          "_id": "6a0dd24d4ff8277cd43061fe"
+        },
+        {
+          "person": "Aivar Nurk",
+          "collective": "Eesti Filharmoonia Kammerkoor",
+          "section": "Tenor",
+          "_id": "6a0dd24e4ff8277cd4306208"
+        },
+        {
+          "person": "Priit Lepp",
+          "collective": "Eesti Filharmoonia Kammerkoor",
+          "section": "Tenor",
+          "_id": "6a0dd24e4ff8277cd4306212"
+        },
+        {
+          "person": "Raivo Põld",
+          "collective": "Eesti Filharmoonia Kammerkoor",
+          "section": "Tenor",
+          "_id": "6a0dd24e4ff8277cd430621c"
+        },
+        {
+          "person": "Lauri Kivi",
+          "collective": "Eesti Filharmoonia Kammerkoor",
+          "section": "Tenor",
+          "_id": "6a0dd24e4ff8277cd4306226"
+        },
+        {
+          "person": "Tarmo Sild",
+          "collective": "Eesti Filharmoonia Kammerkoor",
+          "section": "Tenor",
+          "_id": "6a0dd24f4ff8277cd4306230"
+        },
+        {
+          "person": "Ott Mänd",
+          "collective": "Eesti Filharmoonia Kammerkoor",
+          "section": "Tenor",
+          "_id": "6a0dd24f4ff8277cd430623a"
+        },
+        {
+          "person": "Andres Tamm",
+          "collective": "Eesti Filharmoonia Kammerkoor",
+          "section": "Bass",
+          "_id": "6a0dd24f4ff8277cd4306244"
+        },
+        {
+          "person": "Kalev Ojala",
+          "collective": "Eesti Filharmoonia Kammerkoor",
+          "section": "Bass",
+          "_id": "6a0dd24f4ff8277cd430624e"
+        },
+        {
+          "person": "Tiit Saar",
+          "collective": "Eesti Filharmoonia Kammerkoor",
+          "section": "Bass",
+          "_id": "6a0dd24f4ff8277cd4306258"
+        },
+        {
+          "person": "Mati Rand",
+          "collective": "Eesti Filharmoonia Kammerkoor",
+          "section": "Bass",
+          "_id": "6a0dd24f4ff8277cd4306262"
+        },
+        {
+          "person": "Rein Lepp",
+          "collective": "Eesti Filharmoonia Kammerkoor",
+          "section": "Bass",
+          "_id": "6a0dd24f4ff8277cd430626c"
+        },
+        {
+          "person": "Peeter Mägi",
+          "collective": "Eesti Filharmoonia Kammerkoor",
+          "section": "Bass",
+          "_id": "6a0dd2504ff8277cd4306276"
+        },
+        {
+          "person": "Raul Kask",
+          "collective": "Eesti Filharmoonia Kammerkoor",
+          "section": "Bass",
+          "_id": "6a0dd2504ff8277cd4306280"
+        },
+        {
+          "person": "Maret Kask",
+          "collective": "Kammernaiskoor Sireen",
+          "section": "Soprano I",
+          "_id": "6a0dd2504ff8277cd430628a"
+        },
+        {
+          "person": "Piia Tamm",
+          "collective": "Kammernaiskoor Sireen",
+          "section": "Soprano I",
+          "_id": "6a0dd2504ff8277cd4306294"
+        },
+        {
+          "person": "Siiri Lepik",
+          "collective": "Kammernaiskoor Sireen",
+          "section": "Soprano I",
+          "_id": "6a0dd2504ff8277cd430629e"
+        },
+        {
+          "person": "Moonika Mägi",
+          "collective": "Kammernaiskoor Sireen",
+          "section": "Soprano I",
+          "_id": "6a0dd2504ff8277cd43062a8"
+        },
+        {
+          "person": "Kerli Ots",
+          "collective": "Kammernaiskoor Sireen",
+          "section": "Soprano I",
+          "_id": "6a0dd2514ff8277cd43062b2"
+        },
+        {
+          "person": "Liisa Pärn",
+          "collective": "Kammernaiskoor Sireen",
+          "section": "Soprano I",
+          "_id": "6a0dd2514ff8277cd43062bc"
+        },
+        {
+          "person": "Kaire Luik",
+          "collective": "Kammernaiskoor Sireen",
+          "section": "Soprano I",
+          "_id": "6a0dd2514ff8277cd43062c6"
+        },
+        {
+          "person": "Anett Laan",
+          "collective": "Kammernaiskoor Sireen",
+          "section": "Soprano I",
+          "_id": "6a0dd2514ff8277cd43062d0"
+        },
+        {
+          "person": "Reelika Rand",
+          "collective": "Kammernaiskoor Sireen",
+          "section": "Soprano I",
+          "_id": "6a0dd2524ff8277cd43062da"
+        },
+        {
+          "person": "Reet Karu",
+          "collective": "Kammernaiskoor Sireen",
+          "section": "Soprano II",
+          "_id": "6a0dd2524ff8277cd43062e4"
+        },
+        {
+          "person": "Tiina Nurk",
+          "collective": "Kammernaiskoor Sireen",
+          "section": "Soprano II",
+          "_id": "6a0dd2524ff8277cd43062ee"
+        },
+        {
+          "person": "Külli Saar",
+          "collective": "Kammernaiskoor Sireen",
+          "section": "Soprano II",
+          "_id": "6a0dd2524ff8277cd43062f8"
+        },
+        {
+          "person": "Marika Lepp",
+          "collective": "Kammernaiskoor Sireen",
+          "section": "Soprano II",
+          "_id": "6a0dd2524ff8277cd4306302"
+        },
+        {
+          "person": "Triinu Rand",
+          "collective": "Kammernaiskoor Sireen",
+          "section": "Soprano II",
+          "_id": "6a0dd2524ff8277cd430630c"
+        },
+        {
+          "person": "Aire Kivi",
+          "collective": "Kammernaiskoor Sireen",
+          "section": "Soprano II",
+          "_id": "6a0dd2534ff8277cd4306316"
+        },
+        {
+          "person": "Katre Mets",
+          "collective": "Kammernaiskoor Sireen",
+          "section": "Soprano II",
+          "_id": "6a0dd2534ff8277cd4306320"
+        },
+        {
+          "person": "Ene Tamm",
+          "collective": "Kammernaiskoor Sireen",
+          "section": "Alto I",
+          "_id": "6a0dd2534ff8277cd430632a"
+        },
+        {
+          "person": "Kaja Mets",
+          "collective": "Kammernaiskoor Sireen",
+          "section": "Alto I",
+          "_id": "6a0dd2534ff8277cd4306334"
+        },
+        {
+          "person": "Leelo Luik",
+          "collective": "Kammernaiskoor Sireen",
+          "section": "Alto I",
+          "_id": "6a0dd2534ff8277cd430633e"
+        },
+        {
+          "person": "Sirje Koger",
+          "collective": "Kammernaiskoor Sireen",
+          "section": "Alto I",
+          "_id": "6a0dd2544ff8277cd4306348"
+        },
+        {
+          "person": "Merike Laas",
+          "collective": "Kammernaiskoor Sireen",
+          "section": "Alto I",
+          "_id": "6a0dd2544ff8277cd4306352"
+        },
+        {
+          "person": "Viive Ojala",
+          "collective": "Kammernaiskoor Sireen",
+          "section": "Alto I",
+          "_id": "6a0dd2544ff8277cd430635c"
+        },
+        {
+          "person": "Helle Kask",
+          "collective": "Kammernaiskoor Sireen",
+          "section": "Alto II",
+          "_id": "6a0dd2544ff8277cd4306366"
+        },
+        {
+          "person": "Tiiu Mägi",
+          "collective": "Kammernaiskoor Sireen",
+          "section": "Alto II",
+          "_id": "6a0dd2544ff8277cd4306370"
+        },
+        {
+          "person": "Silvi Rand",
+          "collective": "Kammernaiskoor Sireen",
+          "section": "Alto II",
+          "_id": "6a0dd2554ff8277cd430637a"
+        },
+        {
+          "person": "Anne Lepp",
+          "collective": "Kammernaiskoor Sireen",
+          "section": "Alto II",
+          "_id": "6a0dd2554ff8277cd4306384"
+        },
+        {
+          "person": "Aleksander Kask",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "I Tenor",
+          "_id": "6a0dd2554ff8277cd430638e"
+        },
+        {
+          "person": "Kirill Tamm",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "I Tenor",
+          "_id": "6a0dd2554ff8277cd4306398"
+        },
+        {
+          "person": "Aivar Kaldre",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "I Tenor",
+          "_id": "6a0dd2564ff8277cd43063a2"
+        },
+        {
+          "person": "Priidu Mägi",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "I Tenor",
+          "_id": "6a0dd2564ff8277cd43063ac"
+        },
+        {
+          "person": "Reio Lepik",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "I Tenor",
+          "_id": "6a0dd2564ff8277cd43063b6"
+        },
+        {
+          "person": "Taavi Kivisik",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "I Tenor",
+          "_id": "6a0dd2564ff8277cd43063c0"
+        },
+        {
+          "person": "Mihkel Kõrv",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "I Tenor",
+          "_id": "6a0dd2574ff8277cd43063ca"
+        },
+        {
+          "person": "Jaan Lattik",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "I Tenor",
+          "_id": "6a0dd2574ff8277cd43063d4"
+        },
+        {
+          "person": "Tarmo Evestus",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "I Tenor",
+          "_id": "6a0dd2574ff8277cd43063de"
+        },
+        {
+          "person": "Hannes Kont",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "I Tenor",
+          "_id": "6a0dd2574ff8277cd43063e8"
+        },
+        {
+          "person": "Mikk Dede",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "II Tenor",
+          "_id": "6a0dd2574ff8277cd43063f2"
+        },
+        {
+          "person": "Kaspar Kaljuste",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "II Tenor",
+          "_id": "6a0dd2574ff8277cd43063fc"
+        },
+        {
+          "person": "Toomas Lunge",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "II Tenor",
+          "_id": "6a0dd2584ff8277cd4306406"
+        },
+        {
+          "person": "Arvo Meier",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "II Tenor",
+          "_id": "6a0dd2584ff8277cd4306410"
+        },
+        {
+          "person": "Ott Indermitte",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "II Tenor",
+          "_id": "6a0dd2584ff8277cd430641a"
+        },
+        {
+          "person": "Raul Põld",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "II Tenor",
+          "_id": "6a0dd2584ff8277cd4306424"
+        },
+        {
+          "person": "Lauri Rand",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "II Tenor",
+          "_id": "6a0dd2584ff8277cd430642e"
+        },
+        {
+          "person": "Siim Saar",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "II Tenor",
+          "_id": "6a0dd2584ff8277cd4306438"
+        },
+        {
+          "person": "Kaido Nurk",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "II Tenor",
+          "_id": "6a0dd2594ff8277cd4306442"
+        },
+        {
+          "person": "Meelis Lepp",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "II Tenor",
+          "_id": "6a0dd2594ff8277cd430644c"
+        },
+        {
+          "person": "Olev Luik",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "II Tenor",
+          "_id": "6a0dd2594ff8277cd4306456"
+        },
+        {
+          "person": "Peeter Hillep",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "Baritone",
+          "_id": "6a0dd2594ff8277cd4306460"
+        },
+        {
+          "person": "Hanno Hint",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "Baritone",
+          "_id": "6a0dd2594ff8277cd430646a"
+        },
+        {
+          "person": "Alar Kask",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "Baritone",
+          "_id": "6a0dd2594ff8277cd4306474"
+        },
+        {
+          "person": "Tõnis Mägi",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "Baritone",
+          "_id": "6a0dd25a4ff8277cd430647e"
+        },
+        {
+          "person": "Meelis Kubits",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "Baritone",
+          "_id": "6a0dd25a4ff8277cd4306488"
+        },
+        {
+          "person": "Tiit Koger",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "Baritone",
+          "_id": "6a0dd25a4ff8277cd4306492"
+        },
+        {
+          "person": "Rein Laas",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "Baritone",
+          "_id": "6a0dd25a4ff8277cd430649c"
+        },
+        {
+          "person": "Sulev Mets",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "Baritone",
+          "_id": "6a0dd25a4ff8277cd43064a6"
+        },
+        {
+          "person": "Tanel Kõrv",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "Baritone",
+          "_id": "6a0dd25a4ff8277cd43064b0"
+        },
+        {
+          "person": "Mihail Sepp",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "Baritone",
+          "_id": "6a0dd25b4ff8277cd43064ba"
+        },
+        {
+          "person": "Kaur Nurk",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "Baritone",
+          "_id": "6a0dd25b4ff8277cd43064c4"
+        },
+        {
+          "person": "Indrek Laan",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "Baritone",
+          "_id": "6a0dd25b4ff8277cd43064ce"
+        },
+        {
+          "person": "Andres Alamaa",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "Bass",
+          "_id": "6a0dd25b4ff8277cd43064d8"
+        },
+        {
+          "person": "Jüri Eensoo",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "Bass",
+          "_id": "6a0dd25b4ff8277cd43064e2"
+        },
+        {
+          "person": "Rasmus Erismaa",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "Bass",
+          "_id": "6a0dd25b4ff8277cd43064ec"
+        },
+        {
+          "person": "Vello Tamm",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "Bass",
+          "_id": "6a0dd25c4ff8277cd43064f6"
+        },
+        {
+          "person": "Lembit Kask",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "Bass",
+          "_id": "6a0dd25c4ff8277cd4306500"
+        },
+        {
+          "person": "Enn Lepik",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "Bass",
+          "_id": "6a0dd25c4ff8277cd430650a"
+        },
+        {
+          "person": "Elmar Saar",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "Bass",
+          "_id": "6a0dd25c4ff8277cd4306514"
+        },
+        {
+          "person": "Hugo Rand",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "Bass",
+          "_id": "6a0dd25c4ff8277cd430651e"
+        },
+        {
+          "person": "Karl Heinz",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "Bass",
+          "_id": "6a0dd25d4ff8277cd4306528"
+        },
+        {
+          "person": "Ülo Ojala",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "Bass",
+          "_id": "6a0dd25d4ff8277cd4306532"
+        },
+        {
+          "person": "Heino Luik",
+          "collective": "Eesti Rahvusmeeskoor",
+          "section": "Bass",
+          "_id": "6a0dd25d4ff8277cd430653c"
+        },
+        {
+          "person": "Jüri Tamm",
+          "collective": "Tartu Akadeemiline Meeskoor",
+          "section": "I Tenor",
+          "_id": "6a0dd25d4ff8277cd4306546"
+        },
+        {
+          "person": "Tõnis Kask",
+          "collective": "Tartu Akadeemiline Meeskoor",
+          "section": "I Tenor",
+          "_id": "6a0dd25d4ff8277cd4306550"
+        },
+        {
+          "person": "Ants Mägi",
+          "collective": "Tartu Akadeemiline Meeskoor",
+          "section": "I Tenor",
+          "_id": "6a0dd25d4ff8277cd430655a"
+        },
+        {
+          "person": "Kalle Lepik",
+          "collective": "Tartu Akadeemiline Meeskoor",
+          "section": "I Tenor",
+          "_id": "6a0dd25e4ff8277cd4306564"
+        },
+        {
+          "person": "Ain Saar",
+          "collective": "Tartu Akadeemiline Meeskoor",
+          "section": "I Tenor",
+          "_id": "6a0dd25e4ff8277cd430656e"
+        },
+        {
+          "person": "Ülo Rand",
+          "collective": "Tartu Akadeemiline Meeskoor",
+          "section": "II Tenor",
+          "_id": "6a0dd25e4ff8277cd4306578"
+        },
+        {
+          "person": "Kalmer Pärn",
+          "collective": "Tartu Akadeemiline Meeskoor",
+          "section": "II Tenor",
+          "_id": "6a0dd25e4ff8277cd4306582"
+        },
+        {
+          "person": "Olev Kivi",
+          "collective": "Tartu Akadeemiline Meeskoor",
+          "section": "II Tenor",
+          "_id": "6a0dd25e4ff8277cd430658c"
+        },
+        {
+          "person": "Heino Ots",
+          "collective": "Tartu Akadeemiline Meeskoor",
+          "section": "II Tenor",
+          "_id": "6a0dd25e4ff8277cd4306596"
+        },
+        {
+          "person": "Veiko Laas",
+          "collective": "Tartu Akadeemiline Meeskoor",
+          "section": "II Tenor",
+          "_id": "6a0dd25e4ff8277cd43065a0"
+        },
+        {
+          "person": "Hannes Mets",
+          "collective": "Tartu Akadeemiline Meeskoor",
+          "section": "II Tenor",
+          "_id": "6a0dd25f4ff8277cd43065aa"
+        },
+        {
+          "person": "Priit Koger",
+          "collective": "Tartu Akadeemiline Meeskoor",
+          "section": "II Tenor",
+          "_id": "6a0dd25f4ff8277cd43065b4"
+        },
+        {
+          "person": "Tiit Nurk",
+          "collective": "Tartu Akadeemiline Meeskoor",
+          "section": "Baritone",
+          "_id": "6a0dd25f4ff8277cd43065be"
+        },
+        {
+          "person": "Rein Kõrv",
+          "collective": "Tartu Akadeemiline Meeskoor",
+          "section": "Baritone",
+          "_id": "6a0dd25f4ff8277cd43065c8"
+        },
+        {
+          "person": "Kaur Laan",
+          "collective": "Tartu Akadeemiline Meeskoor",
+          "section": "Baritone",
+          "_id": "6a0dd25f4ff8277cd43065d2"
+        },
+        {
+          "person": "Toivo Rand",
+          "collective": "Tartu Akadeemiline Meeskoor",
+          "section": "Baritone",
+          "_id": "6a0dd25f4ff8277cd43065dc"
+        },
+        {
+          "person": "Mait Saar",
+          "collective": "Tartu Akadeemiline Meeskoor",
+          "section": "Baritone",
+          "_id": "6a0dd2604ff8277cd43065e6"
+        },
+        {
+          "person": "Erkki Luik",
+          "collective": "Tartu Akadeemiline Meeskoor",
+          "section": "Baritone",
+          "_id": "6a0dd2604ff8277cd43065f0"
+        },
+        {
+          "person": "Valdur Tamm",
+          "collective": "Tartu Akadeemiline Meeskoor",
+          "section": "Bass",
+          "_id": "6a0dd2604ff8277cd43065fa"
+        },
+        {
+          "person": "Tauno Kask",
+          "collective": "Tartu Akadeemiline Meeskoor",
+          "section": "Bass",
+          "_id": "6a0dd2604ff8277cd4306604"
+        },
+        {
+          "person": "Ülo Mägi",
+          "collective": "Tartu Akadeemiline Meeskoor",
+          "section": "Bass",
+          "_id": "6a0dd2604ff8277cd430660e"
+        },
+        {
+          "person": "Arvo Lepp",
+          "collective": "Tartu Akadeemiline Meeskoor",
+          "section": "Bass",
+          "_id": "6a0dd2604ff8277cd4306618"
+        }
+      ],
+      "skipped": [],
+      "wouldCreate": [],
+      "failed": []
+    }
+  }
+}
