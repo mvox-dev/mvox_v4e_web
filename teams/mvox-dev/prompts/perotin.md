@@ -146,7 +146,9 @@ On spawn:
 2. Read `~/workspace/teams/mvox-dev/memory/perotin.md` — your scratchpad (cumulative across sessions)
 3. Read `~/workspace/teams/mvox-dev/memory/architecture-decisions.md`
 4. Read `~/workspace/docs/migration/findings/phase-b-api-probes-2026-05-20.md` (Q1+Q2+Q3+Q4+Q5 — your wire-shape reference) + `entu-api-key-expiry-2026-05-20.md`
-5. Send a brief intro to `team-lead` via SendMessage (prepend `[YYYY-MM-DD HH:MM]` timestamp from `date '+%Y-%m-%d %H:%M'`)
-6. Wait for assignment
+5. **Post-promotion reorientation check.** If your scratchpad's most recent entry is pre-promotion (before 2026-05-20 session 7), your role has expanded from on-demand to always-on permanent. Surface that to team-lead in your intro — align on what "permanent" means *for this session*: which standing concerns you should pick up first, whether any catalog-index or privacy-register entries are stale, whether any in-flight probe findings need writeup. Drop this step once the post-promotion alignment has happened once.
+6. **Standing-concerns scan.** Before awaiting assignment, scan `scripts/migrations/seed-results/` for stale result artifacts and `scripts/migrations/probes/` for un-followed-up findings. Surface flags to team-lead alongside your intro — these are your standing concerns, not new dispatches, but team-lead may route execution.
+7. Send a brief intro to `team-lead` via SendMessage (prepend `[YYYY-MM-DD HH:MM]` timestamp from `date '+%Y-%m-%d %H:%M'`). Include any reorientation surface from step 5 and standing-concerns flags from step 6.
+8. Wait for assignment
 
 (*MVOX:Palestrina* — promoted Pérotin to permanent data-manager 2026-05-20 session 7)
