@@ -33,13 +33,15 @@
  *   scripts/migrations/seed-results/phase-b-1-cleanup-<ISO-timestamp>.json
  */
 
-import { writeFile, mkdir } from 'node:fs/promises';
-import { resolve, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { getJwt, type EntuClient } from './lib/entu-client.js';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+import {
+	getJwt,
+	fetchEntity,
+	listInstancesByType,
+	deletePropertyValue,
+	deleteEntity,
+	type EntuClient,
+} from './lib/entu-client.js';
+import { isDryRun, writeResultArtifact } from './perotin-toolkit.js';
 
 const API_BASE = process.env.ENTU_API_BASE ?? 'https://api.entu.app';
 const DB = process.env.ENTU_DB ?? 'polyphony';
@@ -59,59 +61,10 @@ interface CleanupOpResult {
   errors: string[];
 }
 
-// ── Entu API helpers ──────────────────────────────────────────────────────────
-
-async function listEntitiesWithProp(
-  jwt: string,
-  entityType: string,
-  propName: string
-): Promise<Array<{ _id: string } & Record<string, unknown>>> {
-  const qs = new URLSearchParams({
-    '_type.string': entityType,
-    props: `_id,${propName}`,
-    limit: '500'
-  }).toString();
-  const url = `${API_BASE}/${DB}/entity?${qs}`;
-  const res = await fetch(url, { headers: { Authorization: `Bearer ${jwt}` } });
-  if (!res.ok) throw new Error(`list ${entityType} failed: ${res.status} ${await res.text()}`);
-  const body = (await res.json()) as { entities?: Array<{ _id: string } & Record<string, unknown>> };
-  return body.entities ?? [];
-}
-
-async function deletePropValue(jwt: string, propValueId: string, dryRun: boolean): Promise<void> {
-  if (dryRun) {
-    console.log(`    [DRY-RUN] would DELETE /property/${propValueId}`);
-    return;
-  }
-  const url = `${API_BASE}/${DB}/property/${propValueId}`;
-  const res = await fetch(url, {
-    method: 'DELETE',
-    headers: { Authorization: `Bearer ${jwt}` }
-  });
-  if (!res.ok) {
-    throw new Error(`DELETE /property/${propValueId} failed: ${res.status} ${await res.text()}`);
-  }
-}
-
-async function deleteEntityById(jwt: string, entityId: string, dryRun: boolean): Promise<void> {
-  if (dryRun) {
-    console.log(`    [DRY-RUN] would DELETE /entity/${entityId}`);
-    return;
-  }
-  const url = `${API_BASE}/${DB}/entity/${entityId}`;
-  const res = await fetch(url, {
-    method: 'DELETE',
-    headers: { Authorization: `Bearer ${jwt}` }
-  });
-  if (!res.ok) {
-    throw new Error(`DELETE /entity/${entityId} failed: ${res.status} ${await res.text()}`);
-  }
-}
-
 // ── Per-op cleanup logic ──────────────────────────────────────────────────────
 
 async function clearInstancePropValues(
-  jwt: string,
+  client: EntuClient,
   opKey: string,
   entityType: string,
   propName: string,
@@ -127,7 +80,8 @@ async function clearInstancePropValues(
     errors: []
   };
 
-  const entities = await listEntitiesWithProp(jwt, entityType, propName);
+  const resp = await listInstancesByType(client, entityType, `_id,${propName}`);
+  const entities = resp.entities;
   const toDelete: PropValueRef[] = [];
 
   for (const entity of entities) {
@@ -149,7 +103,11 @@ async function clearInstancePropValues(
   for (const ref of toDelete) {
     try {
       console.log(`    entity ${ref.entityId}: deleting prop value ${ref.propValueId}`);
-      await deletePropValue(jwt, ref.propValueId, dryRun);
+      if (dryRun) {
+        console.log(`    [DRY-RUN] would DELETE /property/${ref.propValueId}`);
+      } else {
+        await deletePropertyValue(client, ref.propValueId);
+      }
       result.deleted += 1;
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -163,7 +121,7 @@ async function clearInstancePropValues(
 }
 
 async function deleteOrgMemberCountPropDef(
-  jwt: string,
+  client: EntuClient,
   dryRun: boolean
 ): Promise<CleanupOpResult> {
   const result: CleanupOpResult = {
@@ -176,10 +134,10 @@ async function deleteOrgMemberCountPropDef(
     errors: []
   };
 
-  // Verify prop-def still exists before attempting deletion
-  const url = `${API_BASE}/${DB}/entity/${ORG_MEMBER_COUNT_PROP_DEF_ID}`;
-  const checkRes = await fetch(url, { headers: { Authorization: `Bearer ${jwt}` } });
-  if (!checkRes.ok) {
+  // Verify prop-def still exists before attempting deletion.
+  try {
+    await fetchEntity(client, ORG_MEMBER_COUNT_PROP_DEF_ID);
+  } catch {
     result.skipped = 1;
     result.found = 0;
     console.log(`  op4: prop-def ${ORG_MEMBER_COUNT_PROP_DEF_ID} not found (already deleted?) — skipping`);
@@ -188,7 +146,11 @@ async function deleteOrgMemberCountPropDef(
 
   console.log(`  op4: deleting prop-def entity ${ORG_MEMBER_COUNT_PROP_DEF_ID} (organization.member_count)`);
   try {
-    await deleteEntityById(jwt, ORG_MEMBER_COUNT_PROP_DEF_ID, dryRun);
+    if (dryRun) {
+      console.log(`    [DRY-RUN] would DELETE /entity/${ORG_MEMBER_COUNT_PROP_DEF_ID}`);
+    } else {
+      await deleteEntity(client, ORG_MEMBER_COUNT_PROP_DEF_ID);
+    }
     result.deleted = 1;
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
@@ -203,7 +165,7 @@ async function deleteOrgMemberCountPropDef(
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 async function main() {
-  const dryRun = process.argv.includes('--dry-run');
+  const dryRun = isDryRun();
   const includeOp4 = process.argv.includes('--include-op4');
   const apiKey = process.env.ENTU_API_KEY;
 
@@ -212,7 +174,7 @@ async function main() {
     process.exit(1);
   }
 
-  const startedAt = new Date().toISOString();
+  const startedAt = new Date();
   console.log(`Phase B.1 cleanup${dryRun ? ' [DRY-RUN]' : ''} starting…`);
   console.log(`  API base: ${API_BASE}`);
   console.log(`  DB: ${DB}`);
@@ -223,26 +185,27 @@ async function main() {
   console.log();
 
   const jwt = await getJwt({ apiBase: API_BASE, db: DB, apiKey });
+  const client: EntuClient = { apiBase: API_BASE, db: DB, jwt };
   console.log('JWT obtained successfully.\n');
 
   const results: CleanupOpResult[] = [];
 
   // Op #1: org.contact_email
   console.log('--- Op #1: organization.contact_email ---');
-  results.push(await clearInstancePropValues(jwt, 'op1_org_contact_email', 'organization', 'contact_email', dryRun));
+  results.push(await clearInstancePropValues(client, 'op1_org_contact_email', 'organization', 'contact_email', dryRun));
 
   // Op #2: org.org_type
   console.log('\n--- Op #2: organization.org_type ---');
-  results.push(await clearInstancePropValues(jwt, 'op2_org_org_type', 'organization', 'org_type', dryRun));
+  results.push(await clearInstancePropValues(client, 'op2_org_org_type', 'organization', 'org_type', dryRun));
 
   // Op #3: member.joined_at
   console.log('\n--- Op #3: member.joined_at ---');
-  results.push(await clearInstancePropValues(jwt, 'op3_member_joined_at', 'member', 'joined_at', dryRun));
+  results.push(await clearInstancePropValues(client, 'op3_member_joined_at', 'member', 'joined_at', dryRun));
 
   // Op #4: org.member_count prop-def DELETE (gated)
   if (includeOp4) {
     console.log('\n--- Op #4: organization.member_count prop-def (--include-op4 authorized) ---');
-    results.push(await deleteOrgMemberCountPropDef(jwt, dryRun));
+    results.push(await deleteOrgMemberCountPropDef(client, dryRun));
   } else {
     console.log('\n--- Op #4: organization.member_count prop-def (SKIPPED — not authorized) ---');
     console.log('  Diagnostic: Probe 1 false positive confirmed. See docs/migration/findings/phase-b-1-diagnostic-2026-05-20.md.');
@@ -275,19 +238,15 @@ async function main() {
   }
 
   // ── Write result artifact ────────────────────────────────────────────────────
-  const resultDir = resolve(__dirname, 'seed-results');
-  await mkdir(resultDir, { recursive: true });
-  const ts = startedAt.replace(/[:.]/g, '-');
-  const outPath = resolve(resultDir, `phase-b-1-cleanup-${ts}.json`);
   const artifact = {
     script: 'phase-b-1-cleanup.ts',
-    executedAt: startedAt,
+    executedAt: startedAt.toISOString(),
     dryRun,
     includeOp4,
     db: DB,
     results
   };
-  await writeFile(outPath, JSON.stringify(artifact, null, 2), 'utf8');
+  const outPath = await writeResultArtifact('phase-b-1-cleanup', artifact, { at: startedAt });
   console.log(`\nResult artifact: ${outPath}`);
 
   process.exit(totalFailed > 0 ? 1 : 0);
