@@ -1,0 +1,126 @@
+{
+  "phase": "B",
+  "executedAt": "2026-05-20T13:56:36.613Z",
+  "db": "polyphony",
+  "summary": {
+    "dryRun": false,
+    "wouldRenames": 0,
+    "wouldObsoleteDeletes": 3,
+    "wouldFormulaUpdates": 1,
+    "wouldTouchSaves": 3,
+    "failed": 1
+  },
+  "snapshot": {
+    "path": null,
+    "sha256": null,
+    "entityCount": 0,
+    "skipped": true
+  },
+  "wouldExecute": [
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "organization",
+      "propertyName": "contact_email",
+      "propertyDefId": "69c7ea488489bfcb0e819e5e",
+      "verifyPreconditions": true
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "organization",
+      "propertyName": "org_type",
+      "propertyDefId": "69c7ea478489bfcb0e819e50",
+      "verifyPreconditions": true
+    },
+    {
+      "kind": "DELETE_PROPERTY",
+      "parentType": "member",
+      "propertyName": "joined_at",
+      "propertyDefId": "69c7ea4c8489bfcb0e819f1d",
+      "verifyPreconditions": true
+    },
+    {
+      "kind": "UPDATE_FORMULA",
+      "parentType": "section",
+      "propertyName": "member_count",
+      "propertyDefId": "69c7ea4a8489bfcb0e819ed1",
+      "newFormula": "(_child.member COUNT) (_child.section.member_count SUM) +"
+    },
+    {
+      "kind": "TOUCH_SAVE",
+      "parentType": "lending",
+      "propertyName": "name",
+      "formulaExpression": "member.*.name copy.*.name ' — ' CONCAT_WS"
+    },
+    {
+      "kind": "TOUCH_SAVE",
+      "parentType": "organization",
+      "propertyName": "member_count_per_section",
+      "formulaExpression": "(_child.member COUNT) (_child.section.member_count SUM) +"
+    },
+    {
+      "kind": "TOUCH_SAVE",
+      "parentType": "edition",
+      "propertyName": "work",
+      "formulaExpression": "_parent"
+    }
+  ],
+  "warnings": [
+    "snapshot skipped via --skip-snapshot flag"
+  ],
+  "addedProperties": [],
+  "backfilled": [],
+  "deleted": [
+    {
+      "parentType": "organization",
+      "propertyName": "contact_email",
+      "propertyDefId": "69c7ea488489bfcb0e819e5e",
+      "deletedAt": "2026-05-20T13:56:38.497Z"
+    },
+    {
+      "parentType": "organization",
+      "propertyName": "org_type",
+      "propertyDefId": "69c7ea478489bfcb0e819e50",
+      "deletedAt": "2026-05-20T13:56:38.659Z"
+    },
+    {
+      "parentType": "member",
+      "propertyName": "joined_at",
+      "propertyDefId": "69c7ea4c8489bfcb0e819f1d",
+      "deletedAt": "2026-05-20T13:56:38.786Z"
+    }
+  ],
+  "blockedDeletes": [],
+  "formulaUpdates": [],
+  "touchSaves": [
+    {
+      "parentType": "lending",
+      "propertyName": "name",
+      "count": 0,
+      "noInstances": true,
+      "failed": 0
+    },
+    {
+      "parentType": "organization",
+      "propertyName": "member_count_per_section",
+      "count": 6,
+      "noInstances": false,
+      "failed": 0
+    },
+    {
+      "parentType": "edition",
+      "propertyName": "work",
+      "count": 0,
+      "noInstances": true,
+      "failed": 0
+    }
+  ],
+  "skipped": [],
+  "failed": [
+    {
+      "kind": "UPDATE_FORMULA",
+      "parentType": "section",
+      "propertyName": "member_count",
+      "error": "property DELETE failed: 404 {\n  \"error\": true,\n  \"url\": \"https://api.entu.app/polyphony/entity/6a0972be90c8df7a1cc7d68a\",\n  \"status\": 404,\n  \"statusText\": \"Entity 6a0972be90c8df7a1cc7d68a not found\",\n  \"message\": \"Entity 6a0972be90c8df7a1cc7d68a not found\"\n}"
+    }
+  ]
+}

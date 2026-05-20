@@ -35,6 +35,32 @@ Result: scripts/migrations/seed-results/seed-voices-2026-05-20T08-14-58-992Z.jso
 [CHECKPOINT] Manifest at scripts/migrations/seed-sources/collectives.json (c15df7a, branch chore/seeding-source-plan).
 [DEFERRED] seed-collectives.ts — next session after PO final review of manifest.
 
+## Session 8 — 2026-05-20
+
+### Phase B.1 diagnostic + cleanup (task #53)
+
+[PROBE-RESULT] Op #1 org.contact_email: 6/6 org instances still have property value set.
+  Prop value _ids: 69c7f8718489bfcb0e81b05f, 69c7f8728489bfcb0e81b06a, 69c7f8788489bfcb0e81b1ae, 69c7f87d8489bfcb0e81b2de, 69c7f87d8489bfcb0e81b2e9, 69c7f8868489bfcb0e81b4f5
+  DELETE via: DELETE /property/{value._id} (NOT /entity/)
+
+[PROBE-RESULT] Op #2 org.org_type: 6/6 org instances still have property value set. Legitimate block.
+  Prop value _ids: 69c7f8718489bfcb0e81b05e, 69c7f8728489bfcb0e81b069, 69c7f8788489bfcb0e81b1ad, 69c7f87d8489bfcb0e81b2dd, 69c7f87d8489bfcb0e81b2e8, 69c7f8868489bfcb0e81b4f4
+
+[PROBE-RESULT] Op #3 member.joined_at: ALL 116 members have joined_at set (Phase B report said 10 — YELLOW-13 undercount confirmed). Legitimate block. 116 prop value _ids in cleanup script.
+
+[PROBE-RESULT] Op #4 org.member_count (prop-def 69c7ea498489bfcb0e819e96): FALSE POSITIVE CONFIRMED.
+  Probe 1 word-boundary matches:
+  - Match 1: prop-def's OWN formula references member_count recursively (self-ref; deleting entity removes its own formula)
+  - Match 2: member_count_per_section formula "SUM(_child section.member_count)" — depends on SECTION.member_count, not ORGANIZATION.member_count
+  Neither match is a real semantic dependency on the org prop-def. Awaiting team-lead auth for --include-op4.
+
+[DECISION] Wire shape distinction (CRITICAL):
+  - Instance property-value DELETE: DELETE /property/{value._id}
+  - Prop-def entity DELETE: DELETE /entity/{propDefId}
+  These are NOT interchangeable. Bug 1 in Phase B confused them.
+
+[CHECKPOINT] Phase B.1 cleanup script written (scripts/migrations/phase-b-1-cleanup.ts), dry-run passes (128 ops: 6+6+116). Commit 72dd6cd on branch chore/phase-b-1-cleanup. Awaiting team-lead auth for live execution + Op #4 authorization.
+
 ## Permanent role note
 
 Promoted from temporary specialist to permanent data-manager (session 7 end). Future seeding work:

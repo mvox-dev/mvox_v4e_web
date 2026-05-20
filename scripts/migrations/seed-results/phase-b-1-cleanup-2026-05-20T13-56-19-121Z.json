@@ -1,0 +1,47 @@
+{
+  "script": "phase-b-1-cleanup.ts",
+  "executedAt": "2026-05-20T13:56:19.121Z",
+  "dryRun": false,
+  "includeOp4": false,
+  "db": "polyphony",
+  "results": [
+    {
+      "op": "op1_org_contact_email",
+      "description": "Clear organization.contact_email instance values",
+      "found": 6,
+      "deleted": 6,
+      "skipped": 0,
+      "failed": 0,
+      "errors": []
+    },
+    {
+      "op": "op2_org_org_type",
+      "description": "Clear organization.org_type instance values",
+      "found": 6,
+      "deleted": 6,
+      "skipped": 0,
+      "failed": 0,
+      "errors": []
+    },
+    {
+      "op": "op3_member_joined_at",
+      "description": "Clear member.joined_at instance values",
+      "found": 116,
+      "deleted": 116,
+      "skipped": 0,
+      "failed": 0,
+      "errors": []
+    },
+    {
+      "op": "op4_org_member_count_propdef",
+      "description": "Delete organization.member_count prop-def (69c7ea498489bfcb0e819e96) — DEFERRED",
+      "found": 0,
+      "deleted": 0,
+      "skipped": 0,
+      "failed": 0,
+      "errors": [
+        "deferred: awaiting team-lead authorization (Probe 1 false positive — see diagnostic doc)"
+      ]
+    }
+  ]
+}
