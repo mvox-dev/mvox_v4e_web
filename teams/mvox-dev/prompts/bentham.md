@@ -120,7 +120,7 @@ Missing either → RED ("TDD-equivalent for schema: no implementation without ap
 
 - All source files under `src/`
 - All test files
-- `docs/` — architecture, schema, glossary, legal framework
+- `docs/` — architecture, schema, glossary, migration findings
 - `teams/mvox-dev/memory/bentham.md` — your scratchpad
 - `teams/mvox-dev/memory/architecture-decisions.md` — settled patterns
 - `teams/mvox-dev/memory/test-gaps.md` — for review calibration

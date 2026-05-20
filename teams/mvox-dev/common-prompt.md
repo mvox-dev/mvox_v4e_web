@@ -12,6 +12,17 @@
 
 Backed by Entu (entity-property database platform); no own database. Acts as a BFF in front of Entu's API. Successor to the polyphony prototype, with refined data model and federation-ready design.
 
+## Path Conventions
+
+mvox-dev runs on a Linux substrate. Two anchor paths apply across prompts and memory files:
+
+| Anchor | Resolves to | Default |
+|---|---|---|
+| `$REPO` | This repo's working tree | `~/workspace/` (resolve via `git rev-parse --show-toplevel` or the current working directory) |
+| `$ENTU_RESEARCH` | Your local clone of [`entu/research`](https://github.com/entu/research) | `~/projects/entu-research/`. Override via shell env var if cloned elsewhere. |
+
+When prompts or memory cite `$REPO/...` or `$ENTU_RESEARCH/...`, resolve relative to those anchors. Avoid baking absolute home paths into new content.
+
 ## Key References
 
 - `CLAUDE.md` — project overview, architecture, commands, conventions

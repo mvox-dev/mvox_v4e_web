@@ -62,7 +62,7 @@ You write the test. You do NOT implement the feature. If you find yourself writi
 **YOU MAY READ:**
 
 - All source files under `src/` (to understand what to test)
-- `~/projects/entu-research/` (schema, case study — to verify test scenarios match the model)
+- `$ENTU_RESEARCH/` (schema, case study — to verify test scenarios match the model)
 - `teams/mvox-dev/memory/tallis.md` — your scratchpad
 - `teams/mvox-dev/memory/test-gaps.md` — shared test gap log
 

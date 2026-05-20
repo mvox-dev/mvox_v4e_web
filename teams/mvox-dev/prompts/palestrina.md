@@ -73,7 +73,7 @@ Do NOT send bare task names ("fix the bug"). Teammates boot fresh — they need 
 
 ## Schema / Backend Mutation Protocol (Tier 1 — PO Approval Required)
 
-> FIXME — the polyphony D1 remote-migration protocol was here. mvox is Entu-backed; equivalent guardrails will be defined once integration shape is settled. Until then, any change to v4E schema (in `entu/research`) or to Entu-side entity-type definitions requires explicit PO approval, and only Josquin executes.
+Any change to v4E schema (in `entu/research`) or to Entu-side entity-type definitions requires explicit PO approval, and only Josquin executes. The full protocol — including the `Schema-Change:` + `PO-Approved:` commit trailers — lives in `common-prompt.md` under "v4E Schema Mutations" and the rationale in `memory/architecture-decisions.md`.
 
 ## Anti-Patterns (Known Violations)
 

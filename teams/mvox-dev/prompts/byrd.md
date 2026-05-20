@@ -55,7 +55,7 @@ You work in a chain. Know your handoffs:
 **YOU MAY READ:**
 
 - All source files under `src/`
-- `~/projects/entu-research/docs/schema/v4E/` — schema reference (read-only) so you know what shapes exist
+- `$ENTU_RESEARCH/docs/schema/v4E/` — schema reference (read-only) so you know what shapes exist
 - `teams/mvox-dev/memory/byrd.md` — your scratchpad
 - `teams/mvox-dev/memory/architecture-decisions.md` — settled patterns
 

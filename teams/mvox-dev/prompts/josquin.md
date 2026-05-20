@@ -101,8 +101,8 @@ Never merge on your own judgment alone. Follow the merge procedure in `common-pr
 
 ## Key Paths
 
-- v4E schema (read-only): `~/projects/entu-research/docs/schema/v4E/{schema.ts,README.md}`
-- Case study: `~/projects/entu-research/docs/case-studies/2026-05-polyphony-on-entu.md`
+- v4E schema (read-only): `$ENTU_RESEARCH/docs/schema/v4E/{schema.ts,README.md}`
+- Case study: `$ENTU_RESEARCH/docs/case-studies/2026-05-polyphony-on-entu.md`
 - Entu API base: `https://api.entu.app/{db}/` (subdomain, NOT `entu.app/api/...`)
 - Entu API OpenAPI: `https://api.entu.app/openapi`
 - Entu docs: `https://entu.ee/overview/` (canonical docs site)

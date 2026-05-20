@@ -8,8 +8,8 @@
 - Backend: Entu API (no own DB). Auth: Entu OAuth + BFF JWT httpOnly cookie
 - i18n: Paraglide, locales en/et/lv/uk. Testing: Vitest + Playwright. pnpm, flat single-app
 - Flat layout: `src/lib/`, `src/routes/`, `src/lib/server/` — no monorepo
-- v4E schema source-of-truth: `~/projects/entu-research/docs/schema/v4E/`
-- Case study (Entu integration patterns): `~/projects/entu-research/docs/case-studies/2026-05-polyphony-on-entu.md`
+- v4E schema source-of-truth: `$ENTU_RESEARCH/docs/schema/v4E/`
+- Case study (Entu integration patterns): `$ENTU_RESEARCH/docs/case-studies/2026-05-polyphony-on-entu.md`
 - Polyphony (`~/projects/polyphony/`) archived — reference only; D1/Registry/Vault patterns do NOT apply to mvox
 
 ### [GOTCHA] v4E formula rules (Bentham will RED violations)

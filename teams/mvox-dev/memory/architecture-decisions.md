@@ -12,7 +12,7 @@ Format per entry: short title, decision, rationale, date. Most recent at the top
 
 **Rationale**: Inherited shape from the entu-research POC (also SvelteKit + Entu OAuth + BFF + Cloudflare). mvox is the production fork; it shares only the v4E schema as a contract with entu-research (option b — schema-as-contract, see below).
 
-**Source**: PO briefing in session 2; cross-checked against `~/projects/entu-research/CLAUDE.md`.
+**Source**: PO briefing in session 2; cross-checked against `$ENTU_RESEARCH/CLAUDE.md`.
 
 ---
 
@@ -68,7 +68,7 @@ Polyphony's analogous list, for reference (NOT auto-inherited by mvox): cron cle
 
 **Rationale**: Case study Section B4. The rights model is the authoritative API contract; if the BFF has magic capabilities beyond user rights, alternative clients become second-class. Heuristic: if a frequent user operation needs elevation, the role model is probably wrong.
 
-**Source**: Case study `~/projects/entu-research/docs/case-studies/2026-05-polyphony-on-entu.md` Section B4.
+**Source**: Case study `$ENTU_RESEARCH/docs/case-studies/2026-05-polyphony-on-entu.md` Section B4.
 
 ---
 
@@ -102,7 +102,7 @@ Bentham REDs PRs that violate any of these.
 
 **Decision**: The mvox Cloudflare Pages project is named `multivox`, served at `multivox.pages.dev` (and any future custom domain). Cloudflare account ID `1431b76f0b65e3d23833966744ff2bdf`. `mvox.pages.dev` is owned by a third party (live cert, dead origin); `multivox.pages.dev` and `mvox-app.pages.dev` were both free as of 2026-05-18.
 
-**Rationale**: `multivox` matches the full product name from `~/projects/entu-research/docs/user-stories.md` ("Multivox — User Stories"). Cleaner brand at the URL surface than `mvox-app`. Mild repo↔URL mismatch (`mvox_v4e_web` repo, `multivox` deploy) is acceptable since the repo is internal-facing and the URL is user-facing. entu-research's adjacent project (`entuphony.pages.dev`) follows the same "long name at the URL" pattern.
+**Rationale**: `multivox` matches the full product name from `$ENTU_RESEARCH/docs/user-stories.md` ("Multivox — User Stories"). Cleaner brand at the URL surface than `mvox-app`. Mild repo↔URL mismatch (`mvox_v4e_web` repo, `multivox` deploy) is acceptable since the repo is internal-facing and the URL is user-facing. entu-research's adjacent project (`entuphony.pages.dev`) follows the same "long name at the URL" pattern.
 
 **Source**: PO decision, session 3 (Gap 5 of the 5 session-2 carryforwards). Availability check by Finn 2026-05-18, ownership confirmed via CF API token check (5 projects in account, no `mvox`).
 

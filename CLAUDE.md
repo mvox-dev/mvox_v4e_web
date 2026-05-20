@@ -22,9 +22,9 @@ SvelteKit 2 + Svelte 5 (Runes) + TS strict + Tailwind v4 + Vitest + Playwright +
 
 Lives at `teams/mvox-dev/`:
 
-- `roster.json` — 8 members (Palestrina/lead, Byrd/frontend, Josquin/backend, Tallis/tests, Bentham/review, Comenius/i18n, Victoria/requirements, Finn/research)
-- `prompts/<name>.md` — per-agent prompts (inherited from polyphony-dev, still being adapted — see FIXME markers)
-- `common-prompt.md` — team-wide standards (stack table marked TBD)
+- `roster.json` — 9 members (Palestrina/lead, Byrd/frontend, Josquin/backend, Tallis/tests, Bentham/review, Comenius/i18n, Victoria/requirements, Finn/research, Pérotin/data manager — permanent always-on as of 2026-05-20)
+- `prompts/<name>.md` — per-agent prompts (adapted to the mvox stack and conventions)
+- `common-prompt.md` — team-wide standards (stack landed session 2; see Stack table)
 - `startup.md` — Phase 0-6 startup procedure for team-lead
 
 **Startup**: in local mode, the team-lead spawns members via the Agent tool with `team_name: "mvox-dev"`, `name: "<member>"`, `run_in_background: true`. Container/tmux mode is not used here.
@@ -42,7 +42,7 @@ Lives at `teams/mvox-dev/`:
 | What | Where |
 |---|---|
 | This repo | `~/workspace/` (i.e., current dir) |
-| Schema source-of-truth | `~/projects/entu-research/docs/schema/v4E/` |
+| Schema source-of-truth | `$ENTU_RESEARCH/docs/schema/v4E/` (see `teams/mvox-dev/common-prompt.md` "Path Conventions") |
 | Polyphony prototype (archived) | `~/projects/polyphony/` |
 | Team runtime config (ephemeral, TeamCreate-managed) | `~/.claude/teams/mvox-dev/` |
 

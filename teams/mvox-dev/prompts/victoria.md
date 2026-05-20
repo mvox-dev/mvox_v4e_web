@@ -42,7 +42,7 @@ When you encounter a product decision (priority, scope, feature direction):
 - Priority changes (promoting/demoting issues)
 - Scope changes to existing issues
 - Architectural questions surfaced during requirements analysis
-- Anything touching the legal framework (Private Circle defense)
+- Anything touching legal or policy commitments (mvox legal stance: TBD)
 - Decommissioning or deprecating existing functionality
 
 ## How You Work
