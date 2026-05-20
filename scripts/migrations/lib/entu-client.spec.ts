@@ -284,6 +284,18 @@ describe('listInstancesByType', () => {
 		expect(calledUrl).not.toContain('limit=500');
 	});
 
+	it('accepts extraQuery filter at position 4 (merged into query params)', async () => {
+		const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
+			new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 })
+		);
+
+		await listInstancesByType(client, 'section', '_id', { '_parent.reference': 'org-1' });
+
+		const calledUrl = fetchMock.mock.calls[0][0] as string;
+		expect(calledUrl).toContain('_parent.reference=org-1');
+		expect(calledUrl).toContain('limit=500'); // default still applies when extraQuery is used
+	});
+
 	it('throws on non-2xx response', async () => {
 		vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
 			new Response('Server Error', { status: 500 })
