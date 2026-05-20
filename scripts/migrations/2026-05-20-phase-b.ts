@@ -409,17 +409,25 @@ export function buildLiveCallbacks(client: EntuClient): PhaseBLiveCallbacks {
 		return { _id: 'unknown' };
 	};
 
-	// DELETE /property/{id} — shared with the deleteProperty live callback below.
-	const deletePropertyByIdLive = async (_c: EntuClient, propertyId: string): Promise<void> => {
-		// Bug 1 fix (v12): property-def entities ARE entities. Entu's /property/{id} endpoint
-		// returns 404 for property-def _ids. DELETE /entity/{id} is the correct shape.
-		const url = `${client.apiBase}/${client.db}/entity/${propertyId}`;
+	// DELETE /property/{id} — property-VALUE deletion. Callers: updateFormula's pre-delete
+	// loop (formula values on a prop-def) and migrateProperty injectables.deleteProperty
+	// (pruneExistingTarget path, stale target-property values on instances). Property
+	// VALUES are property records, not entities — /property/{id} is the correct endpoint.
+	//
+	// NOT for prop-def deletion. The op-level deleteProperty callback below has its own
+	// inline DELETE /entity/{propertyDefId} call (v12 Bug-1: property-def _ids are entity
+	// _ids; /property/{id} returns 404 for them).
+	const deletePropertyValueByIdLive = async (
+		_c: EntuClient,
+		propertyValueId: string
+	): Promise<void> => {
+		const url = `${client.apiBase}/${client.db}/property/${propertyValueId}`;
 		const res = await fetch(url, {
 			method: 'DELETE',
 			headers: { Authorization: `Bearer ${client.jwt}` }
 		});
 		if (!res.ok) {
-			throw new Error(`property DELETE failed: ${res.status} ${await res.text()}`);
+			throw new Error(`property-value DELETE failed: ${res.status} ${await res.text()}`);
 		}
 	};
 
@@ -473,7 +481,7 @@ export function buildLiveCallbacks(client: EntuClient): PhaseBLiveCallbacks {
 			},
 			writeProperty:
 				op.backfillKind === 'string_to_reference' ? writeReferencePropertyLive : writePropertyLive,
-			deleteProperty: deletePropertyByIdLive,
+			deleteProperty: deletePropertyValueByIdLive,
 			voiceLookup: op.backfillKind === 'string_to_reference' ? voiceLookupLive : undefined,
 			parentLookup: op.backfillKind === 'parent_copy' ? await buildParentLookup(op) : undefined
 		};
@@ -481,7 +489,9 @@ export function buildLiveCallbacks(client: EntuClient): PhaseBLiveCallbacks {
 	};
 
 	const deleteProperty: DeletePropertyFn = async (_c, op: DeletePropertyOp) => {
-		// Bug 1 fix (v12): DELETE /entity/{id} not /property/{id}; see deletePropertyByIdLive comment.
+		// Prop-DEF deletion. v12 Bug-1: property-def _ids are entity _ids; Entu's
+		// /property/{id} returns 404 for them. DELETE /entity/{id} is the correct shape.
+		// Property-VALUE deletion uses /property/{id} via deletePropertyValueByIdLive.
 		const url = `${client.apiBase}/${client.db}/entity/${op.propertyDefId}`;
 		const res = await fetch(url, {
 			method: 'DELETE',
@@ -595,7 +605,7 @@ export function buildLiveCallbacks(client: EntuClient): PhaseBLiveCallbacks {
 		}
 		for (const v of formulaValues) {
 			if (typeof v._id === 'string') {
-				await deletePropertyByIdLive(client, v._id);
+				await deletePropertyValueByIdLive(client, v._id);
 			}
 		}
 		await postEntityProperty(client, op.propertyDefId, { type: 'formula', string: op.newFormula });

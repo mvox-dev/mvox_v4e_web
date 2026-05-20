@@ -328,11 +328,11 @@ describe('RED v12.2: buildLiveCallbacks.updateFormula — pre-delete existing fo
 
 		await cbs.updateFormula(client, op);
 
-		// Must have called DELETE /entity/stale-formula-id
+		// Must have called DELETE /property/stale-formula-id (property-VALUE delete, not /entity/)
 		const deleteCall = fetchMock.mock.calls.find(
 			([url, init]) =>
 				(init as RequestInit)?.method === 'DELETE' &&
-				String(url).includes('/entity/stale-formula-id')
+				String(url).includes('/property/stale-formula-id')
 		);
 		expect(deleteCall).toBeDefined();
 
@@ -340,7 +340,7 @@ describe('RED v12.2: buildLiveCallbacks.updateFormula — pre-delete existing fo
 		const deleteIdx = fetchMock.mock.calls.findIndex(
 			([url, init]) =>
 				(init as RequestInit)?.method === 'DELETE' &&
-				String(url).includes('/entity/stale-formula-id')
+				String(url).includes('/property/stale-formula-id')
 		);
 		const postIdx = fetchMock.mock.calls.findIndex(
 			([, init]) => (init as RequestInit)?.method === 'POST'
@@ -396,9 +396,10 @@ describe('RED v12.2: buildLiveCallbacks.updateFormula — pre-delete existing fo
 		);
 		expect(deleteCalls).toHaveLength(3);
 		const deleteUrls = deleteCalls.map(([url]) => String(url));
-		expect(deleteUrls.some((u) => u.includes('/entity/stale-1'))).toBe(true);
-		expect(deleteUrls.some((u) => u.includes('/entity/stale-2'))).toBe(true);
-		expect(deleteUrls.some((u) => u.includes('/entity/stale-3'))).toBe(true);
+		// property-VALUE DELETEs must use /property/{id}, not /entity/{id}
+		expect(deleteUrls.some((u) => u.includes('/property/stale-1'))).toBe(true);
+		expect(deleteUrls.some((u) => u.includes('/property/stale-2'))).toBe(true);
+		expect(deleteUrls.some((u) => u.includes('/property/stale-3'))).toBe(true);
 	});
 
 	it('skips DELETE when no existing formula values on prop-def (fresh prop-def)', async () => {
@@ -851,8 +852,8 @@ describe('RED v10 integration: live-mode multi-value pre-delete guard', () => {
 					{ status: 200 }
 				);
 			}
-			// DELETE /entity/{id} — property-def entities ARE entities (Bug 1 fix)
-			if (init?.method === 'DELETE' && urlStr.includes('/entity/')) {
+			// DELETE /property/{id} — property-VALUE delete (pruneExistingTarget path)
+			if (init?.method === 'DELETE' && urlStr.includes('/property/')) {
 				return new Response(JSON.stringify({ deleted: true }), { status: 200 });
 			}
 			// POST /entity/{id} — target property write
@@ -876,11 +877,11 @@ describe('RED v10 integration: live-mode multi-value pre-delete guard', () => {
 
 		await cbs.migrateProperty(client, op);
 
-		// Must have called DELETE /entity/stale-voice-ref (property-def entities ARE entities)
+		// Must have called DELETE /property/stale-voice-ref (property-VALUE delete, not /entity/)
 		const deleteCall = fetchMock.mock.calls.find(
 			([url, init]) =>
 				(init as RequestInit)?.method === 'DELETE' &&
-				String(url).includes('/entity/stale-voice-ref')
+				String(url).includes('/property/stale-voice-ref')
 		);
 		expect(deleteCall).toBeDefined();
 
@@ -889,7 +890,7 @@ describe('RED v10 integration: live-mode multi-value pre-delete guard', () => {
 			.map((call, i) => ({ call, i }))
 			.filter(({ call: [url, init] }) =>
 				(init as RequestInit)?.method === 'DELETE' &&
-				String(url).includes('/entity/stale-voice-ref')
+				String(url).includes('/property/stale-voice-ref')
 			);
 		const postCalls = fetchMock.mock.calls
 			.map((call, i) => ({ call, i }))
@@ -1055,5 +1056,154 @@ describe('RED YELLOW-12: updateFormula must propagate DELETE failures (not swall
 			([, init]) => (init as RequestInit)?.method === 'POST'
 		);
 		expect(postCall).toBeUndefined();
+	});
+});
+
+// ── RED v13: property-value DELETE must use /property/{id}, not /entity/{id} ──
+//
+// Wire-shape bug (#56): deletePropertyByIdLive uses /entity/{id} for ALL callers.
+// Correct:
+//   - op-level deleteProperty (prop-def delete): DELETE /entity/{propertyDefId}  [v12 Bug-1, unchanged]
+//   - updateFormula pre-delete loop (formula-value delete): DELETE /property/{id}
+//   - migrateProperty injectables.deleteProperty (pruneExistingTarget path): DELETE /property/{id}
+//
+// (*MVOX:Tallis*)
+
+describe('RED v13.1: updateFormula pre-delete loop uses DELETE /property/{id} for formula values', () => {
+	it('pre-delete fetch URL ends with /property/{formulaValueId}, not /entity/{formulaValueId}', async () => {
+		const fetchMock = vi.spyOn(globalThis, 'fetch');
+
+		// GET prop-def entity — has one existing formula value
+		fetchMock.mockResolvedValueOnce(
+			new Response(
+				JSON.stringify({
+					entity: {
+						_id: 'member-count-prop-id',
+						formula: [{ _id: 'fv1', string: '_referrer.member.name COUNT' }]
+					}
+				}),
+				{ status: 200 }
+			)
+		);
+		// DELETE response (whatever endpoint is called)
+		fetchMock.mockResolvedValueOnce(
+			new Response(JSON.stringify({ deleted: true }), { status: 200 })
+		);
+		// POST response
+		fetchMock.mockResolvedValueOnce(
+			new Response(
+				JSON.stringify({ _id: 'member-count-prop-id', properties: [{ _id: 'new-formula-id' }] }),
+				{ status: 200 }
+			)
+		);
+
+		const cbs = buildLiveCallbacks(client);
+		const op: UpdateFormulaOp = {
+			kind: 'UPDATE_FORMULA',
+			parentType: 'section',
+			propertyName: 'member_count',
+			propertyDefId: 'member-count-prop-id',
+			newFormula: '(_child.member COUNT) (_child.section.member_count SUM) +'
+		};
+
+		await cbs.updateFormula(client, op);
+
+		const deleteCall = fetchMock.mock.calls.find(
+			([, init]) => (init as RequestInit)?.method === 'DELETE'
+		);
+		expect(deleteCall).toBeDefined();
+		const deleteUrl = String(deleteCall![0]);
+		// Must use /property/{id} — formula values are property records, not entities
+		expect(deleteUrl).toContain('/property/fv1');
+		expect(deleteUrl).not.toContain('/entity/fv1');
+	});
+});
+
+describe('RED v13.2: migrateProperty injectables.deleteProperty uses DELETE /property/{id} for property values', () => {
+	it('pruneExistingTarget DELETE URL ends with /property/{staleValueId}, not /entity/{staleValueId}', async () => {
+		const fetchMock = vi.spyOn(globalThis, 'fetch');
+
+		fetchMock.mockImplementation(async (url: RequestInfo, init?: RequestInit) => {
+			const urlStr = String(url);
+			// listInstances for section — returns section with a stale voice reference
+			if (urlStr.includes('_type.string=section') || urlStr.includes('/entity/')) {
+				if (!init?.method || init.method === 'GET') {
+					return new Response(
+						JSON.stringify({
+							entities: [
+								{
+									_id: 'section-1',
+									voice_type: [{ type: 'string', string: 'soprano' }],
+									voice: [{ _id: 'stale-pv1', type: 'reference', reference: 'old-voice-id' }]
+								}
+							],
+							count: 1
+						}),
+						{ status: 200 }
+					);
+				}
+			}
+			if (urlStr.includes('name.string=soprano')) {
+				return new Response(
+					JSON.stringify({ entities: [{ _id: 'soprano-voice-id' }], count: 1 }),
+					{ status: 200 }
+				);
+			}
+			if (init?.method === 'DELETE') {
+				return new Response(JSON.stringify({ deleted: true }), { status: 200 });
+			}
+			if (init?.method === 'POST') {
+				return new Response(
+					JSON.stringify({ _id: 'section-1', properties: [{ _id: 'new-voice-prop-id' }] }),
+					{ status: 200 }
+				);
+			}
+			return new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 });
+		});
+
+		const cbs = buildLiveCallbacks(client);
+		const op: BackfillDataOp = {
+			kind: 'BACKFILL_DATA',
+			parentType: 'section',
+			sourceProperty: 'voice_type',
+			targetProperty: 'voice',
+			backfillKind: 'string_to_reference'
+		};
+
+		await cbs.migrateProperty(client, op);
+
+		const deleteCall = fetchMock.mock.calls.find(
+			([, init]) => (init as RequestInit)?.method === 'DELETE'
+		);
+		expect(deleteCall).toBeDefined();
+		const deleteUrl = String(deleteCall![0]);
+		// Must use /property/{id} — stale target property values are property records, not entities
+		expect(deleteUrl).toContain('/property/stale-pv1');
+		expect(deleteUrl).not.toContain('/entity/stale-pv1');
+	});
+});
+
+describe('RED v13.3 (regression): op-level deleteProperty still uses DELETE /entity/{propertyDefId}', () => {
+	it('DELETE URL ends with /entity/{propertyDefId} — the v12 Bug-1 fix must be preserved', async () => {
+		const fetchMock = vi.spyOn(globalThis, 'fetch');
+		fetchMock.mockResolvedValueOnce(
+			new Response(JSON.stringify({ deleted: true }), { status: 200 })
+		);
+
+		const cbs = buildLiveCallbacks(client);
+		const op: DeletePropertyOp = {
+			kind: 'DELETE_PROPERTY',
+			parentType: 'organization',
+			propertyName: 'contact_email',
+			propertyDefId: 'org-contact-email-prop-id'
+		};
+
+		await cbs.deleteProperty(client, op);
+
+		const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+		// Prop-def DELETE must still use /entity/{id} — property-def entities ARE entities
+		expect(url).toContain('/entity/org-contact-email-prop-id');
+		expect(url).not.toContain('/property/');
+		expect(init?.method).toBe('DELETE');
 	});
 });
