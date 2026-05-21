@@ -163,6 +163,7 @@ Result: scripts/migrations/seed-results/seed-voices-2026-05-20T08-14-58-992Z.jso
   Sub-ops 3+4: 4 forename/surname values deleted from PO + Test User; both prop-defs retired
   Sub-op 5: _inheritrights=false set on all 6 orgs (commit 88595c7)
   Sub-op 3 (deprecated types): 0 found — no-op
+  Test User name restore: COMPLETE (commit f89295f) — 3 stale values cleared, "Test User" set, VERIFY OK
   Bentham post-write review: pending (batch routed by team-lead)
   YELLOW-15 carry-forward: fetchEntity per-org verification in sub-op 5 — batch with initial list for larger sets
   YELLOW (sub-op 1 sanity check): use seed person not PO for future formula-unwrap sanity checks
