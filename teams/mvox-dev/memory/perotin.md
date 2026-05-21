@@ -217,6 +217,28 @@ Result: scripts/migrations/seed-results/seed-voices-2026-05-20T08-14-58-992Z.jso
 
 ## Session 10 — 2026-05-21
 
+### Phase C discovery (commit a1aba7a)
+
+[PROBE-RESULT] Phase C entity counts (probe-phase-c-discovery-2026-05-21):
+  - inventory_copy: 0 instances
+  - participation: 0 instances
+  - affiliation: 4 instances — collective↔umbrella federation links (no person property)
+  - member.role: 4 members with role (PO only, Owner+Admin on each of 4 collectives = 8 value DELETEs)
+  Scope reframe: Phase C is Phase-D-sized. PO approved single-bundle design+execution.
+
+[DECISION] Affiliation disposition: PO confirmed — delete all 4 instances + retire type. (session 10)
+
+[DECISION] Role-type instances confirmed (pre-flight probe eb3038f): 5 total, not 2.
+  Owner (69c7f8708489bfcb0e81b020), Admin (69c7f8708489bfcb0e81b02e),
+  Librarian (69c7f8718489bfcb0e81b03b), Conductor (69c7f8718489bfcb0e81b045),
+  Section Leader (69c7f8718489bfcb0e81b050). Last 3 are orphaned (no live member.role values).
+  All 5 retire in Phase C.5. Script must enumerate dynamically at runtime.
+
+[DECISION] Corrected PO member IDs (confirmed live in pre-flight probe):
+  EFK: 69c7f8728489bfcb0e81b085  Sireen: 69c7f8788489bfcb0e81b1c9
+  Rahvusmeeskoor: 69c7f87e8489bfcb0e81b304  TAM: 69c7f8878489bfcb0e81b510
+  (Session-10 discovery had wrong IDs for Rahvusmeeskoor + TAM.)
+
 ### Task #64 YELLOW fixup (commit 10e1c2c)
 
 [CHECKPOINT] All 5 Phase D YELLOWs closed GREEN by Bentham:
