@@ -1,0 +1,62 @@
+{
+  "probeDate": "2026-05-21T05:02:03.828Z",
+  "persons": {
+    "total": 122,
+    "withForename": 2,
+    "withSurname": 2,
+    "withNameAlreadySet": 2,
+    "forenameOnly": 0,
+    "surnameOnly": 0,
+    "neitherNoName": 120,
+    "backfillTargets": 0,
+    "hasAllThree": 2,
+    "totalForenameValues": 2,
+    "totalSurnameValues": 2,
+    "backfillTargetIds": []
+  },
+  "organizations": [
+    {
+      "_id": "69c7f8718489bfcb0e81b05a",
+      "name": "Eesti Kammerkooride Liit",
+      "_inheritrights": true,
+      "_inheritrightsValueId": "69c7f8718489bfcb0e81b062",
+      "needsFlip": true
+    },
+    {
+      "_id": "69c7f8718489bfcb0e81b065",
+      "name": "Eesti Filharmoonia Kammerkoor",
+      "_inheritrights": true,
+      "_inheritrightsValueId": "69c7f8728489bfcb0e81b06d",
+      "needsFlip": true
+    },
+    {
+      "_id": "69c7f8788489bfcb0e81b1a9",
+      "name": "Kammernaiskoor Sireen",
+      "_inheritrights": true,
+      "_inheritrightsValueId": "69c7f8788489bfcb0e81b1b1",
+      "needsFlip": true
+    },
+    {
+      "_id": "69c7f87d8489bfcb0e81b2d9",
+      "name": "Eesti Meeskooride Liit",
+      "_inheritrights": true,
+      "_inheritrightsValueId": "69c7f87d8489bfcb0e81b2e1",
+      "needsFlip": true
+    },
+    {
+      "_id": "69c7f87d8489bfcb0e81b2e4",
+      "name": "Eesti Rahvusmeeskoor",
+      "_inheritrights": true,
+      "_inheritrightsValueId": "69c7f87d8489bfcb0e81b2ec",
+      "needsFlip": true
+    },
+    {
+      "_id": "69c7f8868489bfcb0e81b4f0",
+      "name": "Tartu Akadeemiline Meeskoor",
+      "_inheritrights": true,
+      "_inheritrightsValueId": "69c7f8868489bfcb0e81b4f8",
+      "needsFlip": true
+    }
+  ],
+  "deprecatedTypes": []
+}
