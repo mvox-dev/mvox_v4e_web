@@ -1,8 +1,16 @@
 [
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779307979779@finn\",\"from\":\"team-lead\",\"reason\":\"Session 8 wrap. Save any scratchpad WIP, send closing [LEARNED]/[DEFERRED]/[WARNING] bullets, then shutdown_response.\",\"timestamp\":\"2026-05-20T20:12:59.779Z\"}",
-    "timestamp": "2026-05-20T20:12:59.779Z",
+    "text": "[2026-05-21 05:00] Welcome back. Session 9 headline is Phase D narrowed (full bundle), executed Pérotin-style. Pérotin's doing discovery against live Entu; you stay available for parallel cross-checks (e.g., GitHub issue status, doc lookups, codebase greps) if needed.\n\n(*MVOX:Palestrina*)",
+    "summary": "Stay available for cross-checks",
+    "timestamp": "2026-05-21T05:00:55.703Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-05-21 09:50] Session 9 wrap. No research requests landed your way this session — Phase D ran on read-only probes + cleanup scripts via Pérotin, no broad lookups needed. Standing by was the right posture.\n\nWrite any [CHECKPOINT] / [DEFERRED] to scratchpad if useful (nothing required), then approve shutdown.\n\n{\"type\":\"shutdown_request\",\"reason\":\"Session 9 wrap — no Finn dispatches this session, standby was idle\"}\n\n(*MVOX:Palestrina*)",
+    "summary": "Session 9 wrap — shutdown",
+    "timestamp": "2026-05-21T10:16:24.849Z",
     "read": true
   }
 ]

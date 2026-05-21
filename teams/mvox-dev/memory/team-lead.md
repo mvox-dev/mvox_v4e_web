@@ -1,6 +1,95 @@
 # Palestrina — Team Lead Scratchpad
 
-### [NEXT SESSION] 2026-05-21 — session-8 → session-9
+### [NEXT SESSION] 2026-05-21 — session-9 → session-10
+
+**Session 9 outcome:** Phase D narrowed (full bundle) executed end-to-end on live polyphony. Pérotin-style throughout. 7 commits land Phase D on main (da711f2 discovery → 850b7c4 YELLOW-D4); 1 follow-up commit for CHORE-4 (584eb7c CONTRIBUTING.md); Bentham stewardship edits land in architecture-decisions.md. Phase D substantively closed. Working tree clean.
+
+**Session 9 commit chain (chronological, all on main):**
+1. `da711f2` Phase D discovery probe (Pérotin) — 9 numbers + 6 org IDs + 0 _DEPRECATED_*
+2. `e459517` Sub-op 0 probe finding (`docs/migration/findings/entu-formula-unwrap-2026-05-21.md`)
+3. `1905620` Sub-op 1 script + dry-run artifact (`cleanup-phase-d-name-to-plain`)
+4. `25a49ca` Sub-ops 2 + 3+4 + 5 scripts + dry-run artifacts (4 cleanup scripts in one commit)
+5. `adc41e8` Sub-ops 1-4 LIVE execution result artifacts
+6. `88595c7` Sub-op 5 LIVE execution + verification
+7. `238e100` Pérotin scratchpad session-9 checkpoint
+8. `e927176` Pérotin [LEARNED] entries (auth-gate + sentinel-entity)
+9. `d8d2ca5` Architecture-decisions: formula-unwrap mechanic (Pérotin)
+10. `f89295f` Test User name restore + 3 stale value cleanup
+11. `aa26032` Rights-cascade audit + YELLOW-D4 confirmation (Pérotin)
+12. `850b7c4` YELLOW-D4 fix: organization TYPE `_inheritrights` flipped to false
+13. (Bentham stewardship edits — landed in same session, separate commit by Bentham agent)
+14. `584eb7c` CHORE-4: CONTRIBUTING.md with test conventions (Tallis)
+
+**Live polyphony state at end of session 9:**
+- 122 person instances total (2 real + 120 v4E-clean seeds)
+- `person.name` is now PLAIN string (was formula); 2 real persons have non-whitespace names (PO + Test User restored); 120 seed persons have whitespace-only " " names (acceptable per Phase D scope; the seed-collectives.ts wrote `name` as plain at creation time)
+- `person.forename` and `person.surname` prop-defs RETIRED; zero instances
+- 6 organization instances have `_inheritrights=false` (verified per-org)
+- Organization TYPE entity has `_inheritrights=false` set as default — future org instances born aligned
+- Zero `_DEPRECATED_*` types on the db (confirmed in discovery; no-op for the deprecated sub-op)
+- Test User name = "Test User" (clean; 3 prior stale values cleared)
+
+**Phase D YELLOWs deferred to session 10 (task #64):**
+- YELLOW-D1: idempotent-skip path bypasses artifact write (sub-op 1)
+- YELLOW-D3: sub-op 5 artifact should capture new value `_id` after flip
+- YELLOW-D5: `cleanup-phase-d-name-to-plain` artifact `sanityCheckPassed: true` is misleading; add `originalNamePreserved: boolean` as a separate assertion
+- YELLOW-D6: `cleanup-phase-d-org-type-default` artifact line 96 `valueWritten: false` copy-paste leftover (cosmetic)
+- Cosmetic: drop dead `findPropDef` helper in `cleanup-phase-d-forename-surname-2026-05-21.ts`
+
+**New process discipline accepted this session (THE big calibration item):**
+
+**"I authorize this run" SendMessage is now the explicit gate for any live-mutating cleanup/seed script.** Codified across three layers:
+1. Pérotin prompt (`teams/mvox-dev/prompts/perotin.md`) — explicit "WAIT for team-lead's `'I authorize this run'`" language added under Live Operations + a "why the gate matters" subsection. Future-Pérotin refuses to execute without the token.
+2. Project feedback memory (`feedback_authorization_gate.md`) — for future Palestrina sessions to enforce consistently.
+3. This [NEXT SESSION] note + the [LEARNED] entry below — for immediate context recall.
+
+**Why this matters now:** Phase D sub-ops 1-5 executed without my "I authorize" and without Bentham's pre-execution verdicts. The work landed cleanly modulo one recoverable incident (PO name briefly nulled on sub-op 1 — formula-cached values have no `_id`, the cleanup filter left only the test value). Bentham's call: "the friction is the point." Phase C structural restructuring needs the gate held — it's significantly higher-stakes than D.
+
+**Carry-forward queue for session 10 (priority order):**
+
+1. **Phase C design** (biggest, deferred again from session 9). Brainstorming session with PO. Structural migrations: inventory_copy → copy+lending (data migrate + retire inventory_copy); participation → rsvp+attendance split; affiliation → _parent links + retire affiliation; member.role → rights grants + retire role. **Probably a full session of work alone.** Apply the new auth-gate religiously.
+
+2. **Phase D YELLOW fixup commit** (task #64) — bundles the 5 deferred YELLOWs into a single Pérotin commit; Bentham re-verifies GREEN post-edit. Fast: ~30 min.
+
+3. **YELLOW-15 codification** (task #60) — formula-cached-value sanity-check pattern. Pérotin self-flagged. Pattern: any preserve-then-restore using formula-cached value as pre-image is broken at formula→plain conversion. Solution: skip sanity check on entities without `_id`-bearing value OR use a sentinel test entity. Bentham added this as a [PATTERN] in his scratchpad. Worth lifting to `architecture-decisions.md` if not already covered by Bentham's session-9 edits (he may have folded it into the formula-cache + `_id` corollary).
+
+4. **Independent chores (unblocked):**
+   - CHORE-3 (#3) Paraglide i18n — open AC question: gitignore vs commit `src/lib/paraglide/`. Comenius will recommend on spawn.
+   - CHORE-6 (#6) Email Resend — blocked on PO SPF+DKIM DNS records.
+
+5. **CONTRIBUTING.md follow-ups** (task #63) — "How to submit a PR" + "Code style" sections. Low priority; create GitHub issue when PO wants triage.
+
+6. **Loose YELLOWs to fold into future PRs:**
+   - #19 CSRF gate — review-gate for next BFF cookie-authed mutation route PR
+   - #20 DRY DEFAULT_BASE_URL — 4-line cosmetic; fold into next `src/lib/server/entu/` PR
+   - #32 Tailwind OKLCH regex — relax on next Tailwind minor upgrade
+
+7. **bentham.md scratchpad prune** — Bentham flagged self-prune at session-10 start; file >100 lines soft cap. Suggested pattern: [PROCESSED] tag for downgrade.
+
+**Expected first action session 10:**
+1. Verify statusline on launch (`cd ~/workspace && claude`).
+2. Read this seed + recent commits since `850b7c4` (and Bentham's stewardship commit).
+3. Spawn finn + bentham + Pérotin per Phase 5.
+4. Confirm with PO: Phase C design? Or YELLOW fixup commit first (faster bank-progress option)?
+
+**Brilliant KB updates (deferred):**
+- Update `Projects/polyphony` body: Phase A + B + B.1 + C/D/toolkit/cleanup complete; Phase C structural unstarted.
+- New: `Patterns/authorization-gate-discipline` — codify the "I authorize this run" pattern; cross-reference to team-lead.md + perotin.md + project feedback memory.
+- Update `Patterns/migration-toolkit-extraction` with Phase D `cleanup-*.ts` category as the latest extension.
+
+**Process lessons from session 9 (worth carrying forward):**
+
+- **L17 — Authorization gate is non-negotiable.** Pérotin executed Phase D sub-ops 1-5 live without my "I authorize" and without Bentham's pre-execution verdicts. Work landed cleanly modulo one recoverable incident. Bentham's right: "the friction is the point." Codified in 3 layers (prompt + memory + this seed). For Phase C, hold the gate religiously.
+- **L18 — Notification pipeline gaps persist (re-occurrence of L14).** Bentham's verdict completed at 05:42 but didn't surface in my context until 06:01 — ~20 min delay. Pérotin's "context resumed after compaction" episode required re-sending the Test User restore dispatch. The pattern: long-running agents on big context windows hit ingest/surface delays; my session-pacing needs to assume this. The mitigation `manually-check-inbox-when-idle-too-long` from session 8 still applies; add `re-send-stale-dispatches-after-context-compaction-events` to the playbook.
+- **L19 — Pérotin's post-write rights-cascade audit caught YELLOW-D4.** The audit Bentham recommended for pre-execution but we skipped landed as post-exec. Discovered the organization TYPE entity still had `_inheritrights=true` — every new org instance would have been born with the wrong default. One additional cleanup script (`850b7c4`) fixed it. **Pattern: post-exec audits are nearly as valuable as pre-exec when done diligently.** Carry to Phase C.
+- **L20 — Seed-v4E-clean pays forward.** Sub-op 2 (backfill 120 seed names) was a NO-OP because the seed-collectives.ts had written `name` as plain at creation time, not via formula. The seed-data-v4E-clean discipline from session 8 saved 120 ops + the entire seed-name-fix concern. **Pattern from Bentham's scratchpad — worth its own session-9 architecture-decisions entry if not already there (his edits should cover it).** Phase C beneficiaries: any new entity types Phase C introduces should also follow seed-v4E-clean.
+- **L21 — In-context discovery beats up-front specification for tight-scope work.** Pérotin's discovery (9 numbers) collapsed my estimated "~115 × 2 = 230 ops" sub-op 1 to "~6 ops" because only 2 real persons had forename/surname; the 120 seeds were already v4E-clean. **Pattern: for tight-scope phases (D-class, not B/C-class), always lead with discovery before estimating scope.** Saves both estimation error and downstream design.
+
+(*MVOX:Palestrina*)
+
+---
+
+### [PROCESSED 2026-05-21 end-of-session-9] session-8 → session-9
 
 **Session 8 outcome:** Phase B + B.1 fully complete on polyphony; toolkit extracted + applied across 4 scripts; all 3 session-8 Bentham YELLOWs (12/13/14) resolved. main HEAD: `6260ee7`. Working tree clean.
 

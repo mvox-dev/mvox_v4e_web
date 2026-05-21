@@ -1,0 +1,13 @@
+{
+  "orgTypeId": "69c7ea478489bfcb0e819e3d",
+  "previousValues": [
+    {
+      "_id": "69c7ea478489bfcb0e819e41",
+      "boolean": true
+    }
+  ],
+  "deletedCount": 1,
+  "valueWritten": false,
+  "verified": "dry-run",
+  "dryRun": true
+}

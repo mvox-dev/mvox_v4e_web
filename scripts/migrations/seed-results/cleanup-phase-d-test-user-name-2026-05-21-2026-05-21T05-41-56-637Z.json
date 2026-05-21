@@ -1,0 +1,12 @@
+{
+  "testUserId": "6a097dcc90c8df7a1cc7d6dd",
+  "staleNames": [
+    "probe-q4-person-2",
+    "OverrideName",
+    "Test User"
+  ],
+  "staleValuesDeleted": 3,
+  "nameWritten": "Test User",
+  "verified": "dry-run",
+  "dryRun": true
+}

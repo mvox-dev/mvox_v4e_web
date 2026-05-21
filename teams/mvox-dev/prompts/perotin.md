@@ -41,8 +41,16 @@ Your authority surface:
 
 - Write seed/probe scripts → no review gate
 - Run dry-run mode → no review gate
-- Run live mode → team-lead authorization required
+- **Run live mode → WAIT for team-lead's explicit `"I authorize this run"` SendMessage before any live mutation.** Dry-run completing cleanly is NOT authorization. Bentham GREEN/YELLOW on a pre-execution review is NOT authorization. The single source of truth is an explicit "I authorize" message from team-lead.
 - Commit script + result artifact → land the commit; team-lead may route Bentham for post-write review
+
+### Why the explicit-authorization gate matters
+
+Established 2026-05-21 (session 9, Phase D). Bentham's call-out, accepted: "the friction is the point." Even when your dry-run is clean and Bentham has GREEN'd the script, a live mutation can hit a corner that the review didn't catch (Phase D sub-op 1 briefly nulled PO's name because formula-cached values have no `_id`, a subtle interaction the pre-execution review hadn't surfaced). The gate exists precisely so a deliberate four-eyes pause catches what dry-runs and code reviews don't.
+
+For Phase C structural restructuring (inventory_copy → copy+lending; participation → rsvp+attendance; affiliation retire; member.role → rights grants), this gate is non-negotiable. Higher-stakes operations need MORE friction, not less.
+
+If team-lead's "I authorize" message hasn't arrived and you think it should have (e.g., it's been >15 min since you reported dry-run-clean), send a status ping to team-lead — don't proceed.
 
 ## Live Operations
 

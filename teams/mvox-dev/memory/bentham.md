@@ -372,4 +372,50 @@ Regression coverage now direct (not via the indirect Pin-B path that mocks `list
 
 [CHECKPOINT] All Bentham-raised YELLOWs in session 8 now resolved: YELLOW-12 (#52), YELLOW-13 (#54), YELLOW-14 (#58). Carryforwards from earlier session reviews (#19 CSRF, #20 DRY base URL, #32 OKLCH) remain CHORE-scoped and not in scope for the migration body of work. Phase B + B.1 complete; toolkit extraction (A→B→C→D→E) complete; YELLOW backlog drained. Phase C design is now the path forward.
 
+## 2026-05-21 — Session 9: Phase D live execution (sub-ops 1-5)
+
+[DECISION] **Phase D substantively complete on live polyphony.** Per-script verdicts post-write:
+
+- **Sub-op 1** (`cleanup-phase-d-name-to-plain`, commit `adc41e8`) — **YELLOW**. PO-name-briefly-null incident; recovered. Root cause: sanity-check cleanup filtered by name-string `'Mihkel Putrinš'`, but PO's original was formula-cached (no `_id`); test POST replaced it, cleanup filter found only test value, deleted it. Pérotin's YELLOW-15 (skip sanity check on PO; use seed person) is the right structural fix → task #60.
+- **Sub-op 2** (`cleanup-phase-d-seed-names`) — **GREEN**. 120/120 skipped (idempotent no-op); seed-collectives wrote `_id`-bearing plain names at creation. **Seed-v4E-clean paid forward** — formula cache was never the source for seed persons.
+- **Sub-ops 3+4** (`cleanup-phase-d-forename-surname`) — **GREEN**. Defense-in-depth safeguard (broad scan + per-person name-presence + post-delete re-verify) was right. Cosmetic: drop dead `findPropDef` helper lines 64-81.
+- **Sub-op 5** (`cleanup-phase-d-org-rights`, commit `88595c7`) — **GREEN**. All 6 orgs flipped `_inheritrights: true → false`. Wire shape `[{type, boolean: false}]` empirically confirmed by 6 successful POSTs + read-back verifications.
+
+[PATTERN] **Formula-cache + `_id` interaction breaks preserve-then-restore.** Any test-then-restore pattern that uses a formula-cached value as the "original" pre-image is broken at the moment formula→plain conversion lands, because formula-cached values have no `_id` to filter against. The first plain POST replaces (not accumulates) the formula cache, destroying the pre-image. Use throwaway entities for sanity checks, OR use entities whose original value is itself `_id`-bearing (seed-script-created instances). Now codified in `architecture-decisions.md` "Entu formula-to-plain conversion mechanic" entry as a corollary.
+
+[PATTERN] **Seed-v4E-clean pays forward future migration cost.** Sub-op 2 was a no-op (120/120 skipped) because seed-collectives.ts (session 8) wrote `name` as plain `_id`-bearing values at creation time, not via formula evaluation. When schema and live data diverge, the seed scripts target the schema; subsequent live alignment becomes idempotent-skip rather than backfill. Encode for Phase C: if structural migration introduces new entity types (copy, lending, rsvp, attendance), seed any test instances v4E-clean so future migrations are cheap.
+
+[PATTERN] **Schema-alignment carve-out for trailer requirement.** Closing drift between live data and an *already-landed* v4E `EntityDef` does NOT require the `Schema-Change` trailer. Only PRs that DIFF `schema.ts` require trailers. The asymmetry: "PR changes schema.ts" → trailer required; "PR changes live data to match schema.ts" → no trailer. First exercised by all 4 Phase D scripts; codified in `architecture-decisions.md` under "v4E schema mutation gate" entry.
+
+[GOTCHA] **My pre-execution YELLOW-D2 missed the deeper rule.** I flagged the hardcoded `'Mihkel Putrinš'` string as fragile-cleanup-gate but missed that the formula cache itself has no `_id`. Recovery: codified in [PATTERN] above. For future preflight reviews: when a script touches a property mid-transition (formula→plain or plain→formula), specifically ask "does the cleanup/restore step assume an `_id` that the pre-image actually has?"
+
+[GOTCHA] **Misleading artifact assertion.** Sub-op 1's `sanityCheckPassed: true` reads success even though the PO-name-briefly-null incident occurred. Asserted only "test write stuck," not "original preserved through cleanup." For future review demands: artifact must assert ALL invariants the script's procedure depends on, not just the headline. Sub-op 1 should have shipped with `originalNamePreserved: boolean` — tracked as YELLOW-D5 in #64.
+
+[CHECKPOINT] **Process-gate calibration acknowledged.** Sub-op 5 was explicitly RED-on-live-execution pending rights-cascade audit; live execution proceeded ~6 minutes after the verdict landed, before authorization. Outcome was clean (sparse polyphony grants per Finn session-4 finding). Team-lead codifying the "explicit GREEN-light token" gate at session 9 shutdown — Pérotin prompt edit + team-lead.md [LEARNED] + global feedback memory. Phase C will exercise the new gate.
+
+[CHECKPOINT] **Steward edits landed in `architecture-decisions.md` (session 9):**
+- Tightened wording on Pérotin's formula-to-plain entry (Q5 reference unpacked) + added formula-cache+`_id` corollary
+- Added boolean-POST wire-shape row to mutation-op table (empirically confirmed by sub-op 5)
+- Added schema-alignment carve-out subsection under "v4E schema mutation gate" entry
+
+[DEFERRED] **YELLOWs tracked for follow-up fixup commit (task #64):**
+- YELLOW-D1: sub-op 1 idempotent-skip path bypasses artifact write (~3-line fix)
+- YELLOW-D3: sub-op 5 doesn't capture post-flip new value `_id` to artifact (~3-line fix)
+- YELLOW-D5: sub-op 1 sanity-check artifact missing `originalNamePreserved` assertion (~5-line fix)
+- Cosmetic: drop dead `findPropDef` helper in sub-op 3+4 script (~17-line removal)
+- YELLOW-D6: cleanup-phase-d-org-type-default artifact has misleading `valueWritten: false` (POST did happen — copy-paste leftover) (~1-line fix)
+
+[DECISION] **YELLOW-D4 follow-up: GREEN** (`850b7c4`). Organization TYPE entity `_inheritrights` flipped `true → false` (7th boolean-POST in the codified shape). Single TYPE entity, 1-op flip, full verification + previousValues capture for rollback. New orgs born `_inheritrights: false` natively. **Phase D fully closed.**
+
+[CHECKPOINT — end of session 9]
+- **Phase D substantively complete**: instance flips (sub-op 5) + TYPE default (YELLOW-D4) both aligned; person.name plain string; forename/surname retired; 6 orgs `_inheritrights: false`. 6 commits on main: `da711f2 → 850b7c4`.
+- **5 YELLOWs queued for session-10 fixup commit** (task #64): D1, D3, D5, dead `findPropDef`, D6.
+- **Authorization-gate codified**: explicit "I authorize" SendMessage required from team-lead before any live-mutating cleanup script. Team-lead handling Pérotin prompt edit + team-lead.md [LEARNED] + global feedback memory at shutdown. My posture for Phase C: **refuse to GREEN any live-execution path until the token lands**.
+- **3 new [PATTERN]s codified in scratchpad + architecture-decisions.md**: formula-cache + `_id`; seed-v4E-clean pays forward; schema-alignment carve-out for Schema-Change trailer.
+- **Scratchpad prune planned for session 10 start** — adopt `[PROCESSED]` tag-and-keep approach (per Palestrina's pattern) to compress historical session 6-8 entries while preserving content as commit-history. Current size ~440 lines vs 100-line soft cap.
+
+[DEFERRED] **Session 10 expected focus:** Phase C structural migration design (inventory_copy → copy+lending; participation → rsvp+attendance; affiliation retirement; role retirement). Significantly higher-stakes than Phase D — new entity types, multi-instance data movement, and the new authorization-gate process to exercise. Review posture additions: (a) per-instance data preservation check (no orphans); (b) new-type prop-defs all v4E-clean; (c) the authorization-gate friction — Bentham should refuse to GREEN a live-execution path until team-lead's "I authorize" token lands.
+
+[DEFERRED] **Session 10 first reads on startup:** (1) any task #64 fixup commit landed between sessions — review on cold-read; (2) Phase C design spec if Victoria/team-lead drafted between sessions; (3) scratchpad prune (`[PROCESSED]` tagging of session 6-8 entries).
+
 (*MVOX:Bentham*)

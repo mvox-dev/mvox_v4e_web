@@ -12,7 +12,9 @@ Format per entry: short title, decision, rationale, date. Most recent at the top
 
 After deletion:
 - New instances: plain POSTs write and persist normally.
-- Existing instances with stale formula-cached values: the cached value persists (consistent with Q4 — Entu retains materialized formula values after source deletion). A direct POST replaces the stale value with a single clean value — no pre-delete of the stale value needed. Formula-cached values have no `_id`, so Entu's POST path does not accumulate them alongside the new write (unlike the Q5 multi-value trap for plain properties).
+- Existing instances with stale formula-cached values: the cached value persists (consistent with Q4 — Entu retains materialized formula values after source deletion). A direct POST replaces the stale value with a single clean value — no pre-delete of the stale value needed. Formula-cached values have no `_id`, so Entu's POST path does not accumulate them alongside the new write — unlike the Q5 multi-value-append trap, where plain-string POSTs append rather than replace, requiring DELETE-then-POST for replace semantics.
+
+**Corollary (formula-cache + `_id` interaction)**: Sanity-check or preserve-then-restore patterns that depend on a stable pre-image to restore to are BROKEN at the moment formula→plain conversion lands, because the pre-image (formula-cached value) has no `_id` to filter against. Any test-then-restore script that writes a probe value to a real entity whose original value came from a formula will lose the original on cleanup. **Use a throwaway entity for sanity checks, or use a real entity whose original value is itself an `_id`-bearing plain POST (e.g., seed-script-created instance).**
 
 **Rationale**: Verified live against polyphony via `scripts/migrations/probes/probe-phase-d-formula-unwrap-2026-05-21.ts`. Unlocked Phase D sub-op 1 (converting `person.name` from formula `forename ' ' surname` → plain string to align live polyphony with v4E `schema.ts`). The "POST replaces stale formula cache without pre-delete" finding significantly reduces Phase D op count.
 
@@ -45,6 +47,7 @@ After deletion:
 | **UPDATE** single property value | `DELETE /property/{old-value-id}` + `POST /entity/{id}` with new value | Entu POST APPENDS to multi-valued properties. Must DELETE old value before POST for replace semantics. |
 | **REMOVE** single property value | `DELETE /property/{value-id}` | Clean, immediate. Verified via post-GET. |
 | **DELETE_ENTITY** | `DELETE /entity/{id}` | Returns 404 on subsequent GET. Distinct from property-value delete. |
+| **POST boolean property** | `POST /entity/{id}` with body `[{type: '<prop>', boolean: <true\|false>}]` | Replace semantics: DELETE existing value first then POST (same as UPDATE). Empirically confirmed by Phase D sub-op 5 (commit `88595c7`) — 6 successful `_inheritrights: false` flips on `organization` instances. |
 
 Companion call-out: **prop-def DELETE** also uses `DELETE /entity/{prop-def-id}` (prop-defs ARE entities). The v12 Bug-1 fix + #56 wire-shape split established the distinction between entity-`_id` and property-value-`_id`:
 
@@ -102,6 +105,15 @@ Companion call-out: **prop-def DELETE** also uses `DELETE /entity/{prop-def-id}`
 PO approval can be in-session verbal (logged by team-lead in scratchpad with timestamp) or written (GitHub comment / email). Strictness can ratchet up later if needed.
 
 **Rationale**: Closes Bentham's session-1 flag #4. Convention-only (zero tooling), works across the repo boundary (the schema isn't in this repo). The trailer makes the dependency visible at review time; the entu-research PR provides the queryable audit history. Adopted essentially as Bentham's Option A proposal from his session-2 intro.
+
+### Schema-alignment carve-out (2026-05-21, session 9)
+
+A PR that closes drift between live data and an *already-landed* v4E `EntityDef` does NOT require the `Schema-Change` trailer. Only PRs that diff `entu/research/docs/schema/v4E/schema.ts` (new/changed `EntityDef`s, properties, formulas, or rights defaults) require the trailer. Bentham distinguishes:
+
+- "Does this PR change what's in `schema.ts`?" → trailer required
+- "Does this PR change live data to match what's already in `schema.ts`?" → no trailer
+
+First exercised by Phase D sub-ops 1+3+4 (forename/surname retirement; `person.name` formula→plain; commit `adc41e8`) and sub-op 5 (`_inheritrights: false` on 6 orgs; commit `88595c7`). All four had no Schema-Change trailer on the justification that v4E `schema.ts` already declared the target shape; live polyphony was the drift to close.
 
 **Source**: Bentham proposal session 2 + PO confirmation.
 
