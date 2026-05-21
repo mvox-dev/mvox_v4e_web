@@ -1,0 +1,38 @@
+{
+  "dryRun": false,
+  "runAt": "2026-05-21T05:21:46.202Z",
+  "subOp3": {
+    "persons": [
+      {
+        "_id": "69bcfd8e9c031ab8e6ce8079",
+        "label": "PO",
+        "name": "Mihkel Putrinš",
+        "forenameValueId": "69bcfd8e9c031ab8e6ce8174",
+        "surnameValueId": "69bcfd8e9c031ab8e6ce81d3",
+        "forenameDeleted": true,
+        "surnameDeleted": true
+      },
+      {
+        "_id": "6a097dcc90c8df7a1cc7d6dd",
+        "label": "Test User",
+        "name": "probe-q4-person-2",
+        "forenameValueId": "6a0d62a590c8df7a1cc7e0ed",
+        "surnameValueId": "6a0d613090c8df7a1cc7e0e7",
+        "forenameDeleted": true,
+        "surnameDeleted": true
+      }
+    ]
+  },
+  "subOp4": {
+    "forename": {
+      "propDefId": "69bcfd8e9c031ab8e6ce8065",
+      "deleted": true
+    },
+    "surname": {
+      "propDefId": "69bcfd8e9c031ab8e6ce806d",
+      "deleted": true
+    }
+  },
+  "safeguardPassed": true,
+  "error": null
+}

@@ -1,0 +1,11 @@
+{
+  "dryRun": false,
+  "runAt": "2026-05-21T05:20:45.236Z",
+  "propDefId": "69bcfd8e9c031ab8e6ce8068",
+  "formulaValueId": "69bcfd8e9c031ab8e6ce81cb",
+  "beforeFormula": "forename ' ' surname",
+  "afterFormula": null,
+  "formulaDeleted": true,
+  "sanityCheckPassed": true,
+  "error": null
+}

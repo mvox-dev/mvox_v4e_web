@@ -137,9 +137,10 @@ async function main() {
       console.log('  [DRY-RUN] WOULD: POST name="__sanity_check__" to PO, verify it sticks, DELETE it');
       result.sanityCheckPassed = null;
     } else {
-      // Read current PO name (to restore)
+      // Read current PO name — capture pre-existing _ids to identify new values after POST
       const poBefore = await fetchEntity(client, SANITY_CHECK_PERSON_ID) as EntityFields;
       const poNameValues = poBefore.name ?? [];
+      const preExistingNameIds = new Set(poNameValues.map(v => v._id).filter(Boolean));
       console.log(`  PO current name values: ${JSON.stringify(poNameValues.map(v => ({ _id: v._id, string: v.string })))}`);
 
       // POST test name
@@ -163,9 +164,10 @@ async function main() {
         throw new Error('Sanity check FAILED: plain POST to person.name did not stick — formula may still be active');
       }
 
-      // Clean up: delete the test name value (and any other non-original name values)
+      // Clean up: delete only values whose _id was NOT present before the test POST.
+      // This avoids relying on the string value to identify what to keep.
       const testNameValueIds = nameAfterWrite
-        .filter(v => v.string !== 'Mihkel Putrinš')
+        .filter(v => v._id && !preExistingNameIds.has(v._id))
         .map(v => v._id)
         .filter(Boolean) as string[];
       for (const id of testNameValueIds) {
