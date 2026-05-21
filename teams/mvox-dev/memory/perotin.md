@@ -334,6 +334,25 @@ Commits (in order):
   `git show <branch>:<path> > /workspace/scripts/migrations/probes/<filename>` to copy it
   into the current working tree temporarily. Run, then delete. Don't leave it staged.
 
+## Session 11 — process patterns (2026-05-21)
+
+[PATTERN] Manifest-first dry-run discipline for seed scripts:
+  Write manifest output (KEEP/DELETE/UPDATE/CREATE table with open questions) BEFORE
+  any live execution logic. Surface open questions [Q] in the dry-run output so PO can
+  answer before authorizing. Don't implement full execution before the manifest is signed off.
+  Dry-run catches structural issues; full execution logic follows only after PO confirms design.
+
+[PATTERN] Post-mutation type-name sweep as standard close:
+  After any op that creates/modifies menu entities (or any entities with query strings),
+  re-run probe-type-name-string-sweep against the live db as a sanity check. Cost is low
+  (read-only, fast); confirms no new type-name regressions introduced. Commit the sweep
+  artifact alongside the seed result artifact.
+
+[PATTERN] Seed catalog index (standing concern):
+  seed-voices.ts          — voice instances (5 voices), idempotent by name, last live: 2026-05-20
+  seed-collectives.ts     — org/section/person/member instances (120p, 235m, 6o, 16s), last live: session 8
+  seed-menu-items-per-entity-type-2026-05-21.ts — menu entity rationalization, idempotent by query, last live: 2026-05-21
+
 ## Permanent role note
 
 Promoted from temporary specialist to permanent data-manager (session 7 end). Future seeding work:
