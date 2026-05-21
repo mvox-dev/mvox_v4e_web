@@ -1,4 +1,4 @@
-const DEFAULT_BASE_URL = 'https://entu.app/api/';
+export const DEFAULT_BASE_URL = 'https://entu.app/api/';
 
 export interface EntuEntity {
 	_id: string;

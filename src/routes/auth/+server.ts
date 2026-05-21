@@ -1,7 +1,6 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import { json } from '@sveltejs/kit';
-
-const DEFAULT_BASE_URL = 'https://entu.app/api/';
+import { DEFAULT_BASE_URL } from '../../lib/server/entu/client.ts';
 
 export const POST: RequestHandler = async ({ request, cookies, url }) => {
 	const authHeader = request.headers.get('Authorization');

@@ -4,6 +4,28 @@ Personal notes. Only Josquin writes here.
 
 ---
 
+## [PATTERN] 2026-05-21 — Test fixtures pin historical defaults; don't DRY them
+
+When a beforeEach stubs an env var to match the production default literal, that's a **fixture**, not duplication. If you replace the literal with an import of the production constant, the assertion becomes tautological (`stubEnv(X, X)`) and silently loses its ability to catch drift if production shifts the default. Surfaced via Bentham's #20 v1 review: I had switched `client.spec.ts:7` from `'https://entu.app/api/'` literal to `DEFAULT_BASE_URL` — wrong move, reverted in v2.
+
+**Rule:** DRY applies to production-to-production duplication. Test fixtures hardcode expected values *on purpose* — that's how they catch drift. If two test files share a fixture, factor it into a test helper (still a literal there), not into the production code under test.
+
+**Also:** the SvelteKit `$lib` alias does NOT resolve in `vitest.config.ts` (separate from `vite.config.ts`, no sveltekit plugin loaded). Use relative paths (`'../../lib/...'`) for cross-tree imports in `src/routes/**` when the file is tested via vitest. Or teach vitest the alias if it ever becomes painful — for now relative is the smaller diff.
+
+---
+
+## [GOTCHA] 2026-05-21 — Entu API base URL: client.ts uses legacy `entu.app/api/` form, prompt says `api.entu.app/{db}/`
+
+Surfaced during #20. My prompt (L107) declares the canonical Entu API base as `https://api.entu.app/{db}/` (subdomain form), but `src/lib/server/entu/client.ts` defaults to `'https://entu.app/api/'` (path form). The path form is also baked into the SvelteKit cookie name expectations and was apparently inherited from the CHORE-5 skeleton (#16/#17).
+
+Out of scope for #20 (cosmetic DRY). Two possibilities:
+1. Legacy form works (path-based routing on the same MongoDB+S3 backend) — likely, given CHORE-5 GREEN landed and the test/probe suite exercises the live API via this path elsewhere. Worth confirming the next time a BFF route actually calls Entu for real (today the client lives but has no live caller).
+2. Legacy form is broken — would be caught the first time we make a real Entu call. Risk: silent failure path or wrong-host CORS.
+
+**Action when next BFF route lands:** before merging, swap `DEFAULT_BASE_URL` to `'https://api.entu.app/'` and adjust `entityUrl` / `search` URL construction (the current code does `${baseUrl}${db}/entity/...` which works for both forms since baseUrl already has the trailing slash and db slots in next). Then probe live to confirm. May warrant its own chore issue — flag to team-lead when the first real-call route is in flight.
+
+---
+
 ## [LEARNED] 2026-05-20 — Squash-merge flow on this team
 
 Each PR landed on main via the same local squash-merge ritual (no PRs opened on GitHub; all feature branches stayed local). Steps that became muscle memory:
