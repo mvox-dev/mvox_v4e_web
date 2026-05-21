@@ -101,6 +101,11 @@ async function main() {
       if (liveVals.length !== values.length) {
         throw new Error(`HALT: member ${memberId} has ${liveVals.length} role values live, preflight expected ${values.length}. Drift detected.`);
       }
+      const liveIds = new Set(liveVals.map(v => v._id));
+      const missingIds = values.filter(v => !liveIds.has(v._id));
+      if (missingIds.length > 0) {
+        throw new Error(`HALT: member ${memberId} missing hardcoded value IDs: ${missingIds.map(v => v._id).join(', ')}. ID drift — preflight IDs no longer present live.`);
+      }
     }
     artifact.initialValueCount = liveValueCount;
     console.log(`  Total live role values: ${liveValueCount} (expected ${EXPECTED_VALUE_COUNT})`);

@@ -107,6 +107,12 @@ async function main() {
     if (liveInstances.length !== EXPECTED_INSTANCE_COUNT) {
       throw new Error(`HALT: expected ${EXPECTED_INSTANCE_COUNT} role-type instances, found ${liveInstances.length}. Drift from pre-flight — investigate.`);
     }
+    // Sanity-check: every live ID must be in the hardcoded preflight list (exact-ID drift guard)
+    const hardcodedIds = new Set(ROLE_TYPE_INSTANCES.map(r => r._id));
+    const unknownIds = liveInstances.filter(i => !hardcodedIds.has(i._id));
+    if (unknownIds.length > 0) {
+      throw new Error(`HALT: live role instances contain IDs not in preflight hardcoded list: ${unknownIds.map(i => i._id).join(', ')}. ID drift — re-run pre-flight probe before proceeding.`);
+    }
 
     // Cross-script gate: live only — verify C.4 already cleared member.role values
     if (!DRY_RUN) {
@@ -127,30 +133,35 @@ async function main() {
       console.log('  [DRY-RUN] cross-script gate skipped (not applicable in dry-run)');
     }
 
+    // Resolve display names from hardcoded list for logging; live list is authoritative for IDs
+    const displayNameMap = new Map(ROLE_TYPE_INSTANCES.map(r => [r._id, r.displayName]));
+
     // Preservation snapshot
     console.log('\n=== Preservation snapshot ===');
-    for (const inst of ROLE_TYPE_INSTANCES) {
+    for (const inst of liveInstances) {
+      const displayName = displayNameMap.get(inst._id) ?? inst._id;
       const entity = await fetchEntity(client, inst._id);
-      artifact.preservation.push({ _id: inst._id, displayName: inst.displayName, properties: entity });
-      console.log(`  Captured: ${inst._id} "${inst.displayName}"`);
+      artifact.preservation.push({ _id: inst._id, displayName, properties: entity });
+      console.log(`  Captured: ${inst._id} "${displayName}"`);
     }
 
     // Delete role-type instance entities
     console.log('\n=== Delete role-type instance entities ===');
-    for (const inst of ROLE_TYPE_INSTANCES) {
+    for (const inst of liveInstances) {
+      const displayName = displayNameMap.get(inst._id) ?? inst._id;
       if (DRY_RUN) {
-        console.log(`  [DRY-RUN] WOULD DELETE entity (role instance) _id=${inst._id} "${inst.displayName}"`);
-        artifact.instanceResult.push({ id: inst._id, displayName: inst.displayName, outcome: 'would-delete' });
+        console.log(`  [DRY-RUN] WOULD DELETE entity (role instance) _id=${inst._id} "${displayName}"`);
+        artifact.instanceResult.push({ id: inst._id, displayName, outcome: 'would-delete' });
       } else {
         try {
           await deleteEntity(client, inst._id);
-          console.log(`  DELETED role instance "${inst.displayName}" _id=${inst._id}`);
-          artifact.instanceResult.push({ id: inst._id, displayName: inst.displayName, outcome: 'deleted' });
+          console.log(`  DELETED role instance "${displayName}" _id=${inst._id}`);
+          artifact.instanceResult.push({ id: inst._id, displayName, outcome: 'deleted' });
         } catch (err) {
           const msg = String(err);
           console.error(`  FAILED to delete role instance _id=${inst._id}: ${msg}`);
-          artifact.instanceResult.push({ id: inst._id, displayName: inst.displayName, outcome: 'failed' });
-          artifact.errors.push(`role instance ${inst._id} (${inst.displayName}): ${msg}`);
+          artifact.instanceResult.push({ id: inst._id, displayName, outcome: 'failed' });
+          artifact.errors.push(`role instance ${inst._id} (${displayName}): ${msg}`);
         }
       }
     }
