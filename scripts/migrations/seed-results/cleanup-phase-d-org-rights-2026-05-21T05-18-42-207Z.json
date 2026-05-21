@@ -1,0 +1,53 @@
+{
+  "dryRun": true,
+  "runAt": "2026-05-21T05:18:42.207Z",
+  "orgCount": 6,
+  "set": 0,
+  "alreadyFalse": 0,
+  "failed": 0,
+  "dryRunWouldSet": 6,
+  "results": [
+    {
+      "_id": "69c7f8718489bfcb0e81b05a",
+      "name": "Eesti Kammerkooride Liit",
+      "currentInheritRights": true,
+      "existingValueId": "69c7f8718489bfcb0e81b062",
+      "action": "DRY-RUN"
+    },
+    {
+      "_id": "69c7f8718489bfcb0e81b065",
+      "name": "Eesti Filharmoonia Kammerkoor",
+      "currentInheritRights": true,
+      "existingValueId": "69c7f8728489bfcb0e81b06d",
+      "action": "DRY-RUN"
+    },
+    {
+      "_id": "69c7f8788489bfcb0e81b1a9",
+      "name": "Kammernaiskoor Sireen",
+      "currentInheritRights": true,
+      "existingValueId": "69c7f8788489bfcb0e81b1b1",
+      "action": "DRY-RUN"
+    },
+    {
+      "_id": "69c7f87d8489bfcb0e81b2d9",
+      "name": "Eesti Meeskooride Liit",
+      "currentInheritRights": true,
+      "existingValueId": "69c7f87d8489bfcb0e81b2e1",
+      "action": "DRY-RUN"
+    },
+    {
+      "_id": "69c7f87d8489bfcb0e81b2e4",
+      "name": "Eesti Rahvusmeeskoor",
+      "currentInheritRights": true,
+      "existingValueId": "69c7f87d8489bfcb0e81b2ec",
+      "action": "DRY-RUN"
+    },
+    {
+      "_id": "69c7f8868489bfcb0e81b4f0",
+      "name": "Tartu Akadeemiline Meeskoor",
+      "currentInheritRights": true,
+      "existingValueId": "69c7f8868489bfcb0e81b4f8",
+      "action": "DRY-RUN"
+    }
+  ]
+}
