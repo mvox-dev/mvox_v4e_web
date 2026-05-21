@@ -165,9 +165,11 @@ Result: scripts/migrations/seed-results/seed-voices-2026-05-20T08-14-58-992Z.jso
   Sub-op 3 (deprecated types): 0 found — no-op
   Test User name restore: COMPLETE (commit f89295f) — 3 stale values cleared, "Test User" set, VERIFY OK
     [DATA-QUALITY] Post-mortem: 3 accumulated name values found (probe-q4-person-2 + OverrideName + prior "Test User") — repeated probe writes without DELETE-first cleanup. Lesson: any plain (non-formula) property touched by probes needs explicit cleanup; POST appends, it does not replace.
-  Bentham post-write review: pending (batch routed by team-lead)
+  Bentham post-write review: COMPLETE (5 YELLOWs, no RED; session 9 follow-ups in tasks #60, #64)
   YELLOW-15 carry-forward: fetchEntity per-org verification in sub-op 5 — batch with initial list for larger sets
   YELLOW (sub-op 1 sanity check): use seed person not PO for future formula-unwrap sanity checks
+  Post-exec rights audit: CLEAN — all 6 orgs confirmed _inheritrights=false, sections+members intact (probe-phase-d-rights-audit-2026-05-21)
+  YELLOW-D4: org TYPE entity (_id 69c7ea478489bfcb0e819e3d) has _inheritrights=true — NEEDS FIX. Fix script proposed; awaiting team-lead authorization before live execution.
 
 ## Session 9 — Process calibration
 
