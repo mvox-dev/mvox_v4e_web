@@ -1,0 +1,159 @@
+{
+  "runAt": "2026-05-21T20:24:31.179Z",
+  "db": "polyphony",
+  "canonicalTypeCount": 19,
+  "canonicalTypes": [
+    "application",
+    "attendance",
+    "copy",
+    "edition",
+    "event",
+    "event_series",
+    "invitation",
+    "lending",
+    "library",
+    "member",
+    "organization",
+    "person",
+    "program_item",
+    "repertoire_item",
+    "rsvp",
+    "season",
+    "section",
+    "voice",
+    "work"
+  ],
+  "pass1Menu": {
+    "totalMenus": 7,
+    "mismatchCount": 5,
+    "mismatches": [
+      {
+        "entityId": "69bcfd8e9c031ab8e6ce8070",
+        "entityName": "Entities",
+        "entuUrl": "https://entu.app/polyphony/69bcfd8e9c031ab8e6ce8070",
+        "source": "menu.query",
+        "rawText": "_type.string=entity&system._id.exists=false&sort=name.string",
+        "extractedTypeName": "entity",
+        "suggestion": "(no suggestion — 'entity' not recognised)"
+      },
+      {
+        "entityId": "69bcfd8e9c031ab8e6ce8071",
+        "entityName": "Menu",
+        "entuUrl": "https://entu.app/polyphony/69bcfd8e9c031ab8e6ce8071",
+        "source": "menu.query",
+        "rawText": "_type.string=menu&sort=name.string",
+        "extractedTypeName": "menu",
+        "suggestion": "(no suggestion — 'menu' not recognised)"
+      },
+      {
+        "entityId": "69bcfd8e9c031ab8e6ce8072",
+        "entityName": "Plugins",
+        "entuUrl": "https://entu.app/polyphony/69bcfd8e9c031ab8e6ce8072",
+        "source": "menu.query",
+        "rawText": "_type.string=plugin&sort=name.string",
+        "extractedTypeName": "plugin",
+        "suggestion": "(no suggestion — 'plugin' not recognised)"
+      },
+      {
+        "entityId": "69c7f88b8489bfcb0e81b5f8",
+        "entityName": "Choirs",
+        "entuUrl": "https://entu.app/polyphony/69c7f88b8489bfcb0e81b5f8",
+        "source": "menu.query",
+        "rawText": "_type.string=Organization&org_type.string=collective&sort=name.string",
+        "extractedTypeName": "Organization",
+        "suggestion": "organization"
+      },
+      {
+        "entityId": "69c7f88b8489bfcb0e81b5f8",
+        "entityName": "Choirs",
+        "entuUrl": "https://entu.app/polyphony/69c7f88b8489bfcb0e81b5f8",
+        "source": "menu.query",
+        "rawText": "_type.string=Organization&org_type.string=collective&sort=name.string",
+        "extractedTypeName": "collective",
+        "suggestion": "(no suggestion — 'collective' not recognised)"
+      }
+    ],
+    "allMenus": [
+      {
+        "_id": "69bcfd8e9c031ab8e6ce8070",
+        "name": "Entities",
+        "query": [
+          "_type.string=entity&system._id.exists=false&sort=name.string"
+        ],
+        "reference_query": [],
+        "add": [],
+        "search": []
+      },
+      {
+        "_id": "69bcfd8e9c031ab8e6ce8071",
+        "name": "Menu",
+        "query": [
+          "_type.string=menu&sort=name.string"
+        ],
+        "reference_query": [],
+        "add": [],
+        "search": []
+      },
+      {
+        "_id": "69bcfd8e9c031ab8e6ce8072",
+        "name": "Plugins",
+        "query": [
+          "_type.string=plugin&sort=name.string"
+        ],
+        "reference_query": [],
+        "add": [],
+        "search": []
+      },
+      {
+        "_id": "69bcfd8e9c031ab8e6ce8073",
+        "name": "Persons",
+        "query": [
+          "_type.string=person&sort=name.string"
+        ],
+        "reference_query": [],
+        "add": [],
+        "search": []
+      },
+      {
+        "_id": "69bcfd8e9c031ab8e6ce8074",
+        "name": "Billing",
+        "query": [
+          "/{DATABASE}/billing"
+        ],
+        "reference_query": [],
+        "add": [],
+        "search": []
+      },
+      {
+        "_id": "69c7f88b8489bfcb0e81b5f8",
+        "name": "Choirs",
+        "query": [
+          "_type.string=Organization&org_type.string=collective&sort=name.string"
+        ],
+        "reference_query": [],
+        "add": [],
+        "search": []
+      },
+      {
+        "_id": "69c7f88c8489bfcb0e81b600",
+        "name": "Umbrella Orgs",
+        "query": [
+          "_type.string=organization&sort=name.string"
+        ],
+        "reference_query": [],
+        "add": [],
+        "search": []
+      }
+    ]
+  },
+  "pass2Formula": {
+    "totalFormulaProps": 0,
+    "mismatchCount": 0,
+    "mismatches": []
+  },
+  "pass3Reference": {
+    "totalReferenceProps": 0,
+    "mismatchCount": 0,
+    "mismatches": []
+  }
+}

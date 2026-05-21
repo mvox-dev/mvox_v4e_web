@@ -303,6 +303,19 @@ Commits (in order):
 [NEXT DISPATCHES EXPECTED] Seeding new v4E entity types (copy, lending, rsvp, attendance
   subtrees), BFF rights-aware contracts, dev/staging refresh.
 
+## Session 10 — type-name-string sweep (2026-05-21)
+
+[PROBE-RESULT] Type-name-string sweep (probe-type-name-string-sweep-2026-05-21):
+  7 menu entities scanned. 1 genuine mismatch:
+  - "Choirs" menu (69c7f88b8489bfcb0e81b5f8): query uses _type.string=Organization (capital O)
+    → should be organization (v4E canonical lowercase). Fix: PO manual UI edit.
+  - "Umbrella Orgs" (69c7f88c8489bfcb0e81b600): already clean (lowercase).
+  Formula + reference prop-defs: 0 results via _type.string=_property query path.
+
+[GOTCHA] _type.string=_property with type.string=formula/reference returns 0 on polyphony.
+  Prop-defs likely not reachable via flat _type.string=_property filter. If completeness
+  needed, explore alternative path (e.g., children of _property type entity).
+
 ## Permanent role note
 
 Promoted from temporary specialist to permanent data-manager (session 7 end). Future seeding work:
