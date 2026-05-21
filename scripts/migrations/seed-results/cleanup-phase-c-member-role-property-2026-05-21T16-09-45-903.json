@@ -1,0 +1,128 @@
+{
+  "phase": "C.4",
+  "script": "cleanup-phase-c-member-role-property",
+  "dryRun": false,
+  "startedAt": "2026-05-21T16:09:44.975Z",
+  "completedAt": "2026-05-21T16:09:45.903Z",
+  "initialValueCount": 8,
+  "preservation": [
+    {
+      "memberId": "69c7f8728489bfcb0e81b085",
+      "roleValues": [
+        {
+          "_id": "69c7f8728489bfcb0e81b08b",
+          "reference": "69c7f8708489bfcb0e81b020",
+          "displayName": "Owner"
+        },
+        {
+          "_id": "69c7f8728489bfcb0e81b08c",
+          "reference": "69c7f8708489bfcb0e81b02e",
+          "displayName": "Admin"
+        }
+      ]
+    },
+    {
+      "memberId": "69c7f8788489bfcb0e81b1c9",
+      "roleValues": [
+        {
+          "_id": "69c7f8788489bfcb0e81b1cf",
+          "reference": "69c7f8708489bfcb0e81b020",
+          "displayName": "Owner"
+        },
+        {
+          "_id": "69c7f8788489bfcb0e81b1d0",
+          "reference": "69c7f8708489bfcb0e81b02e",
+          "displayName": "Admin"
+        }
+      ]
+    },
+    {
+      "memberId": "69c7f87e8489bfcb0e81b304",
+      "roleValues": [
+        {
+          "_id": "69c7f87e8489bfcb0e81b30a",
+          "reference": "69c7f8708489bfcb0e81b020",
+          "displayName": "Owner"
+        },
+        {
+          "_id": "69c7f87e8489bfcb0e81b30b",
+          "reference": "69c7f8708489bfcb0e81b02e",
+          "displayName": "Admin"
+        }
+      ]
+    },
+    {
+      "memberId": "69c7f8878489bfcb0e81b510",
+      "roleValues": [
+        {
+          "_id": "69c7f8878489bfcb0e81b516",
+          "reference": "69c7f8708489bfcb0e81b020",
+          "displayName": "Owner"
+        },
+        {
+          "_id": "69c7f8878489bfcb0e81b517",
+          "reference": "69c7f8708489bfcb0e81b02e",
+          "displayName": "Admin"
+        }
+      ]
+    }
+  ],
+  "valueDeletions": [
+    {
+      "memberId": "69c7f8728489bfcb0e81b085",
+      "valueId": "69c7f8728489bfcb0e81b08b",
+      "displayName": "Owner",
+      "outcome": "deleted"
+    },
+    {
+      "memberId": "69c7f8728489bfcb0e81b085",
+      "valueId": "69c7f8728489bfcb0e81b08c",
+      "displayName": "Admin",
+      "outcome": "deleted"
+    },
+    {
+      "memberId": "69c7f8788489bfcb0e81b1c9",
+      "valueId": "69c7f8788489bfcb0e81b1cf",
+      "displayName": "Owner",
+      "outcome": "deleted"
+    },
+    {
+      "memberId": "69c7f8788489bfcb0e81b1c9",
+      "valueId": "69c7f8788489bfcb0e81b1d0",
+      "displayName": "Admin",
+      "outcome": "deleted"
+    },
+    {
+      "memberId": "69c7f87e8489bfcb0e81b304",
+      "valueId": "69c7f87e8489bfcb0e81b30a",
+      "displayName": "Owner",
+      "outcome": "deleted"
+    },
+    {
+      "memberId": "69c7f87e8489bfcb0e81b304",
+      "valueId": "69c7f87e8489bfcb0e81b30b",
+      "displayName": "Admin",
+      "outcome": "deleted"
+    },
+    {
+      "memberId": "69c7f8878489bfcb0e81b510",
+      "valueId": "69c7f8878489bfcb0e81b516",
+      "displayName": "Owner",
+      "outcome": "deleted"
+    },
+    {
+      "memberId": "69c7f8878489bfcb0e81b510",
+      "valueId": "69c7f8878489bfcb0e81b517",
+      "displayName": "Admin",
+      "outcome": "deleted"
+    }
+  ],
+  "postDeleteVerified": true,
+  "propDefResult": {
+    "id": "69c7ea4b8489bfcb0e819f11",
+    "name": "role",
+    "outcome": "deleted"
+  },
+  "exitCode": 0,
+  "errors": []
+}

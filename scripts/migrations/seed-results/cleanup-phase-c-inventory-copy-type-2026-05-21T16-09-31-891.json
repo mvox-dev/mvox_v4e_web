@@ -1,0 +1,51 @@
+{
+  "phase": "C.1",
+  "script": "cleanup-phase-c-inventory-copy-type",
+  "dryRun": false,
+  "startedAt": "2026-05-21T16:09:31.404Z",
+  "completedAt": "2026-05-21T16:09:31.891Z",
+  "initialInstances": 0,
+  "propDefsResult": [
+    {
+      "id": "69c7ea508489bfcb0e819ff4",
+      "name": "name",
+      "outcome": "deleted"
+    },
+    {
+      "id": "69c7ea518489bfcb0e81a000",
+      "name": "copy_number",
+      "outcome": "deleted"
+    },
+    {
+      "id": "69c7ea518489bfcb0e81a00b",
+      "name": "edition",
+      "outcome": "deleted"
+    },
+    {
+      "id": "69c7ea518489bfcb0e81a017",
+      "name": "condition",
+      "outcome": "deleted"
+    },
+    {
+      "id": "69c7ea518489bfcb0e81a025",
+      "name": "assigned_to",
+      "outcome": "deleted"
+    },
+    {
+      "id": "69c7ea528489bfcb0e81a030",
+      "name": "assigned_at",
+      "outcome": "deleted"
+    },
+    {
+      "id": "69c7ea528489bfcb0e81a03a",
+      "name": "notes",
+      "outcome": "deleted"
+    }
+  ],
+  "typeDefResult": {
+    "id": "69c7ea508489bfcb0e819fed",
+    "outcome": "deleted"
+  },
+  "exitCode": 0,
+  "errors": []
+}

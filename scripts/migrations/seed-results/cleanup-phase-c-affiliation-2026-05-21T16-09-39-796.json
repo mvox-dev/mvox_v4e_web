@@ -1,0 +1,762 @@
+{
+  "phase": "C.3",
+  "script": "cleanup-phase-c-affiliation",
+  "dryRun": false,
+  "startedAt": "2026-05-21T16:09:38.976Z",
+  "completedAt": "2026-05-21T16:09:39.796Z",
+  "initialInstances": 4,
+  "preservation": [
+    {
+      "_id": "69c7f8728489bfcb0e81b071",
+      "properties": {
+        "_id": "69c7f8728489bfcb0e81b071",
+        "_created": [
+          {
+            "_id": "69c7f8728489bfcb0e81b07a",
+            "reference": "69bcfd8e9c031ab8e6ce8079",
+            "datetime": "2026-03-28T15:49:06.246Z",
+            "property_type": "_created",
+            "string": "Mihkel Putrinš",
+            "entity_type": "person"
+          }
+        ],
+        "_inheritrights": [
+          {
+            "_id": "69c7f8728489bfcb0e81b078",
+            "boolean": true
+          }
+        ],
+        "_owner": [
+          {
+            "_id": "69c7f8728489bfcb0e81b079",
+            "reference": "69bcfd8e9c031ab8e6ce8079",
+            "property_type": "_owner",
+            "string": "Mihkel Putrinš",
+            "entity_type": "person"
+          }
+        ],
+        "_parent": [
+          {
+            "_id": "69c7f8728489bfcb0e81b073",
+            "reference": "69c7f8718489bfcb0e81b065",
+            "property_type": "_parent",
+            "string": "Eesti Filharmoonia Kammerkoor",
+            "entity_type": "organization"
+          }
+        ],
+        "_sharing": [
+          {
+            "_id": "69c7f8728489bfcb0e81b077",
+            "string": "domain"
+          },
+          {
+            "_id": "69c7ffbd8489bfcb0e81b65a",
+            "string": "domain"
+          },
+          {
+            "_id": "69c800568489bfcb0e81b660",
+            "string": "domain"
+          }
+        ],
+        "_type": [
+          {
+            "_id": "69c7f8728489bfcb0e81b072",
+            "reference": "69c7ea598489bfcb0e81a178",
+            "property_type": "_type",
+            "string": "affiliation",
+            "entity_type": "entity"
+          }
+        ],
+        "collective": [
+          {
+            "_id": "69c7ff248489bfcb0e81b651",
+            "reference": "69c7f8718489bfcb0e81b065",
+            "property_type": "collective",
+            "string": "Eesti Filharmoonia Kammerkoor",
+            "entity_type": "organization"
+          }
+        ],
+        "_reference": [
+          {
+            "_id": "69c7ff248489bfcb0e81b651",
+            "reference": "69c7f8718489bfcb0e81b065",
+            "property_type": "collective",
+            "string": "Eesti Filharmoonia Kammerkoor",
+            "entity_type": "organization"
+          },
+          {
+            "_id": "69c7f8728489bfcb0e81b075",
+            "reference": "69c7f8718489bfcb0e81b05a",
+            "property_type": "umbrella",
+            "string": "Eesti Kammerkooride Liit",
+            "entity_type": "organization"
+          }
+        ],
+        "joined_at": [
+          {
+            "_id": "69c7f8728489bfcb0e81b076",
+            "date": "2026-03-28T00:00:00.000Z"
+          }
+        ],
+        "name": [
+          {
+            "string": "Eesti Filharmoonia Kammerkoor @ Eesti Kammerkooride Liit"
+          }
+        ],
+        "umbrella": [
+          {
+            "_id": "69c7f8728489bfcb0e81b075",
+            "reference": "69c7f8718489bfcb0e81b05a",
+            "property_type": "umbrella",
+            "string": "Eesti Kammerkooride Liit",
+            "entity_type": "organization"
+          }
+        ],
+        "_parent_viewer": [
+          {
+            "_id": "69c7f8728489bfcb0e81b06e",
+            "reference": "69bcfd8e9c031ab8e6ce8079",
+            "property_type": "_owner",
+            "string": "Mihkel Putrinš",
+            "entity_type": "person",
+            "inherited": true
+          }
+        ],
+        "_parent_expander": [
+          {
+            "_id": "69c7f8728489bfcb0e81b06e",
+            "reference": "69bcfd8e9c031ab8e6ce8079",
+            "property_type": "_owner",
+            "string": "Mihkel Putrinš",
+            "entity_type": "person",
+            "inherited": true
+          }
+        ],
+        "_parent_editor": [
+          {
+            "_id": "69c7f8728489bfcb0e81b06e",
+            "reference": "69bcfd8e9c031ab8e6ce8079",
+            "property_type": "_owner",
+            "string": "Mihkel Putrinš",
+            "entity_type": "person",
+            "inherited": true
+          }
+        ],
+        "_parent_owner": [
+          {
+            "_id": "69c7f8728489bfcb0e81b06e",
+            "reference": "69bcfd8e9c031ab8e6ce8079",
+            "property_type": "_owner",
+            "string": "Mihkel Putrinš",
+            "entity_type": "person",
+            "inherited": true
+          }
+        ],
+        "_editor": [
+          {
+            "_id": "69c7f8728489bfcb0e81b079",
+            "reference": "69bcfd8e9c031ab8e6ce8079",
+            "property_type": "_owner",
+            "string": "Mihkel Putrinš",
+            "entity_type": "person"
+          }
+        ],
+        "_expander": [
+          {
+            "_id": "69c7f8728489bfcb0e81b079",
+            "reference": "69bcfd8e9c031ab8e6ce8079",
+            "property_type": "_owner",
+            "string": "Mihkel Putrinš",
+            "entity_type": "person"
+          }
+        ],
+        "_viewer": [
+          {
+            "_id": "69c7f8728489bfcb0e81b079",
+            "reference": "69bcfd8e9c031ab8e6ce8079",
+            "property_type": "_owner",
+            "string": "Mihkel Putrinš",
+            "entity_type": "person"
+          }
+        ]
+      }
+    },
+    {
+      "_id": "69c7f8788489bfcb0e81b1b5",
+      "properties": {
+        "_id": "69c7f8788489bfcb0e81b1b5",
+        "_created": [
+          {
+            "_id": "69c7f8788489bfcb0e81b1be",
+            "reference": "69bcfd8e9c031ab8e6ce8079",
+            "datetime": "2026-03-28T15:49:12.374Z",
+            "property_type": "_created",
+            "string": "Mihkel Putrinš",
+            "entity_type": "person"
+          }
+        ],
+        "_inheritrights": [
+          {
+            "_id": "69c7f8788489bfcb0e81b1bc",
+            "boolean": true
+          }
+        ],
+        "_owner": [
+          {
+            "_id": "69c7f8788489bfcb0e81b1bd",
+            "reference": "69bcfd8e9c031ab8e6ce8079",
+            "property_type": "_owner",
+            "string": "Mihkel Putrinš",
+            "entity_type": "person"
+          }
+        ],
+        "_parent": [
+          {
+            "_id": "69c7f8788489bfcb0e81b1b7",
+            "reference": "69c7f8788489bfcb0e81b1a9",
+            "property_type": "_parent",
+            "string": "Kammernaiskoor Sireen",
+            "entity_type": "organization"
+          }
+        ],
+        "_sharing": [
+          {
+            "_id": "69c7f8788489bfcb0e81b1bb",
+            "string": "domain"
+          },
+          {
+            "_id": "69c7ffbd8489bfcb0e81b65b",
+            "string": "domain"
+          },
+          {
+            "_id": "69c800568489bfcb0e81b661",
+            "string": "domain"
+          }
+        ],
+        "_type": [
+          {
+            "_id": "69c7f8788489bfcb0e81b1b6",
+            "reference": "69c7ea598489bfcb0e81a178",
+            "property_type": "_type",
+            "string": "affiliation",
+            "entity_type": "entity"
+          }
+        ],
+        "collective": [
+          {
+            "_id": "69c7ff258489bfcb0e81b652",
+            "reference": "69c7f8788489bfcb0e81b1a9",
+            "property_type": "collective",
+            "string": "Kammernaiskoor Sireen",
+            "entity_type": "organization"
+          }
+        ],
+        "_reference": [
+          {
+            "_id": "69c7ff258489bfcb0e81b652",
+            "reference": "69c7f8788489bfcb0e81b1a9",
+            "property_type": "collective",
+            "string": "Kammernaiskoor Sireen",
+            "entity_type": "organization"
+          },
+          {
+            "_id": "69c7f8788489bfcb0e81b1b9",
+            "reference": "69c7f8718489bfcb0e81b05a",
+            "property_type": "umbrella",
+            "string": "Eesti Kammerkooride Liit",
+            "entity_type": "organization"
+          }
+        ],
+        "joined_at": [
+          {
+            "_id": "69c7f8788489bfcb0e81b1ba",
+            "date": "2026-03-28T00:00:00.000Z"
+          }
+        ],
+        "name": [
+          {
+            "string": "Kammernaiskoor Sireen @ Eesti Kammerkooride Liit"
+          }
+        ],
+        "umbrella": [
+          {
+            "_id": "69c7f8788489bfcb0e81b1b9",
+            "reference": "69c7f8718489bfcb0e81b05a",
+            "property_type": "umbrella",
+            "string": "Eesti Kammerkooride Liit",
+            "entity_type": "organization"
+          }
+        ],
+        "_parent_viewer": [
+          {
+            "_id": "69c7f8788489bfcb0e81b1b2",
+            "reference": "69bcfd8e9c031ab8e6ce8079",
+            "property_type": "_owner",
+            "string": "Mihkel Putrinš",
+            "entity_type": "person",
+            "inherited": true
+          }
+        ],
+        "_parent_expander": [
+          {
+            "_id": "69c7f8788489bfcb0e81b1b2",
+            "reference": "69bcfd8e9c031ab8e6ce8079",
+            "property_type": "_owner",
+            "string": "Mihkel Putrinš",
+            "entity_type": "person",
+            "inherited": true
+          }
+        ],
+        "_parent_editor": [
+          {
+            "_id": "69c7f8788489bfcb0e81b1b2",
+            "reference": "69bcfd8e9c031ab8e6ce8079",
+            "property_type": "_owner",
+            "string": "Mihkel Putrinš",
+            "entity_type": "person",
+            "inherited": true
+          }
+        ],
+        "_parent_owner": [
+          {
+            "_id": "69c7f8788489bfcb0e81b1b2",
+            "reference": "69bcfd8e9c031ab8e6ce8079",
+            "property_type": "_owner",
+            "string": "Mihkel Putrinš",
+            "entity_type": "person",
+            "inherited": true
+          }
+        ],
+        "_editor": [
+          {
+            "_id": "69c7f8788489bfcb0e81b1bd",
+            "reference": "69bcfd8e9c031ab8e6ce8079",
+            "property_type": "_owner",
+            "string": "Mihkel Putrinš",
+            "entity_type": "person"
+          }
+        ],
+        "_expander": [
+          {
+            "_id": "69c7f8788489bfcb0e81b1bd",
+            "reference": "69bcfd8e9c031ab8e6ce8079",
+            "property_type": "_owner",
+            "string": "Mihkel Putrinš",
+            "entity_type": "person"
+          }
+        ],
+        "_viewer": [
+          {
+            "_id": "69c7f8788489bfcb0e81b1bd",
+            "reference": "69bcfd8e9c031ab8e6ce8079",
+            "property_type": "_owner",
+            "string": "Mihkel Putrinš",
+            "entity_type": "person"
+          }
+        ]
+      }
+    },
+    {
+      "_id": "69c7f87e8489bfcb0e81b2f0",
+      "properties": {
+        "_id": "69c7f87e8489bfcb0e81b2f0",
+        "_created": [
+          {
+            "_id": "69c7f87e8489bfcb0e81b2f9",
+            "reference": "69bcfd8e9c031ab8e6ce8079",
+            "datetime": "2026-03-28T15:49:18.062Z",
+            "property_type": "_created",
+            "string": "Mihkel Putrinš",
+            "entity_type": "person"
+          }
+        ],
+        "_inheritrights": [
+          {
+            "_id": "69c7f87e8489bfcb0e81b2f7",
+            "boolean": true
+          }
+        ],
+        "_owner": [
+          {
+            "_id": "69c7f87e8489bfcb0e81b2f8",
+            "reference": "69bcfd8e9c031ab8e6ce8079",
+            "property_type": "_owner",
+            "string": "Mihkel Putrinš",
+            "entity_type": "person"
+          }
+        ],
+        "_parent": [
+          {
+            "_id": "69c7f87e8489bfcb0e81b2f2",
+            "reference": "69c7f87d8489bfcb0e81b2e4",
+            "property_type": "_parent",
+            "string": "Eesti Rahvusmeeskoor",
+            "entity_type": "organization"
+          }
+        ],
+        "_sharing": [
+          {
+            "_id": "69c7f87e8489bfcb0e81b2f6",
+            "string": "domain"
+          },
+          {
+            "_id": "69c7ffbd8489bfcb0e81b65c",
+            "string": "domain"
+          },
+          {
+            "_id": "69c800568489bfcb0e81b662",
+            "string": "domain"
+          }
+        ],
+        "_type": [
+          {
+            "_id": "69c7f87e8489bfcb0e81b2f1",
+            "reference": "69c7ea598489bfcb0e81a178",
+            "property_type": "_type",
+            "string": "affiliation",
+            "entity_type": "entity"
+          }
+        ],
+        "collective": [
+          {
+            "_id": "69c7ff258489bfcb0e81b653",
+            "reference": "69c7f87d8489bfcb0e81b2e4",
+            "property_type": "collective",
+            "string": "Eesti Rahvusmeeskoor",
+            "entity_type": "organization"
+          }
+        ],
+        "_reference": [
+          {
+            "_id": "69c7ff258489bfcb0e81b653",
+            "reference": "69c7f87d8489bfcb0e81b2e4",
+            "property_type": "collective",
+            "string": "Eesti Rahvusmeeskoor",
+            "entity_type": "organization"
+          },
+          {
+            "_id": "69c7f87e8489bfcb0e81b2f4",
+            "reference": "69c7f87d8489bfcb0e81b2d9",
+            "property_type": "umbrella",
+            "string": "Eesti Meeskooride Liit",
+            "entity_type": "organization"
+          }
+        ],
+        "joined_at": [
+          {
+            "_id": "69c7f87e8489bfcb0e81b2f5",
+            "date": "2026-03-28T00:00:00.000Z"
+          }
+        ],
+        "name": [
+          {
+            "string": "Eesti Rahvusmeeskoor @ Eesti Meeskooride Liit"
+          }
+        ],
+        "umbrella": [
+          {
+            "_id": "69c7f87e8489bfcb0e81b2f4",
+            "reference": "69c7f87d8489bfcb0e81b2d9",
+            "property_type": "umbrella",
+            "string": "Eesti Meeskooride Liit",
+            "entity_type": "organization"
+          }
+        ],
+        "_parent_viewer": [
+          {
+            "_id": "69c7f87d8489bfcb0e81b2ed",
+            "reference": "69bcfd8e9c031ab8e6ce8079",
+            "property_type": "_owner",
+            "string": "Mihkel Putrinš",
+            "entity_type": "person",
+            "inherited": true
+          }
+        ],
+        "_parent_expander": [
+          {
+            "_id": "69c7f87d8489bfcb0e81b2ed",
+            "reference": "69bcfd8e9c031ab8e6ce8079",
+            "property_type": "_owner",
+            "string": "Mihkel Putrinš",
+            "entity_type": "person",
+            "inherited": true
+          }
+        ],
+        "_parent_editor": [
+          {
+            "_id": "69c7f87d8489bfcb0e81b2ed",
+            "reference": "69bcfd8e9c031ab8e6ce8079",
+            "property_type": "_owner",
+            "string": "Mihkel Putrinš",
+            "entity_type": "person",
+            "inherited": true
+          }
+        ],
+        "_parent_owner": [
+          {
+            "_id": "69c7f87d8489bfcb0e81b2ed",
+            "reference": "69bcfd8e9c031ab8e6ce8079",
+            "property_type": "_owner",
+            "string": "Mihkel Putrinš",
+            "entity_type": "person",
+            "inherited": true
+          }
+        ],
+        "_editor": [
+          {
+            "_id": "69c7f87e8489bfcb0e81b2f8",
+            "reference": "69bcfd8e9c031ab8e6ce8079",
+            "property_type": "_owner",
+            "string": "Mihkel Putrinš",
+            "entity_type": "person"
+          }
+        ],
+        "_expander": [
+          {
+            "_id": "69c7f87e8489bfcb0e81b2f8",
+            "reference": "69bcfd8e9c031ab8e6ce8079",
+            "property_type": "_owner",
+            "string": "Mihkel Putrinš",
+            "entity_type": "person"
+          }
+        ],
+        "_viewer": [
+          {
+            "_id": "69c7f87e8489bfcb0e81b2f8",
+            "reference": "69bcfd8e9c031ab8e6ce8079",
+            "property_type": "_owner",
+            "string": "Mihkel Putrinš",
+            "entity_type": "person"
+          }
+        ]
+      }
+    },
+    {
+      "_id": "69c7f8878489bfcb0e81b4fc",
+      "properties": {
+        "_id": "69c7f8878489bfcb0e81b4fc",
+        "_created": [
+          {
+            "_id": "69c7f8878489bfcb0e81b505",
+            "reference": "69bcfd8e9c031ab8e6ce8079",
+            "datetime": "2026-03-28T15:49:27.050Z",
+            "property_type": "_created",
+            "string": "Mihkel Putrinš",
+            "entity_type": "person"
+          }
+        ],
+        "_inheritrights": [
+          {
+            "_id": "69c7f8878489bfcb0e81b503",
+            "boolean": true
+          }
+        ],
+        "_owner": [
+          {
+            "_id": "69c7f8878489bfcb0e81b504",
+            "reference": "69bcfd8e9c031ab8e6ce8079",
+            "property_type": "_owner",
+            "string": "Mihkel Putrinš",
+            "entity_type": "person"
+          }
+        ],
+        "_parent": [
+          {
+            "_id": "69c7f8878489bfcb0e81b4fe",
+            "reference": "69c7f8868489bfcb0e81b4f0",
+            "property_type": "_parent",
+            "string": "Tartu Akadeemiline Meeskoor",
+            "entity_type": "organization"
+          }
+        ],
+        "_sharing": [
+          {
+            "_id": "69c7f8878489bfcb0e81b502",
+            "string": "domain"
+          },
+          {
+            "_id": "69c7ffbd8489bfcb0e81b65d",
+            "string": "domain"
+          },
+          {
+            "_id": "69c800568489bfcb0e81b663",
+            "string": "domain"
+          }
+        ],
+        "_type": [
+          {
+            "_id": "69c7f8878489bfcb0e81b4fd",
+            "reference": "69c7ea598489bfcb0e81a178",
+            "property_type": "_type",
+            "string": "affiliation",
+            "entity_type": "entity"
+          }
+        ],
+        "collective": [
+          {
+            "_id": "69c7ff258489bfcb0e81b654",
+            "reference": "69c7f8868489bfcb0e81b4f0",
+            "property_type": "collective",
+            "string": "Tartu Akadeemiline Meeskoor",
+            "entity_type": "organization"
+          }
+        ],
+        "_reference": [
+          {
+            "_id": "69c7ff258489bfcb0e81b654",
+            "reference": "69c7f8868489bfcb0e81b4f0",
+            "property_type": "collective",
+            "string": "Tartu Akadeemiline Meeskoor",
+            "entity_type": "organization"
+          },
+          {
+            "_id": "69c7f8878489bfcb0e81b500",
+            "reference": "69c7f87d8489bfcb0e81b2d9",
+            "property_type": "umbrella",
+            "string": "Eesti Meeskooride Liit",
+            "entity_type": "organization"
+          }
+        ],
+        "joined_at": [
+          {
+            "_id": "69c7f8878489bfcb0e81b501",
+            "date": "2026-03-28T00:00:00.000Z"
+          }
+        ],
+        "name": [
+          {
+            "string": "Tartu Akadeemiline Meeskoor @ Eesti Meeskooride Liit"
+          }
+        ],
+        "umbrella": [
+          {
+            "_id": "69c7f8878489bfcb0e81b500",
+            "reference": "69c7f87d8489bfcb0e81b2d9",
+            "property_type": "umbrella",
+            "string": "Eesti Meeskooride Liit",
+            "entity_type": "organization"
+          }
+        ],
+        "_parent_viewer": [
+          {
+            "_id": "69c7f8868489bfcb0e81b4f9",
+            "reference": "69bcfd8e9c031ab8e6ce8079",
+            "property_type": "_owner",
+            "string": "Mihkel Putrinš",
+            "entity_type": "person",
+            "inherited": true
+          }
+        ],
+        "_parent_expander": [
+          {
+            "_id": "69c7f8868489bfcb0e81b4f9",
+            "reference": "69bcfd8e9c031ab8e6ce8079",
+            "property_type": "_owner",
+            "string": "Mihkel Putrinš",
+            "entity_type": "person",
+            "inherited": true
+          }
+        ],
+        "_parent_editor": [
+          {
+            "_id": "69c7f8868489bfcb0e81b4f9",
+            "reference": "69bcfd8e9c031ab8e6ce8079",
+            "property_type": "_owner",
+            "string": "Mihkel Putrinš",
+            "entity_type": "person",
+            "inherited": true
+          }
+        ],
+        "_parent_owner": [
+          {
+            "_id": "69c7f8868489bfcb0e81b4f9",
+            "reference": "69bcfd8e9c031ab8e6ce8079",
+            "property_type": "_owner",
+            "string": "Mihkel Putrinš",
+            "entity_type": "person",
+            "inherited": true
+          }
+        ],
+        "_editor": [
+          {
+            "_id": "69c7f8878489bfcb0e81b504",
+            "reference": "69bcfd8e9c031ab8e6ce8079",
+            "property_type": "_owner",
+            "string": "Mihkel Putrinš",
+            "entity_type": "person"
+          }
+        ],
+        "_expander": [
+          {
+            "_id": "69c7f8878489bfcb0e81b504",
+            "reference": "69bcfd8e9c031ab8e6ce8079",
+            "property_type": "_owner",
+            "string": "Mihkel Putrinš",
+            "entity_type": "person"
+          }
+        ],
+        "_viewer": [
+          {
+            "_id": "69c7f8878489bfcb0e81b504",
+            "reference": "69bcfd8e9c031ab8e6ce8079",
+            "property_type": "_owner",
+            "string": "Mihkel Putrinš",
+            "entity_type": "person"
+          }
+        ]
+      }
+    }
+  ],
+  "instanceResult": [
+    {
+      "id": "69c7f8728489bfcb0e81b071",
+      "outcome": "deleted"
+    },
+    {
+      "id": "69c7f8788489bfcb0e81b1b5",
+      "outcome": "deleted"
+    },
+    {
+      "id": "69c7f87e8489bfcb0e81b2f0",
+      "outcome": "deleted"
+    },
+    {
+      "id": "69c7f8878489bfcb0e81b4fc",
+      "outcome": "deleted"
+    }
+  ],
+  "postDeleteVerified": true,
+  "propDefsResult": [
+    {
+      "id": "69c7ea598489bfcb0e81a17f",
+      "name": "name",
+      "outcome": "deleted"
+    },
+    {
+      "id": "69c7ea598489bfcb0e81a18b",
+      "name": "umbrella",
+      "outcome": "deleted"
+    },
+    {
+      "id": "69c7ea5a8489bfcb0e81a197",
+      "name": "joined_at",
+      "outcome": "deleted"
+    },
+    {
+      "id": "69c7ea5a8489bfcb0e81a1a2",
+      "name": "left_at",
+      "outcome": "deleted"
+    },
+    {
+      "id": "69c7ff138489bfcb0e81b644",
+      "name": "collective",
+      "outcome": "deleted"
+    }
+  ],
+  "typeDefResult": {
+    "id": "69c7ea598489bfcb0e81a178",
+    "outcome": "deleted"
+  },
+  "exitCode": 0,
+  "errors": []
+}
