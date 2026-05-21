@@ -1,0 +1,54 @@
+{
+  "probe": "probe-phase-c-ac-verification",
+  "runAt": "2026-05-21T16:15:04.692Z",
+  "db": "polyphony",
+  "results": [
+    {
+      "bullet": "inventory_copy instances = 0",
+      "pass": true,
+      "detail": "found 0"
+    },
+    {
+      "bullet": "participation instances = 0",
+      "pass": true,
+      "detail": "found 0"
+    },
+    {
+      "bullet": "affiliation instances = 0",
+      "pass": true,
+      "detail": "found 0"
+    },
+    {
+      "bullet": "role instances = 0",
+      "pass": true,
+      "detail": "found 0"
+    },
+    {
+      "bullet": "all PO members: role values = 0",
+      "pass": true,
+      "detail": "member 69c7f8728489bfcb0e81b085: 0 role values; member 69c7f8788489bfcb0e81b1c9: 0 role values; member 69c7f87e8489bfcb0e81b304: 0 role values; member 69c7f8878489bfcb0e81b510: 0 role values"
+    },
+    {
+      "bullet": "type-def 404: inventory_copy",
+      "pass": true,
+      "detail": "69c7ea508489bfcb0e819fed → 404"
+    },
+    {
+      "bullet": "type-def 404: participation",
+      "pass": true,
+      "detail": "69c7ea588489bfcb0e81a137 → 404"
+    },
+    {
+      "bullet": "type-def 404: affiliation",
+      "pass": true,
+      "detail": "69c7ea598489bfcb0e81a178 → 404"
+    },
+    {
+      "bullet": "type-def 404: role",
+      "pass": true,
+      "detail": "69c7ea468489bfcb0e819df9 → 404"
+    }
+  ],
+  "overallVerdict": "PASS",
+  "failingBullets": []
+}
