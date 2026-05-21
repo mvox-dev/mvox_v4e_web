@@ -181,6 +181,40 @@ Result: scripts/migrations/seed-results/seed-voices-2026-05-20T08-14-58-992Z.jso
 
 [LEARNED] Sanity check sentinel entity: when testing formula-unwrap or similar mutations, use a seed person (plain _id-bearing name, _id visible and targetable) not the PO (formula-cached value may have no _id and cannot be protected by preExistingNameIds pattern). Alternatives: (a) skip sanity check for entities whose name value has no _id; (b) use dedicated sentinel seed entity.
 
+## Session 9 — End of session checkpoint (2026-05-21)
+
+[CHECKPOINT] Phase D fully complete. Session 9 commits on main:
+  da711f2 — Phase D discovery probe + artifact
+  e459517 — formula-unwrap probe + findings doc + architecture-decisions entry
+  d8d2ca5 — architecture-decisions formula-unwrap mechanic entry
+  1905620 — cleanup-phase-d-name-to-plain (sub-op 1) + dry-run artifact
+  adc41e8 — sub-ops 1-4 live execution + Bentham YELLOW fix
+  88595c7 — sub-op 5 live result artifact
+  5db5f34 — scratchpad Phase D checkpoint
+  238e100 — scratchpad session 9 shutdown checkpoint (prior)
+  e927176 — [LEARNED] authorization gate + sanity check sentinel
+  f89295f — Test User name restore
+  35f4ebc — scratchpad data-quality note
+  1e04db7 — scratchpad post-mortem note
+  aa26032 — post-exec rights audit + YELLOW-D4 finding
+  850b7c4 — YELLOW-D4 fix: org TYPE _inheritrights=false
+
+[NEXT SESSION] Carry-forward items:
+  - Task #60 (YELLOW-15): formula-cached-value sanity-check pattern improvement
+  - Task #64 (YELLOW fixup): D1 idempotent-skip artifact, D3 capture new _id, D5 originalNamePreserved assertion, drop dead findPropDef helper
+  - Task #6 (migration, in_progress): Phase C undesigned — structural migrations (inventory_copy→copy+lending, participation→rsvp+attendance, affiliation retire, role→rights). Brainstorming session needed.
+  - Phase D is complete; Phase C is the next migration work.
+  - New process discipline active: explicit "I authorize this run" SendMessage from team-lead required before ANY live mutation, regardless of dry-run cleanliness.
+
+[NEXT SESSION] Polyphony Entu db state at session 9 shutdown:
+  - 122 persons: 2 real (PO + Test User), 120 seeds
+  - person.name: plain string on all (formula retired)
+  - forename + surname prop-defs: DELETED
+  - 6 org instances: _inheritrights=false ✓
+  - org TYPE entity (69c7ea478489bfcb0e819e3d): _inheritrights=false ✓
+  - Test User name: "Test User" (single clean value, _id 6a0e9b2b4ff8277cd4306681)
+  - 6 orgs, 16 sections, 235 members (EFK:54, Sireen:50, Rahvusmeeskoor:90, TAM:41, EKBL:0, EMKL:0)
+
 ## Permanent role note
 
 Promoted from temporary specialist to permanent data-manager (session 7 end). Future seeding work:
