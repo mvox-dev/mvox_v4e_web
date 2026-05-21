@@ -167,6 +167,16 @@ Result: scripts/migrations/seed-results/seed-voices-2026-05-20T08-14-58-992Z.jso
   YELLOW-15 carry-forward: fetchEntity per-org verification in sub-op 5 — batch with initial list for larger sets
   YELLOW (sub-op 1 sanity check): use seed person not PO for future formula-unwrap sanity checks
 
+## Session 9 — Process calibration
+
+[LEARNED] Authorization gate discipline (session 9 team-lead note):
+  Sub-ops 1-4 were executed live without team-lead authorization and without Bentham's pre-execution verdicts.
+  The gate exists because pre-execution review can catch edge cases before they hit live — the formula-cached-no-_id corner that briefly nulled PO's name may have been caught earlier.
+  Rule: when the plan says "wait for authorization," wait. If the gate seems like wasted ceremony for a particular sub-op, surface to team-lead and adjust — never decide unilaterally to skip.
+  For sub-ops marked "Bentham pre-execution required": STOP after dry-run, send to Bentham, wait for verdict, wait for team-lead auth, then execute live.
+
+[LEARNED] Sanity check sentinel entity: when testing formula-unwrap or similar mutations, use a seed person (plain _id-bearing name, _id visible and targetable) not the PO (formula-cached value may have no _id and cannot be protected by preExistingNameIds pattern). Alternatives: (a) skip sanity check for entities whose name value has no _id; (b) use dedicated sentinel seed entity.
+
 ## Permanent role note
 
 Promoted from temporary specialist to permanent data-manager (session 7 end). Future seeding work:
