@@ -69,6 +69,7 @@ async function main() {
     afterFormula: string | null;
     formulaDeleted: boolean;
     sanityCheckPassed: boolean | null;
+    originalNamePreserved: boolean | null;
     error: string | null;
   } = {
     dryRun,
@@ -79,6 +80,7 @@ async function main() {
     afterFormula: null,
     formulaDeleted: false,
     sanityCheckPassed: null,
+    originalNamePreserved: null,
     error: null,
   };
 
@@ -97,7 +99,10 @@ async function main() {
       console.log('  SKIP: prop-def has no formula value — already plain string. Nothing to do.');
       result.afterFormula = null;
       result.formulaDeleted = false;
-      result.sanityCheckPassed = true;
+      result.sanityCheckPassed = null; // not performed — skip path
+      result.originalNamePreserved = null; // not applicable — skip path
+      const skipFilePath = await writeResultArtifact('cleanup-phase-d-name-to-plain', result);
+      console.log(`\nArtifact: ${skipFilePath}`);
       return;
     }
 
@@ -137,10 +142,11 @@ async function main() {
       console.log('  [DRY-RUN] WOULD: POST name="__sanity_check__" to PO, verify it sticks, DELETE it');
       result.sanityCheckPassed = null;
     } else {
-      // Read current PO name — capture pre-existing _ids to identify new values after POST
+      // Read current PO name — capture pre-existing strings + _ids to verify restoration later
       const poBefore = await fetchEntity(client, SANITY_CHECK_PERSON_ID) as EntityFields;
       const poNameValues = poBefore.name ?? [];
       const preExistingNameIds = new Set(poNameValues.map(v => v._id).filter(Boolean));
+      const preExistingNameStrings = new Set(poNameValues.map(v => v.string).filter(Boolean));
       console.log(`  PO current name values: ${JSON.stringify(poNameValues.map(v => ({ _id: v._id, string: v.string })))}`);
 
       // POST test name
@@ -175,12 +181,15 @@ async function main() {
         console.log(`  Cleaned up test name value _id=${id}`);
       }
 
-      // Verify PO name is back to original
+      // Verify original PLAIN name values are still present after cleanup
       const poFinal = await fetchEntity(client, SANITY_CHECK_PERSON_ID) as EntityFields;
-      const finalNames = (poFinal.name ?? []).map(v => v.string);
-      console.log(`  PO final name values: ${JSON.stringify(finalNames)}`);
+      const finalNameStrings = new Set((poFinal.name ?? []).map(v => v.string).filter(Boolean));
+      const originalNamePreserved = [...preExistingNameStrings].every(s => finalNameStrings.has(s));
+      console.log(`  PO final name values: ${JSON.stringify([...finalNameStrings])}`);
+      console.log(`  Original name preserved: ${originalNamePreserved}`);
 
       result.sanityCheckPassed = testStuck;
+      result.originalNamePreserved = originalNamePreserved;
       console.log(`  Sanity check: ${testStuck ? 'PASSED' : 'FAILED'}`);
     }
 
@@ -205,6 +214,7 @@ async function main() {
     console.log(`formula deleted: ${result.formulaDeleted}`);
     console.log(`before: "${result.beforeFormula}" → after: ${result.afterFormula === null ? 'plain (no formula)' : `"${result.afterFormula}"`}`);
     console.log(`sanity check passed: ${result.sanityCheckPassed}`);
+    console.log(`original name preserved: ${result.originalNamePreserved}`);
     console.log('\nperson.name is now a plain writable string on polyphony.');
     console.log('Next: run cleanup-phase-d-seed-names-2026-05-21.ts to backfill 120 seed persons.');
   }

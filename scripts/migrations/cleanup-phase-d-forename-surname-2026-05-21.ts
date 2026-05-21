@@ -22,7 +22,6 @@
 import {
   getJwt,
   fetchEntity,
-  listInstancesByType,
   deletePropertyValue,
   deleteEntity,
   POLYPHONY_META_TYPE_PROPERTY_ID,
@@ -56,28 +55,6 @@ interface PropDefEntity {
   _id: string;
   name?: Array<{ _id?: string; string?: string }>;
   _parent?: Array<{ _id?: string; reference?: string }>;
-}
-
-// Person type entity _id (from entu-client.ts context)
-const PERSON_TYPE_ENTITY_ID = '69bcfd8e9c031ab8e6ce8068'; // actually the name prop-def; need the person TYPE itself
-
-async function findPropDef(
-  client: EntuClient,
-  propName: string
-): Promise<{ _id: string; name: string } | null> {
-  // Query all prop-defs named `propName`; filter to those parented under person type
-  // Person type _id determined from a person instance's _type.reference
-  const resp = await listInstancesByType(
-    client,
-    // prop-defs are typed as the meta-property type
-    'property', // _type.string won't work directly; use listEntities with _type.reference
-    '_id,name,_parent',
-    { 'name.string': propName, [`_type.reference`]: POLYPHONY_META_TYPE_PROPERTY_ID }
-  );
-  // Filter to prop-defs that belong to the person type
-  // We'll identify person type _id from the _parent of known person prop-defs
-  // Actually: use rawGet to search by name + _type.reference
-  return null; // placeholder — see rawGet approach below
 }
 
 async function rawGet(jwt: string, path: string): Promise<unknown> {

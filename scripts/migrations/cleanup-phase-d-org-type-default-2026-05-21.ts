@@ -93,7 +93,7 @@ const artifact = await writeResultArtifact('cleanup-phase-d-org-type-default-202
   orgTypeId: ORG_TYPE_ID,
   previousValues: irValues,
   deletedCount: toDelete.length,
-  valueWritten: false,
+  valueWritten: DRY_RUN ? false : true,
   verified: DRY_RUN ? 'dry-run' : finalValue === false,
   dryRun: DRY_RUN,
 });

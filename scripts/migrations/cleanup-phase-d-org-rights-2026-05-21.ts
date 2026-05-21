@@ -64,6 +64,7 @@ async function main() {
     name: string;
     currentInheritRights: boolean | null;
     existingValueId: string | null;
+    newValueId: string | null;
     action: 'SET_FALSE' | 'ALREADY_FALSE' | 'DRY-RUN' | 'FAILED';
     error?: string;
   }> = [];
@@ -83,7 +84,7 @@ async function main() {
 
     if (currentVal === false) {
       console.log(`    SKIP — already false`);
-      results.push({ _id: org._id, name: orgName, currentInheritRights: currentVal, existingValueId, action: 'ALREADY_FALSE' });
+      results.push({ _id: org._id, name: orgName, currentInheritRights: currentVal, existingValueId, newValueId: existingValueId, action: 'ALREADY_FALSE' });
       alreadyFalse++;
       continue;
     }
@@ -93,7 +94,7 @@ async function main() {
         console.log(`    [DRY-RUN] WOULD DELETE _inheritrights value _id=${existingValueId}`);
       }
       console.log(`    [DRY-RUN] WOULD POST _inheritrights=false`);
-      results.push({ _id: org._id, name: orgName, currentInheritRights: currentVal, existingValueId, action: 'DRY-RUN' });
+      results.push({ _id: org._id, name: orgName, currentInheritRights: currentVal, existingValueId, newValueId: null, action: 'DRY-RUN' });
       continue;
     }
 
@@ -108,19 +109,21 @@ async function main() {
       await postProperties(client, org._id, [{ type: '_inheritrights', boolean: false }]);
       console.log(`    SET _inheritrights=false`);
 
-      // Verify
+      // Verify and capture new value _id
       const orgAfter = await fetchEntity(client, org._id) as OrgEntity;
-      const verifiedVal = (orgAfter._inheritrights ?? [])[0]?.boolean;
+      const newIrEntry = (orgAfter._inheritrights ?? [])[0];
+      const verifiedVal = newIrEntry?.boolean;
       if (verifiedVal !== false) {
         throw new Error(`Verification failed: _inheritrights is now ${verifiedVal} (expected false)`);
       }
-      console.log(`    VERIFIED: _inheritrights=false`);
+      const newValueId = newIrEntry?._id ?? null;
+      console.log(`    VERIFIED: _inheritrights=false  new value _id=${newValueId}`);
 
-      results.push({ _id: org._id, name: orgName, currentInheritRights: currentVal, existingValueId, action: 'SET_FALSE' });
+      results.push({ _id: org._id, name: orgName, currentInheritRights: currentVal, existingValueId, newValueId, action: 'SET_FALSE' });
       set++;
     } catch (err) {
       console.error(`    ERROR: ${err}`);
-      results.push({ _id: org._id, name: orgName, currentInheritRights: currentVal, existingValueId, action: 'FAILED', error: String(err) });
+      results.push({ _id: org._id, name: orgName, currentInheritRights: currentVal, existingValueId, newValueId: null, action: 'FAILED', error: String(err) });
       failed++;
     }
   }
