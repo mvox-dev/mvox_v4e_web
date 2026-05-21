@@ -6,6 +6,20 @@ Format per entry: short title, decision, rationale, date. Most recent at the top
 
 ---
 
+## Entu formula-to-plain conversion mechanic (2026-05-21, session 9)
+
+**Decision**: To convert a formula property to a plain writable string on a type, DELETE the `formula` property VALUE from the prop-def entity (not the prop-def itself). Wire shape: `DELETE /property/{formulaValueId}` where `formulaValueId` is the `_id` of the formula value on the prop-def entity (not the prop-def entity `_id`).
+
+After deletion:
+- New instances: plain POSTs write and persist normally.
+- Existing instances with stale formula-cached values: the cached value persists (consistent with Q4 — Entu retains materialized formula values after source deletion). A direct POST replaces the stale value with a single clean value — no pre-delete of the stale value needed. Formula-cached values have no `_id`, so Entu's POST path does not accumulate them alongside the new write (unlike the Q5 multi-value trap for plain properties).
+
+**Rationale**: Verified live against polyphony via `scripts/migrations/probes/probe-phase-d-formula-unwrap-2026-05-21.ts`. Unlocked Phase D sub-op 1 (converting `person.name` from formula `forename ' ' surname` → plain string to align live polyphony with v4E `schema.ts`). The "POST replaces stale formula cache without pre-delete" finding significantly reduces Phase D op count.
+
+**Source**: Probe `probe-phase-d-formula-unwrap-2026-05-21.ts`, result artifact `probe-phase-d-formula-unwrap-2026-05-21T05-13-08-917Z.json`, findings doc `docs/migration/findings/entu-formula-unwrap-2026-05-21.md`. Session 9.
+
+---
+
 ## Seed-data model — v4E-clean target shape (2026-05-20, session 8)
 
 **Decision**: Seed scripts (`scripts/migrations/seed-*.ts`) write v4E-clean entities, NOT pre-v4E polyphony shape:
