@@ -29,10 +29,11 @@ describe('package.json — @inlang/paraglide-sveltekit dependency', () => {
 		expect(Object.keys(allDeps)).toContain('@inlang/paraglide-sveltekit');
 	});
 
-	it('@inlang/paraglide-sveltekit package is resolvable (installed in node_modules)', async () => {
-		// Throws "Cannot find module" if the package is missing — earliest failure signal.
-		const mod = await import('@inlang/paraglide-sveltekit');
-		expect(mod).toBeDefined();
+	it('@inlang/paraglide-sveltekit is installed in node_modules', () => {
+		// Check the package's own package.json rather than importing the entry point —
+		// the entry point pulls in .svelte components that require a Svelte transform.
+		const pkgJson = resolve(ROOT, 'node_modules/@inlang/paraglide-sveltekit/package.json');
+		expect(existsSync(pkgJson)).toBe(true);
 	});
 });
 
