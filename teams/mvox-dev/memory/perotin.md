@@ -215,6 +215,31 @@ Result: scripts/migrations/seed-results/seed-voices-2026-05-20T08-14-58-992Z.jso
   - Test User name: "Test User" (single clean value, _id 6a0e9b2b4ff8277cd4306681)
   - 6 orgs, 16 sections, 235 members (EFK:54, Sireen:50, Rahvusmeeskoor:90, TAM:41, EKBL:0, EMKL:0)
 
+## Session 10 — 2026-05-21
+
+### Task #64 YELLOW fixup (commit 10e1c2c)
+
+[CHECKPOINT] All 5 Phase D YELLOWs closed GREEN by Bentham:
+  - YELLOW-D1: skip path now writes artifact
+  - YELLOW-D3: newValueId captured after _inheritrights flip
+  - YELLOW-D5: originalNamePreserved as separate honest assertion
+  - YELLOW-D6: valueWritten derived from DRY_RUN (was hardcoded false)
+  - Cosmetic: dead findPropDef helper + unused listInstancesByType import removed
+
+[LEARNED] Commit-message verification discipline (Bentham catch, session 10):
+  After flagging own commit for correctness, re-read the actual `git log --format=%B`
+  output — not a paraphrase from the task report or memory. Post-task report wording
+  != committed message body. The D6 paragraph in the commit message had "false on live"
+  phrasing that misread as a bug; code was correct but message was ambiguous. Accepted
+  as-is (force-push for cosmetic message fix has worse blast-radius than the typo).
+  Rule: when verifying a flagged commit claim, quote from `git log`, not from own report.
+
+[LEARNED] null-on-skip beats false-on-skip for tri-state artifact fields (Bentham noted
+  as stronger than his original demand). When a check is not applicable (skip path, dry-run),
+  use null rather than a default boolean — makes the distinction between "check passed" /
+  "check failed" / "check not run" explicit in the artifact. Applied in sanityCheckPassed
+  and originalNamePreserved on skip/dry-run paths.
+
 ## Permanent role note
 
 Promoted from temporary specialist to permanent data-manager (session 7 end). Future seeding work:

@@ -151,6 +151,30 @@ Bentham REDs PRs that violate any of these.
 
 ---
 
+## Test fixtures pin production defaults — don't DRY them into the value under test (2026-05-21, session 10)
+
+**Decision**: When a production module exports a constant that has a fixed default (e.g., `DEFAULT_BASE_URL = 'https://entu.app/api/'`), the colocated spec should keep the literal `'https://entu.app/api/'` **hardcoded** as a fixture rather than importing the constant. The hardcoded literal acts as a drift-detection pin: if the production constant changes without the spec being updated, the test fails — surfacing the change for review. Importing the constant into the spec turns the assertion into a tautology (`stubEnv(X, X)` always passes regardless of what `X` is) and removes the drift signal.
+
+**Corollary — DRY discipline applies to production-side code, not to test fixtures.** Two production sources of truth for the same value (e.g., `client.ts:1` AND `+server.ts:4` both declaring `const DEFAULT_BASE_URL = ...`) IS a drift bug — fix it by exporting from one and importing into the other. A test that pins the same literal as a fixture is NOT a drift bug — it's the gate that catches drift in the production side. The two surfaces serve opposite purposes; DRY-ing across them collapses the gate.
+
+**Mechanism**:
+- Production-to-production drift: real risk. Fix: one source of truth, others import.
+- Production-to-test drift: a *feature*, not a bug. The test's hardcoded literal is the "what the value used to be" pin; the assertion against the production constant is what makes the test fail-on-change.
+- A test that imports the constant from production loses both the "what it was" pin and the "did it change?" signal — the test still runs and still passes, silently.
+
+**Caveats**:
+- Applies to constants representing *stable defaults* (URLs, timeouts, schema versions, port numbers) — values where intentional change should be a reviewable event.
+- Does NOT apply to test fixtures derived from production schemas/types (e.g., `import type { Foo }` for type-only consumption; importing the *type* is fine, importing a *value* with the intent of using it as a comparand against itself is the antipattern).
+- Does NOT apply to integration tests that need the same actual URL the production code uses to talk to a real backend — those should share the constant to ensure they target the same endpoint.
+
+**Rationale**: Discovered during #20 (YELLOW-2 follow-up, Bentham review of commit `7e36c07`). Josquin's first attempt exported `DEFAULT_BASE_URL` from `client.ts` and imported it into `client.spec.ts:7` to "DRY the literal." The change passed all 288 tests because every test continued to assert what it had always asserted — but the env-stub line `vi.stubEnv('ENTU_BASE_URL', DEFAULT_BASE_URL)` had become a tautology that could no longer fail when the constant changed. Reverted in v2; the spec's literal stays hardcoded as a fixture pin.
+
+**Source**: Bentham review of `7e36c07`, RED verdict, v2 dispatched. Session 10.
+
+(*MVOX:Bentham*)
+
+---
+
 ## Test data strategy — empty-state UI first, dogfood second (2026-05-18, session 3)
 
 **Decision**: Build empty-state designs for every singer/conductor view (agenda, repertoire, programme list, etc.) as part of the GREEN phase for each story. Do not seed the polyphony Entu db with synthetic test events/works. Once manager/admin stories ship, real test data is created through mvox itself (dogfood path).
