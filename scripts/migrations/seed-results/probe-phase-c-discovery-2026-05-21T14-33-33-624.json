@@ -1,0 +1,99 @@
+{
+  "runAt": "2026-05-21T14:33:33.463Z",
+  "db": "polyphony",
+  "inventoryCopy": {
+    "count": 0,
+    "sampleSize": 0,
+    "propPresence": {},
+    "sampleInstances": []
+  },
+  "participation": {
+    "count": 0,
+    "sampleSize": 0,
+    "propPresence": {},
+    "sampleInstances": []
+  },
+  "affiliation": {
+    "count": 4,
+    "sampleSize": 4,
+    "propPresence": {},
+    "sampleInstances": [
+      {
+        "_id": "69c7f8728489bfcb0e81b071"
+      },
+      {
+        "_id": "69c7f8788489bfcb0e81b1b5"
+      },
+      {
+        "_id": "69c7f87e8489bfcb0e81b2f0"
+      }
+    ]
+  },
+  "memberWithRole": {
+    "totalMembers": 235,
+    "membersWithRole": 4,
+    "roleValueDistribution": {
+      "Owner": 4,
+      "Admin": 4
+    },
+    "sampleInstances": [
+      {
+        "_id": "69c7f8728489bfcb0e81b085",
+        "role": [
+          {
+            "_id": "69c7f8728489bfcb0e81b08b",
+            "reference": "69c7f8708489bfcb0e81b020",
+            "property_type": "role",
+            "string": "Owner",
+            "entity_type": "role"
+          },
+          {
+            "_id": "69c7f8728489bfcb0e81b08c",
+            "reference": "69c7f8708489bfcb0e81b02e",
+            "property_type": "role",
+            "string": "Admin",
+            "entity_type": "role"
+          }
+        ]
+      },
+      {
+        "_id": "69c7f8788489bfcb0e81b1c9",
+        "role": [
+          {
+            "_id": "69c7f8788489bfcb0e81b1cf",
+            "reference": "69c7f8708489bfcb0e81b020",
+            "property_type": "role",
+            "string": "Owner",
+            "entity_type": "role"
+          },
+          {
+            "_id": "69c7f8788489bfcb0e81b1d0",
+            "reference": "69c7f8708489bfcb0e81b02e",
+            "property_type": "role",
+            "string": "Admin",
+            "entity_type": "role"
+          }
+        ]
+      },
+      {
+        "_id": "69c7f87e8489bfcb0e81b304",
+        "role": [
+          {
+            "_id": "69c7f87e8489bfcb0e81b30a",
+            "reference": "69c7f8708489bfcb0e81b020",
+            "property_type": "role",
+            "string": "Owner",
+            "entity_type": "role"
+          },
+          {
+            "_id": "69c7f87e8489bfcb0e81b30b",
+            "reference": "69c7f8708489bfcb0e81b02e",
+            "property_type": "role",
+            "string": "Admin",
+            "entity_type": "role"
+          }
+        ]
+      }
+    ]
+  }
+}
