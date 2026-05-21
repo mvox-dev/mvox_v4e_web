@@ -1,0 +1,390 @@
+{
+  "runAt": "2026-05-21T15:28:23.732Z",
+  "db": "polyphony",
+  "haltCondition": false,
+  "formulaReferences": [],
+  "referenceQueryPickers": [],
+  "instanceCounts": {
+    "inventory_copy": 0,
+    "participation": 0,
+    "affiliation": 4,
+    "memberRoleValuesTotal": 8
+  },
+  "driftDetected": false,
+  "affiliationInstances": [
+    {
+      "_id": "69c7f8728489bfcb0e81b071",
+      "_parent": [
+        {
+          "_id": "69c7f8728489bfcb0e81b073",
+          "reference": "69c7f8718489bfcb0e81b065",
+          "property_type": "_parent",
+          "string": "Eesti Filharmoonia Kammerkoor",
+          "entity_type": "organization"
+        }
+      ],
+      "umbrella": [
+        {
+          "_id": "69c7f8728489bfcb0e81b075",
+          "reference": "69c7f8718489bfcb0e81b05a",
+          "property_type": "umbrella",
+          "string": "Eesti Kammerkooride Liit",
+          "entity_type": "organization"
+        }
+      ],
+      "joined_at": [
+        {
+          "_id": "69c7f8728489bfcb0e81b076",
+          "date": "2026-03-28T00:00:00.000Z"
+        }
+      ],
+      "name": [
+        {
+          "string": "Eesti Filharmoonia Kammerkoor @ Eesti Kammerkooride Liit"
+        }
+      ]
+    },
+    {
+      "_id": "69c7f8788489bfcb0e81b1b5",
+      "_parent": [
+        {
+          "_id": "69c7f8788489bfcb0e81b1b7",
+          "reference": "69c7f8788489bfcb0e81b1a9",
+          "property_type": "_parent",
+          "string": "Kammernaiskoor Sireen",
+          "entity_type": "organization"
+        }
+      ],
+      "umbrella": [
+        {
+          "_id": "69c7f8788489bfcb0e81b1b9",
+          "reference": "69c7f8718489bfcb0e81b05a",
+          "property_type": "umbrella",
+          "string": "Eesti Kammerkooride Liit",
+          "entity_type": "organization"
+        }
+      ],
+      "joined_at": [
+        {
+          "_id": "69c7f8788489bfcb0e81b1ba",
+          "date": "2026-03-28T00:00:00.000Z"
+        }
+      ],
+      "name": [
+        {
+          "string": "Kammernaiskoor Sireen @ Eesti Kammerkooride Liit"
+        }
+      ]
+    },
+    {
+      "_id": "69c7f87e8489bfcb0e81b2f0",
+      "_parent": [
+        {
+          "_id": "69c7f87e8489bfcb0e81b2f2",
+          "reference": "69c7f87d8489bfcb0e81b2e4",
+          "property_type": "_parent",
+          "string": "Eesti Rahvusmeeskoor",
+          "entity_type": "organization"
+        }
+      ],
+      "umbrella": [
+        {
+          "_id": "69c7f87e8489bfcb0e81b2f4",
+          "reference": "69c7f87d8489bfcb0e81b2d9",
+          "property_type": "umbrella",
+          "string": "Eesti Meeskooride Liit",
+          "entity_type": "organization"
+        }
+      ],
+      "joined_at": [
+        {
+          "_id": "69c7f87e8489bfcb0e81b2f5",
+          "date": "2026-03-28T00:00:00.000Z"
+        }
+      ],
+      "name": [
+        {
+          "string": "Eesti Rahvusmeeskoor @ Eesti Meeskooride Liit"
+        }
+      ]
+    },
+    {
+      "_id": "69c7f8878489bfcb0e81b4fc",
+      "_parent": [
+        {
+          "_id": "69c7f8878489bfcb0e81b4fe",
+          "reference": "69c7f8868489bfcb0e81b4f0",
+          "property_type": "_parent",
+          "string": "Tartu Akadeemiline Meeskoor",
+          "entity_type": "organization"
+        }
+      ],
+      "umbrella": [
+        {
+          "_id": "69c7f8878489bfcb0e81b500",
+          "reference": "69c7f87d8489bfcb0e81b2d9",
+          "property_type": "umbrella",
+          "string": "Eesti Meeskooride Liit",
+          "entity_type": "organization"
+        }
+      ],
+      "joined_at": [
+        {
+          "_id": "69c7f8878489bfcb0e81b501",
+          "date": "2026-03-28T00:00:00.000Z"
+        }
+      ],
+      "name": [
+        {
+          "string": "Tartu Akadeemiline Meeskoor @ Eesti Meeskooride Liit"
+        }
+      ]
+    }
+  ],
+  "memberRoleValues": {
+    "69c7f8728489bfcb0e81b085": [
+      {
+        "_id": "69c7f8728489bfcb0e81b08b",
+        "reference": "69c7f8708489bfcb0e81b020",
+        "displayName": "Owner"
+      },
+      {
+        "_id": "69c7f8728489bfcb0e81b08c",
+        "reference": "69c7f8708489bfcb0e81b02e",
+        "displayName": "Admin"
+      }
+    ],
+    "69c7f8788489bfcb0e81b1c9": [
+      {
+        "_id": "69c7f8788489bfcb0e81b1cf",
+        "reference": "69c7f8708489bfcb0e81b020",
+        "displayName": "Owner"
+      },
+      {
+        "_id": "69c7f8788489bfcb0e81b1d0",
+        "reference": "69c7f8708489bfcb0e81b02e",
+        "displayName": "Admin"
+      }
+    ],
+    "69c7f87e8489bfcb0e81b304": [
+      {
+        "_id": "69c7f87e8489bfcb0e81b30a",
+        "reference": "69c7f8708489bfcb0e81b020",
+        "displayName": "Owner"
+      },
+      {
+        "_id": "69c7f87e8489bfcb0e81b30b",
+        "reference": "69c7f8708489bfcb0e81b02e",
+        "displayName": "Admin"
+      }
+    ],
+    "69c7f8878489bfcb0e81b510": [
+      {
+        "_id": "69c7f8878489bfcb0e81b516",
+        "reference": "69c7f8708489bfcb0e81b020",
+        "displayName": "Owner"
+      },
+      {
+        "_id": "69c7f8878489bfcb0e81b517",
+        "reference": "69c7f8708489bfcb0e81b02e",
+        "displayName": "Admin"
+      }
+    ]
+  },
+  "roleTypeInstances": [
+    {
+      "_id": "69c7f8708489bfcb0e81b020",
+      "displayName": "Owner"
+    },
+    {
+      "_id": "69c7f8708489bfcb0e81b02e",
+      "displayName": "Admin"
+    },
+    {
+      "_id": "69c7f8718489bfcb0e81b03b",
+      "displayName": "Librarian"
+    },
+    {
+      "_id": "69c7f8718489bfcb0e81b045",
+      "displayName": "Conductor"
+    },
+    {
+      "_id": "69c7f8718489bfcb0e81b050",
+      "displayName": "Section Leader"
+    }
+  ],
+  "typeDefIds": {
+    "inventory_copy": "69c7ea508489bfcb0e819fed",
+    "participation": "69c7ea588489bfcb0e81a137",
+    "affiliation": "69c7ea598489bfcb0e81a178",
+    "role": "69c7ea468489bfcb0e819df9"
+  },
+  "propDefs": {
+    "inventory_copy": [
+      {
+        "_id": "69c7ea508489bfcb0e819ff4",
+        "name": "name",
+        "type": "string",
+        "formula": null,
+        "referenceQuery": null
+      },
+      {
+        "_id": "69c7ea518489bfcb0e81a000",
+        "name": "copy_number",
+        "type": "number",
+        "formula": null,
+        "referenceQuery": null
+      },
+      {
+        "_id": "69c7ea518489bfcb0e81a00b",
+        "name": "edition",
+        "type": "reference",
+        "formula": null,
+        "referenceQuery": "_type.string=edition"
+      },
+      {
+        "_id": "69c7ea518489bfcb0e81a017",
+        "name": "condition",
+        "type": "string",
+        "formula": null,
+        "referenceQuery": null
+      },
+      {
+        "_id": "69c7ea518489bfcb0e81a025",
+        "name": "assigned_to",
+        "type": "reference",
+        "formula": null,
+        "referenceQuery": "_type.string=member"
+      },
+      {
+        "_id": "69c7ea528489bfcb0e81a030",
+        "name": "assigned_at",
+        "type": "date",
+        "formula": null,
+        "referenceQuery": null
+      },
+      {
+        "_id": "69c7ea528489bfcb0e81a03a",
+        "name": "notes",
+        "type": "text",
+        "formula": null,
+        "referenceQuery": null
+      }
+    ],
+    "participation": [
+      {
+        "_id": "69c7ea588489bfcb0e81a13e",
+        "name": "name",
+        "type": "string",
+        "formula": null,
+        "referenceQuery": null
+      },
+      {
+        "_id": "69c7ea588489bfcb0e81a14a",
+        "name": "member",
+        "type": "reference",
+        "formula": null,
+        "referenceQuery": "_type.string=member"
+      },
+      {
+        "_id": "69c7ea588489bfcb0e81a156",
+        "name": "rsvp",
+        "type": "string",
+        "formula": null,
+        "referenceQuery": null
+      },
+      {
+        "_id": "69c7ea588489bfcb0e81a163",
+        "name": "attended",
+        "type": "boolean",
+        "formula": null,
+        "referenceQuery": null
+      },
+      {
+        "_id": "69c7ea598489bfcb0e81a16d",
+        "name": "noted_by",
+        "type": "reference",
+        "formula": null,
+        "referenceQuery": "_type.string=member"
+      }
+    ],
+    "affiliation": [
+      {
+        "_id": "69c7ea598489bfcb0e81a17f",
+        "name": "name",
+        "type": "string",
+        "formula": "_parent.*.name ' @ ' umbrella.*.name CONCAT",
+        "referenceQuery": null
+      },
+      {
+        "_id": "69c7ea598489bfcb0e81a18b",
+        "name": "umbrella",
+        "type": "reference",
+        "formula": null,
+        "referenceQuery": "_type.string=organization"
+      },
+      {
+        "_id": "69c7ea5a8489bfcb0e81a197",
+        "name": "joined_at",
+        "type": "date",
+        "formula": null,
+        "referenceQuery": null
+      },
+      {
+        "_id": "69c7ea5a8489bfcb0e81a1a2",
+        "name": "left_at",
+        "type": "date",
+        "formula": null,
+        "referenceQuery": null
+      },
+      {
+        "_id": "69c7ff138489bfcb0e81b644",
+        "name": "collective",
+        "type": "reference",
+        "formula": null,
+        "referenceQuery": "_type.string=organization"
+      }
+    ],
+    "role": [
+      {
+        "_id": "69c7ea468489bfcb0e819e00",
+        "name": "name",
+        "type": "string",
+        "formula": null,
+        "referenceQuery": null
+      },
+      {
+        "_id": "69c7ea468489bfcb0e819e0c",
+        "name": "description",
+        "type": "text",
+        "formula": null,
+        "referenceQuery": null
+      },
+      {
+        "_id": "69c7ea468489bfcb0e819e17",
+        "name": "permissions",
+        "type": "string",
+        "formula": null,
+        "referenceQuery": null
+      },
+      {
+        "_id": "69c7ea478489bfcb0e819e27",
+        "name": "ordinal",
+        "type": "number",
+        "formula": null,
+        "referenceQuery": null
+      },
+      {
+        "_id": "69c7ea478489bfcb0e819e31",
+        "name": "member_count",
+        "type": "number",
+        "formula": "_referrer.member.name COUNT",
+        "referenceQuery": null
+      }
+    ]
+  },
+  "memberRolePropDef": {
+    "_id": "69c7ea4b8489bfcb0e819f11",
+    "name": "role"
+  }
+}
