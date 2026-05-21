@@ -1,0 +1,301 @@
+{
+  "runAt": "2026-05-21T20:38:52.324Z",
+  "db": "polyphony",
+  "canonicalTypeCount": 19,
+  "canonicalTypes": [
+    "application",
+    "attendance",
+    "copy",
+    "edition",
+    "event",
+    "event_series",
+    "invitation",
+    "lending",
+    "library",
+    "member",
+    "organization",
+    "person",
+    "program_item",
+    "repertoire_item",
+    "rsvp",
+    "season",
+    "section",
+    "voice",
+    "work"
+  ],
+  "pass1Menu": {
+    "totalMenus": 23,
+    "mismatchCount": 3,
+    "mismatches": [
+      {
+        "entityId": "69bcfd8e9c031ab8e6ce8070",
+        "entityName": "Entities",
+        "entuUrl": "https://entu.app/polyphony/69bcfd8e9c031ab8e6ce8070",
+        "source": "menu.query",
+        "rawText": "_type.string=entity&system._id.exists=false&sort=name.string",
+        "extractedTypeName": "entity",
+        "suggestion": "(no suggestion — 'entity' not recognised)"
+      },
+      {
+        "entityId": "69bcfd8e9c031ab8e6ce8071",
+        "entityName": "Menu",
+        "entuUrl": "https://entu.app/polyphony/69bcfd8e9c031ab8e6ce8071",
+        "source": "menu.query",
+        "rawText": "_type.string=menu&sort=name.string",
+        "extractedTypeName": "menu",
+        "suggestion": "(no suggestion — 'menu' not recognised)"
+      },
+      {
+        "entityId": "69bcfd8e9c031ab8e6ce8072",
+        "entityName": "Plugins",
+        "entuUrl": "https://entu.app/polyphony/69bcfd8e9c031ab8e6ce8072",
+        "source": "menu.query",
+        "rawText": "_type.string=plugin&sort=name.string",
+        "extractedTypeName": "plugin",
+        "suggestion": "(no suggestion — 'plugin' not recognised)"
+      }
+    ],
+    "allMenus": [
+      {
+        "_id": "69bcfd8e9c031ab8e6ce8070",
+        "name": "Entities",
+        "query": [
+          "_type.string=entity&system._id.exists=false&sort=name.string"
+        ],
+        "reference_query": [],
+        "add": [],
+        "search": []
+      },
+      {
+        "_id": "69bcfd8e9c031ab8e6ce8071",
+        "name": "Menu",
+        "query": [
+          "_type.string=menu&sort=name.string"
+        ],
+        "reference_query": [],
+        "add": [],
+        "search": []
+      },
+      {
+        "_id": "69bcfd8e9c031ab8e6ce8072",
+        "name": "Plugins",
+        "query": [
+          "_type.string=plugin&sort=name.string"
+        ],
+        "reference_query": [],
+        "add": [],
+        "search": []
+      },
+      {
+        "_id": "69bcfd8e9c031ab8e6ce8073",
+        "name": "Persons",
+        "query": [
+          "_type.string=person&sort=name.string"
+        ],
+        "reference_query": [],
+        "add": [],
+        "search": []
+      },
+      {
+        "_id": "69bcfd8e9c031ab8e6ce8074",
+        "name": "Billing",
+        "query": [
+          "/{DATABASE}/billing"
+        ],
+        "reference_query": [],
+        "add": [],
+        "search": []
+      },
+      {
+        "_id": "69c7f88b8489bfcb0e81b5f8",
+        "name": "Organisations",
+        "query": [
+          "_type.string=organization&sort=name.string"
+        ],
+        "reference_query": [],
+        "add": [],
+        "search": []
+      },
+      {
+        "_id": "6a0f6d304ff8277cd43069ab",
+        "name": "Voices",
+        "query": [
+          "_type.string=voice&sort=name.string"
+        ],
+        "reference_query": [],
+        "add": [],
+        "search": []
+      },
+      {
+        "_id": "6a0f6d304ff8277cd43069b6",
+        "name": "Sections",
+        "query": [
+          "_type.string=section&sort=name.string"
+        ],
+        "reference_query": [],
+        "add": [],
+        "search": []
+      },
+      {
+        "_id": "6a0f6d304ff8277cd43069c1",
+        "name": "Members",
+        "query": [
+          "_type.string=member&sort=name.string"
+        ],
+        "reference_query": [],
+        "add": [],
+        "search": []
+      },
+      {
+        "_id": "6a0f6d314ff8277cd43069cc",
+        "name": "Libraries",
+        "query": [
+          "_type.string=library&sort=name.string"
+        ],
+        "reference_query": [],
+        "add": [],
+        "search": []
+      },
+      {
+        "_id": "6a0f6d314ff8277cd43069d7",
+        "name": "Works",
+        "query": [
+          "_type.string=work&sort=name.string"
+        ],
+        "reference_query": [],
+        "add": [],
+        "search": []
+      },
+      {
+        "_id": "6a0f6d314ff8277cd43069e2",
+        "name": "Editions",
+        "query": [
+          "_type.string=edition&sort=name.string"
+        ],
+        "reference_query": [],
+        "add": [],
+        "search": []
+      },
+      {
+        "_id": "6a0f6d314ff8277cd43069ed",
+        "name": "Copies",
+        "query": [
+          "_type.string=copy&sort=name.string"
+        ],
+        "reference_query": [],
+        "add": [],
+        "search": []
+      },
+      {
+        "_id": "6a0f6d314ff8277cd43069f8",
+        "name": "Lending",
+        "query": [
+          "_type.string=lending&sort=name.string"
+        ],
+        "reference_query": [],
+        "add": [],
+        "search": []
+      },
+      {
+        "_id": "6a0f6d314ff8277cd4306a03",
+        "name": "Invitations",
+        "query": [
+          "_type.string=invitation&sort=name.string"
+        ],
+        "reference_query": [],
+        "add": [],
+        "search": []
+      },
+      {
+        "_id": "6a0f6d314ff8277cd4306a0e",
+        "name": "Applications",
+        "query": [
+          "_type.string=application&sort=name.string"
+        ],
+        "reference_query": [],
+        "add": [],
+        "search": []
+      },
+      {
+        "_id": "6a0f6d314ff8277cd4306a19",
+        "name": "Seasons",
+        "query": [
+          "_type.string=season&sort=name.string"
+        ],
+        "reference_query": [],
+        "add": [],
+        "search": []
+      },
+      {
+        "_id": "6a0f6d314ff8277cd4306a24",
+        "name": "Event Series",
+        "query": [
+          "_type.string=event_series&sort=name.string"
+        ],
+        "reference_query": [],
+        "add": [],
+        "search": []
+      },
+      {
+        "_id": "6a0f6d314ff8277cd4306a2f",
+        "name": "Events",
+        "query": [
+          "_type.string=event&sort=name.string"
+        ],
+        "reference_query": [],
+        "add": [],
+        "search": []
+      },
+      {
+        "_id": "6a0f6d324ff8277cd4306a3a",
+        "name": "Repertoire",
+        "query": [
+          "_type.string=repertoire_item&sort=name.string"
+        ],
+        "reference_query": [],
+        "add": [],
+        "search": []
+      },
+      {
+        "_id": "6a0f6d324ff8277cd4306a45",
+        "name": "Programme Items",
+        "query": [
+          "_type.string=program_item&sort=name.string"
+        ],
+        "reference_query": [],
+        "add": [],
+        "search": []
+      },
+      {
+        "_id": "6a0f6d324ff8277cd4306a50",
+        "name": "RSVPs",
+        "query": [
+          "_type.string=rsvp&sort=name.string"
+        ],
+        "reference_query": [],
+        "add": [],
+        "search": []
+      },
+      {
+        "_id": "6a0f6d324ff8277cd4306a5b",
+        "name": "Attendance",
+        "query": [
+          "_type.string=attendance&sort=name.string"
+        ],
+        "reference_query": [],
+        "add": [],
+        "search": []
+      }
+    ]
+  },
+  "pass2Formula": {
+    "totalFormulaProps": 0,
+    "mismatchCount": 0,
+    "mismatches": []
+  },
+  "pass3Reference": {
+    "totalReferenceProps": 0,
+    "mismatchCount": 0,
+    "mismatches": []
+  }
+}

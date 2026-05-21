@@ -1,0 +1,13 @@
+{
+  "runAt": "2026-05-21T20:33:49.493Z",
+  "db": "polyphony",
+  "dryRun": true,
+  "targetMenuCount": 18,
+  "ops": [
+    {
+      "action": "SKIP",
+      "detail": "dry-run mode — all ops skipped",
+      "dryRun": true
+    }
+  ]
+}

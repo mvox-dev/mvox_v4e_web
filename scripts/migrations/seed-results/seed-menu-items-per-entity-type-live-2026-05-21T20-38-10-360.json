@@ -1,0 +1,159 @@
+{
+  "runAt": "2026-05-21T20:38:08.549Z",
+  "db": "polyphony",
+  "dryRun": false,
+  "targetMenuCount": 18,
+  "ops": [
+    {
+      "action": "SKIP",
+      "entityType": "organization",
+      "label": "Organisations",
+      "entityId": "69c7f88b8489bfcb0e81b5f8",
+      "detail": "already correct",
+      "dryRun": false
+    },
+    {
+      "action": "SKIP",
+      "label": "Umbrella Orgs",
+      "entityId": "69c7f88c8489bfcb0e81b600",
+      "detail": "already deleted (404)",
+      "dryRun": false
+    },
+    {
+      "action": "CREATE",
+      "entityType": "voice",
+      "label": "Voices",
+      "entityId": "6a0f6d304ff8277cd43069ab",
+      "detail": "ordinal=110",
+      "dryRun": false
+    },
+    {
+      "action": "CREATE",
+      "entityType": "section",
+      "label": "Sections",
+      "entityId": "6a0f6d304ff8277cd43069b6",
+      "detail": "ordinal=130",
+      "dryRun": false
+    },
+    {
+      "action": "CREATE",
+      "entityType": "member",
+      "label": "Members",
+      "entityId": "6a0f6d304ff8277cd43069c1",
+      "detail": "ordinal=140",
+      "dryRun": false
+    },
+    {
+      "action": "CREATE",
+      "entityType": "library",
+      "label": "Libraries",
+      "entityId": "6a0f6d314ff8277cd43069cc",
+      "detail": "ordinal=200",
+      "dryRun": false
+    },
+    {
+      "action": "CREATE",
+      "entityType": "work",
+      "label": "Works",
+      "entityId": "6a0f6d314ff8277cd43069d7",
+      "detail": "ordinal=210",
+      "dryRun": false
+    },
+    {
+      "action": "CREATE",
+      "entityType": "edition",
+      "label": "Editions",
+      "entityId": "6a0f6d314ff8277cd43069e2",
+      "detail": "ordinal=220",
+      "dryRun": false
+    },
+    {
+      "action": "CREATE",
+      "entityType": "copy",
+      "label": "Copies",
+      "entityId": "6a0f6d314ff8277cd43069ed",
+      "detail": "ordinal=230",
+      "dryRun": false
+    },
+    {
+      "action": "CREATE",
+      "entityType": "lending",
+      "label": "Lending",
+      "entityId": "6a0f6d314ff8277cd43069f8",
+      "detail": "ordinal=240",
+      "dryRun": false
+    },
+    {
+      "action": "CREATE",
+      "entityType": "invitation",
+      "label": "Invitations",
+      "entityId": "6a0f6d314ff8277cd4306a03",
+      "detail": "ordinal=300",
+      "dryRun": false
+    },
+    {
+      "action": "CREATE",
+      "entityType": "application",
+      "label": "Applications",
+      "entityId": "6a0f6d314ff8277cd4306a0e",
+      "detail": "ordinal=310",
+      "dryRun": false
+    },
+    {
+      "action": "CREATE",
+      "entityType": "season",
+      "label": "Seasons",
+      "entityId": "6a0f6d314ff8277cd4306a19",
+      "detail": "ordinal=400",
+      "dryRun": false
+    },
+    {
+      "action": "CREATE",
+      "entityType": "event_series",
+      "label": "Event Series",
+      "entityId": "6a0f6d314ff8277cd4306a24",
+      "detail": "ordinal=410",
+      "dryRun": false
+    },
+    {
+      "action": "CREATE",
+      "entityType": "event",
+      "label": "Events",
+      "entityId": "6a0f6d314ff8277cd4306a2f",
+      "detail": "ordinal=420",
+      "dryRun": false
+    },
+    {
+      "action": "CREATE",
+      "entityType": "repertoire_item",
+      "label": "Repertoire",
+      "entityId": "6a0f6d324ff8277cd4306a3a",
+      "detail": "ordinal=430",
+      "dryRun": false
+    },
+    {
+      "action": "CREATE",
+      "entityType": "program_item",
+      "label": "Programme Items",
+      "entityId": "6a0f6d324ff8277cd4306a45",
+      "detail": "ordinal=440",
+      "dryRun": false
+    },
+    {
+      "action": "CREATE",
+      "entityType": "rsvp",
+      "label": "RSVPs",
+      "entityId": "6a0f6d324ff8277cd4306a50",
+      "detail": "ordinal=500",
+      "dryRun": false
+    },
+    {
+      "action": "CREATE",
+      "entityType": "attendance",
+      "label": "Attendance",
+      "entityId": "6a0f6d324ff8277cd4306a5b",
+      "detail": "ordinal=510",
+      "dryRun": false
+    }
+  ]
+}

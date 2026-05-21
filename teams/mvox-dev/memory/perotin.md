@@ -316,6 +316,24 @@ Commits (in order):
   Prop-defs likely not reachable via flat _type.string=_property filter. If completeness
   needed, explore alternative path (e.g., children of _property type entity).
 
+## Session 10 — menu rationalization (2026-05-21)
+
+[CHECKPOINT] Menu set rationalized on polyphony db:
+  UPDATE: Choirs → Organisations (query fixed Organization→organization, filter dropped)
+  DELETE: Umbrella Orgs
+  CREATE: 17 new Polyphony-group menus — one per remaining v4E type
+  Result: 18 Polyphony-group menus total, all canonical. Post-sweep: 0 domain mismatches.
+
+[GOTCHA] createEntity requires explicit _type reference property.
+  The Entu API returns 400 "Property _type is required" if _type.reference is omitted from
+  the POST body. Dry-run doesn't hit createEntity so this won't surface until live execution.
+  Fix: always include { type: '_type', reference: '<type-entity-id>' } in createEntity calls.
+  menu type entity _id: 69bcfd8e9c031ab8e6ce803c (polyphony db)
+
+[PATTERN] Cross-branch probe execution: if probe script is on an unmerged branch, use
+  `git show <branch>:<path> > /workspace/scripts/migrations/probes/<filename>` to copy it
+  into the current working tree temporarily. Run, then delete. Don't leave it staged.
+
 ## Permanent role note
 
 Promoted from temporary specialist to permanent data-manager (session 7 end). Future seeding work:
