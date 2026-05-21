@@ -1,0 +1,41 @@
+{
+  "phase": "C.2",
+  "script": "cleanup-phase-c-participation-type",
+  "dryRun": true,
+  "startedAt": "2026-05-21T15:37:03.767Z",
+  "completedAt": "2026-05-21T15:37:03.889Z",
+  "initialInstances": 0,
+  "propDefsResult": [
+    {
+      "id": "69c7ea588489bfcb0e81a13e",
+      "name": "name",
+      "outcome": "would-delete"
+    },
+    {
+      "id": "69c7ea588489bfcb0e81a14a",
+      "name": "member",
+      "outcome": "would-delete"
+    },
+    {
+      "id": "69c7ea588489bfcb0e81a156",
+      "name": "rsvp",
+      "outcome": "would-delete"
+    },
+    {
+      "id": "69c7ea588489bfcb0e81a163",
+      "name": "attended",
+      "outcome": "would-delete"
+    },
+    {
+      "id": "69c7ea598489bfcb0e81a16d",
+      "name": "noted_by",
+      "outcome": "would-delete"
+    }
+  ],
+  "typeDefResult": {
+    "id": "69c7ea588489bfcb0e81a137",
+    "outcome": "would-delete"
+  },
+  "exitCode": 0,
+  "errors": []
+}
