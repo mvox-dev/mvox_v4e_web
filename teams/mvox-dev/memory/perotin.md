@@ -153,7 +153,17 @@ Result: scripts/migrations/seed-results/seed-voices-2026-05-20T08-14-58-992Z.jso
   person.name prop-def _id: 69bcfd8e9c031ab8e6ce8068
   person.name formula value _id: 69bcfd8e9c031ab8e6ce81cb (DELETE in sub-op 1)
 
-[SKIP] Open Q re seed name=" " — RESOLVED (PO chose A3: backfill from collectives.json manifest).
+[SKIP] Open Q re seed name=" " — RESOLVED. seed-collectives.ts wrote plain _id-bearing name values at creation time; all 120 were already correct. Sub-op 2 was a clean no-op.
+
+[GOTCHA] Sub-op 1 sanity check used PO person (formula-cached name, no _id). preExistingNameIds was empty so cleanup deleted the only remaining name value. Restored immediately. Future: sanity-check should use a seed person (plain _id-bearing name) not the PO.
+
+[CHECKPOINT] Phase D complete (session 9, 2026-05-21):
+  Sub-op 1: person.name formula value deleted — now plain-writable (commit adc41e8)
+  Sub-op 2: 120 seed names already correct — no-op
+  Sub-ops 3+4: 4 forename/surname values deleted from PO + Test User; both prop-defs retired
+  Sub-op 5: _inheritrights=false set on all 6 orgs (commit 88595c7)
+  Sub-op 3 (deprecated types): 0 found — no-op
+  Bentham post-write review: pending (batch routed by team-lead)
 
 ## Permanent role note
 
