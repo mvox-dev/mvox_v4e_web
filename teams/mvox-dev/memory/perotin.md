@@ -169,7 +169,7 @@ Result: scripts/migrations/seed-results/seed-voices-2026-05-20T08-14-58-992Z.jso
   YELLOW-15 carry-forward: fetchEntity per-org verification in sub-op 5 — batch with initial list for larger sets
   YELLOW (sub-op 1 sanity check): use seed person not PO for future formula-unwrap sanity checks
   Post-exec rights audit: CLEAN — all 6 orgs confirmed _inheritrights=false, sections+members intact (probe-phase-d-rights-audit-2026-05-21)
-  YELLOW-D4: org TYPE entity (_id 69c7ea478489bfcb0e819e3d) has _inheritrights=true — NEEDS FIX. Fix script proposed; awaiting team-lead authorization before live execution.
+  YELLOW-D4: org TYPE entity (_id 69c7ea478489bfcb0e819e3d) _inheritrights set to false — COMPLETE. New org instances will now be born with false by default.
 
 ## Session 9 — Process calibration
 
