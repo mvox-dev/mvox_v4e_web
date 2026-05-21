@@ -262,6 +262,47 @@ Result: scripts/migrations/seed-results/seed-voices-2026-05-20T08-14-58-992Z.jso
   "check failed" / "check not run" explicit in the artifact. Applied in sanityCheckPassed
   and originalNamePreserved on skip/dry-run paths.
 
+### Phase C execution — complete (session 10, 2026-05-21)
+
+[CHECKPOINT] Phase C bundle fully complete. All 44 DELETEs landed, zero failures.
+
+Commits (in order):
+  b01b940 — C.1 script + dry-run artifact (inventory_copy type retire)
+  37097c3 — C.2 script + dry-run artifact (participation type retire)
+  08e60dd — C.3 script + dry-run artifact (affiliation 4-instance + type retire)
+  c90da6e — C.4 script + dry-run artifact (member.role 8-value + prop-def retire)
+  c09bebb — C.5 script + dry-run artifact (role-type instances + type retire)
+  9059e78 — YELLOW fix-up C4-1 + C5-1 (dynamic-enumeration discipline)
+  3a4838b — Phase C live execution artifacts (C.1-C.5 bundle)
+  f3529b7 — Phase C AC verification probe + PASS/FAIL result
+
+[YELLOW-C4-1 fix] C.4 pre-flight now asserts every hardcoded val._id is present in live
+  member.role values (not just count match). Set-based check; halts naming missing IDs.
+
+[YELLOW-C5-1 fix] C.5 preservation+deletion iterates liveInstances (live-fetched list),
+  not hardcoded ROLE_TYPE_INSTANCES. Hardcoded list demoted to display-name map + sanity
+  check: halts if any live ID absent from hardcoded set. Catches exact-count-but-different-IDs drift.
+
+[PATTERN] Both C4-1 and C5-1 follow the same discipline: iterate live results; use preflight
+  hardcoded list as drift-check, not authoritative source. Apply to all future scripts with
+  hardcoded preflight IDs.
+
+[AC VERIFICATION] 9/9 PASS (probe-phase-c-ac-verification-2026-05-21T16-15-05-370.json):
+  - inventory_copy/participation/affiliation/role: 0 instances each
+  - All 4 PO members: role values = 0
+  - All 4 retiring type-defs: 404 on live Entu
+
+[NEXT SESSION] Polyphony Entu db state at Phase C closeout:
+  - inventory_copy, participation, affiliation, role types: RETIRED (404 on type-defs)
+  - member.role property: DELETED (0 values, prop-def deleted)
+  - All role-type instances (Owner/Admin/Librarian/Conductor/Section Leader): DELETED
+  - Remaining live types: organization, section, member, person, work, edition,
+    season, event, event_series, series, repertoire_item, program_item, voice
+  - DB now v4E-aligned per entu/research schema.ts — migration body of work complete
+
+[NEXT DISPATCHES EXPECTED] Seeding new v4E entity types (copy, lending, rsvp, attendance
+  subtrees), BFF rights-aware contracts, dev/staging refresh.
+
 ## Permanent role note
 
 Promoted from temporary specialist to permanent data-manager (session 7 end). Future seeding work:
