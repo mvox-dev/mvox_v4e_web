@@ -4,6 +4,37 @@ Personal notes. Only Josquin writes here.
 
 ---
 
+## [DECISION] 2026-05-21 session 11 — BFF rights-aware design committed (awaiting PO)
+
+Doc lives at `docs/architecture/bff-rights-aware-contracts.md` on branch `docs/bff-rights-design` (pushed, NOT merged — commit `78193e3`). PO reviews next session and decides implementation scope. The 5 open questions (Section 7) are the gating decisions before any `src/` work begins.
+
+Self-calibration on the design pass:
+- **Empty elevated-ops list was the right call**, not a punt. Pre-seeding capabilities (cron, federation reports, self-link) that have no callers yet would invite shortcut use later. Each gets added on demand, with the trailer convention.
+- **Empty-result = empty-state across the board** (Section 4). The temptation to distinguish "0 because no rights" from "0 because no data" is real and I flagged it (Q2). Resisting it stays inside user-rights principle 1; distinguishing requires elevation, which contradicts the whole design.
+- **Narrow typed shapes over Entu passthrough** (Section 5, Q4). My instinct was passthrough-for-velocity but writing it out, the BFF-as-contract posture demands shaping. Each endpoint's response is a deliberate UI contract, not a leaky bag of multi-valued arrays. PO can override.
+
+Implementation-phase blockers I'm tracking, in order:
+1. **PO call on Q1-Q5** — gates everything
+2. **#19 CSRF gate** — before the first MUTATION route, not the first read. MVP surface is GET-only so first impl PR doesn't need it; second impl PR does. Recommended path in Section 6: rely on SvelteKit's built-in `csrf.checkOrigin` (default-on).
+3. **base URL split** (see GOTCHA below from earlier today) — out of scope until a real BFF caller exists; first impl PR is that caller, so flag at that PR.
+
+## [LEARNED] 2026-05-21 session 11 — docs-only branch flow
+
+For docs-only PRs (no `src/` edits), the branch convention is `docs/<topic>` rather than `feat/<issue>` — there's no issue, no TDD chain, no Bentham gate. Workflow:
+
+1. Branch from main, write the doc, commit (auto-co-author trailer), `git push -u origin <branch>`.
+2. Do NOT merge — PO reviews on origin via the GitHub UI before greenlighting.
+3. The branch stays open across sessions until PO either approves (then squash-merge per usual) or asks for revisions.
+
+Differs from feature branches because:
+- No local-only convention — push to origin so PO can review the rendered markdown on GitHub.
+- No squash-merge in the same session — design proposals are PO-gated, not engineer-gated.
+- Memory file mods in the working tree at the time of `git checkout -b` still tag along; stage carefully (just the doc).
+
+I used this for the BFF rights design today. Same pattern works for any future design proposal (`docs/<topic>` branch, push-don't-merge, PO reviews on GitHub).
+
+---
+
 ## [PATTERN] 2026-05-21 — Test fixtures pin historical defaults; don't DRY them
 
 When a beforeEach stubs an env var to match the production default literal, that's a **fixture**, not duplication. If you replace the literal with an import of the production constant, the assertion becomes tautological (`stubEnv(X, X)`) and silently loses its ability to catch drift if production shifts the default. Surfaced via Bentham's #20 v1 review: I had switched `client.spec.ts:7` from `'https://entu.app/api/'` literal to `DEFAULT_BASE_URL` — wrong move, reverted in v2.

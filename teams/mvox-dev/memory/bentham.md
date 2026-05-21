@@ -7,6 +7,25 @@ metadata:
 
 # Bentham scratchpad
 
+## 2026-05-21 — Session 11: CHORE-3 + YELLOW-3.1 post-write
+
+[DECISION] **CHORE-3 (#3) verdict: GREEN with 2 carryforward YELLOWs.** Squash-merged as `7bf0d8f`. All 5 AC verified; 301/301 tests; `pnpm check` 0 errors; TDD chain strictly monotonic (Tallis 19:37 → Byrd 19:44 → Comenius 19:48); zero security-critical surface changes; 4-locale parity + alphabetical sort verified. `vitest.config.ts` scope-drift from Byrd authorized retroactively by team-lead — `mergeConfig(viteConfig, ...)` is the standard SvelteKit+Vitest pattern.
+
+[DECISION] **YELLOW-3.1 fix (`6e8c0f4`) post-write verdict: GREEN.** 13-line refactor — spec replaces `await import('@inlang/paraglide-sveltekit')` with `existsSync(node_modules/@inlang/paraglide-sveltekit/package.json)`; `vitest.config.ts` reverts to standalone `defineConfig` shape (byte-identical to pre-CHORE-3). Substantively the minimum-diff fix I'd have specified myself.
+
+[PATTERN] **Spec-probe shape: filesystem check, not runtime import.** When a test's intent is "is package X installed?", use a `node:fs` filesystem probe against `node_modules/<package>/package.json`, NOT `await import('<package>')`. Dynamic-import probes drag in the package's runtime entry, which can require build-time transforms (Svelte, JSX, TypeScript decorators, etc.) that force the test-harness config to merge with the production Vite config. Filesystem probes stay node-only and let `vitest.config.ts` stay decoupled. **RED trigger going forward**: any new spec that uses `await import(<package>)` purely as an installed-check (i.e., the imported module value is never asserted against meaningfully — just `expect(mod).toBeDefined()` or similar). The shape signals an intent that filesystem probes serve better. Origin: YELLOW-3.1 (CHORE-3 follow-up).
+
+[PATTERN] **Process-deviation calibration — branch-discipline scope.** Branch-discipline (chore branch + formal Josquin merge for follow-ups) is **load-bearing** for: (a) multi-author handoffs, where the branch IS the unit of ownership transfer, and (b) risky changes, where the PR review surface is the gate. It is **ceremony** for: single-author cosmetic refactors with a pre-existing reviewer-spec'd YELLOW and a clean minimum-diff implementation. When a YELLOW-carryforward fix lands direct-to-main and is substantively clean, lean "accept-as-is + coach the path" over "reset + redo." Punishing correct work because the routing skipped a step trades substance for procedure. First exercised on `6e8c0f4` (YELLOW-3.1) — recommended A (push as-is) to team-lead. Carry forward: when reviewing future process-deviation incidents, weigh (a) blast radius, (b) single- vs multi-author, (c) whether the deviation negated any review surface that actually catches bugs.
+
+[GOTCHA] **Squash-merge file-count shift can look like a regression.** Pre-merge `pnpm check` reported 488 files; post-merge (at `6e8c0f4`) it reports 473. Not a regression — squash-merging paraglide artifacts changed what `svelte-check` enumerates (generated `src/lib/paraglide/` files shifted from staged-untracked to gitignored). Watch for this pattern: file-count changes around major scaffolding merges are often artifact-of-gitignore-resolution, not real coverage loss. Spot-check by re-running pre and post to confirm direction; only escalate if errors/warnings change.
+
+[CHECKPOINT — session 11 close]
+- CHORE-3 closed (`7bf0d8f`) + YELLOW-3.1 closed (`6e8c0f4` pending push or pushed depending on team-lead choice between A/B).
+- **Open YELLOWs carried forward**: #19 CSRF gate (fires on first cookie-authed BFF mutation route); #32 Tailwind OKLCH (fires on next Tailwind upgrade); YELLOW-3.2 commit-body process note for paraglide CLI artifacts (cosmetic, owner Byrd).
+- Review surface going into session 12: BFF/auth (Josquin) + frontend (Byrd) work consuming the v4E shape; first security-critical-path reviews of the migration era. YELLOW-1 (#19 CSRF) becomes active the moment the first cookie-authed mutation route lands.
+
+---
+
 ## 2026-05-21 — Session 10 start: scratchpad prune
 
 [CHECKPOINT] Pruned sessions 2-8 narrative entries into the `[PROCESSED]` block at the bottom. Full prior content reachable via `git log --follow teams/mvox-dev/memory/bentham.md`. Session 9 retained verbatim because Phase D patterns/YELLOWs are still active for follow-up task #64.
@@ -31,6 +50,8 @@ metadata:
 [CHECKPOINT] **Polyphony db → v4E migration (task #6) substantively complete.** Phases A, B, B.1, C, D all done. Live polyphony aligns with v4E `schema.ts` across all migration surfaces. Forward-looking work (seeds, BFF contracts, frontend) consumes the v4E-clean shape. Task #6 closeable by team-lead pending AC bullet verification (Step 9.4 of plan).
 
 [CHECKPOINT] Reviewing posture going forward: no live-data-migration in active queue. Next active items likely Josquin/Byrd BFF + frontend work consuming the v4E shape. Reset of review surface — security-critical-paths reviews (`src/lib/server/entu/`, `src/lib/server/auth/`, `src/hooks.server.ts`, `src/routes/api/**`, `src/routes/**/+server.ts`, `src/routes/**/+page.server.ts`) become the primary territory. YELLOW-1 carryforward (#19 — CSRF gate at first cookie-authed mutation route) is now relevant whenever the first such route lands.
+
+[CHECKPOINT — terminal state, session 10 close] **Phase C closed on `f3529b7`** (team-lead Step 9.4: 9/9 AC PASS, task #6 marked completed). Migration body of work substantively done. Post-execution review delivered zero new YELLOWs — every load-bearing assertion in the 5 live artifacts matched plan Step 9.2 exactly. Carryforward YELLOWs at session-10 close: **#19 (CSRF gate, fires on next BFF cookie-authed mutation route PR)** and **#32 (Tailwind OKLCH, fires on next Tailwind upgrade)**. No other open items in my queue. Session 11 should expect review surface to be BFF/auth (Josquin) and frontend (Byrd) work, not migration scripts.
 
 ---
 

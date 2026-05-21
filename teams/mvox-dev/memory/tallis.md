@@ -75,4 +75,14 @@
 
 [PATTERN] `listInstancesByType` union-arg discriminator: `typeof arg4 === 'number'` → treat as limit; otherwise treat as extraQuery Record merged into params. Direct lib test: call with `{ '_parent.reference': 'org-1' }` as arg4 and assert both that filter AND `limit=500` appear in the URL.
 
+## [CHECKPOINT] 2026-05-21 — Session 11: CHORE-3 RED + YELLOW-3.1
+
+[DECISION] CHORE-3 RED: 13 tests in `src/tests/paraglide-setup.spec.ts` covering AC 1-4 (dep declared, vite plugin wired, 4 locale files exist + valid JSON, gitignore entry). Parameterized locale tests use `describe.each`. All 13 failed RED; Byrd's GREEN brought them to passing. Total at GREEN: 301 tests.
+
+[GOTCHA] Dynamic `await import('@inlang/paraglide-sveltekit')` in a Vitest node-env spec forces vitest to load the package's runtime entry containing `.svelte` components — requires merging vitest config with vite config to get the Svelte transform. Bentham flagged this (YELLOW-3.1). Fix: `existsSync` on `node_modules/@inlang/paraglide-sveltekit/package.json` instead. Purely a filesystem check; no Svelte transform needed; `vitest.config.ts` stays standalone.
+
+[PROCESS] Protocol coaching (team-lead, session 11): even for trivial refactors, create the branch first if the brief specifies one. Committing directly to local main skips Bentham's pre-merge review window and leaks intermediate work into main history. Going forward: brief specifies branch → create branch; brief silent → ask.
+
+[DECISION] YELLOW-3.1 committed directly to main (6e8c0f4), Bentham post-write GREEN, pushed to origin/main. Closed.
+
 (*MVOX:Tallis*)

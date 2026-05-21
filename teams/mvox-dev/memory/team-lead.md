@@ -1,6 +1,155 @@
 # Palestrina — Team Lead Scratchpad
 
-### [NEXT SESSION] 2026-05-21 — session-9 → session-10
+### [NEXT SESSION] 2026-05-21 — session-11 → session-12
+
+**Session 11 outcome:** Productive day. CHORE-3 Paraglide closed end-to-end. Comenius spawn structural failure investigated and root-caused (PO-identified — sub-agent permission gates don't surface to parent UI). PO-directed type-name-string sweep + menu rationalization on live polyphony (18 mutations clean). YELLOW-3.1 closed inline. BFF rights-aware contracts design proposal landed on a branch awaiting PO review. ~4h elapsed.
+
+**Session 11 commit chain (chronological, all on origin/main except where noted):**
+1. `7bf0d8f` feat(#3): Paraglide i18n setup + en/et/lv/uk starter keys + conventions doc (CHORE-3 squash; closes #3)
+2. `3525de1` chore(probe): type-name-string sweep on live polyphony (Pérotin diagnostic)
+3. `7b21bcb` chore(seed): rationalize polyphony menu set — one menu per v4E entity type (Pérotin; 18 live mutations)
+4. `6e8c0f4` refactor(#3): replace dynamic import probe with existsSync in paraglide spec (Tallis YELLOW-3.1 follow-up; committed direct on main — procedural deviation handled via coaching)
+5. (this session's shutdown commit — final commit of session 11)
+
+Plus on side branch (NOT merged yet — awaiting PO review):
+- `78193e3` docs(bff): rights-aware contracts design proposal (on `docs/bff-rights-design`)
+
+**Live polyphony state at end of session 11:**
+- 122 person + 6 organization instances (unchanged from session 10)
+- All retired types still at 0 instances (unchanged)
+- **24 menus total** = 5 Entu meta menus (untouched) + 18 v4E domain menus (1 "Organisations" + 17 per-type) + 1 deleted (Umbrella Orgs)
+- Polyphony admin UI now mirrors v4E schema 1:1 for manual validation
+
+**Carry-forward queue for session 12 (priority order):**
+
+1. **BFF design review** (the headline next-session item) — PO reads `docs/architecture/bff-rights-aware-contracts.md` on branch `docs/bff-rights-design`. Five open questions need PO calls:
+   - Q1: orgs-list scope — rights-driven (proposed) vs membership-only
+   - Q2: section-lookup 0 results — generic empty state (proposed, no rights-state hint)
+   - Q3: pagination defaults — Josquin proposed page-size 50, max 200, offset-based; needs Finn probe for Entu hard cap
+   - Q4: narrow typed shape vs wide passthrough (narrow proposed)
+   - Q5: logo/file URL strategy — BFF-proxied vs signed-URL-per-list-call (proposed: defer; MVP returns undefined)
+
+   After PO answers + merges the design branch, route Tallis → Josquin → Bentham → Josquin merge for the first BFF impl (2 GETs: `/api/organizations` + `/api/organizations/[id]/sections`).
+
+2. **#19 CSRF gate** — Josquin's design explicitly flags this as the blocker on the NEXT phase (mutations). Recommends SvelteKit's built-in `csrf.checkOrigin`. Surfaces when the first cookie-authed mutation route is proposed.
+
+3. **Byrd frontend scaffolding** — unblocked since CHORE-3 landed; depends on BFF contract shapes from item 1.
+
+4. **YELLOW-3.2** (task #5) — cosmetic process note on commit-body enumeration for paraglide CLI artifacts. No code change; just remember on next paraglide-touching PR.
+
+5. **CHORE-6 (#6) Email Resend** — still blocked on PO DNS (SPF + DKIM on chosen sender domain).
+
+6. **Task #3 — Anthropic upstream report** — deferred sub-agent permission-gate silent-block reproduction + issue submission. Not urgent.
+
+**Expected first action session 12:**
+1. Verify statusline on launch (`cd ~/workspace && claude`).
+2. Read this seed + recent commits since `6e8c0f4` (or shutdown commit, whichever is last).
+3. Spawn finn + bentham + Pérotin per Phase 5 (always-on).
+4. Confirm with PO: read the BFF design doc on `docs/bff-rights-design` branch + answer Q1-Q5 + merge the design → kick off first BFF impl (Tallis RED for the 2-GET MVP). OR pivot to frontend scaffolding / other priority.
+
+**Process lessons from session 11 (worth carrying forward):**
+
+- **L28 — Sub-agent permission gates don't surface to parent UI.** Comenius spawn appeared dead-silent for ~58 min (session 11) and ~28 min (session 10) — actual cause: context7 MCP permission request that never reached PO's UI. Pre-allowing the tool in `.claude/settings.local.json` does NOT help; sub-agents don't inherit the parent's allowlist. Mitigation: before assigning research tasks to sub-agents, either (a) keep the work in tools that don't gate (Bash/Read/Grep/etc.), or (b) do restricted-tool work in team-lead context. Memory: `feedback_agent_spawn_prompt.md`. Upstream issue submission deferred (task #3).
+- **L29 — Embedded-prompt theory was a confound, not a fix.** Initially attributed Comenius's silent-failure to spawn-prompt content shape (CLAUDE.md spec says embed full prompt file; I'd been passing only "Read your prompt file" directive). The A/B test (`comenius-2`) confounded by also omitting the restricted-tool instruction. The embed-vs-don't-embed pattern is still the documented best practice but NOT the cause of the silent-failure symptom. Important to keep memory honest about which lessons are which.
+- **L30 — Tallis bypass of branch protocol on trivial refactor (YELLOW-3.1).** Tallis committed `6e8c0f4` directly on local main rather than the briefed `chore/refactor-paraglide-spec` branch. Self-disclosed transparently before I noticed. Bentham GREEN substantively + recommended A (accept-as-is + coaching) over B (reset + redo): "punishing the correct outcome of correct work because the path-routing skipped a step feels like ceremony over substance." Calibration: branch discipline is load-bearing for multi-author handoffs and risky changes, but cosmetic for single-author trivial follow-ups. Future briefs for trivial refactors might explicitly grant lite-path authority to avoid the deviation cost.
+- **L31 — Citation discipline for research agents (Finn calibration).** Finn cited `opral/paraglide-js#424` as a Cloudflare blocker for the gitignore-vs-commit decision but misread the issue: it was closed with a Node/compat-flag config fix, not an architectural barrier. Surfaced the symptom for the cause. Calibration sent: when citing a GH issue as load-bearing evidence, check state (open vs closed) and read last ~5 comments — resolution often differs from the title. When sources disagree, default to docs/defaults unless the issue is unresolved + specifically applicable.
+- **L32 — Manifest-first dry-run discipline pays off (Pérotin).** Menu rationalization had a real failure mode (createEntity needed a `_type` reference property that dry-run couldn't catch). The manifest-first design pass + idempotent script meant the live run's partial first attempt recovered cleanly on re-run. The discipline (design before implementation, dry-run before live, post-run probe verifies clean) is now well-grooved for live-data mutations.
+- **L33 — Issue auto-close + structured completion comment race.** Squash commit's `Closes #3` triggered GitHub's auto-close before my structured completion comment could post via `gh issue close --comment`. Had to retry with `gh issue comment` separately. Convention: if squash includes `Closes #N`, post the completion comment via `gh issue comment` (not `gh issue close --comment`) since the issue will already be closed.
+
+**Brilliant KB updates (deferred):**
+- New: `Patterns/sub-agent-permission-gate-trap` — codify L28; cross-reference to memory `feedback_agent_spawn_prompt.md` and the future Anthropic upstream report (task #3).
+- New: `Patterns/branch-discipline-vs-trivial-refactors` — codify L30; what scope of work earns the formal TDD chain vs lite-path.
+- Update: `Projects/polyphony` — menus rationalized; v4E mirror now 1:1 for manual validation.
+- New: `Patterns/manifest-first-dry-run-for-bulk-mutations` — codify L32 (extension of authorization-gate-discipline).
+
+(*MVOX:Palestrina*)
+
+---
+
+### [PROCESSED 2026-05-21 end-of-session-11] session-10 → session-11
+
+**Session 10 outcome:** Big productive day. Four debts cleared (#60, #64, #20, #63). Phase C designed, planned, executed, AC-verified, closed end-to-end in one session (the L21 "discovery first" lesson collapsed scope from 4-session monster to Phase-D-sized bundle). Migration body of work substantively done — Task #6 closed; polyphony Entu db is now v4E-aligned per `entu/research/docs/schema/v4E/schema.ts`.
+
+**Session 10 commit chain (chronological, all on main):**
+1. `10e1c2c` Phase D YELLOW fixup — D1/D3/D5/D6 + cosmetic (Pérotin, #64)
+2. `e34b3f0` Memory drain: architecture-decisions entry + scratchpads
+3. `6fb004f` chore(#20): DRY DEFAULT_BASE_URL — single production source in client.ts (Josquin)
+4. `a1aba7a` Phase C discovery probe + findings (Pérotin)
+5. `d1f613a` Phase C design spec (Palestrina + PO brainstorm)
+6. `b08e266` Phase C implementation plan (9 tasks)
+7. `eb3038f` Phase C pre-flight probe + findings — GO (Pérotin)
+8. `b01b940` Phase C.1 script + dry-run (cleanup-phase-c-inventory-copy-type)
+9. `37097c3` Phase C.2 script + dry-run (cleanup-phase-c-participation-type)
+10. `08e60dd` Phase C.3 script + dry-run (cleanup-phase-c-affiliation)
+11. `c90da6e` Phase C.4 script + dry-run (cleanup-phase-c-member-role-property)
+12. `c09bebb` Phase C.5 script + dry-run (cleanup-phase-c-role-type-entities)
+13. `686f13c` Pérotin scratchpad — Phase C cleanup-script delivery notes
+14. `9059e78` Phase C YELLOW fix-up — C4-1 + C5-1 (PO override: fix-before-gate)
+15. `3a4838b` Phase C live execution artifacts (C.1-C.5 bundle, 44 DELETEs, zero failures)
+16. `f3529b7` Phase C AC verification probe — 9/9 PASS
+17. `6950d02` Pérotin session-10 end-of-session checkpoint
+18. `9f72322` Bentham session-10 scratchpad — Phase C verdicts + calibration
+19. (shutdown commit — final commit by this seed)
+
+**Live polyphony state at end of session 10:**
+- v4E-aligned: inventory_copy / participation / affiliation / role types all retired; member.role property gone; 4 PO members have zero role values
+- 9/9 AC bullets PASSED on the independent AC verification probe (f3529b7)
+- 122 person instances (unchanged from session 9: 2 real + 120 v4E-clean seeds)
+- 6 organization instances (each with `_inheritrights: false` from Phase D)
+- Migration body-of-work substantively done; forward-looking work (BFF rights-aware contracts, frontend, new subtree seeds) unblocked
+
+**Architecture-decisions session-10 additions:**
+- "Test fixtures pin production defaults — don't DRY them into the value under test" (Bentham steward edit, lines ~154-184 of `architecture-decisions.md`, discovered during #20 v1 review)
+
+**Comenius spawn failure (session-10 mini-step abandoned):**
+- ~16:38 spawned Comenius for CHORE-3 mini-step (gitignore-vs-commit recommendation + implementation sketch into `i18n-conventions.md`)
+- ~28 min silence; zero surface artifacts; original ping unread in his inbox
+- ~17:15 PO chose drop-and-restart-next-session. Sent stand-down to Comenius inbox.
+- **Root cause unknown — spawn process needs attention before next CHORE-3 attempt.** Possible: model context error, long-Read stall, silent crash, or specifically the comenius-prompt size. Worth a fresh look before session 11.
+- Task #2 reset to pending, no owner. Session 11 picks up CHORE-3 as full TDD chain.
+
+**Carry-forward queue for session 11 (priority order):**
+
+1. **CHORE-3 Paraglide i18n** (#2, full TDD chain) — Comenius + Tallis RED + Byrd GREEN + maybe Josquin server-hook + Bentham + Josquin merge. ~60-90 min ride. Comenius recommends gitignore-vs-commit as his first action; resolves the open AC question inline.
+
+2. **CHORE-6 Email Resend** (#5) — blocked on PO SPF + DKIM DNS records on chosen sender domain. Re-check at session 11 start whether DNS landed.
+
+3. **Loose YELLOWs to fold into future PRs:**
+   - #19 CSRF gate — review-gate for next BFF cookie-authed mutation route PR
+   - #32 Tailwind OKLCH regex — relax on next Tailwind minor upgrade
+
+4. **Forward-looking surfaces unblocked by Phase C closure:**
+   - **New entity-type seeds** for the eventual library subtree (copy + lending) and event subtree (rsvp + attendance). Pérotin's standing-concerns posture handles when PO routes this.
+   - **BFF rights-aware contracts** — Josquin's territory, post-Phase-C. The `_owner`/`_editor`/`_viewer` rights model is now the only access primitive; BFF queries should reflect that. Likely interacts with #19 CSRF.
+   - **Frontend scaffolding starts** — Byrd's territory. Has been blocked on Paraglide i18n landing (CHORE-3) for clean user-facing string handling.
+
+**Expected first action session 11:**
+1. Verify statusline on launch (`cd ~/workspace && claude`).
+2. Read this seed + recent commits since `9f72322` (or shutdown commit, whichever is last).
+3. Investigate Comenius spawn issue BEFORE re-spawning. Possibilities: read his prompt file size; check if any other agent has a similar prompt-length pattern; consider whether to trim or split the prompt.
+4. Spawn finn + bentham per Phase 5; spawn Pérotin if PO wants forward-looking seed work, otherwise hold.
+5. Confirm with PO: CHORE-3 full TDD chain (assuming Comenius spawn is sorted), or switch to forward-looking work (Josquin BFF / Byrd frontend scaffolding)?
+
+**Process lessons from session 10 (worth carrying forward):**
+
+- **L22 — Subagent idle-with-summary pattern.** Pérotin (and Josquin v2) repeatedly sent idle notifications with informative `summary` strings but no accompanying SendMessage with full body. The summary line conveys headline state but not the recap content. Mitigation: when the summary mentions completion of significant work, IMMEDIATELY inspect git log + artifact files to reconstruct the report rather than waiting for a SendMessage that may never arrive. Pattern fits L14/L18 lineage.
+- **L23 — Fix-before-gate posture (PO override accepted).** Bentham's default "carryforward YELLOWs after gate fire" framing is technically defensible (post-delete verifies are sufficient safety nets) but underweights the cost-vs-benefit of catching surprises BEFORE any irreversible op runs. PO's choice to fix YELLOW-C4-1 + C5-1 before the gate cost ~5 min Pérotin time + one re-review cycle and gained exact-ID-drift detection at pre-flight. **Carry-forward calibration:** for irreversible-delete bundles, "cheap-fix + new drift class detected at pre-flight" should weigh fix-before-gate over carry-forward.
+- **L24 — Discovery probes collapse scope dramatically — repeatedly.** Phase D session 9 collapsed via Pérotin probe (230 → 6 ops). Phase C session 10 collapsed similarly (4-session monster → Phase-D-sized bundle). The discovery-first discipline is now a settled pattern for live-data migrations on minimal-instance surfaces. Document in `architecture-decisions.md` if not already: "before estimating scope for live-data migrations, run a read-only discovery probe."
+- **L25 — Brainstorming skill works.** Phase C brainstorm flowed clean through 9-step checklist; the design + plan landed in ~45 min of conversation + write time. The skill's HARD-GATE (no implementation until design approved + spec self-review + user review) caught no real issues this session but its presence felt right for live-data work. Mental note: keep using the skill for any creative architectural work, not just for big phases.
+- **L26 — Auth-gate fired cleanly the first time.** Phase D session-9 incident codified the gate; Phase C session-10 was the first deliberate exercise. Worked. The literal `"I authorize this run"` token + PO confirmation before sending it + halt-on-surprise structures in the scripts all functioned. Carry the discipline.
+- **L27 — Subagent prompt sizing risk (preliminary).** Comenius spawn silently failed at ~28 min with zero artifacts. Could be model-context-error, could be specifically the prompt size + 5-file startup-read sequence overwhelming initial context. Worth a fresh investigation at session 11 start before re-spawn.
+
+**Brilliant KB updates (deferred):**
+- Update `Projects/polyphony` body: migration body-of-work done; v4E alignment complete; mvox forward-looking work unblocked.
+- New: `Patterns/discovery-probe-first` — settle the read-only-probe-before-scope-estimate discipline (L24).
+- New: `Patterns/fix-before-gate-for-irreversible-ops` — codify the L23 calibration.
+- Update `Patterns/authorization-gate-discipline` with first-clean-exercise note (Phase C session 10).
+
+(*MVOX:Palestrina*)
+
+---
+
+### [PROCESSED 2026-05-21 end-of-session-10] session-9 → session-10
 
 **Session 9 outcome:** Phase D narrowed (full bundle) executed end-to-end on live polyphony. Pérotin-style throughout. 7 commits land Phase D on main (da711f2 discovery → 850b7c4 YELLOW-D4); 1 follow-up commit for CHORE-4 (584eb7c CONTRIBUTING.md); Bentham stewardship edits land in architecture-decisions.md. Phase D substantively closed. Working tree clean.
 

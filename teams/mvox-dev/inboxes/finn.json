@@ -1,16 +1,22 @@
 [
   {
     "from": "team-lead",
-    "text": "[2026-05-21 05:00] Welcome back. Session 9 headline is Phase D narrowed (full bundle), executed Pérotin-style. Pérotin's doing discovery against live Entu; you stay available for parallel cross-checks (e.g., GitHub issue status, doc lookups, codebase greps) if needed.\n\n(*MVOX:Palestrina*)",
-    "summary": "Stay available for cross-checks",
-    "timestamp": "2026-05-21T05:00:55.703Z",
+    "text": "[2026-05-21 18:43]\n\n## Research Request\n- **From:** team-lead\n- **Story:** #3 — CHORE-3 Paraglide i18n setup\n- **Urgency:** blocking (gates Tallis's RED phase)\n- **Question:** For a SvelteKit 2 + Svelte 5 project using `@inlang/paraglide-sveltekit`, **should the generated TypeScript output directory `src/lib/paraglide/` be gitignored, or committed to the repo?**\n\n### Context\n- This is a fresh setup — no Paraglide is currently installed in this repo.\n- Open AC question on GH issue #3, line: \"Generated TS at `src/lib/paraglide/` gitignored or committed — choice documented\".\n- Target deployment: Cloudflare Pages + Workers.\n- Comenius (i18n specialist) was the natural owner for this, but his spawn is dead-registered (twice in two sessions). Routing to you instead — this is a build/CI/repo-hygiene policy question, doesn't actually need i18n-domain expertise to settle.\n\n### What I need from you\nMarkdown report covering:\n1. **The two options** — gitignore vs commit; standard practice in Paraglide / inlang ecosystem\n2. **Trade-offs** — build-time generation determinism, CI reproducibility, PR diff noise, onboarding friction, drift risk, Cloudflare Pages build behavior\n3. **Recommendation** with rationale (pick one — don't hedge)\n4. **Follow-up actions** that flow from the recommendation: e.g., `.gitignore` line content; postinstall hook in `package.json`; SvelteKit `prepare` script; Cloudflare Pages build command settings\n5. **Open second-order questions** if any, called out separately\n\n### Sources to consult\n- Paraglide official docs (likely `inlang.com/m/gerre34r/library-inlang-paraglideJs/usage` or similar)\n- @inlang/paraglide-sveltekit README on GitHub\n- Existing public SvelteKit + Paraglide repos (look at 2-3 to see what they actually do)\n- context7 MCP if it has up-to-date Paraglide docs\n\n~15-20 min target. The recommendation is what unblocks the next step; brevity over comprehensiveness.",
+    "summary": "research request: Paraglide gitignore vs commit",
+    "timestamp": "2026-05-21T18:43:48.911Z",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "[2026-05-21 09:50] Session 9 wrap. No research requests landed your way this session — Phase D ran on read-only probes + cleanup scripts via Pérotin, no broad lookups needed. Standing by was the right posture.\n\nWrite any [CHECKPOINT] / [DEFERRED] to scratchpad if useful (nothing required), then approve shutdown.\n\n{\"type\":\"shutdown_request\",\"reason\":\"Session 9 wrap — no Finn dispatches this session, standby was idle\"}\n\n(*MVOX:Palestrina*)",
-    "summary": "Session 9 wrap — shutdown",
-    "timestamp": "2026-05-21T10:16:24.849Z",
+    "text": "[2026-05-21 19:36]\n\nThanks for the report on the Paraglide gitignore question. PO confirmed Option A (gitignore) — the call went the other way from your recommendation.\n\nQuick calibration note worth flagging for next time, no urgency:\n\nThe `opral/paraglide-js#424` citation in your report describes the issue as a Cloudflare Pages architectural blocker for gitignored output. I verified the issue directly via `gh issue view`: closed 2025-03-11, and the actual root cause was a Node version / Cloudflare compatibility-flag config problem (sqlite3 + crypto + async_hooks resolution). The \"missing `src/lib/paraglide/` directory\" line you saw in the error log was a SECONDARY symptom — `paraglide-js compile` crashed during build, which is why the dir wasn't generated, which is why subsequent imports failed. Fix: `nodejs_compat_v2` flag + `NODE_VERSION ≥ 20` + compatibility date ≥ 2024-09-23. Not an \"architectural barrier to regenerating at build time.\"\n\nYour report read the symptom for the cause. The deeper context (which comments resolved it, what the issue's CLOSED state means) was in the issue thread but didn't make it into your report.\n\nFor future research:\n1. When citing a GitHub issue as a load-bearing piece of evidence, check the issue's state (open vs closed) and read at least the last ~5 comments — the resolution often differs from the title or opening description.\n2. When two sources disagree (Paraglide's docs/default vs. an issue), default to the docs/default UNLESS you can show the issue is unresolved or specifically applicable to the target deployment in its current state.\n\nNo follow-up needed from you. Go idle.",
+    "summary": "CHORE-3 verdict + small citation-check note",
+    "timestamp": "2026-05-21T19:36:16.394Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779401751332@finn\",\"from\":\"team-lead\",\"reason\":\"Session 11 wrap. No in-progress work for you. Save scratchpad if any session-11 findings worth keeping; otherwise standard shutdown response.\",\"timestamp\":\"2026-05-21T22:15:51.332Z\"}",
+    "timestamp": "2026-05-21T22:15:51.332Z",
     "read": true
   }
 ]

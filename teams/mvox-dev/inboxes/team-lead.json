@@ -1,474 +1,5 @@
 [
   {
-    "from": "josquin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-20T16:02:12.475Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-20T16:02:12.475Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "perotin",
-    "text": "[2026-05-20 16:10] PR B done. `chore/toolkit-consumer-pr-b-probe` HEAD `222cea3`.\n\n1 file touched (`probe-mutation-ops-2026-05-20.ts`): +30/-78. 287 vitest + 3 Playwright pass, 0 type errors. Handed to Bentham for review per dispatch.\n\n(*MVOX:Pérotin*)\n",
-    "summary": "PR B committed — 222cea3, handed to Bentham for review",
-    "timestamp": "2026-05-20T16:08:03.444Z",
-    "color": "pink",
-    "read": true
-  },
-  {
-    "from": "perotin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"perotin\",\"timestamp\":\"2026-05-20T16:08:06.398Z\",\"idleReason\":\"available\",\"summary\":\"[to bentham] PR B handoff — probe-mutation-ops toolkit refactor ready for review\"}",
-    "timestamp": "2026-05-20T16:08:06.398Z",
-    "color": "pink",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "[2026-05-20 16:09]\n\n## Review Verdict: GREEN (1 cosmetic note, not blocking)\n\nPR B `chore/toolkit-consumer-pr-b-probe` @ `222cea3` cleared to squash-merge. Single-file +30/-78 refactor; wire-shape equivalence verified op-by-op.\n\n### Op-by-op equivalence\n\n- **Op 1 UPDATE:** `replaceProperty(client, entityId, 'display_order', [actualPropId], intermediateValue)` decomposes inside the toolkit to one `deletePropertyValue` (matches old Step A) + one `postProperties` with `{type: 'display_order', number: intermediate}` (matches old Step B). Identical wire sequence. Steps C+F verification GETs retained as `fetchEntity`. Same pattern for D+E with `finalValue`. Console labels updated to \"Steps A+B\"/\"Steps D+E\" — accurately reflects the collapse.\n- **Op 2 REMOVE:** `deleteProperty` → `deletePropertyValue`. Same URL `/property/{id}`, same method. Pre/post `fetchEntity` unchanged.\n- **Op 3 DELETE_ENTITY:** `deleteEntity` direct, same URL `/entity/{id}`. Post-verify raw `fetch` retained — Pérotin's call-out is correct, the 404-check idiom doesn't belong in the toolkit.\n\n### Result-artifact improvement (side-benefit)\n\nThe refactor uses a single `at: Date` for both the filename timestamp AND the payload's `executedAt` field. The old code used two `new Date()` calls that could diverge by milliseconds. Minor consistency win.\n\n### Dead-import cleanup verified\n\n`writeFileSync` / `mkdirSync` / `node:fs` / `node:path` all removed. `listEntities` + `EntuClient` retained because they're still used inline elsewhere. No leftover dead code.\n\n### No regressions\n\n287 vitest + 3 Playwright remain GREEN — toolkit functions consumed by phase-b.ts still behave per their contracts. Probe scripts don't have spec.ts coverage by design (Pérotin's prompt allows this); behavior-equivalence at review time is the contract.\n\n### Cosmetic note (not blocking)\n\nThe slug changed from `probe-mutation-ops` (implicit) to `probe-mutation-ops-2026-05-20` (now matching source filename). Future artifacts: `probe-mutation-ops-2026-05-20-2026-05-20T<...>.json` — date appears twice. Two interpretations:\n- (1) Keep — slug should anchor to script identity, which includes its date.\n- (2) Drop date from slug.\n\nI lean (1) — clearer slug-to-source-file mapping; less risk of two probes-of-different-dates colliding on slug. Either is fine. Flag only if PO has a preference.\n\n### Pattern logged\n\n**Refactor-of-untested-code posture:** probe scripts and one-off seeds don't have spec.ts by design. Safety net is (a) toolkit-side test coverage of the consumed functions (PR A established this) + (b) op-by-op wire-shape inspection at review time. As long as toolkit functions are GREEN-tested AND the call-site map is provably equivalent, GREEN is the right verdict. **Carry forward to PRs C/D/E:** don't require new spec.ts for refactor-equivalent consumer-script PRs.\n\n### Recommendation\n\nRoute Pérotin (or Josquin per merge authority) to squash-merge PR B. Then queue PR C (seed-voices), PR D (phase-b-1-cleanup), PR E (seed-collectives) in that order.\n\n(*MVOX:Bentham*)",
-    "summary": "GREEN — PR B probe-mutation-ops refactor",
-    "timestamp": "2026-05-20T16:09:46.231Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-20T16:09:49.278Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-20T16:09:49.278Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "[2026-05-20 16:12] PR B squash-merge complete.\n\n**Merge SHA:** `db19ecf` on `main` (pushed to origin: `0cda89f..db19ecf`)\n**Squash content:** 1 file / +30 / -78 — `scripts/migrations/probes/probe-mutation-ops-2026-05-20.ts`. Inline fetch wrappers consolidated to lib helpers; DELETE+POST UPDATE merged to `replaceProperty`; result-artifact write moved to `writeResultArtifact` with single `at: Date`; dry-run guard now `isDryRun`.\n\n**Branch cleanup:**\n- Local `chore/toolkit-consumer-pr-b-probe` deleted (force-delete required — squash-merge pattern).\n- Remote `origin/chore/toolkit-consumer-pr-b-probe`: \"remote ref does not exist\" (branch never pushed). State clean.\n\n**Hygiene:** Bentham's unstaged scratchpad was dirty at merge start — stashed before checkout, popped after push, intact.\n\n**Trailer:** Co-author auto-added. Verified.\n\nTask #59 stays pending (umbrella for PRs B–E; PR B is 1/4 done). #58 (YELLOW-14) still pending. Ready for Pérotin's PR C (seed-voices) when you dispatch.",
-    "summary": "PR B merged, db19ecf on main",
-    "timestamp": "2026-05-20T16:10:58.961Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-20T16:11:01.790Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-20T16:11:01.790Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "perotin",
-    "text": "[2026-05-20 16:16] PR C done. `chore/toolkit-consumer-pr-c-voices` HEAD `784ba30`.\n\n1 file touched (`seed-voices.ts`): +21/-23. 287 vitest + 3 Playwright pass, 0 type errors. Handed to Bentham.\n\nOne implementation note for Bentham's awareness: the live create path now goes through `findOrCreateByName` which does its own `listInstancesByType` check internally — meaning each voice gets two `listInstancesByType` calls in live-non-race mode (one from the outer loop's existence check, one from inside `findOrCreateByName`). This is a minor redundancy — acceptable for a 5-item seed. If it surfaces as a YELLOW, I can inline `createEntity` directly instead of `findOrCreateByName` for the create path.\n\n(*MVOX:Pérotin*)\n",
-    "summary": "PR C committed — 784ba30, handed to Bentham for review",
-    "timestamp": "2026-05-20T16:13:33.098Z",
-    "color": "pink",
-    "read": true
-  },
-  {
-    "from": "perotin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"perotin\",\"timestamp\":\"2026-05-20T16:13:36.679Z\",\"idleReason\":\"available\",\"summary\":\"[to bentham] PR C handoff — seed-voices toolkit refactor ready for review\"}",
-    "timestamp": "2026-05-20T16:13:36.679Z",
-    "color": "pink",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "[2026-05-20 16:15]\n\n## Review Verdict: GREEN (1 dead-import cleanup ask + 2 cosmetic notes; none blocking)\n\nPR C `chore/toolkit-consumer-pr-c-voices` @ `784ba30` cleared to squash-merge. Single-file +21/-23 refactor; wire-shape equivalence preserved.\n\n### Call-site equivalence verified\n\n- **Inline existence check:** `listEntities(client, {_type.string, name.string, props})` → `listInstancesByType(client, 'voice', '_id', {name.string})`. Same GET URL with type+name filters; `entities.length > 0` semantically equals `count > 0`.\n- **Create path:** direct `createEntity(client, [...])` → `findOrCreateByName(client, 'voice', voiceName, undefined, [...])`. The new path runs an INTERNAL `listInstancesByType` AGAIN before `createEntity` — that's the race-safe double-check.\n- **Artifact write:** same single-`at: Date` pattern as PR B; slug stays bare (`seed-voices`, no date suffix — correct, this script isn't date-stamped). `executedAt` matches filename timestamp.\n\n### Wire-cost analysis (intentional)\n\nCreate path is now 2 GETs + 1 POST (was 1+1). Inline check gates the dry-run/existence-log path; `findOrCreateByName`'s internal check is the race-safe re-verification. **Steady-state cost is ZERO** — after initial seed, inline check always finds existing, `findOrCreateByName` never called. Acceptable.\n\n### Why the inline check stays (not redundant)\n\nRemoving it would force `findOrCreateByName` to dispatch in dry-run mode, which would call `createEntity` if not found. The inline check is structurally necessary to gate the dry-run branch before any live call. The redundant-looking 2x-GET is the price of clean dry-run semantics.\n\n### Race-safe path is defensive, not a bug fix\n\n`seed-voices` is single-process. Original could double-create only in hypothetical concurrent runs. The \"skip (race)\" log covers a real edge case but not one that's been observed. Free resilience — keep.\n\n### One cleanup ask (1-line followup, not blocking merge)\n\n`createEntity` is imported on L1 but never directly called — all create paths now go through `findOrCreateByName`. Dead import. TypeScript strict + tsconfig don't enforce `noUnusedLocals`, so `pnpm check` passes cleanly; toolchain doesn't catch it.\n\n**Suggest:** Pérotin drops the dead `createEntity` from the import statement either:\n- (a) as a 1-line followup commit on this branch before squash-merge, OR\n- (b) as part of a sweep-unused-imports finishing commit at the end of PR E (since PRs D + E will likely face the same pattern as more `createEntity`/`listEntities` callsites migrate to `findOrCreateByName`).\n\nEither is fine. Don't block this PR for it.\n\n### Cosmetic notes (not blocking)\n\n- Wide import line (95+ cols): consider multi-line import style for readability.\n- A one-line comment above the inline check explaining the 2x-GET pattern (\"// inline check gates the dry-run path; findOrCreateByName re-checks on the live path\") would help future maintainers.\n\n### Other items\n\n- `findVoiceTypeId` parameter properly typed `EntuClient` (was anonymous structural). Minor improvement.\n- `node:fs` / `node:path` / `writeFileSync` / `mkdirSync` all removed.\n- `listEntities` retained because `findVoiceTypeId` still needs it (queries with `_type.reference`, which `listInstancesByType` doesn't support). Correct call-out.\n\n### Carry-forward for PR D + PR E\n\n**Watch for dead `createEntity` / `listEntities` / similar imports** as more inline call sites get replaced by `findOrCreateByName`. The pattern: if the PR replaces ALL direct calls to a lib function with a toolkit wrapper, the lib function may become unused at that file. Drop it from imports.\n\n### Recommendation\n\nRoute Pérotin to squash-merge PR C. Then PR D (phase-b-1-cleanup), PR E (seed-collectives). YELLOW-14 (lib union-arg test gap, task #58) still pending for Tallis to pick up between PRs.\n\n(*MVOX:Bentham*)",
-    "summary": "GREEN — PR C seed-voices, 1 cleanup ask",
-    "timestamp": "2026-05-20T16:15:45.380Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-20T16:15:48.915Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-20T16:15:48.915Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "perotin",
-    "text": "[2026-05-20 16:20] PR C cleanup done. `68de164` on `chore/toolkit-consumer-pr-c-voices`.\n\nDead `createEntity` import dropped, import block multi-lined, 2x-GET comment added. Type-check clean. Handed to Josquin for squash-merge.\n\nCarry-forward noted: watch for dead imports in PR D + E whenever a toolkit wrapper replaces ALL direct calls to a lib function.\n\n(*MVOX:Pérotin*)\n",
-    "summary": "PR C cleanup done — 68de164, handed to Josquin for squash-merge",
-    "timestamp": "2026-05-20T16:52:30.855Z",
-    "color": "pink",
-    "read": true
-  },
-  {
-    "from": "perotin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"perotin\",\"timestamp\":\"2026-05-20T16:52:33.388Z\",\"idleReason\":\"available\",\"summary\":\"[to josquin] PR C ready for squash-merge — chore/toolkit-consumer-pr-c-voices HEAD 68de164\"}",
-    "timestamp": "2026-05-20T16:52:33.388Z",
-    "color": "pink",
-    "read": true
-  },
-  {
-    "from": "perotin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"perotin\",\"timestamp\":\"2026-05-20T16:52:44.634Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-20T16:52:44.634Z",
-    "color": "pink",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "[2026-05-20 16:14] Pérotin reports PR C ready for squash-merge.\n\n**Branch:** `chore/toolkit-consumer-pr-c-voices` @ `68de164`\n**Bentham:** GREEN at `784ba30`\n**Cleanup commit:** `68de164` (drop dead `createEntity` import per Bentham's ask)\n**Quality gates per Pérotin:** `pnpm check` clean, 287 tests pass.\n\nHolding for your explicit merge dispatch per the §Merge Authority convention (\"Bentham GREEN + Palestrina approval\"). Ready to execute the standard squash-merge flow when you authorize.",
-    "summary": "PR C queued, awaiting your merge dispatch",
-    "timestamp": "2026-05-20T16:52:46.531Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-20T16:52:49.796Z\",\"idleReason\":\"available\",\"summary\":\"[to perotin] PR C ack, holding for team-lead\"}",
-    "timestamp": "2026-05-20T16:52:49.796Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "[2026-05-20 16:55] PR C squash-merge complete.\n\n**Merge SHA:** `8495883` on `main` (pushed to origin: `db19ecf..8495883`)\n**Squash content:** 1 file / +27 / -23 — `scripts/migrations/seed-voices.ts`. findOrCreateByName replaces inline GET+check+POST; writeResultArtifact replaces inline fs scaffolding; isDryRun replaces argv parsing; dead createEntity import dropped.\n\n**Branch cleanup:**\n- Local `chore/toolkit-consumer-pr-c-voices` deleted (force-delete required — squash-merge pattern).\n- Remote `origin/chore/toolkit-consumer-pr-c-voices`: \"remote ref does not exist\" (branch never pushed). State clean.\n\n**Hygiene:** Bentham's unstaged scratchpad was dirty at merge start — stashed before checkout, popped after push, intact.\n\n**Trailer:** Co-author auto-added. Verified.\n\n#59 stays in_progress (PR C is 2/4). #58 (YELLOW-14) still pending. Ready for Pérotin's PR D (phase-b-1-cleanup) when you dispatch.",
-    "summary": "PR C merged, 8495883 on main",
-    "timestamp": "2026-05-20T16:54:28.631Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-20T16:54:31.527Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-20T16:54:31.527Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "perotin",
-    "text": "[2026-05-20 16:58] PR D done. `chore/toolkit-consumer-pr-d-phase-b-1` HEAD `8372ac8`.\n\n1 file touched (`phase-b-1-cleanup.ts`): +36/-77. 287 vitest + 3 Playwright pass, 0 type errors. Handed to Bentham.\n\nKey point for review: the op4 existence check migrated from `fetch(url) → !res.ok → skip` to `fetchEntity(client, id)` in try/catch — `fetchEntity` throws on non-200, so the catch path is semantically equivalent to the original `!checkRes.ok` guard.\n\n(*MVOX:Pérotin*)\n",
-    "summary": "PR D committed — 8372ac8, handed to Bentham for review",
-    "timestamp": "2026-05-20T16:57:28.172Z",
-    "color": "pink",
-    "read": true
-  },
-  {
-    "from": "perotin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"perotin\",\"timestamp\":\"2026-05-20T16:57:31.507Z\",\"idleReason\":\"available\",\"summary\":\"[to bentham] PR D handoff — phase-b-1-cleanup toolkit refactor ready for review\"}",
-    "timestamp": "2026-05-20T16:57:31.507Z",
-    "color": "pink",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-20T16:57:33.887Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-20T16:57:33.887Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "[2026-05-20 19:12]\n\nBack online — apologies for the silence after the handoff. Verdict below.\n\n## Review Verdict: GREEN, no YELLOW, no cleanup asks\n\nPR D `chore/toolkit-consumer-pr-d-phase-b-1` @ `8372ac8` cleared to squash-merge. Squeaky-clean refactor; the PR C dead-import carry-forward was applied throughout.\n\n### Op-by-op equivalence\n\n- **Ops 1-3 (`clearInstancePropValues`):** `listEntitiesWithProp(jwt, ...)` → `listInstancesByType(client, entityType, '_id,${propName}')`. Same GET URL with default `limit=500`. Inner DELETE loop's dry-run check moved to caller (was inside the inline helper). `[DRY-RUN] would DELETE /property/{id}` log preserved verbatim.\n- **Op 4 (`deleteOrgMemberCountPropDef`):** existence check switched from `fetch(url) → !res.ok → skip` to `try { await fetchEntity(client, id) } catch { skip }`. `fetchEntity` throws on non-2xx → catch path is the equivalent skip. DELETE branch follows the same dry-run-check-then-call pattern as Ops 1-3.\n- **Result-artifact write:** PR B + C pattern repeated. Single `at: Date` (was a `string`) shared between filename and `executedAt` payload field. Slug stays bare (`phase-b-1-cleanup`, no date suffix). Filename format identical.\n- **Op 4 gating logic** (`includeOp4` flag + deferred-result error path) unchanged.\n\n### Pérotin's noted op-4 refactor\n\nPérotin called out the try/catch existence check explicitly — and they're right that it's behavior-equivalent. `fetchEntity` rejects on `!res.ok`; the catch arm matches the old `if (!checkRes.ok)` branch.\n\n### Pre-existing observation (NOT a YELLOW)\n\nOp 4's existence check treats ANY non-200 as \"already deleted\" — including transient 5xx server errors. Both old and new versions share this behavior; the refactor faithfully preserves it. Could be tightened in a future hardening pass (`catch (err) { if (msg.includes('404')) skip; else throw; }`), but that's a separate concern and not what this PR is doing. Watch for unexpected `skipped=1` in a result artifact when the prop-def should exist — that would be the signal to tighten.\n\n### Dead-import sweep verified\n\n`writeFile`, `mkdir`, `resolve`, `dirname`, `fileURLToPath` all dropped. `__filename`/`__dirname` derivation removed. No leftover `createEntity` or `listEntities` imports (neither was needed here). **PR C feedback applied cleanly.**\n\n### `client: EntuClient` threaded\n\nConstructed once after `getJwt` (L188), passed to all 4 helper invocations. No leftover inline `fetch(...)` calls. ✓\n\n### Pattern logged\n\n**Try/catch as existence check on a throwing helper.** When a lib helper throws on non-2xx (like `fetchEntity`), the natural existence-check pattern is `try { await fetchEntity(...); /* exists */ } catch { /* not found */ }`. Cleaner than threading a `notFoundOk: true` option through the helper signature. Carry forward to Phase C/D: canonical shape for \"check before delete\" against the lib's throwing helpers.\n\n### Recommendation\n\nRoute Pérotin to squash-merge PR D. PR E (seed-collectives) is the last one in the sequence — the biggest of the four (617 LOC original) so it'll be the most interesting to review, but the pattern is now firmly established. YELLOW-14 (task #58) still pending for Tallis between PRs.\n\nRefactor pace has been healthy: PR B 16:07 → PR C 16:13 → PR D 16:56. All three small, focused, behavior-equivalent, no regressions. One PR to go.\n\n(*MVOX:Bentham*)",
-    "summary": "GREEN — PR D phase-b-1-cleanup refactor",
-    "timestamp": "2026-05-20T19:13:28.862Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-20T19:13:32.816Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-20T19:13:32.816Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "[2026-05-20 19:16] PR D squash-merge complete.\n\n**Merge SHA:** `9565363` on `main` (pushed to origin: `8495883..9565363`)\n**Squash content:** 1 file / +36 / -77 — `scripts/migrations/phase-b-1-cleanup.ts`. Inline fetch wrappers → fetchEntity/listInstancesByType/deletePropertyValue/deleteEntity; op-4 existence check now try/catch on fetchEntity; result-artifact write → writeResultArtifact with single `at: Date`; isDryRun replaces argv parsing; dead-import sweep applied.\n\n**Branch cleanup:**\n- Local `chore/toolkit-consumer-pr-d-phase-b-1` deleted (force-delete required).\n- Remote `origin/chore/toolkit-consumer-pr-d-phase-b-1`: \"remote ref does not exist\" (branch never pushed). State clean.\n\n**Hygiene:** Bentham's unstaged scratchpad was dirty at merge start — stashed before checkout, popped after push, intact.\n\n**Trailer:** Co-author auto-added. Verified.\n\n#59 stays in_progress (PR D is 3/4). Standing by for the final PR E (seed-collectives).",
-    "summary": "PR D merged, 9565363 on main",
-    "timestamp": "2026-05-20T19:14:34.685Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-20T19:14:46.069Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-20T19:14:46.069Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "perotin",
-    "text": "PR E complete. seed-collectives toolkit refactor committed at 1106ba5 on branch chore/toolkit-consumer-pr-e-collectives. Verification clean (287+3 pass, 0 type errors). Handed to Bentham for review.\n\nAll four consumer PRs (B probe, C voices, D phase-b-1, E collectives) now in Bentham's queue. Workstream #59 is fully authored — pending Bentham verdicts + Josquin merges.\n\nStanding by.",
-    "summary": "PR E committed, handed to Bentham",
-    "timestamp": "2026-05-20T19:21:36.635Z",
-    "color": "pink",
-    "read": true
-  },
-  {
-    "from": "perotin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"perotin\",\"timestamp\":\"2026-05-20T19:21:43.004Z\",\"idleReason\":\"available\",\"summary\":\"[to bentham] PR E handoff — seed-collectives toolkit refactor\"}",
-    "timestamp": "2026-05-20T19:21:43.004Z",
-    "color": "pink",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "[2026-05-20 19:23]\n\n## Review Verdict: GREEN, no YELLOW, 1 cosmetic observation\n\nPR E `chore/toolkit-consumer-pr-e-collectives` @ `1106ba5` cleared to squash-merge. **This closes the toolkit-extraction sequence** (A → B → C → D → E). Largest of the four consumer refactors (+79/-93); all 4 seed idioms refactored consistently.\n\n### Per-function equivalence\n\n- **`buildVoiceMap`:** `findByName` → `listInstancesByType(client, 'voice', '_id', { name.string })`. Same wire shape; throws if not found. ✓\n- **`seedPerson` / `seedOrg`:** inline `listInstancesByType` gates dry-run; `findOrCreateByName` on live path with race-skip discriminator (`r.created`). The parent-scoping difference between inline check (no parent) and `findOrCreateByName` (with founder parent) is intentional preservation of old behavior — `findByName` was also unscoped. ✓\n- **`seedSection`:** parent-scoped inline check (matches old code's scoped query) + `findOrCreateByName(client, 'section', spec.name, collective._id, props)`. Parent scoping consistent on both sides. ✓\n- **`seedMember`:** inline check correctly scopes by `{ person.reference, _parent.reference }` (natural member identity). See cosmetic observation below.\n- **Umbrella two-POST:** `listEntities({_id, props:_parent})` → `fetchEntity(client, id)`. Over-fetches (no `props=` filter) but only reads `_parent`. Few extra bytes on 4 calls total. Behavior equivalent; wire shape simplified.\n- **Artifact write:** same `at: Date` shared-source pattern as PRs B/C/D. Slug stays `seed-collectives`.\n\n### Cosmetic observation (NOT a YELLOW, not blocking)\n\n**`seedMember`'s race-safe branch is structurally unreachable.** `findOrCreateByName` looks up by `name.string`, but members don't have a `name` property (per the v4E seed-data model in architecture-decisions session-8). The internal lookup query is empty by construction → `findOrCreateByName` always returns `{ created: true }`. So the \"skip (race)\" log line on member will never fire.\n\n**Not a regression** — old code had zero race handling for member; the new code's race-safe path is just dead-as-applied. The inline check IS the canonical idempotency mechanism for member (scoped by person + parent, the natural member identity).\n\nA future cleanup could: (a) call `createEntity` directly for `seedMember` (requires re-importing it — moves away from the pattern consistency the PR achieves), OR (b) extend `findOrCreateByName` with a custom lookup-key parameter when the third such use case emerges. Current shape is consistent with the other three seed idioms even if it's a no-op on member; arguably worth leaving as-is for pattern uniformity.\n\n### Dead-import sweep clean\n\n`createEntity`, `writeFileSync`, `mkdirSync` all dropped. `listEntities` retained (resolveTypeId needs `_type.reference`, which `listInstancesByType` doesn't support). `readFileSync` + `join` retained (manifest reading). **PR C carry-forward applied throughout the sequence.**\n\n### Pattern logged\n\n**`findOrCreateByName` is for name-keyed entities.** Voice, person, organization, section — all have natural identity via `name` + parent. Member is keyed by `person.reference` + `_parent.reference`. **Encode for future seed scripts:** if the entity's natural identity doesn't include `name`, the inline check IS the idempotency gate; `findOrCreateByName` becomes decorative. Either accept the cosmetic inconsistency, or write a typed `findOrCreateByQuery(client, typeName, extraQuery, propsIfCreating)` when the third such use case appears (member is the second after section's `_parent`-scoped checks).\n\n### Toolkit body of work — complete\n\n- PR A (toolkit definition + phase-b call-site migration): merged\n- PR B (probe-mutation-ops): merged\n- PR C (seed-voices): merged\n- PR D (phase-b-1-cleanup): merged\n- PR E (seed-collectives): GREEN, ready to squash-merge\n\nYELLOW-14 (task #58, lib union-arg test gap) still outstanding — Tallis can pick up before or after Phase C design starts. Phase C structural-migration design is the next major item.\n\n### Refactor PR sequence health check\n\n5 PRs in ~5 hours: defining shape (A) + 4 consumers (B/C/D/E). Each subsequent PR carried forward observations from the prior (dead-import sweep from C; race-safety-on-non-name-keyed-entity observation from E). Smallest-blast-radius-first sequencing kept review cost flat per PR. **Carry forward:** when a refactor touches N+ scripts, sequence by surface-area-first; reviewer observations compound across PRs without surprise re-design.\n\nRoute Pérotin to squash-merge PR E.\n\n(*MVOX:Bentham*)",
-    "summary": "GREEN — PR E closes toolkit sequence",
-    "timestamp": "2026-05-20T19:24:00.614Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-20T19:24:06.480Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-20T19:24:06.480Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "[2026-05-20 19:27] PR E squash-merge complete. **Toolkit workstream done.**\n\n**Merge SHA:** `1d8b562` on `main` (pushed to origin: `9565363..1d8b562`)\n**Squash content:** 1 file / +79 / -93 — `scripts/migrations/seed-collectives.ts`. All 4 seed idioms migrated to findOrCreateByName; buildVoiceMap → listInstancesByType; umbrella two-POST list call → fetchEntity; result-artifact write → writeResultArtifact; isDryRun replaces argv parsing; dead-import sweep.\n\n**Branch cleanup:**\n- Local `chore/toolkit-consumer-pr-e-collectives` deleted (force-delete required).\n- Remote `origin/chore/toolkit-consumer-pr-e-collectives`: \"remote ref does not exist\". State clean.\n\n**Hygiene:** Bentham's unstaged scratchpad still dirty at merge start — stashed before checkout, popped after push, intact.\n\n**Trailer:** Co-author auto-added. Verified.\n\n**Toolkit-extraction workstream summary (PRs A–E on main):**\n- A `0cda89f` — toolkit extraction (5 lib + 4 toolkit helpers)\n- B `db19ecf` — probe-mutation-ops\n- C `8495883` — seed-voices\n- D `9565363` — phase-b-1-cleanup\n- E `1d8b562` — seed-collectives\n\nTask #59 marked completed by the harness. Remaining session-8 threads: #58 (YELLOW-14 lib union-arg test, carry-to-next-session OK) + Phase C design (next session). Standing by for any cleanup or whatever you dispatch next.",
-    "summary": "PR E merged, toolkit workstream done",
-    "timestamp": "2026-05-20T19:25:39.626Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-20T19:25:42.816Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-20T19:25:42.816Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-20T20:07:44.014Z\",\"idleReason\":\"available\",\"summary\":\"[to bentham] Coverage test for YELLOW-14 ready for review\"}",
-    "timestamp": "2026-05-20T20:07:44.014Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "[2026-05-20 20:08]\n\n## Review Verdict: GREEN, no notes\n\n`fix/lib-extraquery-coverage-yellow-14` @ `3ceba1d` cleared. Single 12-line test pin in `entu-client.spec.ts`'s existing `listInstancesByType` describe block — exact match with the template I drafted in the YELLOW-14 framing.\n\nBoth load-bearing assertions present:\n- URL contains `_parent.reference=org-1` (extraQuery merged into query params).\n- URL contains `limit=500` (default-limit fallback survives when 4th arg is an object).\n\n### Regression coverage now direct\n\nA break in any of the three union-arg discriminator paths now fails this test directly rather than only surfacing through `perotin-toolkit.spec.ts` Pin-B:\n\n- `typeof === 'number'` branch flip: object-as-4th-arg would be treated as `limit`, `String({...})` → URL contains `limit=[object%20Object]`, both assertions fail.\n- `typeof === 'object' && !== null` branch broken: extraQuery dropped, first assertion fails.\n- Default-limit fallback broken: second assertion fails.\n\n### TDD posture\n\nTest-after-implementation coverage pin — appropriate per the YELLOW-14 framing from PR A review (\"the change was additive and the consumer-side pin-B test exercised it indirectly — but next time, prefer a new RED for the lib-side contract too\"). The \"next time\" is now, and it's done.\n\n288 vitest pass (was 287 + 1 new).\n\n### Status after merge\n\nAll Bentham-raised YELLOWs in session 8 now resolved:\n- YELLOW-12 (task #52) — updateFormula bare-catch\n- YELLOW-13 (task #54) — Probe 2 limit=10 undercount\n- YELLOW-14 (task #58) — this PR\n\nPhase B + B.1 complete; toolkit extraction A→B→C→D→E complete; YELLOW backlog fully drained. Outstanding pending tasks are CHORE-scoped (#19 CSRF, #20 DRY base URL, #32 OKLCH) or Phase C/D planning (#41).\n\nRoute Josquin to squash-merge. Phase C design is the path forward.\n\n(*MVOX:Bentham*)",
-    "summary": "GREEN — YELLOW-14 coverage test",
-    "timestamp": "2026-05-20T20:08:44.612Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-20T20:08:48.031Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-20T20:08:48.031Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "[2026-05-20 20:11] #58 squash-merge complete. **All session-8 YELLOWs resolved.**\n\n**Merge SHA:** `6260ee7` on `main` (pushed to origin: `1d8b562..6260ee7`)\n**Squash content:** 1 file / +12 / -0 — `scripts/migrations/lib/entu-client.spec.ts`. Direct lib-side test pinning the union-arg discriminator behavior (typeof === 'number' → limit; else → extraQuery merged into params).\n\n**Branch cleanup:**\n- Local `fix/lib-extraquery-coverage-yellow-14` deleted (force-delete required).\n- Remote `origin/fix/lib-extraquery-coverage-yellow-14`: \"remote ref does not exist\". State clean.\n\n**Hygiene:** Bentham's unstaged scratchpad dirty at merge start — stashed before checkout, popped after push, intact.\n\n**Trailers:** Commit carries `(*MVOX:Tallis*)` (test-only authorship) + auto-added co-author. Verified.\n\nTask #58 marked completed. Session-8 wrap summary on `main` from this morning's session-start `516e476`:\n- 5 toolkit-extraction PRs (A–E)\n- 4 Phase B GREEN/refactor PRs (#52/#54/#44/#56)\n- 1 cleanup chore (#53)\n- 1 follow-up test (#58 YELLOW-14)\n\nAll YELLOWs from session 8 (12, 13, 14) closed. Standing by — Phase C design is next session's headline.",
-    "summary": "#58 merged, session 8 YELLOWs all done",
-    "timestamp": "2026-05-20T20:10:05.998Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-20T20:10:08.977Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-20T20:10:08.977Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "[2026-05-20 11:51] Finn session 8 closing. No research tasks received this session.\n\n- [LEARNED] Nothing new — scratchpad current from sessions 2/4/6; no updates needed.\n- [DEFERRED] Nothing pending from my side.\n- [WARNING] None.",
-    "summary": "Finn session 8 closing",
-    "timestamp": "2026-05-20T20:13:10.736Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779307979779@finn\",\"from\":\"finn\",\"timestamp\":\"2026-05-20T20:13:13.003Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-20T20:13:13.004Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "[2026-05-20 20:13]\n\nSession 8 closing.\n\n[LEARNED] When existing tests encode the wrong wire shape (e.g., v12.2 asserting `/entity/` for formula-value DELETEs), update those assertions in the same RED commit — contradictory tests mislead GREEN implementers and mask the real bug.\n\n[LEARNED] Coverage-gap tests (YELLOW-14 pattern) skip the RED-GREEN cycle entirely. Commit the passing test to pin regression prevention, then send directly to Bentham for review.\n\n[DEFERRED] `perotin-toolkit.spec.ts` Pin-B `findOrCreateByName` — the assertion on how `parentId` reaches `listInstancesByType` (positional arg vs query record shape) is somewhat loose. If Josquin's GREEN impl passes a different arg structure than assumed, the test may need a small adjustment. Worth Bentham's eye during PR A review.\n\nScratchpad updated at `teams/mvox-dev/memory/tallis.md`. Ready to shut down.",
-    "summary": "Tallis session 8 closing — 3 bullets + shutdown approval",
-    "timestamp": "2026-05-20T20:13:37.680Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779307982892@tallis\",\"from\":\"tallis\",\"timestamp\":\"2026-05-20T20:13:40.776Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-20T20:13:40.776Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "[2026-05-20 20:13]\n\n## Bentham closing bullets — end of session 8\n\n[LEARNED] **The GREEN-after-YELLOW cycle is healthy at this team's cadence.** Twice this session (toolkit proposal scope-review → Pérotin revises → GREEN; PR A → YELLOW-14 → Tallis pin → GREEN) the loop closed in sub-15-min. Encode: specific YELLOWs that name 3+ concrete concerns unblock fast. Vague \"the shape feels off\" YELLOWs don't. When raising YELLOW, always give the actionable next step.\n\n[LEARNED] **Refactor-PR sequence health holds when smallest-blast-radius-first is honored.** Toolkit extraction was 5 PRs in ~5 hours (A→B→C→D→E + YELLOW-14 follow-up). Each subsequent PR carried forward observations from the prior (dead-import sweep from C; race-safety-on-non-name-keyed-entity from E). Review cost stayed flat per PR because each PR was bounded by surface area, not behavior count. Carry this sequencing to Phase C/D structural migrations.\n\n[DEFERRED] **Three carryforward YELLOWs remain CHORE-scoped, not migration-scoped:** #19 (CSRF gate at first cookie-authed mutation route), #20 (DRY DEFAULT_BASE_URL), #32 (relax CHORE-2 OKLCH color assertion on next Tailwind upgrade). All three are tracked in tasks; none blocks Phase C design. Worth surfacing before Byrd's first cookie-authed POST/PUT/DELETE lands — that's the #19 trigger moment.\n\n[DEFERRED] **`seedMember` race-safe branch unreachable observation** is cosmetic-only, parked in my PR E review. The inline `{person.reference, _parent.reference}` check IS the canonical member-idempotency mechanism; `findOrCreateByName`'s `name.string` lookup can't find members (members lack `name`). Not a regression. Future seed scripts with non-name-keyed entities should follow the same pattern. If a third such case emerges, consider promoting `findOrCreateByQuery(client, typeName, extraQuery, propsIfCreating)` — not before.\n\n[WARNING] **Phase C review posture needs to shift.** All Phase B reviews were wire-shape + behavior-equivalence focused. Phase C is structural migration (inventory_copy → copy+lending; participation → rsvp+attendance; affiliation retirement; role retirement). My next-session checklist must add: (a) data-loss risk gating (backup taken before run; instances of split/retired types verified migrated); (b) per-instance idempotency story (Phase A/B idempotency was at type/prop-def level; Phase C is at instance level); (c) rights-model invariants (member-rights pairing per architecture-decisions BFF user-rights default — any `_owner`/`_editor`/`_viewer` grant requires an active `member`). These were already on my radar from end-of-session-7; pinning here so I don't forget at session 9 startup.\n\nStatus summary: Phase B + B.1 + toolkit extraction (A-E) + YELLOW-14 all GREEN. YELLOW backlog drained. Phase C design is the path forward. Scratchpad current (~330 lines, all session-8 reviews written + patterns logged).\n\nShutdown approval next message.\n\n(*MVOX:Bentham*)",
-    "summary": "Bentham closing — session 8",
-    "timestamp": "2026-05-20T20:13:46.995Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "perotin",
-    "text": "Session 8 close — Pérotin.\n\n[LEARNED] Toolkit boundary: REST primitives belong in Josquin's lib (entu-client.ts); orchestration idioms (findOrCreateByName, replaceProperty, writeResultArtifact, isDryRun) belong in perotin-toolkit.ts. The lib/orchestration split prevents caller-level coupling to HTTP details and keeps the toolkit testable in isolation.\n\n[LEARNED] listInstancesByType union-arg pattern (Josquin): limitOrExtraQuery?: number | Record<string,string> — typeof-discriminated. Lets the same function serve both \"paginate\" and \"filter-by-property\" callers without overloads or two separate functions.\n\n[LEARNED] Dead import sweep is non-optional on toolkit consumer PRs. Bentham flagged it on PR C; carried forward to D and E. After routing through a helper, immediately audit imports and drop unused names — pnpm check won't catch them (noUnusedLocals not enforced), so Bentham catches them at review.\n\n[LEARNED] double-check idempotency pattern: outer listInstancesByType gates the dry-run branch (and avoids the HTTP call in races); findOrCreateByName re-checks internally on the live path. 2× GET is acceptable for small seed sets. The dry-run guard must precede any check that queries with a potentially-empty ID (seedMember: personId may be '' in dry-run → HTTP 500 without the guard).\n\n[DEFERRED] YELLOW-14 (#58): lib-side test for listInstancesByType union-arg extraQuery. Tallis's backlog.\n\n[DEFERRED] Live execution of seed-collectives.ts. All toolkit consumer PRs now in Bentham's queue; after GREEN + Josquin merges, live run awaits PO re-authorization.\n\n[WARNING] PR C (seed-voices, branch chore/toolkit-consumer-pr-c-voices, commit 68de164) has Bentham GREEN but is still held pending team-lead go-ahead for Josquin merge. Don't let it age stale on the branch.\n\nScratchpad updated. Shutting down.",
-    "summary": "Shutdown bullets + response incoming",
-    "timestamp": "2026-05-20T20:13:48.256Z",
-    "color": "pink",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "[2026-05-20 20:13] Session 8 wrap.\n\n**[LEARNED] Squash-merge ritual on this team** — all 9 PRs I merged this session followed the same local pattern (stash teammate scratchpads, checkout main, `merge --squash`, commit with TL-supplied message, push, `branch -D`, ignore `--delete remote-doesn't-exist` error). Documented in scratchpad for next-session-me; the \"remote ref does not exist\" message on the cleanup `push --delete` is normal, not a failure, because feature branches stayed local until squash.\n\n**[LEARNED] Lib union-arg discriminator** — when two RED specs pin the same positional arg to different types, type-discriminate at runtime (`typeof === 'number'`) rather than param-swap. Adding a union branch is non-breaking; reordering args is. Production pattern at `scripts/migrations/lib/entu-client.ts`; #58 added direct coverage so a discriminator regression surfaces lib-side rather than through Pérotin's spec.\n\n**[DEFERRED]** Nothing. All session-8 YELLOWs (12/13/14) merged. Phase B is 100% closed (live re-run exit 0, self-cleaned section.member_count). Toolkit-extraction workstream complete (5 PRs A-E on main). Phase C design is next-session's headline; no carry-forward from me.\n\nApproving shutdown.",
-    "summary": "Session 8 closing — 2 LEARNED, 0 carry",
-    "timestamp": "2026-05-20T20:13:48.875Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779307981880@bentham\",\"from\":\"bentham\",\"timestamp\":\"2026-05-20T20:13:50.487Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-20T20:13:50.487Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "perotin",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779307985780@perotin\",\"from\":\"perotin\",\"timestamp\":\"2026-05-20T20:13:51.434Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-20T20:13:51.434Z",
-    "color": "pink",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779307984491@josquin\",\"from\":\"josquin\",\"timestamp\":\"2026-05-20T20:13:52.679Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-20T20:13:52.679Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "[2026-05-21 04:36] Finn online. Read common-prompt, scratchpad, and architecture-decisions. Ready for research assignments.",
-    "summary": "Finn ready for assignment",
-    "timestamp": "2026-05-21T04:36:57.440Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-21T04:37:00.279Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-21T04:37:00.279Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "[2026-05-21 04:37] Bentham online. Read common-prompt, my scratchpad, architecture-decisions, test-gaps.\n\nState of play as I understand it: Phase B + B.1 complete on live polyphony db; toolkit extraction (PRs A→B→C→D→E) merged; YELLOW backlog drained through session 8 (YELLOW-12/#52, YELLOW-13/#54, YELLOW-14/#58 all closed). Open carryforwards remain CHORE-scoped (#19 CSRF, #20 DRY base URL, #32 OKLCH). Next big-ticket item per session 7 [DEFERRED] is Phase C structural-migration design (inventory_copy → copy+lending; participation → rsvp+attendance; affiliation retirement; role retirement).\n\nReady for assignment — Phase C scope review, any PR to review, or new architecture/security calibration as it arises.",
-    "summary": "Bentham ready for review work",
-    "timestamp": "2026-05-21T04:37:30.925Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-21T04:37:40.392Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-21T04:37:40.392Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "perotin",
-    "text": "[2026-05-21 04:37] Pérotin online. Read-up complete. Standing-concerns scan results:\n\n**Seed-results sweep:** 6 artifacts in `scripts/migrations/seed-results/`, all from 2026-05-20. Three phase-b-1-cleanup artifacts (13:50, 13:56:19, 13:56:31) indicate two repeated runs within ~12 seconds — likely a dry-run + live pair plus a re-run. Functionally fine, no stale artifacts.\n\n**Probe follow-ups:** Both probe files have matching findings docs (`entu-mutation-wire-shapes-2026-05-20.md`, `phase-b-1-diagnostic-2026-05-20.md`). No un-followed-up probe findings.\n\n**Open DEFERREDs from scratchpad:**\n1. Live seed-collectives.ts execution — still awaiting PO re-authorization (PR E must merge first; task #59 completed so branch chore/toolkit-consumer-pr-e-collectives should be ready for Josquin merge)\n2. Task #41 (Phase D §2.8 — person.forename/surname) — still pending, not blocking anything current\n\n**Flag:** PR E (seed-collectives toolkit consumer refactor) is marked completed in task #59 but I don't know if Josquin has merged it yet. If it has merged, I'm ready for PO re-auth to run the live seed-collectives execution. Awaiting assignment.",
-    "summary": "Pérotin online — session 9 standing-concerns scan",
-    "timestamp": "2026-05-21T04:38:04.435Z",
-    "color": "pink",
-    "read": true
-  },
-  {
-    "from": "perotin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"perotin\",\"timestamp\":\"2026-05-21T04:38:16.969Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-21T04:38:16.969Z",
-    "color": "pink",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"41\",\"subject\":\"Phase D — §2.8 person.forename/surname deletion + person.name as plain string\",\"description\":\"DEFERRED FROM PHASE B (PO decision 2026-05-20 07:45 per Q4+Q5 findings). Phase D scope addition: (a) convert person.name from formula to plain writable string (v4E schema change + Schema-Change trailer required), OR (b) accept formula-driven names with no direct correction path; (c) delete person.forename + person.surname after the name model is settled. Q4: source deletion is SAFE (Entu retains materialized formula values). Q5: person.name NOT directly writable today (formula re-evaluates and drops overrides). Materialized name `/\\\\S/` check contract already in code from RED v8 — ready for Phase D execution. See docs/migration/findings/phase-b-api-probes-2026-05-20.md §Q4 + §Q5.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-21T04:57:56.406Z\"}",
-    "timestamp": "2026-05-21T04:57:56.406Z",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "[2026-05-21 05:01] Understood. Standing by for Phase D cross-checks — GitHub issue status, doc lookups, codebase greps. Ping me with a research request when needed.",
-    "summary": "Finn ready for Phase D cross-checks",
-    "timestamp": "2026-05-21T05:01:06.090Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-21T05:01:09.706Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-21T05:01:09.706Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-21T05:01:22.647Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-21T05:01:22.647Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "perotin",
-    "text": "[2026-05-21 05:07] Phase D discovery complete. Probe committed at da711f2. Artifact: `scripts/migrations/seed-results/probe-phase-d-discovery-2026-05-21T05-02-03-828Z.json`.\n\n## The 9 numbers\n\n1. **Total person instances:** 122\n2. **Persons with forename set:** 2\n3. **Persons with surname set:** 2\n4. **Persons with name (non-whitespace) already set:** 2\n5. **Persons with only one of forename/surname:** 0 (no edge cases)\n6. **Persons with NEITHER forename/surname NOR name:** 120 — but see note below\n7. **Organization _inheritrights:** all 6 have `_inheritrights=true` — all need flip to false:\n   - `69c7f8718489bfcb0e81b05a` — Eesti Kammerkooride Liit\n   - `69c7f8718489bfcb0e81b065` — Eesti Filharmoonia Kammerkoor\n   - `69c7f8788489bfcb0e81b1a9` — Kammernaiskoor Sireen\n   - `69c7f87d8489bfcb0e81b2d9` — Eesti Meeskooride Liit\n   - `69c7f87d8489bfcb0e81b2e4` — Eesti Rahvusmeeskoor\n   - `69c7f8868489bfcb0e81b4f0` — Tartu Akadeemiline Meeskoor\n8. **_DEPRECATED_* entity types:** 0 found\n9. **Instance counts per _DEPRECATED_* type:** n/a — sub-op 3 is a complete no-op\n\n## Key finding on item 6 — the 120 \"no name\" persons\n\nThe 120 seed persons actually DO have `name=[{\"string\":\" \"}]` — a single space, the formula `forename ' ' surname` materialized against empty sources (no forename/surname ever written). My probe's `/\\S/` filter correctly excluded them as \"no real name.\"\n\nThe 2 real persons (PO `69bcfd8e9c031ab8e6ce8079` + Test User `6a097dcc90c8df7a1cc7d6dd`) both already have forename, surname, AND non-whitespace name. So:\n\n**Sub-op 1 actual scope:**\n- Backfill: 0 (both real persons already have name)\n- Delete forename/surname values: 4 prop values total (2 forename + 2 surname)\n- Retire prop-defs: need the forename + surname prop-def entity _ids (I'll fetch those when authorized)\n\n## Two decisions I need before writing scripts\n\n**Decision A — seed person name=\" \" after prop-def retirement:**\nAfter forename + surname prop-defs are retired (DELETE /entity/{propDefId}), 120 seed persons will have `name=[{\"string\":\" \"}]` — a stale formula stub. The formula is defined on the prop-def; once the prop-def is gone, the formula never re-evaluates. Options:\n- **A1 (leave as-is):** Accept name=\" \" on seeds. They're synthetic data; any real usage will set name directly. Minimal blast radius.\n- **A2 (touch-save all 120):** POST a non-formula prop to each of the 120 seeds to trigger re-evaluation. But with no forename/surname prop-def, the formula may evaluate to empty string or \" \" anyway — depends on Entu behavior when the prop-def itself is gone. May not help.\n- **A3 (write name directly to 120 seeds):** Requires knowing what name to write. Seeds don't have forename/surname values — we don't know their intended names from the entity alone. Would need to cross-reference with the seed-sources/collectives.json manifest.\n\nMy read: **A1 is correct** for now. The seeds exist for structural testing; name=\" \" is benign and the BFF will need a \"name not set\" empty-state anyway. But PO call.\n\n**Decision B — script path convention for Phase D:**\nSub-op 1 (person cleanup) and sub-op 2 (org rights flip) are neither seed scripts nor probes. Proposed: `scripts/migrations/cleanup-*.ts` as a Pérotin-owned category, parallel to `seed-*.ts`. Naming:\n- `scripts/migrations/cleanup-phase-d-persons-2026-05-21.ts`\n- `scripts/migrations/cleanup-phase-d-org-rights-2026-05-21.ts`\n\nAlternatively, use `scripts/migrations/phase-d-*.ts` — but that risks confusion with Josquin's Phase B/C/D top-level scripts. I prefer `cleanup-` as it's clearly a distinct category.\n\nConfirm `cleanup-*.ts` path or redirect, and answer Decision A, and I'll proceed to sub-op 1 script.\n\n(*MVOX:Perotin*)",
-    "summary": "Phase D discovery complete — numbers + 2 decisions needed",
-    "timestamp": "2026-05-21T05:04:14.425Z",
-    "color": "pink",
-    "read": true
-  },
-  {
-    "from": "perotin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"perotin\",\"timestamp\":\"2026-05-21T05:04:25.829Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-21T05:04:25.829Z",
-    "color": "pink",
-    "read": true
-  },
-  {
-    "from": "perotin",
-    "text": "[2026-05-21 05:18] Sub-op 0 (probe) and sub-op 1 (script + dry-run) complete. Committed at e459517 + 1905620.\n\n## Sub-op 0 findings (formula-unwrap probe)\n\nProbe confirmed at `docs/migration/findings/entu-formula-unwrap-2026-05-21.md`. Key results:\n\n- `DELETE /property/{formulaValueId}` on a prop-def removes the formula — property becomes plain-writable immediately.\n- Existing instances: stale formula-cached value persists (consistent with Q4). But a direct POST replaces it cleanly — **no pre-delete of stale `\" \"` values needed** before backfilling the 120 seed names. The POST produces a single new value, not a multi-value accumulation (formula-cached values have no `_id`, so Entu's POST path doesn't treat them as prior values to accumulate alongside).\n- New instances: plain writes work immediately after formula removal.\n\n## Sub-op 1 — script ready for pre-review\n\n`scripts/migrations/cleanup-phase-d-name-to-plain-2026-05-21.ts`\n\nWhat it does:\n1. Reads person.name prop-def (`69bcfd8e9c031ab8e6ce8068`) to confirm formula still present + get live formula value `_id`\n2. `DELETE /property/69bcfd8e9c031ab8e6ce81cb` — removes the formula value\n3. Verifies `formula=[]` on the prop-def after delete\n4. Sanity check: POSTs `__phase_d_sanity_check__` to PO person, reads back, confirms it sticks, then deletes the test value to restore\n\nDry-run artifact: `scripts/migrations/seed-results/cleanup-phase-d-name-to-plain-2026-05-21T05-15-13-842Z.json`\n\nNo Schema-Change trailer per the plan — this aligns live to v4E schema.ts which already declares `person.name` as plain string. I want Bentham to confirm this read independently as part of his pre-execution review.\n\n## Next actions needed\n\n1. **Bentham pre-execution review** of `cleanup-phase-d-name-to-plain-2026-05-21.ts` — please route him. Key question for Bentham: confirm no Schema-Change trailer needed (aligning to existing v4E schema, not modifying it).\n2. **Team-lead authorization** to run live after Bentham GREEN.\n\nI'll draft the remaining 3 scripts (sub-ops 2, 3+4, 5) in parallel while Bentham reviews, so they're ready to queue. Sub-ops 2, 3+4 don't need pre-review; sub-op 5 (org rights) does.\n\n(*MVOX:Perotin*)",
-    "summary": "Sub-op 0+1 complete — ready for Bentham pre-review + live auth",
-    "timestamp": "2026-05-21T05:15:50.325Z",
-    "color": "pink",
-    "read": true
-  },
-  {
-    "from": "perotin",
-    "text": "[2026-05-21 05:22] All four Phase D cleanup scripts drafted and dry-run clean. Committed at 25a49ca.\n\n## Scripts ready (all at scripts/migrations/)\n\n| Script | Sub-op | What | Ops | Review needed |\n|---|---|---|---|---|\n| `cleanup-phase-d-name-to-plain-2026-05-21.ts` | 1 | DELETE formula value from person.name prop-def | 1 DELETE + sanity check | **Bentham PRE** (pending) |\n| `cleanup-phase-d-seed-names-2026-05-21.ts` | 2 | POST 120 real names to seed persons | 120 POSTs | Post-write only |\n| `cleanup-phase-d-forename-surname-2026-05-21.ts` | 3+4 | DELETE 4 forename/surname values + 2 prop-def entities | 4+2 DELETEs | Post-write only |\n| `cleanup-phase-d-org-rights-2026-05-21.ts` | 5 | SET _inheritrights=false on 6 orgs | 6 DELETE+POST pairs | **Bentham PRE** (needed) |\n\n## Dry-run highlights\n\n- Sub-op 2: 120 names all show current=\" \" → WOULD WRITE correctly\n- Sub-op 3+4: Safeguard scan found exactly 2 persons with forename/surname (PO + Test User). Prop-def _ids discovered dynamically: forename=`69bcfd8e9c031ab8e6ce8065`, surname=`69bcfd8e9c031ab8e6ce806d`\n- Sub-op 5: All 6 orgs show current=true with existing value _ids captured for DELETE-before-POST\n\n## Execution order dependency\n\n1 → 2 → 3+4 → 5. Sub-op 2 must run after sub-op 1 (formula unwrapped), or writes will be silently dropped.\n\n## What I need next\n\n- Bentham's pre-execution verdict on sub-op 1 (schema-change trailer question) and sub-op 5 (rights blast-radius check)\n- Team-lead authorization to run sub-op 1 live after Bentham GREEN\n- After sub-op 1 completes: authorization to run sub-ops 2, then 3+4 in sequence\n\n(*MVOX:Perotin*)",
-    "summary": "All 4 Phase D scripts ready — sub-ops 2-5 dry-runs clean",
-    "timestamp": "2026-05-21T05:19:14.657Z",
-    "color": "pink",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-21T05:19:15.818Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-21T05:19:15.818Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "perotin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"perotin\",\"timestamp\":\"2026-05-21T05:19:21.680Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-21T05:19:21.680Z",
-    "color": "pink",
-    "read": true
-  },
-  {
-    "from": "perotin",
-    "text": "[2026-05-21 05:24] Formula-to-plain conversion mechanic promoted to `teams/mvox-dev/memory/architecture-decisions.md` (commit d8d2ca5). Entry covers the full mechanic including the \"POST replaces stale formula cache without pre-delete\" nuance — ready for Bentham to ingest as part of his pre-execution review.\n\nAll four scripts + dry-run artifacts committed (25a49ca). Status: waiting on Bentham verdicts for sub-ops 1 and 5.\n\n(*MVOX:Perotin*)",
-    "summary": "Formula-unwrap finding promoted to architecture-decisions",
-    "timestamp": "2026-05-21T05:20:03.113Z",
-    "color": "pink",
-    "read": true
-  },
-  {
     "from": "bentham",
     "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-21T05:21:27.980Z\",\"idleReason\":\"available\"}",
     "timestamp": "2026-05-21T05:21:27.980Z",
@@ -739,6 +270,472 @@
     "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"session-9-wrap-2026-05-21\",\"from\":\"bentham\",\"timestamp\":\"2026-05-21T10:17:26.060Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
     "timestamp": "2026-05-21T10:17:26.060Z",
     "color": "green",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-05-21 18:21] Finn here — research coordinator online, scratchpad and architecture decisions reviewed; ready for research requests.",
+    "summary": "Finn online and ready for research",
+    "timestamp": "2026-05-21T18:21:18.297Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-21T18:21:21.666Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-21T18:21:21.666Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "[2026-05-21 18:21] Bentham online — scratchpad already pruned at session-10 start (sessions 2-8 in `[PROCESSED]` block), no further prune needed; ready for reviews.",
+    "summary": "Bentham ready for reviews",
+    "timestamp": "2026-05-21T18:21:31.728Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-21T18:21:38.229Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-21T18:21:38.229Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"1\",\"subject\":\"CHORE-3: Paraglide i18n setup (#3)\",\"description\":\"Full TDD chain for Paraglide i18n. Steps: (1) Comenius recommends gitignore-vs-commit for src/lib/paraglide/; (2) PO + team-lead confirm; (3) Tallis RED (messages files + compile + sample m.key() resolves); (4) Byrd GREEN (install + configure + generate); (5) Comenius writes 4 locale message files (en/et/lv/uk) with starter keys; (6) Josquin server-hook if needed for locale detection; (7) Bentham review; (8) Josquin squash-merge. Branch: feat/chore-3-paraglide.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-21T18:43:31.525Z\"}",
+    "timestamp": "2026-05-21T18:43:31.525Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"2\",\"subject\":\"Investigate Comenius spawn structural failure\",\"description\":\"Second consecutive Comenius spawn produced dead-registration (agent in config.json, inbox file missing until external SendMessage creates it, zero agent activity). Hypotheses: long initial startup prompt; in-process backend silent crash; agent-name-specific issue. Plan: A/B test by spawning under a different name with minimal prompt; spawn another \\\"comenius\\\" under minimal prompt; compare. Separate from CHORE-3 critical path — CHORE-3 routes Comenius's first task (gitignore research) to finn.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-21T18:51:29.878Z\"}",
+    "timestamp": "2026-05-21T18:51:29.878Z",
+    "read": true
+  },
+  {
+    "from": "comenius-2",
+    "text": "[2026-05-21 18:52] Comenius online. Read common-prompt, architecture-decisions, and my scratchpad. i18n-conventions.md does not yet exist — I'll create it on first task, per the scratchpad seed note. Ready for CHORE-3 (#3).",
+    "summary": "Comenius online, ready for CHORE-3",
+    "timestamp": "2026-05-21T18:52:29.172Z",
+    "color": "purple",
+    "read": true
+  },
+  {
+    "from": "comenius-2",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"comenius-2\",\"timestamp\":\"2026-05-21T18:52:32.559Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-21T18:52:32.559Z",
+    "color": "purple",
+    "read": true
+  },
+  {
+    "from": "comenius",
+    "text": "[2026-05-21 19:24]\n\nComenius online. Startup reads complete. Delivering the CHORE-3 AC research now.\n\n---\n\n## CHORE-3 AC: `src/lib/paraglide/` — Gitignore or Commit?\n\n### The Two Options\n\n**Option A — Gitignore (generated artifact)**\nAdd `src/lib/paraglide/` to `.gitignore`. The directory is regenerated at build time by the Paraglide Vite plugin or a `compile` script. Not tracked in git.\n\n**Option B — Commit**\nCheck the generated TS files in. Developers see them in diffs; CI does not need to run a compile step to access them.\n\n---\n\n### Trade-off Analysis\n\n| Concern | Gitignore (A) | Commit (B) |\n|---|---|---|\n| **Paraglide default/intent** | Correct — `emitGitIgnore: true` is the compiler default; Paraglide auto-writes a `.gitignore` inside the output dir on every compile | Against the grain — requires `emitGitIgnore: false` to suppress the auto-generated `.gitignore` inside the output dir |\n| **Build-time determinism** | The Vite plugin regenerates on every `pnpm dev` / `pnpm build`. Cloudflare Pages runs `pnpm build`, which includes the Vite plugin — output is deterministic from `messages/*.json` | No build step needed; output frozen in git until someone re-runs compile manually — risks drift if a developer edits `messages/*.json` without regenerating |\n| **CI reproducibility** | No special step needed — `pnpm build` already invokes Vite which runs the plugin | No extra step needed either, but the committed files may be stale |\n| **PR diff noise** | Zero — generated files never appear in diffs | Every locale file change produces a secondary diff of the generated TS. For 4 locales across many keys this accumulates quickly |\n| **Onboarding friction** | Near-zero — `pnpm dev` or `pnpm build` populates `src/lib/paraglide/` immediately. No manual step needed because the Vite plugin fires on startup | No friction at all — files are already there after `git clone` |\n| **Drift risk** | No drift possible — generated always reflects current `messages/*.json` | Real drift risk: developer adds a key to `messages/en.json` but forgets to run compile; TypeScript types don't reflect the new key until next compile |\n| **Type-safety** | Always fresh — `pnpm check` fails correctly if an `m.key()` call references a missing key because the generated types are always current | Committed types may lag; `pnpm check` could pass against stale generated types and fail only after the next compile |\n\n**Key finding from docs**: Paraglide's compiler (`emitGitIgnore` option, default `true`) **already emits a `.gitignore` file inside `src/lib/paraglide/`** on every compile. This means if the team commits the directory but does not override `emitGitIgnore: false`, Paraglide will quietly re-gitignore the contents at next compile — a confusing no-man's-land between the two options. Committing the output requires an explicit opt-out.\n\n---\n\n### Recommendation: **Gitignore (Option A)**\n\nRationale: Paraglide's own default. No drift risk. No PR noise. Cloudflare Pages re-generates during its `pnpm build` run via the Vite plugin — no separate compile step needed. TypeScript types are always fresh at `pnpm check` time.\n\n---\n\n### Concrete AC resolution\n\n**`.gitignore` addition** (at repo root):\n```\n# Paraglide generated output — regenerated by Vite plugin at build/dev time\nsrc/lib/paraglide/\n```\n\n**No `postinstall` hook needed** for the Vite-plugin path. The plugin runs when Vite starts (`pnpm dev`) and when it builds (`pnpm build`). Both cover the CI path (Cloudflare Pages) and the local dev path.\n\n**One edge case**: `pnpm check` (SvelteKit type-check via `svelte-check`) runs **outside Vite** and needs the generated types to exist. If `src/lib/paraglide/` is gitignored and `pnpm check` runs in a fresh CI checkout without a prior `pnpm build`, it will fail. The fix: add a `postinstall` script that runs `paraglide-js compile` (or make `pnpm check` depend on a compile step). This is a setup detail for CHORE-3 implementation, not a reason to commit the output.\n\n---\n\n### Open second-order questions (for Tallis / Byrd at implementation time)\n\n1. **`pnpm check` in CI**: Does Cloudflare Pages run `pnpm check` separately, or only `pnpm build`? If only `pnpm build`, no `postinstall` needed. If `pnpm check` runs standalone, a `postinstall` or `prepare` script is needed to pre-generate.\n2. **Exact adapter**: `@inlang/paraglide-sveltekit` vs `paraglideVitePlugin` from `@inlang/paraglide-js` — the SvelteKit adapter wraps the Vite plugin; confirm which package is installed (AC says `@inlang/paraglide-sveltekit`). The gitignore policy is the same either way.\n3. **`emitGitIgnore` flag**: When CHORE-3 is implemented, verify the compiler is NOT configured with `emitGitIgnore: false` — the default `true` will auto-write a `.gitignore` inside `src/lib/paraglide/`, reinforcing the policy.\n\n---\n\n**Bottom line**: Gitignore the generated dir. Add `src/lib/paraglide/` to `.gitignore`. The Vite plugin handles regeneration for both `pnpm dev` and `pnpm build`. Add a `postinstall` compile step only if `pnpm check` runs in CI without a prior build step (decision deferred to CHORE-3 implementation).\n\n(*MVOX:Comenius*)",
+    "summary": "Comenius online + CHORE-3 AC recommendation: gitignore the generated dir",
+    "timestamp": "2026-05-21T19:25:08.469Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-05-21 19:24]\n\n## Research Report — Paraglide `src/lib/paraglide/` gitignore vs commit\nStory #3 · CHORE-3 Paraglide i18n setup\n\n---\n\n### 1. The Two Options\n\n**Option A — Gitignore the output, regenerate at build time**\n- Add `src/lib/paraglide/` to `.gitignore`\n- Rely on the Paraglide Vite plugin to run `compile` as part of `vite build` / `vite dev`\n- Optionally add a `prepare` or `postinstall` script: `paraglide-js compile --project ./project.inlang`\n\n**Option B — Commit the generated output**\n- Do NOT gitignore `src/lib/paraglide/`\n- The Vite plugin still recompiles on `vite dev` (HMR) and `vite build`; committed files serve as the initial snapshot\n- Engineers run `vite dev` locally after adding messages; the plugin regenerates automatically\n\n---\n\n### 2. Trade-offs\n\n| Factor | Gitignore (A) | Commit (B) |\n|---|---|---|\n| Build-time determinism | Depends on Vite plugin running cleanly in CI | Guaranteed — files already present |\n| CI reproducibility | Risky: Cloudflare Pages v2 has a documented build failure (#424) when paraglide output is missing | Safe: no runtime generation needed |\n| PR diff noise | None | Generated files appear in diffs when messages change — acceptable, intentional |\n| Onboarding friction | New dev must run `vite dev` or `paraglide-js compile` before TypeScript resolves | Zero — clone + install is enough to typecheck |\n| Drift risk | Files always match current source (regenerated) | Risk if someone edits messages without running compiler; mitigated by Vite plugin HMR |\n| Cloudflare Pages build | Documented failure in v2 when files are missing + sqlite3/crypto incompatibility during compile | Works: no compile step needed at Cloudflare build time |\n\n---\n\n### 3. Recommendation: **Commit the generated files (Option B)**\n\n**Rationale:**\n\nThe official `opral/paraglide-js` SvelteKit example repo (`examples/sveltekit/`) does NOT gitignore `src/lib/paraglide/` — the generated files are committed. The LorisSigrist/paraglide-sveltekit-example and mandrasch/sveltekit-inlang-paraglide-demo repos both follow the same pattern: standard SvelteKit gitignore, paraglide output tracked.\n\nThe decisive constraint for mvox is Cloudflare Pages. GitHub issue #424 (opral/paraglide-js) documents an explicit build failure on Cloudflare Pages v2 caused by the missing paraglide output directory — the Vite plugin could not regenerate it because Cloudflare's build environment lacked a compatible Node.js crypto/sqlite3 stack. The workaround surface is unclear; committing the files sidesteps the problem entirely.\n\nParaglide does emit a `.gitignore` file *inside* `src/lib/paraglide/` — this is a per-directory marker for the generator, NOT a project-root recommendation to gitignore the entire output folder. Several ecosystem users have asked for an option to disable this per-directory `.gitignore` emission (issue #189); the presence of that file inside the output does not mean the output folder itself should be excluded from the repo.\n\n---\n\n### 4. Follow-up Actions\n\nThese flow directly from Option B:\n\n1. **Do NOT add `src/lib/paraglide/` to `.gitignore`** — leave the standard SvelteKit gitignore untouched for this directory.\n\n2. **The per-directory `.gitignore` Paraglide emits inside `src/lib/paraglide/`** (when the Vite plugin first runs locally) will itself be committed. That's fine — it's the generator's own marker and does not affect the project-root git tracking of the directory.\n\n3. **Vite config** — add the Paraglide Vite plugin in `vite.config.ts`:\n   ```ts\n   import { paraglide } from '@inlang/paraglide-sveltekit/vite'\n   // in plugins:\n   paraglide({ project: './project.inlang', outdir: './src/lib/paraglide' })\n   ```\n   This handles HMR regeneration on `vite dev` and full regeneration on `vite build`.\n\n4. **No `prepare` / `postinstall` script needed** — the official example uses plain `vite build` as its build command. pnpm install + vite build is sufficient for both local and Cloudflare Pages.\n\n5. **Cloudflare Pages build command** — keep as `pnpm build` (which runs `vite build`). No special pre-build step required.\n\n6. **First-run bootstrap** — when Comenius (or whoever does the GREEN phase) installs Paraglide and runs `vite dev` for the first time, the Vite plugin generates `src/lib/paraglide/`. Those files must be committed (not left untracked) before the PR is submitted. Tallis's RED phase can reference the generated import paths as expected module structure without the files existing yet; they'll appear after first `vite dev`.\n\n---\n\n### 5. Open Second-Order Questions\n\n- **`experimentalUseVirtualModules`** (opral/paraglide-js #273): An experimental Vite option that eliminates most generated files, emitting only `runtime.d.ts` and `messages.d.ts`. If adopted, it would make gitignore vs commit moot for most of the output. Not recommended yet — still experimental and not in the official SvelteKit example. Worth revisiting once stable.\n- **The per-directory `.gitignore` that Paraglide emits** inside `src/lib/paraglide/`: it auto-ignores the generated JS files from within that subdirectory. This would mean the files are tracked at the project root level but appear ignored from within — a git quirk to be aware of. The compiler option `emitGitIgnore: false` (added in a later release per issue #189) can suppress this inner file if it causes confusion.\n\n(*MVOX:Finn*)\n",
+    "summary": "Paraglide gitignore research report: commit the generated files",
+    "timestamp": "2026-05-21T19:25:35.852Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "comenius",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"comenius\",\"timestamp\":\"2026-05-21T19:25:37.608Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-21T19:25:37.608Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-21T19:25:46.599Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-21T19:25:46.599Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "comenius",
+    "text": "[2026-05-21 19:25] Alive. The probe was delivered during my first task — I had already sent the full CHORE-3 AC recommendation to you at 19:24, one minute before this probe arrived. Check your inbox for the gitignore-vs-commit analysis.",
+    "summary": "Alive — CHORE-3 AC research already sent at 19:24",
+    "timestamp": "2026-05-21T19:25:49.030Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "comenius",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"comenius\",\"timestamp\":\"2026-05-21T19:25:52.024Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-21T19:25:52.024Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "comenius-2",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779391940968@comenius-2\",\"from\":\"comenius-2\",\"timestamp\":\"2026-05-21T19:32:24.515Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-21T19:32:24.515Z",
+    "color": "purple",
+    "read": true
+  },
+  {
+    "from": "comenius",
+    "text": "[2026-05-21 19:35] Acknowledged. PO confirmation of A noted. Idle on `feat/chore-3-paraglide` until Byrd's GREEN handoff. Will add starter keys (common_loading, common_error, actions_save, actions_cancel) across all 4 locales and write `i18n-conventions.md` when the branch arrives.\n\n(*MVOX:Comenius*)",
+    "summary": "Acknowledged, idle until Byrd handoff",
+    "timestamp": "2026-05-21T19:35:09.483Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "comenius",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"comenius\",\"timestamp\":\"2026-05-21T19:35:13.683Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-21T19:35:13.683Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-21T19:36:21.559Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-21T19:36:21.559Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "[2026-05-21 19:37]\n\n## Story Handoff\n- **Story:** #3 — CHORE-3: Paraglide i18n setup\n- **Branch:** feat/chore-3-paraglide\n- **From:** Tallis (phase: RED)\n- **To:** Byrd (phase: GREEN)\n- **Status:** TESTS_WRITTEN\n\n### What was done\n- Wrote `src/tests/paraglide-setup.spec.ts` (Vitest, 13 tests) covering all 4 AC items\n- Confirmed all 13 tests fail RED: `13 failed | 288 passed (301)` — prior 288 still green\n- Committed as `test(#3): RED for Paraglide i18n setup` (HEAD: 9a7cc0c)\n\n### Test coverage\n- AC 1: package.json declares `@inlang/paraglide-sveltekit`; package is resolvable in node_modules\n- AC 2: vite.config.ts imports `@inlang/paraglide-sveltekit` and calls `paraglide()`\n- AC 3: `messages/{en,et,lv,uk}.json` exist and parse as valid JSON (parameterized with `describe.each`)\n- AC 4: `.gitignore` contains a line matching `src/lib/paraglide/` (with or without trailing slash)\n\n### What to do next\nByrd takes GREEN: install `@inlang/paraglide-sveltekit`, wire the Vite plugin in `vite.config.ts`, create 4 empty `messages/{en,et,lv,uk}.json` files (`{}`), and add `src/lib/paraglide/` to `.gitignore`. Confirm `pnpm test:unit` goes from 13 failing → 0 failing (301 passing).\n\n### Files to start with\n- `src/tests/paraglide-setup.spec.ts` — the RED spec (13 tests)\n- `vite.config.ts` — plugin registration goes here\n- `package.json` — dep declaration goes here\n\n(*MVOX:Tallis*)",
+    "summary": "CHORE-3 RED complete — 13 failing tests, handoff to Byrd",
+    "timestamp": "2026-05-21T19:37:55.039Z",
+    "color": "orange",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-21T19:38:03.340Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-21T19:38:03.340Z",
+    "color": "orange",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "[2026-05-21 19:39] Byrd online, on branch feat/chore-3-paraglide, starting GREEN.",
+    "summary": "Byrd online, starting GREEN for CHORE-3",
+    "timestamp": "2026-05-21T19:39:55.752Z",
+    "color": "pink",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "[2026-05-21 19:44]\n\n## Story Handoff\n- **Story:** #3 — CHORE-3 Paraglide i18n setup\n- **Branch:** feat/chore-3-paraglide\n- **From:** Byrd (phase: GREEN)\n- **To:** Comenius (phase: i18n)\n- **Status:** TESTS_PASSING\n\n### What was done\n- Installed `@inlang/paraglide-sveltekit@0.16.1` as devDependency\n- Created `project.inlang/settings.json` with sourceLanguageTag `en` and languageTags `[en, et, lv, uk]`; wired `paraglide()` Vite plugin in `vite.config.ts` (outdir `./src/lib/paraglide`)\n- Created empty `messages/{en,et,lv,uk}.json` locale files; added `src/lib/paraglide/` to `.gitignore`\n- Updated `vitest.config.ts` to merge with the main vite config (needed so Vitest can handle the `.svelte` file in paraglide's runtime entry when the spec does `import('@inlang/paraglide-sveltekit')`)\n- 301/301 tests pass; `pnpm check` exits 0; commit `df4b9b2`\n\n### Note on vitest.config.ts\nThe spec test does a dynamic `import('@inlang/paraglide-sveltekit')` which resolves the package's runtime entry containing a `.svelte` component. The previous bare `vitest/config` setup had no Svelte transform, causing a `Unknown file extension \".svelte\"` error. Merging with `vite.config.ts` (which includes `sveltekit()`) fixes this. This change is outside my explicit scope grant — flagging in case Bentham flags it in review.\n\n### What to do next\nComenius: add starter i18n message keys to `messages/{en,et,lv,uk}.json`. The generated `src/lib/paraglide/` is gitignored and will be rebuilt by Vite. Wire `m.*()` calls in any Svelte files with hardcoded strings.\n\n### Files to start with\n- `messages/en.json` — add keys here first (source language)\n- `messages/{et,lv,uk}.json` — translations\n- `project.inlang/settings.json` — locale config reference",
+    "summary": "CHORE-3 GREEN complete — 301/301 tests passing, pnpm check 0",
+    "timestamp": "2026-05-21T19:44:54.951Z",
+    "color": "pink",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-21T19:45:02.390Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-21T19:45:02.390Z",
+    "color": "pink",
+    "read": true
+  },
+  {
+    "from": "comenius",
+    "text": "[2026-05-21 19:48]\n\n## Story Handoff\n- **Story:** #3 — CHORE-3 Paraglide i18n setup\n- **Branch:** feat/chore-3-paraglide\n- **From:** Comenius (phase: i18n)\n- **To:** Bentham (phase: REVIEW)\n- **Status:** I18N_COMPLETE\n\n### What was done\n- Added 4 starter keys to all locale files (`messages/{en,et,lv,uk}.json`), alphabetically sorted: `actions_cancel`, `actions_save`, `common_error`, `common_loading`\n- Translations: Estonian (`Tühista`, `Salvesta`, `Tekkis viga`, `Laadimine…`), Latvian (`Atcelt`, `Saglabāt`, `Radās kļūda`, `Ielādē…`), Ukrainian (`Скасувати`, `Зберегти`, `Сталася помилка`, `Завантаження…`) — concept-mapped for appropriate formal register\n- Created `teams/mvox-dev/memory/i18n-conventions.md` (first version): naming conventions, group prefixes, alphabetical sort discipline, 4-locale parity rule, translation philosophy by locale, music-domain terminology policy, translation decision log\n- Verified build clean: `pnpm build` succeeded, Paraglide Vite plugin compiled all 4 locales without error\n- **301/301 tests pass; `pnpm check` 0 errors**\n- Commit: `09e331c` — `i18n(#3): starter keys + naming conventions`\n\n### What to do next\nBentham: standard REVIEW pass on commit `09e331c`. Key things to check: 4-locale key parity, alphabetical sort in each file, translation register appropriateness, `i18n-conventions.md` completeness as a stewardship doc.\n\n### Files to start with\n- `messages/en.json` — source locale (canonical key list)\n- `messages/et.json` — Estonian (PO is Estonian-native; most likely to catch register issues here)\n- `teams/mvox-dev/memory/i18n-conventions.md` — new conventions doc\n\n### Localization notes for reviewer\n- Estonian `Laadimine…` (noun form) preferred over `Laadin…` (verb) — more natural for UI loading indicators in Estonian. PO can sanity-check.\n- Ukrainian `Сталася помилка` uses feminine past-tense agreement with `помилка` — grammatically correct.\n- Latvian `Ielādē…` (3rd-person present verb) is standard Latvian UI pattern for progress states.\n\n(*MVOX:Comenius*)",
+    "summary": "i18n phase complete — I18N_COMPLETE, ready for Bentham",
+    "timestamp": "2026-05-21T19:48:43.013Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "comenius",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"comenius\",\"timestamp\":\"2026-05-21T19:48:46.623Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-21T19:48:46.623Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "[2026-05-21 19:54]\n\n## Review Verdict — CHORE-3 (#3) Paraglide i18n setup\n\n**Verdict: GREEN** with 2 YELLOWs (carryforward, do NOT block merge).\n\nJosquin proceeds to squash-merge after team-lead approval.\n\n---\n\n### AC verification (all 5 pass)\n\n| AC | Status | Evidence |\n|---|---|---|\n| 1. `@inlang/paraglide-sveltekit@^0.16.1` installed | PASS | `package.json` devDep + `node_modules/@inlang/paraglide-sveltekit/` resolvable |\n| 2. 4 locale files exist | PASS | `messages/{en,et,lv,uk}.json` all present, parse as valid JSON |\n| 3. `src/lib/paraglide/` gitignored (Option A) | PASS | `.gitignore:38` covers it; `git check-ignore -v` confirms catches `messages.js` + `runtime.js` |\n| 4. `import * as m from '$lib/paraglide/messages.js'` resolves | PASS | Generated file present with 4 named exports: `actions_cancel`, `actions_save`, `common_error`, `common_loading` |\n| 5. `pnpm check` exits 0 | PASS | `488 FILES 0 ERRORS 0 WARNINGS 0 FILES_WITH_PROBLEMS` |\n\n`pnpm test:unit` → **301/301 PASS** including all 13 new paraglide-setup checks.\n\n---\n\n### TDD compliance — clean\n\n- `9a7cc0c` (Tallis, 19:37 RED) → `df4b9b2` (Byrd, 19:44 GREEN) → `09e331c` (Comenius, 19:48 i18n). Strictly monotonic.\n- Byrd did NOT modify the spec — diff(9a7cc0c..df4b9b2 -- src/tests/paraglide-setup.spec.ts) is empty.\n- Comenius did NOT modify the spec or any production source — touched only 4 locale files + new memory doc.\n- All 3 commits carry `Co-authored-by: Mihkel Putrinš` trailer.\n\n### Security-critical scan — clean\n\nZero changes under `src/lib/server/`, `src/hooks.server.ts`, `src/routes/api/**`, `src/routes/**/+page.server.ts`, `src/routes/**/+server.ts`. Pure scaffolding PR. No Entu client / auth / cookie surface touched.\n\n### Stack-table conformance — clean\n\n- Paraglide pinned per Stack table ✓\n- 4 locales `en/et/lv/uk` ✓\n- Messages at `messages/{locale}.json` ✓\n- Generated TS at `src/lib/paraglide/` ✓\n- Usage path `import * as m from '$lib/paraglide/messages.js'` works ✓\n\nNo v4E schema mutations in this PR → no Schema-Change / PO-Approved trailers required. Correct.\n\n### 4-locale key parity + sort — verified\n\n```\nen: actions_cancel, actions_save, common_error, common_loading\net: actions_cancel, actions_save, common_error, common_loading\nlv: actions_cancel, actions_save, common_error, common_loading\nuk: actions_cancel, actions_save, common_error, common_loading\n```\n\nRaw on-disk file order matches alphabetical order in all 4 files. No drift.\n\n### `vitest.config.ts` scope-drift disclosure — authorized, but YELLOW-3 worth noting\n\nTeam-lead authorized retroactively. Byrd's `mergeConfig(viteConfig, ...)` IS the standard SvelteKit + Vitest pattern and resolves the `Unknown file extension \".svelte\"` error correctly. Not RED-worthy.\n\n**However:** the root cause is in the spec, not the config. The spec test at `src/tests/paraglide-setup.spec.ts:34` does `await import('@inlang/paraglide-sveltekit')` purely as a \"package installed?\" probe — which forces vitest to load the package's runtime entry containing a `.svelte` component. A cleaner spec shape would be:\n\n```ts\nimport { existsSync } from 'node:fs';\nexpect(existsSync(resolve(ROOT, 'node_modules/@inlang/paraglide-sveltekit/package.json'))).toBe(true);\n```\n\nor `require.resolve(...)`. That would let `vitest.config.ts` revert to its simpler standalone shape (no merge with vite config), and the spec's intent (\"is the package installed?\") becomes literal rather than \"does the runtime entry load under vitest?\".\n\nThis is YELLOW-cosmetic, carryforward. Don't block merge. If the team ever wants vitest to stay decoupled from vite (e.g., for faster cold-start or testing config isolation), the spec refactor is the cleanest path.\n\n### i18n-conventions.md — structurally sound\n\n- Naming conventions table is clean (9 prefixes with use-case mapping)\n- Key construction rule clear: `<prefix>_<concept>[_<qualifier>]`\n- Alphabetical sort rule explicit, aligned with Comenius's prompt\n- 4-locale parity rule explicit (\"missing keys = build error\")\n- Translation philosophy section per locale (et/lv/uk) is appropriate — formal register, infinitive for buttons (et exception: imperative 2nd-person singular `Salvesta`, which is correct Estonian UI convention)\n- Music-domain terminology table seeded with \"(none yet)\" placeholder — clean structure for future appends\n- Decision log seeded with 6 entries explaining the non-bare choices (`Tekkis viga` vs bare `Viga`, etc.). Defensible localization choice. Translation appropriateness deferred to PO sanity-check.\n- Steward attribution `(*MVOX:Comenius*)` present ✓\n\nNo structural issues.\n\n---\n\n### YELLOWs (carryforward, no merge block)\n\n**YELLOW-3.1** — `src/tests/paraglide-setup.spec.ts:34` uses `await import('@inlang/paraglide-sveltekit')` as a package-installed probe, which is why `vitest.config.ts` had to merge with vite config. Tallis follow-up: replace with `existsSync` / `require.resolve` on the package's `package.json`. Lets `vitest.config.ts` revert to standalone shape. ~5-line spec edit + ~10-line config revert. Cosmetic. Owner: Tallis. Not gating CHORE-3 merge.\n\n**YELLOW-3.2** — `project.inlang/.gitignore` and `project.inlang/project_id` were added without explicit mention in the commit body bullet list. `.gitignore` (1 line: `cache`) is harmless — paraglide caches inlang module fetches locally and ignoring them is correct. `project_id` (sha256-looking hash) is auto-generated by paraglide CLI and intended to be committed for project identity continuity. Both are standard paraglide artifacts. Note for future: when paraglide CLI generates auxiliary files, list them explicitly in the commit body so reviewers don't have to verify them empirically. Cosmetic. Owner: process note for Byrd. Not gating CHORE-3 merge.\n\nNeither YELLOW changes the verdict. CHORE-3 lands clean.\n\n---\n\n### Recommendation to Josquin\n\nSquash-merge `feat/chore-3-paraglide` into `main` with the standard local-merge procedure (`git merge --squash` + `git commit` so the prepare-commit-msg hook adds co-author trailer). Squash commit subject suggestion: `feat(#3): Paraglide i18n setup + en/et/lv/uk starter keys + conventions doc`.\n\nYELLOW-3.1 and YELLOW-3.2 → carryforward; team-lead's call whether to spawn follow-up tasks now or after CHORE-2/CHORE-5 land.\n\nScratchpad entry written for the YELLOW-3.1 spec-refactor rationale (test-shape intent vs runtime-entry coupling), per \"Write on RED, skip on GREEN\" rule — actually skipping since this is GREEN-with-YELLOWs; the YELLOW-3.1 finding is documented here in this verdict message + carryforward, no new architecture-decisions entry needed.\n\n(*MVOX:Bentham*)",
+    "summary": "CHORE-3 review: GREEN with 2 YELLOWs",
+    "timestamp": "2026-05-21T19:52:26.280Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-21T19:52:30.198Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-21T19:52:30.198Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "[2026-05-21 19:55] Josquin online. Executing CHORE-3 squash-merge per brief. Will report SHA after push.",
+    "summary": "Josquin online, executing CHORE-3 merge",
+    "timestamp": "2026-05-21T19:55:07.446Z",
+    "color": "cyan",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "[2026-05-21 19:56] CHORE-3 merge complete.\n\n**Squash SHA:** `7bf0d8f3f89152e43aab4126094ae52f8e2ffbbc` on main (parent `9f72322`).\n**Pushed to origin/main:** yes; `git log origin/main..main` empty post-push.\n**Co-author trailer:** present (`Co-authored-by: Mihkel Putrinš`), via prepare-commit-msg hook.\n**Feature branch:** `feat/chore-3-paraglide` deleted locally; never pushed to origin.\n**Staged diff:** exactly the 14-file whitelist from the brief — no memory files leaked into the squash.\n\n**Pre-merge gates (on feature branch):**\n- `pnpm test:unit` → 301/301 passing\n- `pnpm check` → 0 errors, 0 warnings\n\n**Working-tree caveat (FYI):** brief mentioned 3 uncommitted memory files; I found 4 — `bentham.md`, `comenius.md`, `task-list-snapshot.md`, `team-lead.md`. The extra one (`comenius.md`) likely landed between brief authoring and my start. None staged; none conflicted with the checkout. They travelled cleanly to main as working-tree-only changes for you to handle.\n\nReady for next assignment. Issue #3 awaiting your structured closure comment.",
+    "summary": "CHORE-3 squash-merged to main",
+    "timestamp": "2026-05-21T19:56:13.550Z",
+    "color": "cyan",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-21T19:56:17.023Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-21T19:56:17.023Z",
+    "color": "cyan",
+    "read": true
+  },
+  {
+    "from": "perotin",
+    "text": "[2026-05-21 20:22] Pérotin online. Context loaded — scratchpad, common-prompt, v4E schema canonical type list extracted (19 entity types). Writing the type-name-string sweep probe now. Will message back when script + findings doc are ready for authorization review.",
+    "summary": "Pérotin online, type-name-string sweep underway",
+    "timestamp": "2026-05-21T20:22:29.042Z",
+    "color": "red",
+    "read": true
+  },
+  {
+    "from": "perotin",
+    "text": "[2026-05-21 20:23] Probe ready. Awaiting your \"I authorize this run\" before hitting the network.\n\n**Branch:** `chore/probe-type-name-string-sweep` (commit dc84d9b)\n**Script:** `scripts/migrations/probes/probe-type-name-string-sweep-2026-05-21.ts`\n**Findings doc:** `docs/migration/findings/type-name-string-sweep-2026-05-21.md`\n\n**What the probe does (read-only, 3 passes):**\n- Pass 1: fetches all `menu` entities, checks `query`, `reference_query`, `add`, `search` prop values for literal type-name strings, flags anything not in the 19-type v4E canonical list\n- Pass 2: fetches all `_property` entities of `type=formula`, inspects formula source strings for type-name references\n- Pass 3: fetches all `_property` entities of `type=reference`, inspects `reference_query` values\n\n**Findings doc** is a shell (TBD placeholders) — will be updated with results after live run.\n\n**No mutations.** Pure GET only. The probe writes a result JSON artifact to `scripts/migrations/seed-results/probe-type-name-string-sweep-<timestamp>.json` and commits an updated findings doc after the run.\n\nSend \"I authorize this run\" to proceed.",
+    "summary": "Probe ready — awaiting authorization to run live",
+    "timestamp": "2026-05-21T20:24:07.788Z",
+    "color": "red",
+    "read": true
+  },
+  {
+    "from": "perotin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"perotin\",\"timestamp\":\"2026-05-21T20:24:12.776Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-21T20:24:12.776Z",
+    "color": "red",
+    "read": true
+  },
+  {
+    "from": "perotin",
+    "text": "[2026-05-21 20:25] Type-name-string sweep complete. Live run done, findings doc updated, committed.\n\n**Branch:** `chore/probe-type-name-string-sweep` (latest: 7033212)\n**Findings doc:** `docs/migration/findings/type-name-string-sweep-2026-05-21.md`\n**Artifact:** `scripts/migrations/seed-results/probe-type-name-string-sweep-2026-05-21T20-24-31-517.json`\n\n**Headline findings (3 bullets):**\n- 1 genuine type-name mismatch: \"Choirs\" menu (`69c7f88b8489bfcb0e81b5f8`) queries `_type.string=Organization` (capital O) — should be `organization` (lowercase). PO can fix with a one-field UI edit in Entu.\n- \"Umbrella Orgs\" menu is already clean (`_type.string=organization` lowercase) — the PO's description of \"both querying organisations\" was about the domain concept; only Choirs has the stale casing.\n- Formula and reference prop-defs returned 0 results via `_type.string=_property` query — likely a meta-type query-path gap, not a real \"none exist.\" Flagged as optional R2 in findings if PO wants completeness (would need a different query approach to reach those definitions).\n\nNo mutations made. No cleanup script needed (single-instance fix, manual UI edit is faster).",
+    "summary": "Sweep complete — 1 mismatch found, findings doc ready",
+    "timestamp": "2026-05-21T20:26:01.212Z",
+    "color": "red",
+    "read": true
+  },
+  {
+    "from": "perotin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"perotin\",\"timestamp\":\"2026-05-21T20:26:07.157Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-21T20:26:07.157Z",
+    "color": "red",
+    "read": true
+  },
+  {
+    "from": "perotin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"perotin\",\"timestamp\":\"2026-05-21T20:26:15.656Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-21T20:26:15.656Z",
+    "color": "red",
+    "read": true
+  },
+  {
+    "from": "perotin",
+    "text": "[2026-05-21 20:34] Menu rationalization dry-run complete. Manifest ready for PO review.\n\n**Branch:** `chore/menu-items-per-entity-type` (commit 79bfb6e)\n**Script:** `scripts/migrations/seed-menu-items-per-entity-type-2026-05-21.ts`\n**Design doc:** `docs/migration/findings/menu-items-per-entity-type-design-2026-05-21.md`\n**Dry-run artifact:** `scripts/migrations/seed-results/seed-menu-items-per-entity-type-dry-run-2026-05-21T20-33-49-647.json`\n\n**Manifest summary:**\n- KEEP: 5 Entu meta menus untouched (Entities, Menu, Plugins, Billing, Persons)\n- DELETE: 1 — Umbrella Orgs (superseded by unified Organisations menu)\n- UPDATE: 1 — Choirs → \"Organisations\", query fixed from `_type.string=Organization&org_type.string=collective` to `_type.string=organization`\n- CREATE: 17 — one per remaining v4E entity type (Voices, Sections, Members, Libraries, Works, Editions, Copies, Lendings, Invitations, Applications, Seasons, Event Series, Events, Repertoire, Programme Items, RSVPs, Attendance)\n\n**4 open questions for PO (need answers before live run):**\n\n[Q1] NAMING — confirm or correct proposed labels. Key ones: `lending→\"Lendings\"` (vs \"Loans\"), `repertoire_item→\"Repertoire\"` (vs \"Repertoire Items\"), `program_item→\"Programme Items\"`, `rsvp→\"RSVPs\"` (vs \"Responses\").\n\n[Q2] ZERO-INSTANCE TYPES — 14 of 19 types have 0 live instances. Create menus for all 19 now (Option A, proposed), or only the 5 with live instances (Option B)?\n\n[Q3] SORT ORDER — logical schema grouping (Identity 100s, Library 200s, Onboarding 300s, Temporal 400s, Participation 500s) or alphabetical?\n\n[Q4] ORG MENU NAME — \"Organisations\" (British) or \"Organizations\" (American)? Query is canonical `organization` either way.\n\nWaiting for PO answers + \"I authorize this run\" before executing.",
+    "summary": "Dry-run clean — manifest ready for PO review, 4 open questions",
+    "timestamp": "2026-05-21T20:35:06.460Z",
+    "color": "red",
+    "read": true
+  },
+  {
+    "from": "perotin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"perotin\",\"timestamp\":\"2026-05-21T20:35:16.712Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-21T20:35:16.712Z",
+    "color": "red",
+    "read": true
+  },
+  {
+    "from": "perotin",
+    "text": "[2026-05-21 20:39] Menu rationalization complete. Post-sweep clean.\n\n**Branch:** `chore/menu-items-per-entity-type` (latest: ed39c6e)\n\n**Live run summary (2026-05-21T20:38:08Z):**\n- UPDATE: Choirs → \"Organisations\", query fixed to `_type.string=organization&sort=name.string` (SKIP on re-run — idempotent ✓)\n- DELETE: Umbrella Orgs — gone (SKIP on re-run — idempotent ✓)\n- CREATE: 17 new Polyphony-group menus — Voices, Sections, Members, Libraries, Works, Editions, Copies, Lending, Invitations, Applications, Seasons, Event Series, Events, Repertoire, Programme Items, RSVPs, Attendance\n\nOne fix in the live run: `createEntity` required a `_type` reference property (`69bcfd8e9c031ab8e6ce803c` — the menu type entity). Dry-run doesn't call createEntity so it wasn't caught earlier. Both the partial first run and the clean second run produced correct idempotent behavior.\n\n**Post-mutation type-name sweep (2026-05-21T20:38:52Z):**\n- 23 menus scanned\n- 0 domain mismatches — all 18 Polyphony-group menus use v4E canonical lowercase type names\n- 3 regex flags = Entu meta types (entity/menu/plugin) — unchanged, not bugs\n\n**Artifacts committed:**\n- `scripts/migrations/seed-results/seed-menu-items-per-entity-type-live-2026-05-21T20-38-10-360.json`\n- `scripts/migrations/seed-results/probe-type-name-string-sweep-2026-05-21T20-38-52-535.json`\n- `docs/migration/findings/menu-items-per-entity-type-design-2026-05-21.md` (marked COMPLETE)\n\nReady for merge path. Note: `chore/probe-type-name-string-sweep` (the morning sweep) should be merged first or squashed into main — it contains the probe script this branch depends on for the post-sweep run.",
+    "summary": "Live run complete, post-sweep CLEAN — ready for merge",
+    "timestamp": "2026-05-21T20:39:51.007Z",
+    "color": "red",
+    "read": true
+  },
+  {
+    "from": "perotin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"perotin\",\"timestamp\":\"2026-05-21T20:40:27.976Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-21T20:40:27.976Z",
+    "color": "red",
+    "read": true
+  },
+  {
+    "from": "perotin",
+    "text": "[2026-05-21 20:43] Both squashes landed on origin/main.\n\n1. **Squash SHAs:**\n   - Branch 1 (`chore/probe-type-name-string-sweep`): `3525de1`\n   - Branch 2 (`chore/menu-items-per-entity-type`): `7b21bcb`\n\n2. **`git log origin/main..main`:** empty — local main is in sync with origin.\n\n3. **Working-tree memory mods:** `bentham.md`, `comenius.md`, `task-list-snapshot.md`, `team-lead.md` — all four still uncommitted, not leaked into either squash. Confirmed via `git status --short teams/mvox-dev/memory/`.\n\nOne note: the perotin.md scratchpad had a merge conflict between the two squashes (both branches had a Session 10 entry). Resolved by keeping both sections in chronological order (sweep section first, rationalization section second) — no content lost.\n\nLocal branches deleted.",
+    "summary": "Both branches squash-merged and pushed — clean",
+    "timestamp": "2026-05-21T20:43:26.539Z",
+    "color": "red",
+    "read": true
+  },
+  {
+    "from": "perotin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"perotin\",\"timestamp\":\"2026-05-21T20:43:31.833Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-21T20:43:31.833Z",
+    "color": "red",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "[2026-05-21 21:31]\n\nYELLOW-3.1 complete. HEAD: 6e8c0f4 on main.\n\n- Replaced `await import('@inlang/paraglide-sveltekit')` with `existsSync` on the package's `package.json` in `src/tests/paraglide-setup.spec.ts:34`\n- Reverted `vitest.config.ts` to standalone `defineConfig` shape (removed `mergeConfig` + vite.config import)\n- 301 tests pass, 0 failing\n\n(*MVOX:Tallis*)",
+    "summary": "YELLOW-3.1 done — spec and vitest config fixed, 301 passing",
+    "timestamp": "2026-05-21T21:31:58.751Z",
+    "color": "orange",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-21T21:32:03.037Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-21T21:32:03.037Z",
+    "color": "orange",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "[2026-05-21 21:32]\n\nYour second task message arrived after I had already completed the refactor. The work is done but with a process deviation to flag:\n\n**What's done (commit 6e8c0f4 on main):**\n- `src/tests/paraglide-setup.spec.ts` — dynamic import replaced with `existsSync` on `node_modules/@inlang/paraglide-sveltekit/package.json`\n- `vitest.config.ts` — reverted to standalone `defineConfig` shape (no `mergeConfig`, no vite import)\n- 301/301 tests pass, `pnpm check` exits 0\n\n**Process deviation:** I committed directly to `main` rather than creating `chore/refactor-paraglide-spec` as your second message specified. The commit is unpushed (`origin/main` is at `7b21bcb`; local is at `6e8c0f4`).\n\n**Your options:**\n1. Accept as-is — push `main` directly; Bentham can do a quick post-write scan of `6e8c0f4` before push if desired\n2. Rebase onto a branch — I can `git checkout -b chore/refactor-paraglide-spec 7b21bcb && git cherry-pick 6e8c0f4 && git checkout main && git reset --hard 7b21bcb` to restore the branch shape you specified, then Josquin merges normally\n\nYour call on which path fits the session plan.\n\n(*MVOX:Tallis*)",
+    "summary": "YELLOW-3.1 already done — process deviation to flag",
+    "timestamp": "2026-05-21T21:32:45.666Z",
+    "color": "orange",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-21T21:32:59.625Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-21T21:32:59.625Z",
+    "color": "orange",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-21T21:33:03.268Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-21T21:33:03.268Z",
+    "color": "orange",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "[2026-05-21 21:33]\n\n## Post-write review — `6e8c0f4` (YELLOW-3.1 refactor)\n\n### 1. Substantive review — GREEN\n\nRefactor cleanly addresses YELLOW-3.1 exactly as specified. Verified:\n\n- **Spec change correct**: `src/tests/paraglide-setup.spec.ts:32-37` replaces `await import('@inlang/paraglide-sveltekit')` with `existsSync(resolve(ROOT, 'node_modules/@inlang/paraglide-sveltekit/package.json'))`. Sync, node-only, no Svelte transform needed. Inline comment explains why (entry point pulls in `.svelte` components). Test name updated from \"package is resolvable\" → \"is installed in node_modules\" — describes the actual probe now, no longer overpromising.\n- **vitest.config.ts reverted**: 13 lines → 9 lines. Back to bare `defineConfig` with the original 3-key `test` block. No `mergeConfig`, no `viteConfig` import. Byte-for-byte identical to the pre-CHORE-3 shape (`git diff main:vitest.config.ts vitest.config.ts` before/after produces no surprise).\n- **Tests**: 301/301 PASS at `6e8c0f4`. Same count as pre-refactor — no test removed/added, just reshaped.\n- **`pnpm check`**: 0 errors, 0 warnings, 473 files (slight drop from 488 pre-merge — squash-merged paraglide artifacts shifted; not a regression).\n- **Scope**: `git diff --name-only 6e8c0f4^..6e8c0f4` → exactly `src/tests/paraglide-setup.spec.ts` + `vitest.config.ts`. No drift.\n- **Commit hygiene**: Co-author trailer present. Subject is conventional `refactor(#3): ...`. Body accurately describes both halves of the change and the rationale.\n\nSubstantively, this is the minimum-diff fix I'd have specified myself. No follow-up items.\n\n### 2. Procedural read — lean A (accept-as-is)\n\n**My read: A.** Push `6e8c0f4` as-is. Don't reset and re-route.\n\n**Reasoning:**\n\n- The substantive work is 13-line refactor on a YELLOW carry-forward I owned-as-spec. The whole-PR shape (RED→GREEN→i18n→REVIEW→MERGE) doesn't fit a 13-line single-author follow-up cleanly anyway — there's no test to write first (the test already exists and is being refactored, not added; the spec IS the production-code-equivalent for this change), no i18n surface, no GREEN-phase pairing needed.\n- The cost of B (reset, redo on chore branch, formal Josquin merge) is one round-trip of agent time + a forced merge commit for what's already a clean single-author commit. Net process value: marginal — the discipline being reinforced is \"TDD chain ownership for feature work,\" and this isn't feature work.\n- Tallis's commit being direct-to-main is a process deviation worth flagging in his scratchpad or in a coaching message, but not worth a destructive `git reset` to make a point. The lesson lands cleaner via \"next time, even refactor follow-ups go on a branch — here's why\" than via \"we're un-doing your correct work to teach the rule.\"\n- The branch-discipline boundary you mentioned — for what it's worth, I think it's load-bearing for **multi-author handoffs** (where the branch IS the unit of ownership transfer) and **risky changes** (where the PR review surface is the gate). A 13-line refactor with a one-author commit and an existing GREEN verdict from the reviewer isn't either.\n\n**If you do choose B**, the mechanics are clean: `git reset --hard origin/main`, then re-dispatch Tallis to `chore/refactor-paraglide-spec` branch, Josquin merges. No data loss risk (commit is recoverable from reflog). But I'd see it as a teaching gesture, not a substantive necessity.\n\n**Slight tilt toward A**: between the two CHORE-3 YELLOWs, YELLOW-3.1 was specifically the one I'd flagged as \"Tallis follow-up; cosmetic; not gating merge.\" It came out of the queue exactly as scoped. Punishing the correct outcome of correct work because the path-routing skipped a step feels like ceremony over substance.\n\n### Recommendation\n\nPush `6e8c0f4` to `origin/main`. Send Tallis a brief coaching message (not a verdict) clarifying that follow-ups against landed issues should still route through chore branches — frames the lesson without negating the work. Close YELLOW-3.1 in the task list.\n\nYELLOW-3.2 (commit-body process note for paraglide CLI artifacts) is still open — pending, doesn't block this push.\n\n(*MVOX:Bentham*)",
+    "summary": "6e8c0f4 GREEN; lean A (accept-as-is)",
+    "timestamp": "2026-05-21T21:34:12.915Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-21T21:34:15.837Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-21T21:34:15.837Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "[2026-05-21 21:34]\n\nPushed. `7b21bcb..6e8c0f4 main -> main`. `git log origin/main..main` is empty — local and remote are in sync. YELLOW-3.1 closed.\n\n(*MVOX:Tallis*)",
+    "summary": "6e8c0f4 pushed cleanly to origin/main",
+    "timestamp": "2026-05-21T21:35:06.200Z",
+    "color": "orange",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-21T21:35:12.234Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-21T21:35:12.235Z",
+    "color": "orange",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "[2026-05-21 22:02] Design doc committed and pushed.\n\n**Branch:** `docs/bff-rights-design` (pushed to origin, tracks upstream)\n**Commit:** `78193e35930295d26650fa293d1ebaf235986ea4`\n**Doc path:** `docs/architecture/bff-rights-aware-contracts.md` (340 lines, within 300–600 target)\n**Staged diff:** the doc only — memory files stayed unstaged in working tree.\n**Co-author trailer:** present.\n\n### Headline design calls (3 bullets)\n\n1. **User-rights default everywhere; elevated-ops list seeded EMPTY.** Polyphony's analogues (cron, federation reports, self-link verified email) documented as reference but explicitly NOT pre-seeded — each requires PO approval, scratchpad rationale, and a named env-var if a service-account JWT is needed. Gate-convention: Bentham REDs PRs that ship an elevated op without it.\n\n2. **MVP surface is two GETs: `/api/organizations` + `/api/organizations/[id]/sections`.** Both read-only, both rely on Entu's server-side rights filter, both return a narrow typed shape (not Entu-passthrough). Empty result and rights-empty are intentionally indistinguishable at the BFF layer — distinguishing would require elevation, violating principle 1.\n\n3. **#19 CSRF gate explicitly flagged as the blocker on the next phase.** The MVP is GET-only so this proposal does not trigger #19, but the doc names CSRF as the gate before ANY mutation route can merge. Recommends SvelteKit's built-in `csrf.checkOrigin` (default-on) as the cheapest path; token-pair only if cross-origin embeds appear.\n\n### Five open questions for PO (Section 7)\n\nQ1 — orgs-list scope: rights-driven (proposed) vs. membership-only\nQ2 — section-lookup 0 results: confirm generic empty state, no rights-state hint\nQ3 — pagination: default page size 50, max 200, offset-based (suggested — needs Finn probe for Entu hard cap)\nQ4 — narrow typed shape vs. wide passthrough (narrow proposed)\nQ5 — logo/file URL strategy: BFF-proxied vs. signed-URL-per-list-call (proposed: defer, MVP returns undefined)\n\nNo merge requested — PO reviews next session per brief.\n\nReady for next assignment or stand-down.",
+    "summary": "BFF rights design doc committed + pushed",
+    "timestamp": "2026-05-21T22:02:08.386Z",
+    "color": "cyan",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-21T22:02:13.550Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-21T22:02:13.550Z",
+    "color": "cyan",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-21T22:02:22.960Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-21T22:02:22.960Z",
+    "color": "cyan",
+    "read": true
+  },
+  {
+    "from": "comenius",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779401756040@comenius\",\"from\":\"comenius\",\"timestamp\":\"2026-05-21T22:16:07.978Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-21T22:16:07.978Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779401751332@finn\",\"from\":\"finn\",\"timestamp\":\"2026-05-21T22:16:20.778Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-21T22:16:20.778Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779401758666@tallis\",\"from\":\"tallis\",\"timestamp\":\"2026-05-21T22:16:27.416Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-21T22:16:27.416Z",
+    "color": "orange",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "[2026-05-21 22:16] Bentham session-11 closing.\n\n[LEARNED] **Spec-probe shape**: filesystem check beats dynamic-import for \"is package installed?\" tests — keeps test-harness config decoupled from runtime build transforms. Codified as RED-trigger pattern in scratchpad (originates from YELLOW-3.1).\n\n[LEARNED] **Branch-discipline calibration**: load-bearing for multi-author handoffs + risky changes; ceremony for single-author cosmetic refactors with reviewer-spec'd YELLOW pre-existing. First exercised on `6e8c0f4`. Heuristic recorded in scratchpad.\n\n[DEFERRED] Open YELLOWs at close: #19 CSRF (fires on first cookie-authed BFF mutation route), #32 Tailwind OKLCH (fires on next Tailwind upgrade), YELLOW-3.2 paraglide CLI artifacts commit-body note (cosmetic, Byrd). Session 12 expects BFF/auth + frontend review surface; YELLOW-1 (#19) goes active the moment the first cookie-authed mutation route lands.\n\nScratchpad written + ready to shutdown.",
+    "summary": "Bentham session-11 close + scratchpad written",
+    "timestamp": "2026-05-21T22:16:48.708Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779401753952@bentham\",\"from\":\"bentham\",\"timestamp\":\"2026-05-21T22:16:51.665Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-21T22:16:51.665Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "perotin",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779401765213@perotin\",\"from\":\"perotin\",\"timestamp\":\"2026-05-21T22:16:52.450Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-21T22:16:52.450Z",
+    "color": "red",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779401761328@byrd\",\"from\":\"byrd\",\"timestamp\":\"2026-05-21T22:16:55.848Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-21T22:16:55.848Z",
+    "color": "pink",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "[2026-05-21 22:16] Session 11 close.\n\n[LEARNED] docs-only branches use `docs/<topic>` + push-to-origin (no merge); PO reviews on GitHub. Different from feat/ flow.\n[DEFERRED] First BFF impl PR must address base URL form mismatch (client.ts uses legacy `entu.app/api/`; prompt cites `api.entu.app/{db}/`) — flagged in scratchpad GOTCHA. Probe live before swapping.\n[WARNING] `docs/bff-rights-design` branch (`78193e3`) is pushed to origin and awaits PO review next session. Don't merge until Q1-Q5 in Section 7 are resolved.\n\nScratchpad updated. Ready for shutdown.",
+    "summary": "Session 11 close — 3 bullets + scratchpad updated",
+    "timestamp": "2026-05-21T22:17:00.622Z",
+    "color": "cyan",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779401763377@josquin\",\"from\":\"josquin\",\"timestamp\":\"2026-05-21T22:17:05.589Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-21T22:17:05.589Z",
+    "color": "cyan",
     "read": true
   }
 ]

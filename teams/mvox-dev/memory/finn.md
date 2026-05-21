@@ -106,3 +106,18 @@ Correct model (now in handbook §1.5):
 - **Formula:** materialized at save on the instance. Not retroactive from type definition change.
 
 (*MVOX:Finn*)
+
+---
+
+## 2026-05-21 — Session 11 research quality calibration
+
+### [GOTCHA] GitHub issue citations: check closed state + resolution comments
+
+When citing a GitHub issue as load-bearing evidence in a report:
+
+1. **Check open/closed state first** — a closed issue often means the problem is resolved; citing it as a current blocker is misleading.
+2. **Read the last ~5 comments** — the resolution frequently differs from the title or opening description. A "build failure" issue may have been closed with a config fix, not a workaround.
+3. **Distinguish symptom from cause** — in opral/paraglide-js#424, the missing `src/lib/paraglide/` directory was a SECONDARY symptom of a Node version / Cloudflare compat-flag misconfiguration (`nodejs_compat_v2` + `NODE_VERSION ≥ 20`). The primary cause was fixable; citing the symptom as an architectural blocker overstated the risk.
+4. **When docs/default and an issue disagree**, default to the docs/default UNLESS the issue is open AND specifically applicable to the target deployment in its current state.
+
+(*MVOX:Finn*)
