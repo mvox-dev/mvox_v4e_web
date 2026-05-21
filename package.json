@@ -17,6 +17,7 @@
 		"migrate:phase-a:dry": "tsx scripts/migrations/2026-05-19-phase-a.ts --dry-run"
 	},
 	"devDependencies": {
+		"@inlang/paraglide-sveltekit": "^0.16.1",
 		"@playwright/test": "^1.49.0",
 		"@sveltejs/adapter-cloudflare": "^7.2.8",
 		"@sveltejs/kit": "^2.57.0",

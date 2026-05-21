@@ -1,0 +1,89 @@
+# mvox i18n Conventions
+
+Steward: **Comenius**. All teammates read; only Comenius appends.
+
+Canonical locale list: `en` (source), `et`, `lv`, `uk`. All 4 must stay in sync at all times.
+
+---
+
+## Naming Conventions
+
+Keys are flat strings in `messages/{locale}.json`. No nesting.
+
+### Group prefixes
+
+| Prefix | Use for |
+|---|---|
+| `common_` | Generic UI concepts reused across features (loading, error, empty states) |
+| `actions_` | Verb labels on buttons and interactive controls |
+| `participation_` | RSVP, attendance, rehearsal presence |
+| `repertoire_` | Works, editions, copies, scores |
+| `materials_` | File uploads, attachments, documents |
+| `roster_` | Members, sections, roles within an org |
+| `events_` | Seasons, events, series, programmes |
+| `org_` | Organisation-level settings, onboarding, admin |
+| `auth_` | Login, logout, identity, invite flows |
+
+Use `common_` not `shared_`. Use `actions_` not `btn_`. Use `roster_` not `event_members_`.
+
+### Key construction
+
+`<prefix>_<concept>[_<qualifier>]`
+
+- `common_loading`, `common_error`, `common_empty`
+- `actions_save`, `actions_cancel`, `actions_add`, `actions_edit`, `actions_delete`
+- `events_create_title`, `events_create_submit`
+- `roster_member_remove_confirm`
+
+Keep qualifiers short. Avoid restating the prefix in the qualifier (`actions_save_action` → `actions_save`).
+
+### Alphabetical sort
+
+Keys within each JSON file are sorted **alphabetically** by key name. This is the canonical order. Do not group by feature inside the file — the prefix carries all grouping information needed.
+
+---
+
+## 4-Locale Parity Rule
+
+Every key that exists in `messages/en.json` must exist in `messages/et.json`, `messages/lv.json`, and `messages/uk.json` with the same key name. Missing keys in any locale file = build error (Paraglide compiler fails loudly).
+
+At handoff to Bentham: all 4 files must have identical key sets.
+
+---
+
+## Translation Philosophy
+
+Translate **meaning and user intent**, not words. A Paraglide message is a UI affordance, not a dictionary entry. Prefer the natural phrasing a native speaker would use in that UI context.
+
+- **Estonian**: direct and concise; formal register by default (app has institutional users — choir admins, conductors). `Salvesta` not `Salvestage` (imperative 2nd-person singular is standard for UI buttons in Estonian).
+- **Latvian**: standard literary Latvian; formal. Infinitive form for button labels where natural (`Saglabāt`, `Atcelt`).
+- **Ukrainian**: standard Ukrainian (not surzhyk); formal register. Infinitive for button labels (`Зберегти`, `Скасувати`).
+
+### Music-domain terminology
+
+Choral-music terms that have no idiomatic translation should stay in English (or use the widely-understood loanword). Decision log below — append as new terms arise.
+
+| Term | Policy | Rationale |
+|---|---|---|
+| (none yet) | — | — |
+
+### Proper nouns and brand names
+
+Brand names (`Multivox`, `Entu`) are never translated. Entity names entered by users (choir name, event title) are not in message files — they come from the database and are displayed as-is.
+
+---
+
+## Translation Decision Log
+
+Append entries here when a non-obvious translation choice is made. Format: key, locale, chosen value, rationale.
+
+| Key | Locale | Value | Rationale |
+|---|---|---|---|
+| `common_loading` | et | `Laadimine…` | Noun form (loading as a process); natural in Estonian UI contexts. `Laadin…` (verb) feels too conversational. |
+| `common_error` | et | `Tekkis viga` | "An error occurred" — past tense; Estonian UI convention for error states. `Viga` alone is too bare. |
+| `common_loading` | lv | `Ielādē…` | Verb form (3rd-person present); natural Latvian pattern for progress states. |
+| `common_error` | lv | `Radās kļūda` | "An error arose" — past tense, standard Latvian UI error phrasing. |
+| `common_loading` | uk | `Завантаження…` | Noun/verbal noun; standard Ukrainian UI loading indicator text. |
+| `common_error` | uk | `Сталася помилка` | "An error occurred" — standard Ukrainian UI error phrasing, feminine agreement with `помилка`. |
+
+(*MVOX:Comenius*)
