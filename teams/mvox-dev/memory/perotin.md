@@ -122,9 +122,42 @@ Result: scripts/migrations/seed-results/seed-voices-2026-05-20T08-14-58-992Z.jso
 
 [DEFERRED] Live seed-collectives.ts execution — awaiting PO re-authorization (branch chore/toolkit-consumer-pr-e-collectives after Bentham GREEN + Josquin merge).
 
+## Session 9 — 2026-05-21
+
+### Phase D discovery (task #41)
+
+[PROBE-RESULT] Live polyphony state as of 2026-05-21T05:02Z (probe-phase-d-discovery):
+  Total persons: 122 = 2 real (PO + Test User) + 120 seeds
+  - 2 persons with forename+surname: PO (69bcfd8e9c031ab8e6ce8079) + Test User (6a097dcc90c8df7a1cc7d6dd)
+  - Both already have non-whitespace name (formula materialized correctly)
+  - 120 seed persons: name=[{string:" "}] (formula stub from empty forename+surname), no forename/surname
+
+[DECISION] Sub-op 1 scope is minimal:
+  - Backfill: 0 persons need backfill (both real persons already have name)
+  - Delete: 4 prop values (2 forename + 2 surname on PO + Test User)
+  - Retire: 2 prop-defs (forename + surname) — need prop-def _ids from db
+  - 120 seed persons have name=" " — touch-save or name-write question DEFERRED to team-lead
+
+[PROBE-RESULT] Org _inheritrights: ALL 6 orgs have _inheritrights=true → all need flip to false.
+  IDs: 69c7f8718489bfcb0e81b05a (EKBL), 69c7f8718489bfcb0e81b065 (EFK),
+       69c7f8788489bfcb0e81b1a9 (Sireen), 69c7f87d8489bfcb0e81b2d9 (EMKL),
+       69c7f87d8489bfcb0e81b2e4 (Rahvusmeeskoor), 69c7f8868489bfcb0e81b4f0 (TAM)
+  Wire shape: DELETE existing _inheritrights value, POST {type:'_inheritrights', boolean:false}
+
+[PROBE-RESULT] _DEPRECATED_* types: 0 found. Sub-op 3 is a no-op.
+
+[DECISION] Formula-unwrap mechanic CONFIRMED (probe-phase-d-formula-unwrap-2026-05-21):
+  DELETE /property/{formulaValueId} on prop-def removes formula; instances become plain-writable.
+  POST to existing instance with stale formula-cached value → single new value (not multi-value).
+  No pre-delete of stale " " values needed before backfilling 120 seed names.
+  person.name prop-def _id: 69bcfd8e9c031ab8e6ce8068
+  person.name formula value _id: 69bcfd8e9c031ab8e6ce81cb (DELETE in sub-op 1)
+
+[SKIP] Open Q re seed name=" " — RESOLVED (PO chose A3: backfill from collectives.json manifest).
+
 ## Permanent role note
 
 Promoted from temporary specialist to permanent data-manager (session 7 end). Future seeding work:
-- Live seed-collectives.ts execution (after PR E merges + PO re-auth)
+- Live seed-collectives.ts execution (PR E merged 1d8b562 — COMPLETE per session-8 note, retiring DEFERRED)
 - Phase C seeding needs (rsvp, attendance once those entities exist)
 - Dev/staging fresh-deploy seed choreography
