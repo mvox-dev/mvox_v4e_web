@@ -1,6 +1,106 @@
 # Palestrina — Team Lead Scratchpad
 
-### [NEXT SESSION] 2026-05-22 — session-13 → session-14
+### [NEXT SESSION] 2026-05-22 — session-14 → session-15
+
+**Session 14 outcome:** Huge productive session. 7 squash merges to main: deploy pipeline (#40), real OAuth wiring (#41), CSRF binding + URL unify + carve-out lift (#45), nodejs_compat hotfix (52a5fca), TLS-lag runbook note (#42), arch-decisions forward-pointer (#46), process.env → $env/dynamic/private migration (#47). First public deployed surface live at **https://multivox.pages.dev/auth/login** with 6 provider buttons rendered. CSRF + env-access hardened. Six memory notes captured + multiple architecture-decisions lifts.
+
+**Session 14 commit chain on main (chronological):**
+1. `a120248` feat(#40): deploy pipeline + smoke deploy to multivox.pages.dev
+2. `a506266` feat(#41): real OAuth wiring — client-side exchange flow
+3. `2fa3b7b` chore(#45): CSRF binding on /auth/cookie + Entu base URL unify + carve-out lift
+4. `52a5fca` fix: wrangler.json compatibility_flags nodejs_als → nodejs_compat (production hotfix)
+5. `c490591` chore(#42): runbook — note TLS cert provisioning lag on fresh deploys
+6. `bb12049` chore(#46): arch-decisions — forward-pointer DEFAULT_BASE_URL → ENTU_API_BASE
+7. `c73b82b` chore(#47): migrate process.env → $env/dynamic/private + meta-spec regression net
+8. (this session's shutdown commit — final commit of session 14)
+
+**Live state at end of session 14:**
+- `https://multivox.pages.dev/` — HTTP 200, landing page from CHORE-35
+- `https://multivox.pages.dev/auth/login` — HTTP 200, 6 provider buttons (smart-id, mobile-id, id-card, google, apple, e-mail)
+- Latest production deploy: `https://4be7414c.multivox.pages.dev` (and earlier `e3e0baf0`, `6d8cc2ae`, `4c8238bb` retained on CF for history)
+- 403/403 unit tests + 0 type errors on main
+- Polyphony Entu db unchanged from session 13 (122 persons, 6 orgs, etc.)
+
+**Brilliant entries created this session:**
+- `Decisions/mvox/domain-registration` — mvox.eu Zone.ee registration record (surfaced from PO mailbox, 2026-04-07 order #1220631)
+
+**Architecture-decisions.md additions this session:**
+- Client-side Entu carve-out for IP-bound OAuth exchange (CHORE-41 review + CHORE-45 bundle lift)
+- Forward-pointer DEFAULT_BASE_URL → ENTU_API_BASE in "Test fixtures pin production defaults" section (CHORE-46)
+
+**Memory notes saved this session (in `~/.claude/projects/-home-michelek-workspace/memory/`):**
+- `feedback_task_dispatch_ordering` — send SendMessage brief BEFORE TaskUpdate(owner); don't rotate owner through TDD chain
+- `feedback_closes_n_pattern` — every squash includes Closes #N for primary + subsumed YELLOWs; backfill audit
+- `feedback_atomic_git_chaining` — chain `checkout && commit && push` in one Bash call against shared-tree branch-flip
+- `project_cf_pages_wrangler_vars` — wrangler.json vars block locks the CF dashboard plaintext-vars UI
+- `project_cf_workers_process_env` — nodejs_als doesn't expose process; use nodejs_compat or $env/static/private
+- (these belong in Brilliant KB later — deferred per PO bandwidth)
+
+**Headline session-15 goal (PO call this session):**
+
+Open. None of the remaining follow-ups is a forced priority. Reasonable picks in priority order:
+
+1. **Custom domain `mvox.eu` wiring (#43 / CHORE-42).** PO owns the domain at Zone.ee. Needs PO DNS work + CF dashboard custom-domain wire-up. Makes the URL bandable as `mvox.eu` rather than `multivox.pages.dev`.
+2. **Section drill-down** — `/orgs/[id]/+page` consuming `GET /api/organizations/[id]/sections` (the second BFF endpoint from #32, currently unused). Phase 3 of the BFF/frontend stack. Pairs naturally with #38 (Byrd cleanup) + #37 (Comenius i18n gap).
+3. **CHORE-36 mock harness + SSR flip** — sets the convention for future BFF-consuming pages. Single-PR scope. Becomes more expensive the more CSR-drift pages we add.
+4. **Git-connected CF Pages migration (#44 / CHORE-43).** Delete + recreate `multivox` Pages project via the "Connect to Git" wizard so future main pushes auto-deploy. Brief outage (~minutes) during the swap. PO dashboard action.
+5. **Real OAuth flow live-test** — PO clicks a provider on `https://multivox.pages.dev/auth/login`, completes Entu OAuth, lands signed in on `/`. If something breaks end-to-end, we learn it now rather than at first user.
+
+**Carry-forward queue for session 15 (priority order):**
+
+1. The session-15 headline (one of the 5 above; PO picks at start).
+2. **#36** — Entu mock harness + SSR flip on landing page (and now login page). Still ~1 day single-PR scope.
+3. **#39 (YELLOW-35.4)** — lift session population to `+layout.server.ts`. Becomes RED for next authenticated route.
+4. **Loose YELLOWs fold-opportunistically:**
+   - #31 — Tailwind OKLCH regex (fires on next Tailwind upgrade)
+   - #33 (YELLOW-32.1) — BFF helper factor-out (`src/lib/server/bff/{pagination,props}.ts`) on next BFF route
+   - #34 (YELLOW-32.2) — `EntuClient.get()` 403/404 throws tests in `client.spec.ts` (~10 lines)
+   - #37 (YELLOW-35.1) — Comenius i18n on residual hardcoded "members/section" string in landing
+   - #38 (YELLOW-35.2 + 35.3) — Byrd cleanup (OrgEntity to types.ts + `$app/state` flip)
+5. **Task #3 (formerly #14) — Layer 2 photo file-payload probe + impl** — still deferred. Fires when actual photo files uploaded or BFF needs `_thumbnail` on real data.
+6. **CHORE-6 Email (#6)** — still blocked on PO SPF + DKIM DNS records.
+7. **YELLOW-41.3** — JWT signature verification on /auth/cookie. Defer until Entu publishes JWKS endpoint.
+8. **CONTRIBUTING.md follow-ups (#29)** — low priority.
+
+**Expected first action session 15:**
+1. Verify statusline on launch (`cd ~/workspace && claude`).
+2. Read this seed + recent commits since the session-14 shutdown commit.
+3. Spawn finn + bentham + perotin per Phase 5 (always-on).
+4. Verify production deploy still healthy: `curl -sI https://multivox.pages.dev/` and `/auth/login` — expect HTTP 200 on both.
+5. Confirm session-15 headline with PO (the 5 options above; PO picks).
+
+**Process lessons from session 14 (worth carrying forward; all also in memory notes):**
+
+- **L46 — TaskUpdate(owner=X) auto-sends task_assignment with ORIGINAL task description.** Hit twice in session 14: Tallis received the implementation brief when I marked owner=tallis just before sending the actual dispatch SendMessage (the notification raced); Bentham received the implementation brief when I marked owner=bentham for review handoff (wrong description for his review scope). Codified rule: send SendMessage brief BEFORE TaskUpdate(owner); for multi-phase TDD chains, DO NOT rotate task owner through phases — pick a stable owner (merge-owner) and let SendMessage handoffs drive phase transitions. Memory: `feedback_task_dispatch_ordering.md`.
+
+- **L47 — Closes #N must include ALL satisfied issues, not just the primary.** PO observation mid-session: GH open-issue list was accumulating because YELLOWs satisfied by recent merges weren't named in the merge commit body. Backfill-closed #30 (CSRF gate, satisfied by CHORE-41+45). Going forward: every squash commit body lists Closes #N for the primary CHORE AND any subsumed YELLOWs whose fire-trigger condition has now been met. Backfill audit `gh issue list --state open` periodically. Memory: `feedback_closes_n_pattern.md`.
+
+- **L48 — CF Workers `process.env` trap.** nodejs_als compat flag (only AsyncLocalStorage) doesn't expose `process`. Server-loads reading `process.env.X` 500 in prod even though vitest passes on Node. CHORE-45 deploy exposed this; hotfix `52a5fca` switched to nodejs_compat; CHORE-47 migrated to `$env/dynamic/private` as the idiomatic SvelteKit fix (nodejs_compat retained as transitive-deps safety net). Memory: `project_cf_workers_process_env.md`.
+
+- **L49 — Atomic git chaining defends against shared-working-tree harness flips.** Session-13 L13 said "shared tree, harness can flip branches between Bash calls" — session-14 Bentham's CHORE-46 commit landed on main instead of his feature branch because of this exact pattern. Recovery via single chained Bash call (`checkout && cherry-pick && verify`) worked atomically. Going forward: chain `checkout && add && commit && push && branch -D` into one Bash call for any branch-stable operation. Memory: `feedback_atomic_git_chaining.md`.
+
+- **L50 — CF Pages wrangler.json `vars` block locks the dashboard.** Discovered when PO tried to set ENTU_DB via CF dashboard. The dashboard UI says "managed through wrangler.toml" and only secrets (encrypted) can be added via dashboard. wrangler config IS the source of truth for plaintext vars; wins over dashboard. Memory: `project_cf_pages_wrangler_vars.md`.
+
+- **L51 — Direct Upload mode != Git-connected mode + no in-place conversion.** `wrangler pages project create <name>` defaults to Direct Upload (manual `pnpm run deploy`). To get Git auto-deploy on push to main, the project must have been created via the "Connect to Git" dashboard wizard. CF doesn't allow converting between modes — would require delete + recreate (CHORE-43 filed). For now we manually run `pnpm run deploy` after every main merge.
+
+- **L52 — Meta-specs that scan source files must be synthetic-violation verified.** Tallis's `no-process-env.spec.ts` in CHORE-47 had `../../../../` path resolution overshoot the repo root by one, causing the spec to pass vacuously (scan empty directory → no violations found). Josquin caught it during GREEN inspection; Bentham verified via synthetic-probe. Rule for future meta-specs: BEFORE marking RED phase complete, manually introduce a known violation and confirm the meta-spec red-flags it. Similar to L40 (clerical defect class), specific to scan-based metaspecs.
+
+- **L53 — Direct-to-Entu carve-out for IP-bound OAuth exchange.** Entu's session token is IP-bound to the browser; CF Workers don't preserve browser IP outbound. The OAuth session→JWT exchange MUST happen client-side. This is an explicit carve-out from the "all Entu calls via BFF" canonical RED trigger. Codified in architecture-decisions.md under the section Bentham lifted as part of CHORE-45 bundle. Future Entu calls outside this single carve-out still require BFF routing.
+
+**Brilliant KB updates (deferred — when PO has bandwidth):**
+- New: `Patterns/closes-n-comprehensive` — codify L47
+- New: `Patterns/atomic-git-chaining` — codify L49
+- New: `Patterns/meta-spec-synthetic-verification` — codify L52
+- New: `Decisions/mvox/client-side-entu-carve-out` — codify L53 + cross-link to arch-decisions section
+- New: `Decisions/mvox/process-env-to-env-dynamic` — codify the CHORE-47 architectural call (dynamic over static for CF Workers)
+- Update: `Projects/mvox` — first public deploy live; OAuth flow live; CSRF hardened
+- Carry forward from session 13: `Patterns/upstream-pr-ownership-shift`, `Patterns/clerical-defect-vs-spec-drift`, `Patterns/architectural-pre-emption-as-followup-chore`, `Patterns/promote-before-prune-stewardship`, `Decisions/mvox/csr-as-ci-accommodation`
+
+(*MVOX:Palestrina*)
+
+---
+
+### [PROCESSED 2026-05-22 end-of-session-14] session-13 → session-14
 
 **Session 13 outcome:** Big productive session. Six issues closed (#32 BFF MVP, #35 frontend scaffolding) or moved to closed-when-trigger-fires state; six follow-up issues filed. Schema PR opened + merged on entu/research end-to-end by team-lead for the first time (entu/research#49 — the new norm). Photo-rename Layer 1 executed live on polyphony. Schema-mutation upstream-ownership norm encoded in common-prompt + architecture-decisions. Two settled patterns added to architecture-decisions.md.
 

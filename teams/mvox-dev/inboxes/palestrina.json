@@ -1,0 +1,11 @@
+[
+  {
+    "from": "tallis",
+    "text": "CHORE-47 RED is complete. Branch: feat/env-migration, commit 53cd4fe.\n\nWhat's in:\n- client.spec.ts: replaced vi.stubEnv with vi.mock('$env/dynamic/private') mutable-object pattern. 2 tests RED: \"uses ENTU_BASE_URL from $env/dynamic/private\" and \"uses ENTU_DB from $env/dynamic/private\" — EntuClient implementation needs to read from $env/dynamic/private, not its current source.\n- callback-page-server.spec.ts, login-page-server.spec.ts, server.spec.ts (auth): same pattern applied, all GREEN (implementations already use $env/dynamic/private).\n- src/tests/deploy/no-process-env.spec.ts: new meta-spec, 4 tests, all GREEN — sources are already free of process.env. Acts as a regression net going forward.\n\nTotal: 2 RED (client.spec.ts), 401 GREEN.\n\nReady for Josquin GREEN: update src/lib/server/entu/client.ts to read ENTU_BASE_URL and ENTU_DB from $env/dynamic/private instead of its current env source.",
+    "summary": "CHORE-47 RED complete, handoff to Josquin",
+    "timestamp": "2026-05-22T19:59:12.852Z",
+    "color": "purple",
+    "type": "message",
+    "read": false
+  }
+]

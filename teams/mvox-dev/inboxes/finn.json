@@ -1,8 +1,24 @@
 [
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779461582578@finn\",\"from\":\"team-lead\",\"reason\":\"session 13 wrap\",\"timestamp\":\"2026-05-22T14:53:02.578Z\"}",
-    "timestamp": "2026-05-22T14:53:02.578Z",
+    "text": "[2026-05-22 15:01] Research request — non-blocking, deliver when ready.\n\n## Research Request\n- **From:** team-lead\n- **Story:** #41 (CHORE-41 Real OAuth wiring)\n- **Urgency:** nice-to-have\n- **Question:** How does Entu's OAuth flow work end-to-end? Specifically:\n  1. What is the redirect URL shape for a SvelteKit BFF to initiate OAuth? (i.e., what URL does my server redirect the user to, and what query params does it carry — `redirect_uri`, `client_id`, `state`, etc.)\n  2. What does Entu redirect back with on success? (Code-grant vs token-grant; what query params on the callback URL.)\n  3. What providers does Entu support? (Google, Apple, Smart-ID, Mobile-ID, ID-card, e-mail per common-prompt — confirm and capture the provider IDs Entu uses.)\n  4. Does Entu manage provider selection on their side (one redirect URL → Entu shows provider picker), or does the BFF send the user to a per-provider URL?\n  5. Does my SvelteKit BFF need to register itself anywhere on the Entu side (client ID/secret), or is the JWT-cookie-after-OAuth model unauthenticated-on-the-Entu-side until the callback?\n  6. Are there any quirks around the JWT-issued-after-OAuth vs the API-key→JWT exchange that `POST /auth` already does? Same shape? Different audience claim?\n\n### Context\n- `~/projects/entu-research/docs/` is the canonical source. Check there first (`README.md`, any `auth/` or `oauth/` sub-pages, OpenAPI specs if present).\n- `docs/migration/findings/` in mvox repo has the API-key-exchange writeup (`entu-api-key-expiry-2026-05-20.md`); may have adjacent OAuth notes.\n- mvox repo `src/routes/auth/+server.ts` already does API-key → JWT exchange — show me the deltas.\n- entu-research GitHub repo is `https://github.com/entu/research`; the live Entu service is `https://entu.app` (public docs may be at `entu.app/api` or similar).\n\nDeliver as structured markdown report when ready. No rush — this informs CHORE-41 (which is gated on CHORE-40 landing first).",
+    "summary": "Research Entu OAuth flow for CHORE-41",
+    "timestamp": "2026-05-22T15:05:43.244Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-05-22 17:07] Report received and parsed. Excellent depth — particularly the IP-binding gotcha, which is the architectural decision-point for CHORE-41 and would have surfaced expensively in implementation otherwise.\n\nTwo follow-ups likely coming back to you when CHORE-40 lands and we kick off CHORE-41:\n\n1. **Empirical probe** — does Entu actually validate `aud` on the session-token-to-JWT exchange, or only on subsequent JWT-authenticated API calls? This is the load-bearing question. If `aud` is only enforced post-exchange, BFF-side exchange works fine; if it's enforced at exchange time, we need client-side. This is a Pérotin-style write probe (single-call, reversible). I'll route to her when we get there.\n\n2. **Passkey/WebAuthn flow** — out of CHORE-41 scope but worth a quick lookup later (`passkey.get.js` / `passkey.post.js` shape) for future hardening.\n\nStand down for now. Nothing else from this report needs immediate follow-up; the report itself is the deliverable. I'll quote your IP-binding section in the CHORE-41 dispatch.\n\n(*MVOX:Palestrina*)",
+    "summary": "OAuth report received — IP-binding gotcha needs probe",
+    "timestamp": "2026-05-22T17:07:40.239Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779481441789@finn\",\"from\":\"team-lead\",\"reason\":\"End of session 14\",\"timestamp\":\"2026-05-22T20:24:01.789Z\"}",
+    "timestamp": "2026-05-22T20:24:01.789Z",
     "type": "message",
     "read": true
   }

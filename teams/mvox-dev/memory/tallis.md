@@ -132,4 +132,53 @@ Commit: `c727f2f` on `feat/frontend-scaffolding-mvp`.
 
 [OPEN] CHORE-35 GREEN — Josquin: `src/routes/+page.server.ts` load(). Byrd: `+layout.svelte`, `+page.svelte`, `src/routes/auth/login/+page.svelte`.
 
+## [CHECKPOINT] 2026-05-22 — Session 14: CHORE-41.1+41.2 RED phase (GH #45)
+
+[DECISION] 8 tests added. 2 files changed. Branch: `feat/oauth-hardening`, HEAD `736f252`. 399 total (8 RED, 391 pass).
+
+New file: `src/lib/entu-config.spec.ts` (3 tests — Cannot find module)
+- Pins `ENTU_API_BASE` exported from `src/lib/entu-config.ts` with value `'https://entu.app/api/'`
+
+Updated: `src/tests/routes/auth/oauth/cookie-server.spec.ts` (5 new tests — assertion failures vs current GREEN)
+- 403 when csrf_state cookie missing (CSRF gate)
+- csrf_state deleted always (success + malformed + expired), path /auth
+
+[DECISION] CSRF semantics: delete-always. csrf_state is single-use; malformed JWT is a programming error not a user retry. Callback page server load no longer deletes csrf_state — that responsibility moved to /auth/cookie POST.
+
+[DECISION] Constant location: `src/lib/entu-config.ts` (Option A). NOT `src/lib/server/` — exchange.ts is client-side and can't cross the server boundary.
+
+[DECISION] exchange.ts spec unchanged (Q5 — hardcoded substring `'entu.app'` stays as drift-detection pin per architecture-decisions.md fixture-pin pattern).
+
+[OPEN] CHORE-41.1+41.2 GREEN — Josquin:
+- Create `src/lib/entu-config.ts` exporting `ENTU_API_BASE = 'https://entu.app/api/'`
+- Update `src/lib/server/entu/client.ts` to import from entu-config.ts (remove local DEFAULT_BASE_URL)
+- Update `src/lib/auth/exchange.ts` to import ENTU_API_BASE from entu-config.ts
+- Update `src/routes/auth/cookie/+server.ts`: read + delete csrf_state cookie BEFORE JWT validation; return 403 if missing; delete-always
+
+---
+
+## [CHECKPOINT] 2026-05-22 — Session 14: CHORE-41 RED phase (revised)
+
+[DECISION] 45 tests written across 5 spec files + 1 Playwright placeholder. All 45 RED on "Cannot find module". 346 existing tests pass. Branch: `feat/oauth-wiring`, HEAD `6a0e856`.
+
+[PROCESS] First attempt wrote wrong architecture (server-side exchange). Lesson: when dispatch says "surface open questions first", treat as HARD GATE before writing any test. Architectural choice (client-side vs server-side exchange) is exactly the kind of decision needing PO confirmation pre-spec.
+
+[DECISION] Files Josquin + Byrd must implement:
+- `src/routes/auth/login/+page.server.ts` — load() generates csrf_state, sets httpOnly cookie (maxAge 600, path /auth), returns providers array with full Entu OAuth URLs
+- `src/routes/auth/callback/+page.server.ts` — load() validates state vs csrf_state cookie, returns { sessionToken, db } or throws redirect to /auth/login?error=csrf_mismatch
+- `src/routes/auth/callback/+page.svelte` — Byrd; calls exchangeSession() from lib/auth/exchange.ts, navigates / on success or /auth/login?error=... on failure
+- `src/lib/auth/exchange.ts` — client-side helper: GET Entu /auth with Bearer, POST jwt to /auth/cookie
+- `src/routes/auth/cookie/+server.ts` — POST; validates JWT shape (3 parts, exp not expired), sets entu_jwt httpOnly cookie
+- `src/routes/auth/logout/+server.ts` — POST; deletes entu_jwt cookie, 303 redirect to /
+
+[DECISION] Provider order locked: smart-id, mobile-id, id-card, google, apple, e-mail (PO 2026-05-22)
+
+[DECISION] CSRF pattern: state in httpOnly cookie (path /auth, maxAge 600) AND embedded in each provider URL's next param as `?state=<csrf>&key=`. Server load validates URL ?state vs cookie before passing sessionToken to client.
+
+[DECISION] db: from ENTU_DB env var (default 'polyphony'). exchange.ts uses this as the Entu db slug.
+
+[GOTCHA] returnTo: deferred. MVP always redirects to / after login.
+
+[OPEN] tests/oauth-flow.spec.ts (Playwright): all tests .skip() pending issue #36 mock harness.
+
 (*MVOX:Tallis*)

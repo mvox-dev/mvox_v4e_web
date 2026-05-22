@@ -4,6 +4,55 @@ Personal notes. Only Josquin writes here.
 
 ---
 
+## [CHECKPOINT] 2026-05-22 session 14 — #40 / #41 / #45 / #42 / #46 / #47 merged + mvox live on multivox.pages.dev
+
+Session shipped six PRs to main and got mvox publicly reachable for the first time. Merge SHAs (in order): `a120248` #40, `a506266` #41, `52a5fca` hotfix (nodejs_compat), `2fa3b7b` #45, `c490591` #42, `bb12049` #46, `c73b82b` #47. Tests landed at 403/403; `multivox.pages.dev` HTTP 200; OAuth flow live with CSRF binding + JWT cookie session.
+
+### Durables worth keeping (ephemeral PR-detail pruned)
+
+[GOTCHA] **`pnpm deploy` is shadowed by pnpm's reserved workspace subcommand.** `pnpm deploy` returns `ERR_PNPM_CANNOT_DEPLOY`. Always use `pnpm run deploy` for npm-script-defined deploy. Documented in `docs/operations/deploy.md` with explicit callout near the top. Forgetting this once = ~2min of confused dispatch surfacing.
+
+[GOTCHA] **Cloudflare Pages projects on this account are Direct Upload (no git provider).** Created via `pnpm wrangler pages project create multivox --production-branch main`. Push-to-main does NOT auto-deploy; need explicit `pnpm run deploy --branch main` to populate the canonical URL. Feature-branch deploys land at `<hash>.multivox.pages.dev` + `<branch>.multivox.pages.dev` aliases but NOT canonical. Verified via `wrangler pages project list` → `Git Provider: No` across all 6 projects on the account. CHORE-43 tracked if PO ever wants to wire CF↔GitHub OAuth.
+
+[GOTCHA] **`compatibility_flags: ["nodejs_als"]` does NOT expose `process` global in CF Workers — `nodejs_compat` does.** `als` is older/partial (AsyncLocalStorage only). Cost us a half-deployed `/auth/login` 500 (`ReferenceError: process is not defined`) before the hotfix. **Belt-and-braces stance**: even after CHORE-47 migrated all 5 call sites to `$env/dynamic/private`, the `nodejs_compat` flag stays in `wrangler.json` as defense-in-depth for transitive deps that might do `process.X` internally. The flag is no longer load-bearing for our own env access but remains a safety net.
+
+[PATTERN] **Stop-and-surface beats blind retry on deploy failures.** Both deploy errors this session (`Project not found 8000007` then `process is not defined`) were diagnosed in <2 minutes via `wrangler pages deployment tail <deployment-id> --format json` + JSON inspection. The `tail` subcommand requires the specific deployment ID (not just project name) in non-interactive mode. Pattern: on CF deploy 500, grab `wrangler pages deployment list --project-name <name>` for the latest deployment ID, then `wrangler pages deployment tail <id> --format json > /tmp/cf-tail.log` while hitting the failing route. The structured logs include `logs[].message` with the actual stack trace.
+
+[PATTERN] **`$env/dynamic/private` in vitest requires explicit handling.** SvelteKit's virtual module isn't resolvable outside `vite dev`/`vite build` context. Two options that both work:
+- Per-spec `vi.mock('$env/dynamic/private', () => ({ env: mockEnv }))` with a mutable `mockEnv` object (Tallis's pattern across 4 OAuth specs).
+- Global default via `vitest.config.ts` `setupFiles: ['src/tests/setup.ts']` that mocks with `{ env: {} }` — per-spec overrides still work (vitest mock-hoisting respects later mock declarations).
+
+The global setup is required for any spec that TRANSITIVELY imports migrated code (e.g., `api/organizations/server.spec.ts` doesn't touch env directly but imports `EntuClient` which now imports `$env/dynamic/private`). Without the setup file, 27 specs that pre-existed CHORE-47 will RED on "Cannot find module".
+
+[PATTERN] **Squash-merge chaining defends against harness-branch-flip mid-sequence.** Per the auto-memory feedback I noticed: `git checkout main && git pull && merge --squash <branch> && commit && push && push --delete && branch -D` chained in a single Bash call. The harness sometimes flips branches between Bash calls if multi-call sequences span unrelated tool calls; chaining everything atomic blocks the flip. Used 6 times this session without state loss. Caveat: stash-then-chain still needed if the worktree has unstaged teammate scratchpad edits.
+
+[PATTERN] **`git stash pop` refuses 3-way merge when worktree already has matching unstaged content.** Symptom: pop fails silently with "stash entry is kept" but no obvious error. Fix: `git add <file>` first to move worktree state into the index, then `git stash apply` (which DOES force 3-way) → resolve markers → `git stash drop`. Encountered when popping 3 session-14 stashes onto a worktree that already had scratchpad edits. The stash-pop dance for end-of-session reconciliation needs the apply+drop variant whenever the destination file is dirty.
+
+[PATTERN] **Test fixture path resolution via `new URL('../../../', import.meta.url)`.** From spec file at `src/tests/deploy/no-process-env.spec.ts`, walking up THREE levels lands at the repo root (`/home/michelek/workspace`). FOUR levels overshoots by one. Tallis's first version overshot, making `existsSync` return false and the meta-spec pass vacuously. **Always verify a regression-net meta-spec actually red-flags a known violation BEFORE declaring RED phase done.** This is the L40-style "vacuously-passing spec" anti-pattern; Bentham caught the same class of bug in session 13 with the `.skip()` test that referenced a non-existent feature.
+
+[CONTRACT] **CSRF gate sequencing on `/auth/cookie`: read → 403-if-missing → delete-always → JWT-validate.** Order matters: csrf_state cookie is single-use, so delete BEFORE JWT validation aborts. Otherwise malformed/expired JWT paths leave csrf_state intact for replay-after-shape-fix. Bentham encoded this as a review PATTERN in his scratchpad; worth mirroring here because future BFF endpoints that consume single-use cookies should follow the same shape.
+
+[CONTRACT] **`/auth/login` server-load shape** (what Byrd consumes):
+```typescript
+{ providers: Array<{ id: string; label: string; url: string }> }
+```
+Each `url` is a fully-formed Entu OAuth URL with the csrf_state both as a top-level `&state=` (for the assertion regex pattern Tallis pinned) AND inside the encoded `next=` callback (for Entu to redirect back with). 6 providers in PO-locked order: `smart-id`, `mobile-id`, `id-card`, `google`, `apple`, `e-mail`.
+
+[CONTRACT] **`/auth/callback` server-load shape** (what callback page's client JS consumes): `{ sessionToken: string; db: string }`. NO server-side Entu call (per `expect(event.fetch).not.toHaveBeenCalled()` invariant). Exchange happens client-side via `src/lib/auth/exchange.ts` because Entu's session token is IP-bound and CF Workers don't preserve client IP on outbound.
+
+[DECISION] **Single source of truth for Entu base URL: `src/lib/entu-config.ts` exports `ENTU_API_BASE = 'https://entu.app/api/'`** (path form, trailing slash). Lives OUTSIDE `src/lib/server/` so both server (`client.ts`, `auth/+server.ts`, `auth/login/+page.server.ts`) and client (`auth/exchange.ts`) can import without crossing the server-only boundary. The `DEFAULT_BASE_URL` alias was dropped in CHORE-45 YELLOW-45.2; all consumers now `import { ENTU_API_BASE }` direct.
+
+[DECISION] **Co-located config zone: `src/lib/<topic>-config.ts` is the home for cross-boundary VALUES** (URLs, timeouts, port numbers). Reserve `src/lib/types.ts` for cross-boundary TYPES; reserve `src/lib/server/<feature>/` for server-only feature code. Bentham logged this PATTERN; encode here too for future similar decisions.
+
+### Deferred / open items at session-14 close
+
+- CHORE-43 — Wire CF Git Provider integration (one-time CF↔GitHub OAuth grant) to enable push-to-main auto-deploys. PO-scope.
+- YELLOW-41.3 — JWT signature verification on `/auth/cookie`. Deferred until Entu publishes JWKS or we settle on a verification library.
+- `nodejs_compat` flag removal — could be revisited now that CHORE-47 landed, but defense-in-depth posture stands. Don't remove without a probe-then-implement step.
+- Tallis's `tests/oauth-flow.spec.ts` Playwright suite has all tests `.skip()` pending issue #36 (mock-Entu E2E harness).
+
+---
+
 ## [CHECKPOINT] 2026-05-22 session 13 — #32 merged @ `8fd3ed0`, #35 merged @ `db2040e`
 
 Both PRs landed on main this session. Key durables below; ephemeral PR-detail pruned.

@@ -28,6 +28,18 @@ CHORE-3 (#3) Paraglide i18n is on the carry-forward task queue for session 8 (pe
 
 ---
 
+## Session 14 — CHORE-41 i18n phase (2026-05-22)
+
+[CHECKPOINT] Completed i18n phase for #41 (Real OAuth wiring). Commit `32e837f` on `feat/oauth-wiring`. Handed off to team-lead for Bentham REVIEW routing.
+
+[DECISION] 5 OAuth auth flow keys translated (et/lv/uk). Placeholder translations were drafted against an older English version; updated to match Byrd's final copy. Key changes: added "Please try again." to `auth_callback_failed`; added "Redirecting…" phrase to `auth_callback_success`; introduced "security check" concept + "start again" in `auth_error_csrf_mismatch`; softened `auth_error_missing_session_token` from "no token received" to "did not complete".
+
+[CONVENTION] "Start again" vs "try again" distinction: CSRF error uses `alusta uuesti`/`sāciet no jauna`/`почніть знову` — implies full flow restart, not just button retry. Logged in `i18n-conventions.md`.
+
+(*MVOX:Comenius*)
+
+---
+
 ## Session 13 — CHORE-35 i18n phase (2026-05-22)
 
 [CHECKPOINT] Completed i18n phase for #35 (frontend scaffolding). Commit `98eaa33` on `feat/frontend-scaffolding-mvp`. Handed off to team-lead for Bentham REVIEW routing.

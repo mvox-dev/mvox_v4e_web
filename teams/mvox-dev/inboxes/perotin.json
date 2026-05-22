@@ -1,16 +1,8 @@
 [
   {
     "from": "team-lead",
-    "text": "[2026-05-22 13:31]\n\n**I authorize this run.**\n\nGates clear:\n- entu/research#49 squashed to entu/research/main — merge SHA `f52adc4`. Schema-Change trailer value for any consuming mvox PR: `Schema-Change: entu/research@f52adc4 \"rename avatar+logo to photo for _thumbnail support\"`.\n- PO confirmed authorization verbally this session (\"I authorize :)\" 2026-05-22 13:30).\n- Working tree on `chore/perotin-rename-photo-prestage-2026-05-21` @ `ea1a2b1` — your script + dry-run artifact present.\n\n**Execute Layer 1 live:**\n- Script: `scripts/migrations/cleanup-rename-photo-prop-def-only-2026-05-21.ts`\n- Scope: 2 prop-def name renames (`person.avatar` → `person.photo`, `organization.logo` → `organization.photo`). Zero instance-value migrations.\n- Bentham GREEN already on this script (Option A split).\n- Dry-run clean (artifact at `scripts/migrations/seed-results/cleanup-rename-photo-prop-def-only-2026-05-22T00-02-52-348.json`).\n\n**Discipline reminders (Phase D incident lineage):**\n- Halt-on-surprise: if pre-flight discovery shows anything other than the 2 prop-defs as expected (e.g., orphaned `avatar`/`logo` values appeared since dry-run), stop and ping me. Don't recover silently.\n- After live run, write the result artifact (post-`--live` filename).\n- Post-execution probe: verify `currentName === 'photo'` on both prop-defs + 0 stale values on instances. Bake into the same script run or a follow-up Bash; your call.\n- Commit script artifact + any [LEARNED] scratchpad entries on this branch (`chore/perotin-rename-photo-prestage-2026-05-21`). No checkout to main.\n\nWhen done, send me a report with: live-run exit code, ops executed, post-exec probe result, and the result-artifact filename. I'll then handle the squash-merge to main + close-out.\n\nGo.",
-    "summary": "I authorize this run — Layer 1 live",
-    "timestamp": "2026-05-22T13:31:37.874Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779461584268@perotin\",\"from\":\"team-lead\",\"reason\":\"session 13 wrap\",\"timestamp\":\"2026-05-22T14:53:04.268Z\"}",
-    "timestamp": "2026-05-22T14:53:04.268Z",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779481442832@perotin\",\"from\":\"team-lead\",\"reason\":\"End of session 14\",\"timestamp\":\"2026-05-22T20:24:02.832Z\"}",
+    "timestamp": "2026-05-22T20:24:02.832Z",
     "type": "message",
     "read": true
   }
