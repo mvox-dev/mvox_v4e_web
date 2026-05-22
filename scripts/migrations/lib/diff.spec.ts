@@ -9,7 +9,7 @@ import {
 	type BackfillDataOp,
 	type DeletePropertyOp,
 	type UpdateFormulaOp,
-	type TouchSaveOp
+	type TouchSaveOp,
 } from './diff';
 import type { V4eSchema } from './schema-loader';
 
@@ -23,15 +23,15 @@ const v4e: V4eSchema = {
 			properties: [
 				{ name: 'start_date', type: 'date', required: true },
 				{ name: 'end_date', type: 'date' },
-				{ name: 'description', type: 'text' }
-			]
+				{ name: 'description', type: 'text' },
+			],
 		},
 		{
 			name: 'voice',
 			blurb: 'Vocal range taxonomy',
-			properties: [{ name: 'name', type: 'string' }]
-		}
-	]
+			properties: [{ name: 'name', type: 'string' }],
+		},
+	],
 };
 
 describe('computeAdditiveDiff', () => {
@@ -49,7 +49,7 @@ describe('computeAdditiveDiff', () => {
 
 	it('skips existing types but adds their missing properties as ADD_PROPERTY ops', () => {
 		const dbState: DbTypeState[] = [
-			{ typeId: 'season-id', name: 'season', propertyNames: ['start_date'] }
+			{ typeId: 'season-id', name: 'season', propertyNames: ['start_date'] },
 		];
 		const ops = computeAdditiveDiff(v4e, dbState);
 
@@ -63,25 +63,27 @@ describe('computeAdditiveDiff', () => {
 		expect(adds).toHaveLength(2);
 		expect(adds.map((a) => `${a.parentTypeName}.${a.propertyName}`).sort()).toEqual([
 			'season.description',
-			'season.end_date'
+			'season.end_date',
 		]);
 	});
 
 	it('returns empty ops when db is already at v4E', () => {
 		const dbState: DbTypeState[] = [
 			{ typeId: 's', name: 'season', propertyNames: ['start_date', 'end_date', 'description'] },
-			{ typeId: 'v', name: 'voice', propertyNames: ['name'] }
+			{ typeId: 'v', name: 'voice', propertyNames: ['name'] },
 		];
 		expect(computeAdditiveDiff(v4e, dbState)).toEqual([]);
 	});
 
 	it('ignores db-only types (Phase A is additive, not destructive)', () => {
 		const dbState: DbTypeState[] = [
-			{ typeId: 'role-id', name: 'role', propertyNames: ['name'] } // not in v4E
+			{ typeId: 'role-id', name: 'role', propertyNames: ['name'] }, // not in v4E
 		];
 		const ops = computeAdditiveDiff(v4e, dbState);
 		// Role is left alone; we only add what v4E specifies
-		expect(ops.find((o) => o.kind === 'CREATE_TYPE' && (o as { typeName: string }).typeName === 'role')).toBeUndefined();
+		expect(
+			ops.find((o) => o.kind === 'CREATE_TYPE' && (o as { typeName: string }).typeName === 'role'),
+		).toBeUndefined();
 	});
 
 	it('respects Phase A scope filter — skips properties not in §4.2', () => {
@@ -93,14 +95,14 @@ describe('computeAdditiveDiff', () => {
 				{
 					name: 'person',
 					properties: [
-						{ name: 'bio', type: 'text' },   // in §4.2 — should be added
-						{ name: 'avatar', type: 'file' } // Phase B rename — should be skipped
-					]
-				}
-			]
+						{ name: 'bio', type: 'text' }, // in §4.2 — should be added
+						{ name: 'avatar', type: 'file' }, // Phase B rename — should be skipped
+					],
+				},
+			],
 		};
 		const dbState: DbTypeState[] = [
-			{ typeId: 'person-id', name: 'person', propertyNames: ['photo'] } // existing
+			{ typeId: 'person-id', name: 'person', propertyNames: ['photo'] }, // existing
 		];
 		const ops = computeAdditiveDiff(v4eWithRename, dbState);
 		const adds = ops.filter((o) => o.kind === 'ADD_PROPERTY') as AddPropertyOp[];
@@ -124,20 +126,20 @@ describe('computeAdditiveDiff', () => {
 					properties: [
 						{ name: 'name', type: 'string' },
 						{ name: 'label', type: 'string' },
-						{ name: 'iso_code', type: 'string' }
-					]
-				}
-			]
+						{ name: 'iso_code', type: 'string' },
+					],
+				},
+			],
 		};
 		const dbState: DbTypeState[] = [
-			{ typeId: 'voice-id', name: 'voice', propertyNames: ['name'] } // partial — only `name` landed
+			{ typeId: 'voice-id', name: 'voice', propertyNames: ['name'] }, // partial — only `name` landed
 		];
 		const ops = computeAdditiveDiff(v4e, dbState);
 		const adds = ops.filter((o) => o.kind === 'ADD_PROPERTY') as AddPropertyOp[];
 		expect(adds).toHaveLength(2);
 		expect(adds.map((a) => `${a.parentTypeName}.${a.propertyName}`).sort()).toEqual([
 			'voice.iso_code',
-			'voice.label'
+			'voice.label',
 		]);
 	});
 });
@@ -159,16 +161,17 @@ describe('computePhaseBDiff', () => {
 					typeId: 'section-type-id',
 					name: 'section',
 					propertyNames: ['ordinal', 'name'],
-					propertyIds: { ordinal: 'ordinal-prop-id' }
-				}
+					propertyIds: { ordinal: 'ordinal-prop-id' },
+				},
 			];
 			const ops = computePhaseBDiff(dbState);
-			const sectionOps = ops.filter(o =>
-				(o as { parentType?: string }).parentType === 'section' ||
-				(o as { sourceType?: string }).sourceType === 'section'
+			const sectionOps = ops.filter(
+				(o) =>
+					(o as { parentType?: string }).parentType === 'section' ||
+					(o as { sourceType?: string }).sourceType === 'section',
 			);
 
-			const kinds = sectionOps.map(o => o.kind);
+			const kinds = sectionOps.map((o) => o.kind);
 			const addIdx = kinds.indexOf('ADD_PROPERTY');
 			const backfillIdx = kinds.indexOf('BACKFILL_DATA');
 			const deleteIdx = kinds.indexOf('DELETE_PROPERTY');
@@ -184,11 +187,13 @@ describe('computePhaseBDiff', () => {
 					typeId: 'section-type-id',
 					name: 'section',
 					propertyNames: ['ordinal'],
-					propertyIds: { ordinal: 'ordinal-prop-id' }
-				}
+					propertyIds: { ordinal: 'ordinal-prop-id' },
+				},
 			];
 			const ops = computePhaseBDiff(dbState);
-			const add = ops.find(o => o.kind === 'ADD_PROPERTY' && (o as AddPropertyOp).propertyName === 'display_order') as AddPropertyOp | undefined;
+			const add = ops.find(
+				(o) => o.kind === 'ADD_PROPERTY' && (o as AddPropertyOp).propertyName === 'display_order',
+			) as AddPropertyOp | undefined;
 			expect(add).toBeDefined();
 			expect(add?.parentTypeName).toBe('section');
 		});
@@ -199,11 +204,13 @@ describe('computePhaseBDiff', () => {
 					typeId: 'section-type-id',
 					name: 'section',
 					propertyNames: ['ordinal', 'display_order'],
-					propertyIds: { ordinal: 'ordinal-prop-id', display_order: 'display-order-prop-id' }
-				}
+					propertyIds: { ordinal: 'ordinal-prop-id', display_order: 'display-order-prop-id' },
+				},
 			];
 			const ops = computePhaseBDiff(dbState);
-			const adds = ops.filter(o => o.kind === 'ADD_PROPERTY' && (o as AddPropertyOp).propertyName === 'display_order');
+			const adds = ops.filter(
+				(o) => o.kind === 'ADD_PROPERTY' && (o as AddPropertyOp).propertyName === 'display_order',
+			);
 			expect(adds).toHaveLength(0);
 		});
 
@@ -213,12 +220,13 @@ describe('computePhaseBDiff', () => {
 					typeId: 'section-type-id',
 					name: 'section',
 					propertyNames: ['ordinal'],
-					propertyIds: { ordinal: 'ordinal-prop-id' }
-				}
+					propertyIds: { ordinal: 'ordinal-prop-id' },
+				},
 			];
 			const ops = computePhaseBDiff(dbState);
-			const backfill = ops.find(o => o.kind === 'BACKFILL_DATA' &&
-				(o as BackfillDataOp).sourceProperty === 'ordinal') as BackfillDataOp | undefined;
+			const backfill = ops.find(
+				(o) => o.kind === 'BACKFILL_DATA' && (o as BackfillDataOp).sourceProperty === 'ordinal',
+			) as BackfillDataOp | undefined;
 			expect(backfill).toBeDefined();
 			expect(backfill?.targetProperty).toBe('display_order');
 			expect(backfill?.backfillKind).toBe('number');
@@ -230,12 +238,13 @@ describe('computePhaseBDiff', () => {
 					typeId: 'section-type-id',
 					name: 'section',
 					propertyNames: ['ordinal'],
-					propertyIds: { ordinal: 'ordinal-prop-id' }
-				}
+					propertyIds: { ordinal: 'ordinal-prop-id' },
+				},
 			];
 			const ops = computePhaseBDiff(dbState);
-			const del = ops.find(o => o.kind === 'DELETE_PROPERTY' &&
-				(o as DeletePropertyOp).propertyName === 'ordinal') as DeletePropertyOp | undefined;
+			const del = ops.find(
+				(o) => o.kind === 'DELETE_PROPERTY' && (o as DeletePropertyOp).propertyName === 'ordinal',
+			) as DeletePropertyOp | undefined;
 			expect(del).toBeDefined();
 			expect(del?.propertyDefId).toBe('ordinal-prop-id');
 		});
@@ -248,13 +257,13 @@ describe('computePhaseBDiff', () => {
 					typeId: 'org-type-id',
 					name: 'organization',
 					propertyNames: ['contact_email', 'name'],
-					propertyIds: { contact_email: 'contact-email-prop-id' }
-				}
+					propertyIds: { contact_email: 'contact-email-prop-id' },
+				},
 			];
 			const ops = computePhaseBDiff(dbState);
-			const del = ops.find(o =>
-				o.kind === 'DELETE_PROPERTY' &&
-				(o as DeletePropertyOp).propertyName === 'contact_email'
+			const del = ops.find(
+				(o) =>
+					o.kind === 'DELETE_PROPERTY' && (o as DeletePropertyOp).propertyName === 'contact_email',
 			) as DeletePropertyOp | undefined;
 			expect(del).toBeDefined();
 			expect(del?.verifyPreconditions).toBe(true);
@@ -266,13 +275,13 @@ describe('computePhaseBDiff', () => {
 					typeId: 'org-type-id',
 					name: 'organization',
 					propertyNames: ['name'], // contact_email already gone
-					propertyIds: {}
-				}
+					propertyIds: {},
+				},
 			];
 			const ops = computePhaseBDiff(dbState);
-			const del = ops.find(o =>
-				o.kind === 'DELETE_PROPERTY' &&
-				(o as DeletePropertyOp).propertyName === 'contact_email'
+			const del = ops.find(
+				(o) =>
+					o.kind === 'DELETE_PROPERTY' && (o as DeletePropertyOp).propertyName === 'contact_email',
 			);
 			expect(del).toBeUndefined();
 		});
@@ -285,13 +294,13 @@ describe('computePhaseBDiff', () => {
 					typeId: 'section-type-id',
 					name: 'section',
 					propertyNames: ['member_count'],
-					propertyIds: { member_count: 'member-count-prop-id' }
-				}
+					propertyIds: { member_count: 'member-count-prop-id' },
+				},
 			];
 			const ops = computePhaseBDiff(dbState);
-			const update = ops.find(o =>
-				o.kind === 'UPDATE_FORMULA' &&
-				(o as UpdateFormulaOp).propertyName === 'member_count'
+			const update = ops.find(
+				(o) =>
+					o.kind === 'UPDATE_FORMULA' && (o as UpdateFormulaOp).propertyName === 'member_count',
 			) as UpdateFormulaOp | undefined;
 			expect(update).toBeDefined();
 			expect(update?.parentType).toBe('section');
@@ -306,13 +315,16 @@ describe('computePhaseBDiff', () => {
 					propertyNames: ['member_count'],
 					propertyIds: { member_count: 'member-count-prop-id' },
 					// We'll simulate "current formula matches" via an extended field
-					currentFormulas: { member_count: '(_child.member COUNT) (_child.section.member_count SUM) +' }
-				} as MinimalDbState & { currentFormulas?: Record<string, string> }
+					currentFormulas: {
+						member_count: '(_child.member COUNT) (_child.section.member_count SUM) +',
+					},
+				} as MinimalDbState & { currentFormulas?: Record<string, string> },
 			];
 			// computePhaseBDiff should accept optional currentFormulas on each type state
 			const ops = computePhaseBDiff(dbState as Parameters<typeof computePhaseBDiff>[0]);
-			const updates = ops.filter(o =>
-				o.kind === 'UPDATE_FORMULA' && (o as UpdateFormulaOp).propertyName === 'member_count'
+			const updates = ops.filter(
+				(o) =>
+					o.kind === 'UPDATE_FORMULA' && (o as UpdateFormulaOp).propertyName === 'member_count',
 			);
 			expect(updates).toHaveLength(0);
 		});
@@ -325,13 +337,13 @@ describe('computePhaseBDiff', () => {
 					typeId: 'season-type-id',
 					name: 'season',
 					propertyNames: ['work_count', 'start_date'],
-					propertyIds: { work_count: 'work-count-prop-id' }
-				}
+					propertyIds: { work_count: 'work-count-prop-id' },
+				},
 			];
 			const ops = computePhaseBDiff(dbState);
-			const del = ops.find(o =>
-				o.kind === 'DELETE_PROPERTY' &&
-				(o as DeletePropertyOp).propertyName === 'work_count'
+			const del = ops.find(
+				(o) =>
+					o.kind === 'DELETE_PROPERTY' && (o as DeletePropertyOp).propertyName === 'work_count',
 			) as DeletePropertyOp | undefined;
 			expect(del).toBeDefined();
 		});
@@ -344,14 +356,15 @@ describe('computePhaseBDiff', () => {
 					typeId: 'org-type-id',
 					name: 'organization',
 					propertyNames: ['member_count_per_section'],
-					propertyIds: { member_count_per_section: 'mcp-prop-id' }
-				}
+					propertyIds: { member_count_per_section: 'mcp-prop-id' },
+				},
 			];
 			const ops = computePhaseBDiff(dbState);
-			const touch = ops.find(o =>
-				o.kind === 'TOUCH_SAVE' &&
-				(o as TouchSaveOp).parentType === 'organization' &&
-				(o as TouchSaveOp).propertyName === 'member_count_per_section'
+			const touch = ops.find(
+				(o) =>
+					o.kind === 'TOUCH_SAVE' &&
+					(o as TouchSaveOp).parentType === 'organization' &&
+					(o as TouchSaveOp).propertyName === 'member_count_per_section',
 			) as TouchSaveOp | undefined;
 			expect(touch).toBeDefined();
 		});
@@ -362,18 +375,18 @@ describe('computePhaseBDiff', () => {
 					typeId: 'section-type-id',
 					name: 'section',
 					propertyNames: ['member_count'],
-					propertyIds: { member_count: 'mc-id' }
+					propertyIds: { member_count: 'mc-id' },
 				},
 				{
 					typeId: 'org-type-id',
 					name: 'organization',
 					propertyNames: ['member_count_per_section'],
-					propertyIds: { member_count_per_section: 'mcp-id' }
-				}
+					propertyIds: { member_count_per_section: 'mcp-id' },
+				},
 			];
 			const ops = computePhaseBDiff(dbState);
-			const lastUpdateIdx = ops.reduce((max, o, i) => o.kind === 'UPDATE_FORMULA' ? i : max, -1);
-			const firstTouchIdx = ops.findIndex(o => o.kind === 'TOUCH_SAVE');
+			const lastUpdateIdx = ops.reduce((max, o, i) => (o.kind === 'UPDATE_FORMULA' ? i : max), -1);
+			const firstTouchIdx = ops.findIndex((o) => o.kind === 'TOUCH_SAVE');
 			if (lastUpdateIdx >= 0 && firstTouchIdx >= 0) {
 				expect(firstTouchIdx).toBeGreaterThan(lastUpdateIdx);
 			}
@@ -389,21 +402,21 @@ describe('computePhaseBDiff', () => {
 					typeId: 'work-type-id',
 					name: 'work',
 					propertyNames: ['arranger', 'title'],
-					propertyIds: { arranger: 'work-arranger-prop-id' }
+					propertyIds: { arranger: 'work-arranger-prop-id' },
 				},
 				{
 					typeId: 'edition-type-id',
 					name: 'edition',
 					propertyNames: ['arranger'],
-					propertyIds: { arranger: 'edition-arranger-prop-id' }
-				}
+					propertyIds: { arranger: 'edition-arranger-prop-id' },
+				},
 			];
 			const ops = computePhaseBDiff(dbState);
 			const backfill = ops.find(
 				(o) =>
 					o.kind === 'BACKFILL_DATA' &&
 					(o as BackfillDataOp).sourceProperty === 'arranger' &&
-					(o as BackfillDataOp).parentType === 'work'
+					(o as BackfillDataOp).parentType === 'work',
 			) as BackfillDataOp | undefined;
 			expect(backfill).toBeDefined();
 			expect(backfill?.backfillKind).toBe('parent_copy');
@@ -413,7 +426,7 @@ describe('computePhaseBDiff', () => {
 				(o) =>
 					o.kind === 'DELETE_PROPERTY' &&
 					(o as DeletePropertyOp).parentType === 'work' &&
-					(o as DeletePropertyOp).propertyName === 'arranger'
+					(o as DeletePropertyOp).propertyName === 'arranger',
 			) as DeletePropertyOp | undefined;
 			expect(del).toBeDefined();
 			expect(del?.propertyDefId).toBe('work-arranger-prop-id');
@@ -425,24 +438,24 @@ describe('computePhaseBDiff', () => {
 					typeId: 'work-type-id',
 					name: 'work',
 					propertyNames: ['arranger'],
-					propertyIds: { arranger: 'work-arranger-prop-id' }
+					propertyIds: { arranger: 'work-arranger-prop-id' },
 				},
 				{
 					typeId: 'edition-type-id',
 					name: 'edition',
 					propertyNames: ['arranger'],
-					propertyIds: { arranger: 'edition-arranger-prop-id' }
-				}
+					propertyIds: { arranger: 'edition-arranger-prop-id' },
+				},
 			];
 			const ops = computePhaseBDiff(dbState);
 			const backfillIdx = ops.findIndex(
-				(o) => o.kind === 'BACKFILL_DATA' && (o as BackfillDataOp).parentType === 'work'
+				(o) => o.kind === 'BACKFILL_DATA' && (o as BackfillDataOp).parentType === 'work',
 			);
 			const deleteIdx = ops.findIndex(
 				(o) =>
 					o.kind === 'DELETE_PROPERTY' &&
 					(o as DeletePropertyOp).parentType === 'work' &&
-					(o as DeletePropertyOp).propertyName === 'arranger'
+					(o as DeletePropertyOp).propertyName === 'arranger',
 			);
 			expect(backfillIdx).toBeGreaterThanOrEqual(0);
 			expect(deleteIdx).toBeGreaterThan(backfillIdx);
@@ -454,24 +467,24 @@ describe('computePhaseBDiff', () => {
 					typeId: 'work-type-id',
 					name: 'work',
 					propertyNames: ['title'], // arranger already gone
-					propertyIds: {}
+					propertyIds: {},
 				},
 				{
 					typeId: 'edition-type-id',
 					name: 'edition',
 					propertyNames: ['arranger'],
-					propertyIds: { arranger: 'edition-arranger-prop-id' }
-				}
+					propertyIds: { arranger: 'edition-arranger-prop-id' },
+				},
 			];
 			const ops = computePhaseBDiff(dbState);
 			const backfill = ops.find(
-				(o) => o.kind === 'BACKFILL_DATA' && (o as BackfillDataOp).parentType === 'work'
+				(o) => o.kind === 'BACKFILL_DATA' && (o as BackfillDataOp).parentType === 'work',
 			);
 			const del = ops.find(
 				(o) =>
 					o.kind === 'DELETE_PROPERTY' &&
 					(o as DeletePropertyOp).parentType === 'work' &&
-					(o as DeletePropertyOp).propertyName === 'arranger'
+					(o as DeletePropertyOp).propertyName === 'arranger',
 			);
 			expect(backfill).toBeUndefined();
 			expect(del).toBeUndefined();
@@ -489,24 +502,24 @@ describe('computePhaseBDiff', () => {
 					typeId: 'work-type-id',
 					name: 'work',
 					propertyNames: ['arranger'],
-					propertyIds: { arranger: 'work-arranger-prop-id' }
+					propertyIds: { arranger: 'work-arranger-prop-id' },
 				},
 				{
 					typeId: 'edition-type-id',
 					name: 'edition',
 					propertyNames: ['arranger'],
-					propertyIds: { arranger: 'edition-arranger-prop-id' }
-				}
+					propertyIds: { arranger: 'edition-arranger-prop-id' },
+				},
 			];
 			const ops = computePhaseBDiff(dbState);
 			const backfill = ops.find(
-				(o) =>
-					o.kind === 'BACKFILL_DATA' &&
-					(o as BackfillDataOp).backfillKind === 'parent_copy'
+				(o) => o.kind === 'BACKFILL_DATA' && (o as BackfillDataOp).backfillKind === 'parent_copy',
 			) as BackfillDataOp | undefined;
 			expect(backfill).toBeDefined();
 			// targetParentType must name the type to iterate (edition), not the source (work)
-			expect((backfill as BackfillDataOp & { targetParentType?: string }).targetParentType).toBe('edition');
+			expect((backfill as BackfillDataOp & { targetParentType?: string }).targetParentType).toBe(
+				'edition',
+			);
 		});
 
 		it('parentType on parent_copy op remains the source type (work)', () => {
@@ -515,20 +528,18 @@ describe('computePhaseBDiff', () => {
 					typeId: 'work-type-id',
 					name: 'work',
 					propertyNames: ['arranger'],
-					propertyIds: { arranger: 'work-arranger-prop-id' }
+					propertyIds: { arranger: 'work-arranger-prop-id' },
 				},
 				{
 					typeId: 'edition-type-id',
 					name: 'edition',
 					propertyNames: ['arranger'],
-					propertyIds: { arranger: 'edition-arranger-prop-id' }
-				}
+					propertyIds: { arranger: 'edition-arranger-prop-id' },
+				},
 			];
 			const ops = computePhaseBDiff(dbState);
 			const backfill = ops.find(
-				(o) =>
-					o.kind === 'BACKFILL_DATA' &&
-					(o as BackfillDataOp).backfillKind === 'parent_copy'
+				(o) => o.kind === 'BACKFILL_DATA' && (o as BackfillDataOp).backfillKind === 'parent_copy',
 			) as BackfillDataOp | undefined;
 			expect(backfill?.parentType).toBe('work');
 		});
@@ -546,16 +557,16 @@ describe('computePhaseBDiff', () => {
 					propertyNames: ['forename', 'surname', 'name'],
 					propertyIds: {
 						forename: 'person-forename-prop-id',
-						surname: 'person-surname-prop-id'
-					}
-				}
+						surname: 'person-surname-prop-id',
+					},
+				},
 			];
 			const ops = computePhaseBDiff(dbState);
 			const delForename = ops.find(
 				(o) =>
 					o.kind === 'DELETE_PROPERTY' &&
 					(o as DeletePropertyOp).parentType === 'person' &&
-					(o as DeletePropertyOp).propertyName === 'forename'
+					(o as DeletePropertyOp).propertyName === 'forename',
 			);
 			expect(delForename).toBeUndefined();
 		});
@@ -568,16 +579,16 @@ describe('computePhaseBDiff', () => {
 					propertyNames: ['forename', 'surname'],
 					propertyIds: {
 						forename: 'person-forename-prop-id',
-						surname: 'person-surname-prop-id'
-					}
-				}
+						surname: 'person-surname-prop-id',
+					},
+				},
 			];
 			const ops = computePhaseBDiff(dbState);
 			const delSurname = ops.find(
 				(o) =>
 					o.kind === 'DELETE_PROPERTY' &&
 					(o as DeletePropertyOp).parentType === 'person' &&
-					(o as DeletePropertyOp).propertyName === 'surname'
+					(o as DeletePropertyOp).propertyName === 'surname',
 			);
 			expect(delSurname).toBeUndefined();
 		});
@@ -588,14 +599,12 @@ describe('computePhaseBDiff', () => {
 					typeId: 'person-type-id',
 					name: 'person',
 					propertyNames: ['name'], // forename + surname already deleted
-					propertyIds: {}
-				}
+					propertyIds: {},
+				},
 			];
 			const ops = computePhaseBDiff(dbState);
 			const personDeletes = ops.filter(
-				(o) =>
-					o.kind === 'DELETE_PROPERTY' &&
-					(o as DeletePropertyOp).parentType === 'person'
+				(o) => o.kind === 'DELETE_PROPERTY' && (o as DeletePropertyOp).parentType === 'person',
 			);
 			expect(personDeletes).toHaveLength(0);
 		});
@@ -610,15 +619,15 @@ describe('computePhaseBDiff', () => {
 					typeId: 'work-type-id',
 					name: 'work',
 					propertyNames: ['edition_count', 'title'],
-					propertyIds: { edition_count: 'work-edition-count-prop-id' }
-				}
+					propertyIds: { edition_count: 'work-edition-count-prop-id' },
+				},
 			];
 			const ops = computePhaseBDiff(dbState);
 			const del = ops.find(
 				(o) =>
 					o.kind === 'DELETE_PROPERTY' &&
 					(o as DeletePropertyOp).parentType === 'work' &&
-					(o as DeletePropertyOp).propertyName === 'edition_count'
+					(o as DeletePropertyOp).propertyName === 'edition_count',
 			) as DeletePropertyOp | undefined;
 			expect(del).toBeDefined();
 			expect(del?.propertyDefId).toBe('work-edition-count-prop-id');
@@ -630,15 +639,15 @@ describe('computePhaseBDiff', () => {
 					typeId: 'work-type-id',
 					name: 'work',
 					propertyNames: ['title'], // edition_count already gone
-					propertyIds: {}
-				}
+					propertyIds: {},
+				},
 			];
 			const ops = computePhaseBDiff(dbState);
 			const del = ops.find(
 				(o) =>
 					o.kind === 'DELETE_PROPERTY' &&
 					(o as DeletePropertyOp).parentType === 'work' &&
-					(o as DeletePropertyOp).propertyName === 'edition_count'
+					(o as DeletePropertyOp).propertyName === 'edition_count',
 			);
 			expect(del).toBeUndefined();
 		});
@@ -653,15 +662,15 @@ describe('computePhaseBDiff', () => {
 					typeId: 'org-type-id',
 					name: 'organization',
 					propertyNames: ['member_count', 'name'],
-					propertyIds: { member_count: 'org-member-count-prop-id' }
-				}
+					propertyIds: { member_count: 'org-member-count-prop-id' },
+				},
 			];
 			const ops = computePhaseBDiff(dbState);
 			const del = ops.find(
 				(o) =>
 					o.kind === 'DELETE_PROPERTY' &&
 					(o as DeletePropertyOp).parentType === 'organization' &&
-					(o as DeletePropertyOp).propertyName === 'member_count'
+					(o as DeletePropertyOp).propertyName === 'member_count',
 			) as DeletePropertyOp | undefined;
 			expect(del).toBeDefined();
 			expect(del?.propertyDefId).toBe('org-member-count-prop-id');
@@ -673,15 +682,15 @@ describe('computePhaseBDiff', () => {
 					typeId: 'org-type-id',
 					name: 'organization',
 					propertyNames: ['member_count'],
-					propertyIds: { member_count: 'org-member-count-prop-id' }
-				}
+					propertyIds: { member_count: 'org-member-count-prop-id' },
+				},
 			];
 			const ops = computePhaseBDiff(dbState);
 			const del = ops.find(
 				(o) =>
 					o.kind === 'DELETE_PROPERTY' &&
 					(o as DeletePropertyOp).parentType === 'organization' &&
-					(o as DeletePropertyOp).propertyName === 'member_count'
+					(o as DeletePropertyOp).propertyName === 'member_count',
 			) as DeletePropertyOp | undefined;
 			expect(del?.verifyPreconditions).toBe(true);
 		});
@@ -692,15 +701,15 @@ describe('computePhaseBDiff', () => {
 					typeId: 'org-type-id',
 					name: 'organization',
 					propertyNames: ['name'], // member_count already gone
-					propertyIds: {}
-				}
+					propertyIds: {},
+				},
 			];
 			const ops = computePhaseBDiff(dbState);
 			const del = ops.find(
 				(o) =>
 					o.kind === 'DELETE_PROPERTY' &&
 					(o as DeletePropertyOp).parentType === 'organization' &&
-					(o as DeletePropertyOp).propertyName === 'member_count'
+					(o as DeletePropertyOp).propertyName === 'member_count',
 			);
 			expect(del).toBeUndefined();
 		});
@@ -713,23 +722,31 @@ describe('computePhaseBDiff', () => {
 					typeId: 'section-type-id',
 					name: 'section',
 					propertyNames: ['ordinal'],
-					propertyIds: { ordinal: 'ordinal-prop-id' }
+					propertyIds: { ordinal: 'ordinal-prop-id' },
 				},
 				{
 					typeId: 'org-type-id',
 					name: 'organization',
 					propertyNames: ['contact_email'],
-					propertyIds: { contact_email: 'ce-prop-id' }
-				}
+					propertyIds: { contact_email: 'ce-prop-id' },
+				},
 			];
 			const ops = computePhaseBDiff(dbState);
 			// Last BACKFILL_DATA index should be before first §3 DELETE
 			// §3 deletes have verifyPreconditions: true, §1 deletes come after their own backfill
-			const backfillIndices = ops.reduce<number[]>((acc, o, i) =>
-				o.kind === 'BACKFILL_DATA' ? [...acc, i] : acc, []);
-			const section3DeleteIndices = ops.reduce<number[]>((acc, o, i) =>
-				(o.kind === 'DELETE_PROPERTY' && (o as DeletePropertyOp).verifyPreconditions &&
-				(o as DeletePropertyOp).propertyName === 'contact_email') ? [...acc, i] : acc, []);
+			const backfillIndices = ops.reduce<number[]>(
+				(acc, o, i) => (o.kind === 'BACKFILL_DATA' ? [...acc, i] : acc),
+				[],
+			);
+			const section3DeleteIndices = ops.reduce<number[]>(
+				(acc, o, i) =>
+					o.kind === 'DELETE_PROPERTY' &&
+					(o as DeletePropertyOp).verifyPreconditions &&
+					(o as DeletePropertyOp).propertyName === 'contact_email'
+						? [...acc, i]
+						: acc,
+				[],
+			);
 
 			if (backfillIndices.length > 0 && section3DeleteIndices.length > 0) {
 				expect(Math.max(...backfillIndices)).toBeLessThan(Math.min(...section3DeleteIndices));

@@ -32,11 +32,11 @@ const DEFAULT_PAGE_SIZE = 200;
 
 async function fetchEntity(
 	client: EntuClient,
-	entityId: string
+	entityId: string,
 ): Promise<{ _id: string; [key: string]: unknown }> {
 	const url = `${client.apiBase}/${client.db}/entity/${entityId}`;
 	const res = await fetch(url, {
-		headers: { Authorization: `Bearer ${client.jwt}` }
+		headers: { Authorization: `Bearer ${client.jwt}` },
 	});
 	if (!res.ok) {
 		throw new Error(`entity fetch failed: ${res.status} ${await res.text()}`);
@@ -47,7 +47,7 @@ async function fetchEntity(
 
 export async function takeSnapshot(
 	client: EntuClient,
-	opts: SnapshotOptions
+	opts: SnapshotOptions,
 ): Promise<SnapshotResult> {
 	const now = opts.now ?? (() => new Date().toISOString());
 
@@ -56,7 +56,7 @@ export async function takeSnapshot(
 			entityCount: 0,
 			snapshotPath: null,
 			sha256: null,
-			skipped: true
+			skipped: true,
 		};
 	}
 
@@ -67,7 +67,7 @@ export async function takeSnapshot(
 	while (true) {
 		const url = `${client.apiBase}/${client.db}/entity?skip=${skip}&limit=${pageSize}`;
 		const res = await fetch(url, {
-			headers: { Authorization: `Bearer ${client.jwt}` }
+			headers: { Authorization: `Bearer ${client.jwt}` },
 		});
 		if (!res.ok) {
 			throw new Error(`snapshot fetch failed: ${res.status} ${await res.text()}`);
@@ -88,7 +88,7 @@ export async function takeSnapshot(
 		snapshotAt,
 		db: client.db,
 		entityCount: entities.length,
-		entities
+		entities,
 	};
 	const json = JSON.stringify(payload, null, 2);
 	const sha256 = createHash('sha256').update(json).digest('hex');
@@ -98,21 +98,18 @@ export async function takeSnapshot(
 			entityCount: entities.length,
 			snapshotPath: null,
 			sha256,
-			dryRun: true
+			dryRun: true,
 		};
 	}
 
 	await mkdir(opts.snapshotDir, { recursive: true });
 	const stamp = snapshotAt.replace(/[:.]/g, '-');
-	const snapshotPath = resolve(
-		opts.snapshotDir,
-		`polyphony-pre-phase-b-${stamp}.json`
-	);
+	const snapshotPath = resolve(opts.snapshotDir, `polyphony-pre-phase-b-${stamp}.json`);
 	await writeFile(snapshotPath, json, 'utf8');
 
 	return {
 		entityCount: entities.length,
 		snapshotPath,
-		sha256
+		sha256,
 	};
 }

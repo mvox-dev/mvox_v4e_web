@@ -11,7 +11,7 @@ import type { EntuClient } from './entu-client';
 const client: EntuClient = {
 	apiBase: 'https://api.entu.app',
 	db: 'polyphony',
-	jwt: 'test-jwt'
+	jwt: 'test-jwt',
 };
 
 let tempDir: string;
@@ -29,7 +29,7 @@ function makeEntity(id: string, type: string) {
 	return {
 		_id: id,
 		_type: [{ string: type }],
-		name: [{ string: `Entity ${id}` }]
+		name: [{ string: `Entity ${id}` }],
 	};
 }
 
@@ -40,19 +40,19 @@ describe('takeSnapshot', () => {
 			const fetchMock = vi.spyOn(globalThis, 'fetch');
 			// First page: returns all 2 entities, count=2
 			fetchMock.mockResolvedValueOnce(
-				new Response(JSON.stringify({ entities, count: 2 }), { status: 200 })
+				new Response(JSON.stringify({ entities, count: 2 }), { status: 200 }),
 			);
 			// Per-entity GETs (unconditional after list)
 			for (const e of entities) {
 				fetchMock.mockResolvedValueOnce(
-					new Response(JSON.stringify({ entity: e }), { status: 200 })
+					new Response(JSON.stringify({ entity: e }), { status: 200 }),
 				);
 			}
 
 			const result: SnapshotResult = await takeSnapshot(client, {
 				snapshotDir: tempDir,
 				pageSize: 100,
-				now: () => '2026-05-20T04:00:00Z'
+				now: () => '2026-05-20T04:00:00Z',
 			});
 
 			expect(result.entityCount).toBe(2);
@@ -68,15 +68,15 @@ describe('takeSnapshot', () => {
 			const fetchMock = vi.spyOn(globalThis, 'fetch');
 			const e1 = makeEntity('e1', 'org');
 			fetchMock.mockResolvedValueOnce(
-				new Response(JSON.stringify({ entities: [e1], count: 1 }), { status: 200 })
+				new Response(JSON.stringify({ entities: [e1], count: 1 }), { status: 200 }),
 			);
 			fetchMock.mockResolvedValueOnce(
-				new Response(JSON.stringify({ entity: e1 }), { status: 200 })
+				new Response(JSON.stringify({ entity: e1 }), { status: 200 }),
 			);
 
 			const result = await takeSnapshot(client, {
 				snapshotDir: tempDir,
-				now: () => '2026-05-20T04:00:00Z'
+				now: () => '2026-05-20T04:00:00Z',
 			});
 
 			const fileContent = await readFile(result.snapshotPath, 'utf8');
@@ -100,23 +100,23 @@ describe('takeSnapshot', () => {
 			const fetchMock = vi.spyOn(globalThis, 'fetch');
 			// Page 1: count=3 (total), entities=[e1,e2]
 			fetchMock.mockResolvedValueOnce(
-				new Response(JSON.stringify({ entities: page1, count: 3 }), { status: 200 })
+				new Response(JSON.stringify({ entities: page1, count: 3 }), { status: 200 }),
 			);
 			// Page 2: entities=[e3]
 			fetchMock.mockResolvedValueOnce(
-				new Response(JSON.stringify({ entities: page2, count: 3 }), { status: 200 })
+				new Response(JSON.stringify({ entities: page2, count: 3 }), { status: 200 }),
 			);
 			// Per-entity GETs for all 3
 			for (const e of [...page1, ...page2]) {
 				fetchMock.mockResolvedValueOnce(
-					new Response(JSON.stringify({ entity: e }), { status: 200 })
+					new Response(JSON.stringify({ entity: e }), { status: 200 }),
 				);
 			}
 
 			const result = await takeSnapshot(client, {
 				snapshotDir: tempDir,
 				pageSize: 2,
-				now: () => '2026-05-20T04:00:00Z'
+				now: () => '2026-05-20T04:00:00Z',
 			});
 
 			expect(result.entityCount).toBe(3);
@@ -128,16 +128,16 @@ describe('takeSnapshot', () => {
 			const fetchMock = vi.spyOn(globalThis, 'fetch');
 			const e1 = makeEntity('e1', 'org');
 			fetchMock.mockResolvedValueOnce(
-				new Response(JSON.stringify({ entities: [e1], count: 1 }), { status: 200 })
+				new Response(JSON.stringify({ entities: [e1], count: 1 }), { status: 200 }),
 			);
 			fetchMock.mockResolvedValueOnce(
-				new Response(JSON.stringify({ entity: e1 }), { status: 200 })
+				new Response(JSON.stringify({ entity: e1 }), { status: 200 }),
 			);
 
 			await takeSnapshot(client, {
 				snapshotDir: tempDir,
 				pageSize: 50,
-				now: () => '2026-05-20T04:00:00Z'
+				now: () => '2026-05-20T04:00:00Z',
 			});
 
 			const [url] = fetchMock.mock.calls[0] as [string, RequestInit];
@@ -150,18 +150,18 @@ describe('takeSnapshot', () => {
 			const page = [makeEntity('e1', 'org'), makeEntity('e2', 'org')];
 			// count=2, return both on first page — should not make a second list call
 			fetchMock.mockResolvedValueOnce(
-				new Response(JSON.stringify({ entities: page, count: 2 }), { status: 200 })
+				new Response(JSON.stringify({ entities: page, count: 2 }), { status: 200 }),
 			);
 			for (const e of page) {
 				fetchMock.mockResolvedValueOnce(
-					new Response(JSON.stringify({ entity: e }), { status: 200 })
+					new Response(JSON.stringify({ entity: e }), { status: 200 }),
 				);
 			}
 
 			await takeSnapshot(client, {
 				snapshotDir: tempDir,
 				pageSize: 100,
-				now: () => '2026-05-20T04:00:00Z'
+				now: () => '2026-05-20T04:00:00Z',
 			});
 
 			// 1 list call + 2 per-entity GETs = 3 (no second list page)
@@ -176,26 +176,22 @@ describe('takeSnapshot', () => {
 			// Run 1: list + GET
 			fetchMock
 				.mockResolvedValueOnce(
-					new Response(JSON.stringify({ entities: [e1], count: 1 }), { status: 200 })
+					new Response(JSON.stringify({ entities: [e1], count: 1 }), { status: 200 }),
 				)
-				.mockResolvedValueOnce(
-					new Response(JSON.stringify({ entity: e1 }), { status: 200 })
-				)
+				.mockResolvedValueOnce(new Response(JSON.stringify({ entity: e1 }), { status: 200 }))
 				// Run 2: same data
 				.mockResolvedValueOnce(
-					new Response(JSON.stringify({ entities: [e1], count: 1 }), { status: 200 })
+					new Response(JSON.stringify({ entities: [e1], count: 1 }), { status: 200 }),
 				)
-				.mockResolvedValueOnce(
-					new Response(JSON.stringify({ entity: e1 }), { status: 200 })
-				);
+				.mockResolvedValueOnce(new Response(JSON.stringify({ entity: e1 }), { status: 200 }));
 
 			const result1 = await takeSnapshot(client, {
 				snapshotDir: tempDir,
-				now: () => '2026-05-20T04:00:00Z'
+				now: () => '2026-05-20T04:00:00Z',
 			});
 			const result2 = await takeSnapshot(client, {
 				snapshotDir: tempDir,
-				now: () => '2026-05-20T04:00:00Z'
+				now: () => '2026-05-20T04:00:00Z',
 			});
 
 			expect(result1.sha256).toBe(result2.sha256);
@@ -207,25 +203,21 @@ describe('takeSnapshot', () => {
 			const fetchMock = vi.spyOn(globalThis, 'fetch');
 			fetchMock
 				.mockResolvedValueOnce(
-					new Response(JSON.stringify({ entities: [e1], count: 1 }), { status: 200 })
+					new Response(JSON.stringify({ entities: [e1], count: 1 }), { status: 200 }),
 				)
+				.mockResolvedValueOnce(new Response(JSON.stringify({ entity: e1 }), { status: 200 }))
 				.mockResolvedValueOnce(
-					new Response(JSON.stringify({ entity: e1 }), { status: 200 })
+					new Response(JSON.stringify({ entities: [e2], count: 1 }), { status: 200 }),
 				)
-				.mockResolvedValueOnce(
-					new Response(JSON.stringify({ entities: [e2], count: 1 }), { status: 200 })
-				)
-				.mockResolvedValueOnce(
-					new Response(JSON.stringify({ entity: e2 }), { status: 200 })
-				);
+				.mockResolvedValueOnce(new Response(JSON.stringify({ entity: e2 }), { status: 200 }));
 
 			const result1 = await takeSnapshot(client, {
 				snapshotDir: tempDir,
-				now: () => '2026-05-20T04:00:00Z'
+				now: () => '2026-05-20T04:00:00Z',
 			});
 			const result2 = await takeSnapshot(client, {
 				snapshotDir: tempDir,
-				now: () => '2026-05-20T04:01:00Z'
+				now: () => '2026-05-20T04:01:00Z',
 			});
 
 			expect(result1.sha256).not.toBe(result2.sha256);
@@ -237,16 +229,16 @@ describe('takeSnapshot', () => {
 			const fetchMock = vi.spyOn(globalThis, 'fetch');
 			const e1 = makeEntity('e1', 'org');
 			fetchMock.mockResolvedValueOnce(
-				new Response(JSON.stringify({ entities: [e1], count: 1 }), { status: 200 })
+				new Response(JSON.stringify({ entities: [e1], count: 1 }), { status: 200 }),
 			);
 			fetchMock.mockResolvedValueOnce(
-				new Response(JSON.stringify({ entity: e1 }), { status: 200 })
+				new Response(JSON.stringify({ entity: e1 }), { status: 200 }),
 			);
 
 			const result = await takeSnapshot(client, {
 				snapshotDir: tempDir,
 				dryRun: true,
-				now: () => '2026-05-20T04:00:00Z'
+				now: () => '2026-05-20T04:00:00Z',
 			});
 
 			expect(result.dryRun).toBe(true);
@@ -262,7 +254,7 @@ describe('takeSnapshot', () => {
 			const result = await takeSnapshot(client, {
 				snapshotDir: tempDir,
 				skipSnapshot: true,
-				now: () => '2026-05-20T04:00:00Z'
+				now: () => '2026-05-20T04:00:00Z',
 			});
 
 			expect(result.skipped).toBe(true);
@@ -279,8 +271,8 @@ describe('takeSnapshot', () => {
 			await expect(
 				takeSnapshot(client, {
 					snapshotDir: tempDir,
-					now: () => '2026-05-20T04:00:00Z'
-				})
+					now: () => '2026-05-20T04:00:00Z',
+				}),
 			).rejects.toThrow(/500/);
 		});
 	});
@@ -298,10 +290,10 @@ describe('takeSnapshot', () => {
 				new Response(
 					JSON.stringify({
 						entities: [{ _id: 'e1' }, { _id: 'e2' }],
-						count: 2
+						count: 2,
 					}),
-					{ status: 200 }
-				)
+					{ status: 200 },
+				),
 			);
 			// Full payload for e1
 			fetchMock.mockResolvedValueOnce(
@@ -311,11 +303,11 @@ describe('takeSnapshot', () => {
 							_id: 'e1',
 							_type: [{ string: 'organization' }],
 							name: [{ string: 'Tallinna Kammerkoor' }],
-							contact_email: [{ string: 'info@kammerkoor.ee' }]
-						}
+							contact_email: [{ string: 'info@kammerkoor.ee' }],
+						},
 					}),
-					{ status: 200 }
-				)
+					{ status: 200 },
+				),
 			);
 			// Full payload for e2
 			fetchMock.mockResolvedValueOnce(
@@ -325,16 +317,16 @@ describe('takeSnapshot', () => {
 							_id: 'e2',
 							_type: [{ string: 'member' }],
 							name: [{ string: 'Jüri Mets' }],
-							voice: [{ reference: 'voice-tenor-id' }]
-						}
+							voice: [{ reference: 'voice-tenor-id' }],
+						},
 					}),
-					{ status: 200 }
-				)
+					{ status: 200 },
+				),
 			);
 
 			await takeSnapshot(client, {
 				snapshotDir: tempDir,
-				now: () => '2026-05-20T04:00:00Z'
+				now: () => '2026-05-20T04:00:00Z',
 			});
 
 			// 1 list call + 2 per-entity calls
@@ -350,10 +342,7 @@ describe('takeSnapshot', () => {
 			const fetchMock = vi.spyOn(globalThis, 'fetch');
 
 			fetchMock.mockResolvedValueOnce(
-				new Response(
-					JSON.stringify({ entities: [{ _id: 'e1' }], count: 1 }),
-					{ status: 200 }
-				)
+				new Response(JSON.stringify({ entities: [{ _id: 'e1' }], count: 1 }), { status: 200 }),
 			);
 			fetchMock.mockResolvedValueOnce(
 				new Response(
@@ -363,16 +352,16 @@ describe('takeSnapshot', () => {
 							_type: [{ string: 'section' }],
 							name: [{ string: 'Sopranod' }],
 							ordinal: [{ number: 1 }],
-							voice_type: [{ string: 'soprano' }]
-						}
+							voice_type: [{ string: 'soprano' }],
+						},
 					}),
-					{ status: 200 }
-				)
+					{ status: 200 },
+				),
 			);
 
 			const result = await takeSnapshot(client, {
 				snapshotDir: tempDir,
-				now: () => '2026-05-20T04:00:00Z'
+				now: () => '2026-05-20T04:00:00Z',
 			});
 
 			const fileContent = await readFile(result.snapshotPath!, 'utf8');
@@ -392,32 +381,30 @@ describe('takeSnapshot', () => {
 			// Two runs: same entity, but different full-payload data
 			// Run 1
 			fetchMock.mockResolvedValueOnce(
-				new Response(JSON.stringify({ entities: [{ _id: 'e1' }], count: 1 }), { status: 200 })
+				new Response(JSON.stringify({ entities: [{ _id: 'e1' }], count: 1 }), { status: 200 }),
 			);
 			fetchMock.mockResolvedValueOnce(
-				new Response(
-					JSON.stringify({ entity: { _id: 'e1', name: [{ string: 'Version A' }] } }),
-					{ status: 200 }
-				)
+				new Response(JSON.stringify({ entity: { _id: 'e1', name: [{ string: 'Version A' }] } }), {
+					status: 200,
+				}),
 			);
 			// Run 2
 			fetchMock.mockResolvedValueOnce(
-				new Response(JSON.stringify({ entities: [{ _id: 'e1' }], count: 1 }), { status: 200 })
+				new Response(JSON.stringify({ entities: [{ _id: 'e1' }], count: 1 }), { status: 200 }),
 			);
 			fetchMock.mockResolvedValueOnce(
-				new Response(
-					JSON.stringify({ entity: { _id: 'e1', name: [{ string: 'Version B' }] } }),
-					{ status: 200 }
-				)
+				new Response(JSON.stringify({ entity: { _id: 'e1', name: [{ string: 'Version B' }] } }), {
+					status: 200,
+				}),
 			);
 
 			const result1 = await takeSnapshot(client, {
 				snapshotDir: tempDir,
-				now: () => '2026-05-20T04:00:00Z'
+				now: () => '2026-05-20T04:00:00Z',
 			});
 			const result2 = await takeSnapshot(client, {
 				snapshotDir: tempDir,
-				now: () => '2026-05-20T04:01:00Z'
+				now: () => '2026-05-20T04:01:00Z',
 			});
 
 			// Different full payloads → different sha256 values
@@ -428,19 +415,18 @@ describe('takeSnapshot', () => {
 			const fetchMock = vi.spyOn(globalThis, 'fetch');
 
 			fetchMock.mockResolvedValueOnce(
-				new Response(JSON.stringify({ entities: [{ _id: 'e1' }], count: 1 }), { status: 200 })
+				new Response(JSON.stringify({ entities: [{ _id: 'e1' }], count: 1 }), { status: 200 }),
 			);
 			fetchMock.mockResolvedValueOnce(
-				new Response(
-					JSON.stringify({ entity: { _id: 'e1', name: [{ string: 'Org' }] } }),
-					{ status: 200 }
-				)
+				new Response(JSON.stringify({ entity: { _id: 'e1', name: [{ string: 'Org' }] } }), {
+					status: 200,
+				}),
 			);
 
 			const result = await takeSnapshot(client, {
 				snapshotDir: tempDir,
 				dryRun: true,
-				now: () => '2026-05-20T04:00:00Z'
+				now: () => '2026-05-20T04:00:00Z',
 			});
 
 			expect(result.dryRun).toBe(true);
@@ -455,7 +441,7 @@ describe('takeSnapshot', () => {
 			const fetchMock = vi.spyOn(globalThis, 'fetch');
 
 			fetchMock.mockResolvedValueOnce(
-				new Response(JSON.stringify({ entities: [{ _id: 'e1' }], count: 1 }), { status: 200 })
+				new Response(JSON.stringify({ entities: [{ _id: 'e1' }], count: 1 }), { status: 200 }),
 			);
 			// Per-entity fetch fails
 			fetchMock.mockResolvedValueOnce(new Response('Not Found', { status: 404 }));
@@ -463,8 +449,8 @@ describe('takeSnapshot', () => {
 			await expect(
 				takeSnapshot(client, {
 					snapshotDir: tempDir,
-					now: () => '2026-05-20T04:00:00Z'
-				})
+					now: () => '2026-05-20T04:00:00Z',
+				}),
 			).rejects.toThrow(/404/);
 		});
 
@@ -482,13 +468,13 @@ describe('takeSnapshot', () => {
 							{
 								_id: 'e1',
 								_type: [{ string: 'organization' }],
-								name: [{ string: 'Inline data' }] // looks full, but list data is unreliable
-							}
+								name: [{ string: 'Inline data' }], // looks full, but list data is unreliable
+							},
 						],
-						count: 1
+						count: 1,
 					}),
-					{ status: 200 }
-				)
+					{ status: 200 },
+				),
 			);
 			// Full payload via per-entity GET (canonical source)
 			fetchMock.mockResolvedValueOnce(
@@ -498,16 +484,16 @@ describe('takeSnapshot', () => {
 							_id: 'e1',
 							_type: [{ string: 'organization' }],
 							name: [{ string: 'Canonical full data' }],
-							contact_email: [{ string: 'info@org.ee' }]
-						}
+							contact_email: [{ string: 'info@org.ee' }],
+						},
 					}),
-					{ status: 200 }
-				)
+					{ status: 200 },
+				),
 			);
 
 			await takeSnapshot(client, {
 				snapshotDir: tempDir,
-				now: () => '2026-05-20T04:00:00Z'
+				now: () => '2026-05-20T04:00:00Z',
 			});
 
 			// Must have made 2 calls: 1 list + 1 per-entity GET (unconditional)

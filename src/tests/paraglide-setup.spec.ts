@@ -24,7 +24,7 @@ describe('package.json — @inlang/paraglide-sveltekit dependency', () => {
 		const pkg = JSON.parse(readFileSync(resolve(ROOT, 'package.json'), 'utf-8'));
 		const allDeps = {
 			...(pkg.dependencies ?? {}),
-			...(pkg.devDependencies ?? {})
+			...(pkg.devDependencies ?? {}),
 		};
 		expect(Object.keys(allDeps)).toContain('@inlang/paraglide-sveltekit');
 	});
@@ -57,12 +57,7 @@ describe('vite.config.ts — Paraglide plugin present', () => {
 // ---------------------------------------------------------------------------
 // AC 3: All 4 locale files exist and contain valid JSON
 // ---------------------------------------------------------------------------
-describe.each([
-	['en'],
-	['et'],
-	['lv'],
-	['uk']
-])('messages/%s.json', (locale) => {
+describe.each([['en'], ['et'], ['lv'], ['uk']])('messages/%s.json', (locale) => {
 	it(`messages/${locale}.json exists`, () => {
 		expect(existsSync(resolve(ROOT, `messages/${locale}.json`))).toBe(true);
 	});
@@ -86,10 +81,7 @@ describe('.gitignore — src/lib/paraglide/ is ignored', () => {
 			if (l.startsWith('#') || l === '') return false;
 			// Normalise the line for comparison: strip a leading slash if present.
 			const normalised = l.replace(/^\//, '');
-			return (
-				normalised === 'src/lib/paraglide' ||
-				normalised === 'src/lib/paraglide/'
-			);
+			return normalised === 'src/lib/paraglide' || normalised === 'src/lib/paraglide/';
 		});
 		expect(matches.length).toBeGreaterThan(0);
 	});

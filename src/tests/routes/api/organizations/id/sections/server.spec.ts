@@ -4,11 +4,11 @@ import type { RequestEvent } from '@sveltejs/kit';
 function makeEvent(
 	jwt: string | null,
 	orgId: string = 'org-1',
-	searchParams: Record<string, string> = {}
+	searchParams: Record<string, string> = {},
 ): RequestEvent {
 	const urlParams = new URLSearchParams(searchParams);
 	const url = new URL(
-		`https://example.com/api/organizations/${orgId}/sections?${urlParams.toString()}`
+		`https://example.com/api/organizations/${orgId}/sections?${urlParams.toString()}`,
 	);
 	return {
 		locals: { entuJwt: jwt },
@@ -100,7 +100,8 @@ describe('GET /api/organizations/[id]/sections', () => {
 	});
 
 	it('happy path: org exists → section search uses _parent.reference = org id', async () => {
-		const fetchMock = vi.fn()
+		const fetchMock = vi
+			.fn()
 			.mockResolvedValueOnce(makeEntuEntityResponse(ORG_ENTITY))
 			.mockResolvedValueOnce(makeEntuSearchResponse([SECTION_FULL]));
 		vi.stubGlobal('fetch', fetchMock);
@@ -119,16 +120,19 @@ describe('GET /api/organizations/[id]/sections', () => {
 	});
 
 	it('happy path: response matches §5.2 narrow section shape', async () => {
-		vi.stubGlobal('fetch', vi.fn()
-			.mockResolvedValueOnce(makeEntuEntityResponse(ORG_ENTITY))
-			.mockResolvedValueOnce(makeEntuSearchResponse([SECTION_FULL]))
+		vi.stubGlobal(
+			'fetch',
+			vi
+				.fn()
+				.mockResolvedValueOnce(makeEntuEntityResponse(ORG_ENTITY))
+				.mockResolvedValueOnce(makeEntuSearchResponse([SECTION_FULL])),
 		);
 
 		const { GET } = await import(
 			'../../../../../../routes/api/organizations/[id]/sections/+server.ts'
 		);
 		const response = await GET(makeEvent('valid-jwt', 'org-1'));
-		const body = await response.json() as { entities: Array<Record<string, unknown>> };
+		const body = (await response.json()) as { entities: Array<Record<string, unknown>> };
 		const sec = body.entities[0];
 
 		expect(sec._id).toBe('sec-1');
@@ -141,30 +145,36 @@ describe('GET /api/organizations/[id]/sections', () => {
 	});
 
 	it('section-of-section: parent_section field populated in flat response', async () => {
-		vi.stubGlobal('fetch', vi.fn()
-			.mockResolvedValueOnce(makeEntuEntityResponse(ORG_ENTITY))
-			.mockResolvedValueOnce(makeEntuSearchResponse([SECTION_WITH_PARENT]))
+		vi.stubGlobal(
+			'fetch',
+			vi
+				.fn()
+				.mockResolvedValueOnce(makeEntuEntityResponse(ORG_ENTITY))
+				.mockResolvedValueOnce(makeEntuSearchResponse([SECTION_WITH_PARENT])),
 		);
 
 		const { GET } = await import(
 			'../../../../../../routes/api/organizations/[id]/sections/+server.ts'
 		);
 		const response = await GET(makeEvent('valid-jwt', 'org-1'));
-		const body = await response.json() as { entities: Array<Record<string, unknown>> };
+		const body = (await response.json()) as { entities: Array<Record<string, unknown>> };
 		expect(body.entities[0].parent_section).toBe('sec-1');
 	});
 
 	it('sparse section: optional fields absent → undefined in response', async () => {
-		vi.stubGlobal('fetch', vi.fn()
-			.mockResolvedValueOnce(makeEntuEntityResponse(ORG_ENTITY))
-			.mockResolvedValueOnce(makeEntuSearchResponse([SECTION_SPARSE]))
+		vi.stubGlobal(
+			'fetch',
+			vi
+				.fn()
+				.mockResolvedValueOnce(makeEntuEntityResponse(ORG_ENTITY))
+				.mockResolvedValueOnce(makeEntuSearchResponse([SECTION_SPARSE])),
 		);
 
 		const { GET } = await import(
 			'../../../../../../routes/api/organizations/[id]/sections/+server.ts'
 		);
 		const response = await GET(makeEvent('valid-jwt', 'org-1'));
-		const body = await response.json() as { entities: Array<Record<string, unknown>> };
+		const body = (await response.json()) as { entities: Array<Record<string, unknown>> };
 		const sec = body.entities[0];
 
 		expect(sec.voice).toBeUndefined();
@@ -175,9 +185,12 @@ describe('GET /api/organizations/[id]/sections', () => {
 	});
 
 	it('empty list: org exists but no sections → 200 { entities: [] }', async () => {
-		vi.stubGlobal('fetch', vi.fn()
-			.mockResolvedValueOnce(makeEntuEntityResponse(ORG_ENTITY))
-			.mockResolvedValueOnce(makeEntuSearchResponse([]))
+		vi.stubGlobal(
+			'fetch',
+			vi
+				.fn()
+				.mockResolvedValueOnce(makeEntuEntityResponse(ORG_ENTITY))
+				.mockResolvedValueOnce(makeEntuSearchResponse([])),
 		);
 
 		const { GET } = await import(
@@ -185,12 +198,13 @@ describe('GET /api/organizations/[id]/sections', () => {
 		);
 		const response = await GET(makeEvent('valid-jwt', 'org-1'));
 		expect(response.status).toBe(200);
-		const body = await response.json() as { entities: unknown[] };
+		const body = (await response.json()) as { entities: unknown[] };
 		expect(body.entities).toEqual([]);
 	});
 
 	it('pagination defaults: no params → Entu search called with limit=50, skip=0', async () => {
-		const fetchMock = vi.fn()
+		const fetchMock = vi
+			.fn()
 			.mockResolvedValueOnce(makeEntuEntityResponse(ORG_ENTITY))
 			.mockResolvedValueOnce(makeEntuSearchResponse([]));
 		vi.stubGlobal('fetch', fetchMock);
@@ -207,7 +221,8 @@ describe('GET /api/organizations/[id]/sections', () => {
 	});
 
 	it('pagination: ?limit=100&skip=50 → passed to search', async () => {
-		const fetchMock = vi.fn()
+		const fetchMock = vi
+			.fn()
 			.mockResolvedValueOnce(makeEntuEntityResponse(ORG_ENTITY))
 			.mockResolvedValueOnce(makeEntuSearchResponse([]));
 		vi.stubGlobal('fetch', fetchMock);
@@ -224,7 +239,8 @@ describe('GET /api/organizations/[id]/sections', () => {
 	});
 
 	it('pagination clamp: ?limit=999 → clamped to 200', async () => {
-		const fetchMock = vi.fn()
+		const fetchMock = vi
+			.fn()
 			.mockResolvedValueOnce(makeEntuEntityResponse(ORG_ENTITY))
 			.mockResolvedValueOnce(makeEntuSearchResponse([]));
 		vi.stubGlobal('fetch', fetchMock);
@@ -239,16 +255,21 @@ describe('GET /api/organizations/[id]/sections', () => {
 	});
 
 	it('3 sections returned: response has 3 entities', async () => {
-		vi.stubGlobal('fetch', vi.fn()
-			.mockResolvedValueOnce(makeEntuEntityResponse(ORG_ENTITY))
-			.mockResolvedValueOnce(makeEntuSearchResponse([SECTION_FULL, SECTION_WITH_PARENT, SECTION_SPARSE]))
+		vi.stubGlobal(
+			'fetch',
+			vi
+				.fn()
+				.mockResolvedValueOnce(makeEntuEntityResponse(ORG_ENTITY))
+				.mockResolvedValueOnce(
+					makeEntuSearchResponse([SECTION_FULL, SECTION_WITH_PARENT, SECTION_SPARSE]),
+				),
 		);
 
 		const { GET } = await import(
 			'../../../../../../routes/api/organizations/[id]/sections/+server.ts'
 		);
 		const response = await GET(makeEvent('valid-jwt', 'org-1'));
-		const body = await response.json() as { entities: unknown[] };
+		const body = (await response.json()) as { entities: unknown[] };
 		expect(body.entities).toHaveLength(3);
 	});
 });

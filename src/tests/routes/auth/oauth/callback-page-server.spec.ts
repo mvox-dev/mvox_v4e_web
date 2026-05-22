@@ -37,7 +37,7 @@ function makeCallbackEvent(
 	key: string | null,
 	stateInUrl: string | null = CSRF_STATE,
 	csrfCookie: string | null = CSRF_STATE,
-	origin = 'https://multivox.pages.dev'
+	origin = 'https://multivox.pages.dev',
 ): ServerLoadEvent {
 	const params = new URLSearchParams();
 	if (key !== null) params.set('key', key);
@@ -79,7 +79,7 @@ describe('auth/callback +page.server.ts load()', () => {
 	it('returns sessionToken when state matches cookie and key is present', async () => {
 		const { load } = await import('../../../../routes/auth/callback/+page.server.ts');
 		const event = makeCallbackEvent(SESSION_TOKEN);
-		const result = await load(event) as { sessionToken: string; db: string };
+		const result = (await load(event)) as { sessionToken: string; db: string };
 
 		expect(result.sessionToken).toBe(SESSION_TOKEN);
 	});
@@ -87,7 +87,7 @@ describe('auth/callback +page.server.ts load()', () => {
 	it('returns db from ENTU_DB env var', async () => {
 		const { load } = await import('../../../../routes/auth/callback/+page.server.ts');
 		const event = makeCallbackEvent(SESSION_TOKEN);
-		const result = await load(event) as { sessionToken: string; db: string };
+		const result = (await load(event)) as { sessionToken: string; db: string };
 
 		expect(result.db).toBe('polyphony');
 	});

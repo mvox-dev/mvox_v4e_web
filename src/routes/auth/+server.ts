@@ -19,11 +19,11 @@ export const POST: RequestHandler = async ({ request, cookies, url }) => {
 	});
 
 	if (!res.ok) {
-		const body = await res.json().catch(() => ({})) as Record<string, unknown>;
+		const body = (await res.json().catch(() => ({}))) as Record<string, unknown>;
 		return json({ error: body?.error ?? 'Entu auth failed' }, { status: res.status });
 	}
 
-	const body = await res.json() as { token: string };
+	const body = (await res.json()) as { token: string };
 
 	cookies.set('entu_jwt', body.token, {
 		httpOnly: true,

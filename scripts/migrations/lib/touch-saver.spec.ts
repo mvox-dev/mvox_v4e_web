@@ -1,5 +1,10 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { touchSaveFormula, entuTouchSave, type TouchSaveOptions, type TouchSaveResult } from './touch-saver';
+import {
+	touchSaveFormula,
+	entuTouchSave,
+	type TouchSaveOptions,
+	type TouchSaveResult,
+} from './touch-saver';
 import type { EntuClient } from './entu-client';
 
 // Wire shape resolved (Josquin's Q2 probe 2026-05-20, docs/migration/findings/phase-b-api-probes-2026-05-20.md):
@@ -12,7 +17,7 @@ import type { EntuClient } from './entu-client';
 const client: EntuClient = {
 	apiBase: 'https://api.entu.app',
 	db: 'polyphony',
-	jwt: 'test-jwt'
+	jwt: 'test-jwt',
 };
 
 afterEach(() => {
@@ -22,11 +27,7 @@ afterEach(() => {
 describe('touchSaveFormula', () => {
 	describe('basic re-write on existing instances', () => {
 		it('re-writes the formula property on each instance', async () => {
-			const instances = [
-				{ _id: 'org-1' },
-				{ _id: 'org-2' },
-				{ _id: 'org-3' }
-			];
+			const instances = [{ _id: 'org-1' }, { _id: 'org-2' }, { _id: 'org-3' }];
 
 			const mockListInstances = vi.fn().mockResolvedValue(instances);
 			const mockTouchSave = vi.fn().mockResolvedValue(undefined);
@@ -36,7 +37,7 @@ describe('touchSaveFormula', () => {
 				propertyName: 'member_count_per_section',
 				formulaExpression: '(_child.member COUNT) (_child.section.member_count SUM) +',
 				listInstances: mockListInstances,
-				touchSave: mockTouchSave
+				touchSave: mockTouchSave,
 			});
 
 			expect(result.touchSaveCount).toBe(3);
@@ -54,7 +55,7 @@ describe('touchSaveFormula', () => {
 				propertyName: 'member_count_per_section',
 				formulaExpression: 'some_formula',
 				listInstances: mockListInstances,
-				touchSave: mockTouchSave
+				touchSave: mockTouchSave,
 			});
 
 			const [entityId] = mockTouchSave.mock.calls[0] as [string, string, string];
@@ -71,10 +72,14 @@ describe('touchSaveFormula', () => {
 				propertyName: 'member_count_per_section',
 				formulaExpression: 'my_formula',
 				listInstances: mockListInstances,
-				touchSave: mockTouchSave
+				touchSave: mockTouchSave,
 			});
 
-			const [, propertyName, formulaExpression] = mockTouchSave.mock.calls[0] as [string, string, string];
+			const [, propertyName, formulaExpression] = mockTouchSave.mock.calls[0] as [
+				string,
+				string,
+				string,
+			];
 			expect(propertyName).toBe('member_count_per_section');
 			expect(formulaExpression).toBe('my_formula');
 		});
@@ -90,7 +95,7 @@ describe('touchSaveFormula', () => {
 				propertyName: 'name',
 				formulaExpression: 'some_formula',
 				listInstances: mockListInstances,
-				touchSave: mockTouchSave
+				touchSave: mockTouchSave,
 			});
 
 			expect(result.touchSaveCount).toBe(0);
@@ -106,8 +111,8 @@ describe('touchSaveFormula', () => {
 			const instances = [
 				{
 					_id: 'org-1',
-					member_count_per_section: [{ type: 'formula', string: '...' }] // already set
-				}
+					member_count_per_section: [{ type: 'formula', string: '...' }], // already set
+				},
 			];
 
 			const mockListInstances = vi.fn().mockResolvedValue(instances);
@@ -118,7 +123,7 @@ describe('touchSaveFormula', () => {
 				propertyName: 'member_count_per_section',
 				formulaExpression: 'my_formula',
 				listInstances: mockListInstances,
-				touchSave: mockTouchSave
+				touchSave: mockTouchSave,
 			});
 
 			// Must still call touchSave — this is NOT a skip case
@@ -129,14 +134,11 @@ describe('touchSaveFormula', () => {
 
 	describe('error handling', () => {
 		it('records per-instance failures without aborting the remaining instances', async () => {
-			const instances = [
-				{ _id: 'org-1' },
-				{ _id: 'org-2' },
-				{ _id: 'org-3' }
-			];
+			const instances = [{ _id: 'org-1' }, { _id: 'org-2' }, { _id: 'org-3' }];
 
 			const mockListInstances = vi.fn().mockResolvedValue(instances);
-			const mockTouchSave = vi.fn()
+			const mockTouchSave = vi
+				.fn()
 				.mockResolvedValueOnce(undefined)
 				.mockRejectedValueOnce(new Error('touch-save failed: 500'))
 				.mockResolvedValueOnce(undefined);
@@ -146,7 +148,7 @@ describe('touchSaveFormula', () => {
 				propertyName: 'member_count_per_section',
 				formulaExpression: 'my_formula',
 				listInstances: mockListInstances,
-				touchSave: mockTouchSave
+				touchSave: mockTouchSave,
 			});
 
 			expect(result.touchSaveCount).toBe(2); // 2 succeeded
@@ -172,18 +174,21 @@ describe('entuTouchSave (concrete wire shape — _sharing POST)', () => {
 				JSON.stringify({
 					entity: {
 						_id: 'org-1',
-						_sharing: [{ _id: 'sharing-prop-id', string: 'private' }]
-					}
+						_sharing: [{ _id: 'sharing-prop-id', string: 'private' }],
+					},
 				}),
-				{ status: 200 }
-			)
+				{ status: 200 },
+			),
 		);
 		// POST /entity/{id} to re-assert _sharing
 		fetchMock.mockResolvedValueOnce(
 			new Response(
-				JSON.stringify({ _id: 'org-1', properties: [{ _id: 'new-sharing-id', type: '_sharing', string: 'private' }] }),
-				{ status: 200 }
-			)
+				JSON.stringify({
+					_id: 'org-1',
+					properties: [{ _id: 'new-sharing-id', type: '_sharing', string: 'private' }],
+				}),
+				{ status: 200 },
+			),
 		);
 
 		await entuTouchSave(client, 'org-1');
@@ -199,7 +204,7 @@ describe('entuTouchSave (concrete wire shape — _sharing POST)', () => {
 		expect(postInit.method).toBe('POST');
 
 		const body = JSON.parse(postInit.body as string) as Array<{ type: string; string: string }>;
-		const sharingProp = body.find(p => p.type === '_sharing');
+		const sharingProp = body.find((p) => p.type === '_sharing');
 		expect(sharingProp).toBeDefined();
 		expect(sharingProp!.string).toBe('private');
 	});
@@ -213,21 +218,21 @@ describe('entuTouchSave (concrete wire shape — _sharing POST)', () => {
 				JSON.stringify({
 					entity: {
 						_id: 'org-2',
-						_sharing: [{ _id: 'sp-2', string: 'public' }]
-					}
+						_sharing: [{ _id: 'sp-2', string: 'public' }],
+					},
 				}),
-				{ status: 200 }
-			)
+				{ status: 200 },
+			),
 		);
 		fetchMock.mockResolvedValueOnce(
-			new Response(JSON.stringify({ _id: 'org-2', properties: [] }), { status: 200 })
+			new Response(JSON.stringify({ _id: 'org-2', properties: [] }), { status: 200 }),
 		);
 
 		await entuTouchSave(client, 'org-2');
 
 		const [, postInit] = fetchMock.mock.calls[1] as [string, RequestInit];
 		const body = JSON.parse(postInit.body as string) as Array<{ type: string; string: string }>;
-		const sharingProp = body.find(p => p.type === '_sharing');
+		const sharingProp = body.find((p) => p.type === '_sharing');
 		// Must use the actual current value, not a hardcoded constant
 		expect(sharingProp!.string).toBe('public');
 	});
@@ -241,12 +246,12 @@ describe('entuTouchSave (concrete wire shape — _sharing POST)', () => {
 				JSON.stringify({
 					entity: {
 						_id: 'org-3',
-						name: [{ string: 'Some org' }]
+						name: [{ string: 'Some org' }],
 						// no _sharing
-					}
+					},
 				}),
-				{ status: 200 }
-			)
+				{ status: 200 },
+			),
 		);
 
 		await expect(entuTouchSave(client, 'org-3')).rejects.toThrow(/_sharing/);
@@ -265,8 +270,8 @@ describe('entuTouchSave (concrete wire shape — _sharing POST)', () => {
 		fetchMock.mockResolvedValueOnce(
 			new Response(
 				JSON.stringify({ entity: { _id: 'org-1', _sharing: [{ _id: 'sp', string: 'private' }] } }),
-				{ status: 200 }
-			)
+				{ status: 200 },
+			),
 		);
 		fetchMock.mockResolvedValueOnce(new Response('Internal Server Error', { status: 500 }));
 

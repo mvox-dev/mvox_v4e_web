@@ -31,7 +31,7 @@ function mockDbWithRenamesAndObsolete() {
 
 	// Auth
 	fetchMock.mockResolvedValueOnce(
-		new Response(JSON.stringify({ token: 'fake-jwt' }), { status: 200 })
+		new Response(JSON.stringify({ token: 'fake-jwt' }), { status: 200 }),
 	);
 
 	// Load Phase A report (sanity check for type ids)
@@ -46,23 +46,23 @@ function mockDbWithRenamesAndObsolete() {
 					{
 						_id: 'section-type-id',
 						name: [{ string: 'section' }],
-						_type: [{ reference: 'meta-type-entity-id' }]
+						_type: [{ reference: 'meta-type-entity-id' }],
 					},
 					{
 						_id: 'org-type-id',
 						name: [{ string: 'organization' }],
-						_type: [{ reference: 'meta-type-entity-id' }]
+						_type: [{ reference: 'meta-type-entity-id' }],
 					},
 					{
 						_id: 'work-type-id',
 						name: [{ string: 'work' }],
-						_type: [{ reference: 'meta-type-entity-id' }]
-					}
+						_type: [{ reference: 'meta-type-entity-id' }],
+					},
 				],
-				count: 3
+				count: 3,
 			}),
-			{ status: 200 }
-		)
+			{ status: 200 },
+		),
 	);
 
 	// Per-type property listings (one per type returned above, in order)
@@ -76,13 +76,13 @@ function mockDbWithRenamesAndObsolete() {
 					{
 						_id: 'section-member-count-prop-id',
 						name: [{ string: 'member_count' }],
-						formula: [{ string: '_referrer.member.name COUNT' }]
-					}
+						formula: [{ string: '_referrer.member.name COUNT' }],
+					},
 				],
-				count: 3
+				count: 3,
 			}),
-			{ status: 200 }
-		)
+			{ status: 200 },
+		),
 	);
 	// organization's properties: contact_email (§3 obsolete), language (§3), member_count_per_section (§5 touch-save)
 	fetchMock.mockResolvedValueOnce(
@@ -94,13 +94,13 @@ function mockDbWithRenamesAndObsolete() {
 					{
 						_id: 'org-mcp-prop-id',
 						name: [{ string: 'member_count_per_section' }],
-						formula: [{ string: 'sections.*.member_count SUM' }]
-					}
+						formula: [{ string: 'sections.*.member_count SUM' }],
+					},
 				],
-				count: 3
+				count: 3,
 			}),
-			{ status: 200 }
-		)
+			{ status: 200 },
+		),
 	);
 	// work's properties: voicing, duration, language (§1 renames), arranger (§2 migration)
 	fetchMock.mockResolvedValueOnce(
@@ -110,12 +110,12 @@ function mockDbWithRenamesAndObsolete() {
 					{ _id: 'work-voicing-prop-id', name: [{ string: 'voicing' }] },
 					{ _id: 'work-duration-prop-id', name: [{ string: 'duration' }] },
 					{ _id: 'work-language-prop-id', name: [{ string: 'language' }] },
-					{ _id: 'work-arranger-prop-id', name: [{ string: 'arranger' }] }
+					{ _id: 'work-arranger-prop-id', name: [{ string: 'arranger' }] },
 				],
-				count: 4
+				count: 4,
 			}),
-			{ status: 200 }
-		)
+			{ status: 200 },
+		),
 	);
 
 	// Snapshot fetch (page 1 — entity stubs for dry-run)
@@ -123,10 +123,10 @@ function mockDbWithRenamesAndObsolete() {
 		new Response(
 			JSON.stringify({
 				entities: [{ _id: 'org-1' }, { _id: 'section-1' }],
-				count: 2
+				count: 2,
 			}),
-			{ status: 200 }
-		)
+			{ status: 200 },
+		),
 	);
 	// Per-entity GET /entity/{id} — Gap-4 full-payload snapshot pattern
 	fetchMock.mockResolvedValueOnce(
@@ -135,11 +135,11 @@ function mockDbWithRenamesAndObsolete() {
 				entity: {
 					_id: 'org-1',
 					_type: [{ string: 'organization' }],
-					name: [{ string: 'Org 1' }]
-				}
+					name: [{ string: 'Org 1' }],
+				},
 			}),
-			{ status: 200 }
-		)
+			{ status: 200 },
+		),
 	);
 	fetchMock.mockResolvedValueOnce(
 		new Response(
@@ -147,11 +147,11 @@ function mockDbWithRenamesAndObsolete() {
 				entity: {
 					_id: 'section-1',
 					_type: [{ string: 'section' }],
-					name: [{ string: 'Sopranod' }]
-				}
+					name: [{ string: 'Sopranod' }],
+				},
 			}),
-			{ status: 200 }
-		)
+			{ status: 200 },
+		),
 	);
 
 	return fetchMock;
@@ -169,7 +169,7 @@ describe('runPhaseB — E2E', () => {
 			snapshotDir: tempSnapshotDir,
 			dryRun: true,
 			skipSnapshot: false,
-			now: () => '2026-05-20T04:00:00Z'
+			now: () => '2026-05-20T04:00:00Z',
 		});
 
 		expect(result.exitCode).toBe(0);
@@ -192,7 +192,7 @@ describe('runPhaseB — E2E', () => {
 			snapshotDir: tempSnapshotDir,
 			dryRun: true,
 			skipSnapshot: false,
-			now: () => '2026-05-20T04:00:00Z'
+			now: () => '2026-05-20T04:00:00Z',
 		});
 
 		const jsonContent = await readFile(result.reportPaths.json, 'utf8');
@@ -212,7 +212,7 @@ describe('runPhaseB — E2E', () => {
 			snapshotDir: tempSnapshotDir,
 			dryRun: true,
 			skipSnapshot: false,
-			now: () => '2026-05-20T04:00:00Z'
+			now: () => '2026-05-20T04:00:00Z',
 		});
 
 		expect(result.report.snapshot).toBeDefined();
@@ -223,10 +223,10 @@ describe('runPhaseB — E2E', () => {
 	it('dry-run: --skip-snapshot omits snapshot and flags warning in report', async () => {
 		const fetchMock = vi.spyOn(globalThis, 'fetch');
 		fetchMock.mockResolvedValueOnce(
-			new Response(JSON.stringify({ token: 'fake-jwt' }), { status: 200 })
+			new Response(JSON.stringify({ token: 'fake-jwt' }), { status: 200 }),
 		);
 		fetchMock.mockResolvedValueOnce(
-			new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 })
+			new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 }),
 		);
 
 		const result = await runPhaseB({
@@ -237,12 +237,12 @@ describe('runPhaseB — E2E', () => {
 			snapshotDir: tempSnapshotDir,
 			dryRun: true,
 			skipSnapshot: true,
-			now: () => '2026-05-20T04:00:00Z'
+			now: () => '2026-05-20T04:00:00Z',
 		});
 
 		expect(result.report.snapshot?.skipped).toBe(true);
 		expect(result.report.warnings ?? []).toEqual(
-			expect.arrayContaining([expect.stringContaining('snapshot')])
+			expect.arrayContaining([expect.stringContaining('snapshot')]),
 		);
 	});
 
@@ -257,7 +257,7 @@ describe('runPhaseB — E2E', () => {
 			snapshotDir: tempSnapshotDir,
 			dryRun: true,
 			skipSnapshot: false,
-			now: () => '2026-05-20T04:00:00Z'
+			now: () => '2026-05-20T04:00:00Z',
 		});
 
 		const jsonContent = await readFile(result.reportPaths.json, 'utf8');
@@ -279,7 +279,7 @@ describe('runPhaseB — E2E', () => {
 			snapshotDir: tempSnapshotDir,
 			dryRun: true,
 			skipSnapshot: true,
-			now: () => '2026-05-20T04:00:00Z'
+			now: () => '2026-05-20T04:00:00Z',
 		});
 
 		// Gap-3 (RED-3): assert against report.wouldExecute (computed diff), not static constants.
@@ -287,8 +287,10 @@ describe('runPhaseB — E2E', () => {
 		// ordering invariant is silently invisible. Remove the conditional guard so this fails
 		// loudly when the diff path doesn't produce these ops.
 		const ops = result.report.wouldExecute ?? [];
-		const lastUpdateIdx = ops.reduce((max: number, o: { kind: string }, i: number) =>
-			o.kind === 'UPDATE_FORMULA' ? i : max, -1);
+		const lastUpdateIdx = ops.reduce(
+			(max: number, o: { kind: string }, i: number) => (o.kind === 'UPDATE_FORMULA' ? i : max),
+			-1,
+		);
 		const firstTouchIdx = ops.findIndex((o: { kind: string }) => o.kind === 'TOUCH_SAVE');
 		// Both kinds must appear in the computed diff — no conditional guard
 		expect(lastUpdateIdx).toBeGreaterThanOrEqual(0); // at least one UPDATE_FORMULA
@@ -308,14 +310,14 @@ describe('runPhaseB — E2E', () => {
 			snapshotDir: tempSnapshotDir,
 			dryRun: true,
 			skipSnapshot: true,
-			now: () => '2026-05-20T04:00:00Z'
+			now: () => '2026-05-20T04:00:00Z',
 		});
 
 		// The diff computes which renames are applicable given the current db state.
 		// summary.wouldRenames must equal the number of RENAME ops in report.wouldExecute,
 		// NOT the static length of PHASE_B_RENAMES.
 		const renameOps = (result.report.wouldExecute ?? []).filter(
-			(o: { kind: string }) => o.kind === 'RENAME'
+			(o: { kind: string }) => o.kind === 'RENAME',
 		);
 		expect(result.report.summary.wouldRenames).toBe(renameOps.length);
 	});
@@ -329,7 +331,9 @@ describe('runPhaseB — E2E', () => {
 		const mockDeleteProperty = vi.fn().mockResolvedValue({ deleted: true });
 		const mockVerifyDeleteSafe = vi.fn().mockResolvedValue({ safe: true });
 		const mockUpdateFormula = vi.fn().mockResolvedValue({ updated: true });
-		const mockTouchSaveFormula = vi.fn().mockResolvedValue({ touchSaveCount: 1, noInstances: false, failed: 0 });
+		const mockTouchSaveFormula = vi
+			.fn()
+			.mockResolvedValue({ touchSaveCount: 1, noInstances: false, failed: 0 });
 
 		// Trace: soprano section has voice_type='soprano' → BACKFILL_DATA op → migrateProperty called.
 		// organization has member_count_per_section formula → TOUCH_SAVE → touchSaveFormula called.
@@ -351,7 +355,7 @@ describe('runPhaseB — E2E', () => {
 			deleteProperty: mockDeleteProperty,
 			verifyDeleteSafe: mockVerifyDeleteSafe,
 			updateFormula: mockUpdateFormula,
-			touchSaveFormula: mockTouchSaveFormula
+			touchSaveFormula: mockTouchSaveFormula,
 		});
 
 		// Each callback must have been called — orchestrator reached executePhaseBOps
@@ -367,10 +371,10 @@ describe('runPhaseB — E2E', () => {
 	it('exits 1 if any sub-op fails', async () => {
 		const fetchMock = vi.spyOn(globalThis, 'fetch');
 		fetchMock.mockResolvedValueOnce(
-			new Response(JSON.stringify({ token: 'fake-jwt' }), { status: 200 })
+			new Response(JSON.stringify({ token: 'fake-jwt' }), { status: 200 }),
 		);
 		fetchMock.mockResolvedValueOnce(
-			new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 })
+			new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 }),
 		);
 		// Snapshot fetch fails
 		fetchMock.mockResolvedValueOnce(new Response('Boom', { status: 500 }));
@@ -383,7 +387,7 @@ describe('runPhaseB — E2E', () => {
 			snapshotDir: tempSnapshotDir,
 			dryRun: false,
 			skipSnapshot: false,
-			now: () => '2026-05-20T04:00:00Z'
+			now: () => '2026-05-20T04:00:00Z',
 		});
 
 		expect(result.exitCode).toBe(1);
@@ -403,7 +407,7 @@ describe('buildLiveCallbacks', () => {
 		const fakeClient: EntuClient = {
 			apiBase: 'https://api.entu.app',
 			db: 'polyphony',
-			jwt: 'fake-jwt'
+			jwt: 'fake-jwt',
 		};
 		const cbs = buildLiveCallbacks(fakeClient);
 		expect(typeof cbs.addProperty).toBe('function');
@@ -418,13 +422,19 @@ describe('buildLiveCallbacks', () => {
 		const fakeClient: EntuClient = {
 			apiBase: 'https://api.entu.app',
 			db: 'polyphony',
-			jwt: 'fake-jwt'
+			jwt: 'fake-jwt',
 		};
 		const cbs = buildLiveCallbacks(fakeClient);
 		// Each function must be async — calling it and checking the result is a Promise
 		// We don't actually send HTTP requests; we just verify the return type.
 		// Use a minimal stub so they fail fast without network access.
-		const addResult = cbs.addProperty({ kind: 'ADD_PROPERTY', parentTypeName: 'test', parentTypeId: 'tid', propertyName: 'p', def: { name: 'p', type: 'string' } });
+		const addResult = cbs.addProperty({
+			kind: 'ADD_PROPERTY',
+			parentTypeName: 'test',
+			parentTypeId: 'tid',
+			propertyName: 'p',
+			def: { name: 'p', type: 'string' },
+		});
 		expect(addResult).toBeInstanceOf(Promise);
 		// Cancel the in-flight request by not awaiting — just verify the shape
 		addResult.catch(() => undefined);
@@ -439,7 +449,7 @@ describe('buildLiveCallbacks', () => {
 		const fakeClient: EntuClient = {
 			apiBase: 'https://api.entu.app',
 			db: 'polyphony',
-			jwt: 'fake-jwt'
+			jwt: 'fake-jwt',
 		};
 		const cbs = buildLiveCallbacks(fakeClient);
 		const runPhaseBKeys: (keyof typeof cbs)[] = [
@@ -448,7 +458,7 @@ describe('buildLiveCallbacks', () => {
 			'deleteProperty',
 			'verifyDeleteSafe',
 			'updateFormula',
-			'touchSaveFormula'
+			'touchSaveFormula',
 		];
 		for (const key of runPhaseBKeys) {
 			expect(cbs).toHaveProperty(key);
@@ -471,10 +481,14 @@ describe('RED v12.3: runPhaseB JSON report includes executionResult detail', () 
 		// deleteProperty throws — triggers a failed[] record
 		const mockAddProperty = vi.fn().mockResolvedValue({ _id: 'new-prop-id' });
 		const mockMigrateProperty = vi.fn().mockResolvedValue({ migrated: 0, skipped: 0, failed: 0 });
-		const mockDeleteProperty = vi.fn().mockRejectedValue(new Error('DELETE /entity/foo 404 not found'));
+		const mockDeleteProperty = vi
+			.fn()
+			.mockRejectedValue(new Error('DELETE /entity/foo 404 not found'));
 		const mockVerifyDeleteSafe = vi.fn().mockResolvedValue({ safe: true });
 		const mockUpdateFormula = vi.fn().mockResolvedValue({ updated: true });
-		const mockTouchSaveFormula = vi.fn().mockResolvedValue({ touchSaveCount: 0, noInstances: false, failed: 0 });
+		const mockTouchSaveFormula = vi
+			.fn()
+			.mockResolvedValue({ touchSaveCount: 0, noInstances: false, failed: 0 });
 
 		const result = await runPhaseB({
 			apiBase: 'https://api.entu.app',
@@ -490,7 +504,7 @@ describe('RED v12.3: runPhaseB JSON report includes executionResult detail', () 
 			deleteProperty: mockDeleteProperty,
 			verifyDeleteSafe: mockVerifyDeleteSafe,
 			updateFormula: mockUpdateFormula,
-			touchSaveFormula: mockTouchSaveFormula
+			touchSaveFormula: mockTouchSaveFormula,
 		});
 
 		const jsonContent = await readFile(result.reportPaths.json, 'utf8');
@@ -512,7 +526,9 @@ describe('RED v12.3: runPhaseB JSON report includes executionResult detail', () 
 		const mockDeleteProperty = vi.fn().mockResolvedValue({ deleted: true });
 		const mockVerifyDeleteSafe = vi.fn().mockResolvedValue({ safe: true });
 		const mockUpdateFormula = vi.fn().mockResolvedValue({ updated: true });
-		const mockTouchSaveFormula = vi.fn().mockResolvedValue({ touchSaveCount: 0, noInstances: false, failed: 0 });
+		const mockTouchSaveFormula = vi
+			.fn()
+			.mockResolvedValue({ touchSaveCount: 0, noInstances: false, failed: 0 });
 
 		const result = await runPhaseB({
 			apiBase: 'https://api.entu.app',
@@ -528,7 +544,7 @@ describe('RED v12.3: runPhaseB JSON report includes executionResult detail', () 
 			deleteProperty: mockDeleteProperty,
 			verifyDeleteSafe: mockVerifyDeleteSafe,
 			updateFormula: mockUpdateFormula,
-			touchSaveFormula: mockTouchSaveFormula
+			touchSaveFormula: mockTouchSaveFormula,
 		});
 
 		const jsonContent = await readFile(result.reportPaths.json, 'utf8');
@@ -551,9 +567,13 @@ describe('RED v12.3: runPhaseB JSON report includes executionResult detail', () 
 		const mockAddProperty = vi.fn().mockResolvedValue({ _id: 'new-prop-id' });
 		const mockMigrateProperty = vi.fn().mockResolvedValue({ migrated: 1, skipped: 0, failed: 0 });
 		const mockDeleteProperty = vi.fn().mockResolvedValue({ deleted: true });
-		const mockVerifyDeleteSafe = vi.fn().mockResolvedValue({ safe: false, reason: 'instances have values' });
+		const mockVerifyDeleteSafe = vi
+			.fn()
+			.mockResolvedValue({ safe: false, reason: 'instances have values' });
 		const mockUpdateFormula = vi.fn().mockResolvedValue({ updated: true });
-		const mockTouchSaveFormula = vi.fn().mockResolvedValue({ touchSaveCount: 0, noInstances: false, failed: 0 });
+		const mockTouchSaveFormula = vi
+			.fn()
+			.mockResolvedValue({ touchSaveCount: 0, noInstances: false, failed: 0 });
 
 		const result = await runPhaseB({
 			apiBase: 'https://api.entu.app',
@@ -569,7 +589,7 @@ describe('RED v12.3: runPhaseB JSON report includes executionResult detail', () 
 			deleteProperty: mockDeleteProperty,
 			verifyDeleteSafe: mockVerifyDeleteSafe,
 			updateFormula: mockUpdateFormula,
-			touchSaveFormula: mockTouchSaveFormula
+			touchSaveFormula: mockTouchSaveFormula,
 		});
 
 		const jsonContent = await readFile(result.reportPaths.json, 'utf8');
@@ -589,7 +609,9 @@ describe('RED v12.3: runPhaseB JSON report includes executionResult detail', () 
 		const mockDeleteProperty = vi.fn().mockRejectedValue(new Error('status 404 entity not found'));
 		const mockVerifyDeleteSafe = vi.fn().mockResolvedValue({ safe: true });
 		const mockUpdateFormula = vi.fn().mockResolvedValue({ updated: true });
-		const mockTouchSaveFormula = vi.fn().mockResolvedValue({ touchSaveCount: 0, noInstances: false, failed: 0 });
+		const mockTouchSaveFormula = vi
+			.fn()
+			.mockResolvedValue({ touchSaveCount: 0, noInstances: false, failed: 0 });
 
 		const result = await runPhaseB({
 			apiBase: 'https://api.entu.app',
@@ -605,7 +627,7 @@ describe('RED v12.3: runPhaseB JSON report includes executionResult detail', () 
 			deleteProperty: mockDeleteProperty,
 			verifyDeleteSafe: mockVerifyDeleteSafe,
 			updateFormula: mockUpdateFormula,
-			touchSaveFormula: mockTouchSaveFormula
+			touchSaveFormula: mockTouchSaveFormula,
 		});
 
 		const mdContent = await readFile(result.reportPaths.md, 'utf8');

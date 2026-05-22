@@ -10,7 +10,7 @@ import type { EntuClient } from './entu-client';
 const client: EntuClient = {
 	apiBase: 'https://api.entu.app',
 	db: 'polyphony',
-	jwt: 'test-jwt'
+	jwt: 'test-jwt',
 };
 
 afterEach(() => {
@@ -20,40 +20,40 @@ afterEach(() => {
 // Simulates GET /entity?_type.reference=<meta-type-id>
 function mockTypesPage(
 	fetchMock: ReturnType<typeof vi.spyOn>,
-	types: Array<{ _id: string; name: string }>
+	types: Array<{ _id: string; name: string }>,
 ) {
 	fetchMock.mockResolvedValueOnce(
 		new Response(
 			JSON.stringify({
-				entities: types.map(t => ({
+				entities: types.map((t) => ({
 					_id: t._id,
 					name: [{ string: t.name }],
-					_type: [{ reference: 'meta-type-entity-id' }]
+					_type: [{ reference: 'meta-type-entity-id' }],
 				})),
-				count: types.length
+				count: types.length,
 			}),
-			{ status: 200 }
-		)
+			{ status: 200 },
+		),
 	);
 }
 
 // Simulates GET /entity?_type.reference=<meta-property-id>&_parent.reference=<type-id>
 function mockPropertiesPage(
 	fetchMock: ReturnType<typeof vi.spyOn>,
-	props: Array<{ _id: string; name: string; formula?: string }>
+	props: Array<{ _id: string; name: string; formula?: string }>,
 ) {
 	fetchMock.mockResolvedValueOnce(
 		new Response(
 			JSON.stringify({
-				entities: props.map(p => ({
+				entities: props.map((p) => ({
 					_id: p._id,
 					name: [{ string: p.name }],
-					...(p.formula ? { formula: [{ string: p.formula }] } : {})
+					...(p.formula ? { formula: [{ string: p.formula }] } : {}),
 				})),
-				count: props.length
+				count: props.length,
 			}),
-			{ status: 200 }
-		)
+			{ status: 200 },
+		),
 	);
 }
 
@@ -63,27 +63,27 @@ describe('fetchPhaseBDbState', () => {
 
 		mockTypesPage(fetchMock, [
 			{ _id: 'section-type-id', name: 'section' },
-			{ _id: 'org-type-id', name: 'organization' }
+			{ _id: 'org-type-id', name: 'organization' },
 		]);
 		// section properties
 		mockPropertiesPage(fetchMock, [
 			{ _id: 'sect-name-prop-id', name: 'name' },
 			{ _id: 'sect-ordinal-prop-id', name: 'ordinal' },
-			{ _id: 'sect-voice-type-prop-id', name: 'voice_type' }
+			{ _id: 'sect-voice-type-prop-id', name: 'voice_type' },
 		]);
 		// organization properties
 		mockPropertiesPage(fetchMock, [
 			{ _id: 'org-name-prop-id', name: 'name' },
-			{ _id: 'org-contact-prop-id', name: 'contact_email' }
+			{ _id: 'org-contact-prop-id', name: 'contact_email' },
 		]);
 
 		const state: PhaseBDbState = await fetchPhaseBDbState(client);
 
 		expect(state.section.propertyNames).toEqual(
-			expect.arrayContaining(['name', 'ordinal', 'voice_type'])
+			expect.arrayContaining(['name', 'ordinal', 'voice_type']),
 		);
 		expect(state.organization.propertyNames).toEqual(
-			expect.arrayContaining(['name', 'contact_email'])
+			expect.arrayContaining(['name', 'contact_email']),
 		);
 	});
 
@@ -93,7 +93,7 @@ describe('fetchPhaseBDbState', () => {
 		mockTypesPage(fetchMock, [{ _id: 'section-type-id', name: 'section' }]);
 		mockPropertiesPage(fetchMock, [
 			{ _id: 'sect-ordinal-prop-id', name: 'ordinal' },
-			{ _id: 'sect-voice-type-prop-id', name: 'voice_type' }
+			{ _id: 'sect-voice-type-prop-id', name: 'voice_type' },
 		]);
 
 		const state: PhaseBDbState = await fetchPhaseBDbState(client);
@@ -108,7 +108,7 @@ describe('fetchPhaseBDbState', () => {
 		mockTypesPage(fetchMock, [{ _id: 'section-type-id', name: 'section' }]);
 		mockPropertiesPage(fetchMock, [
 			{ _id: 'sect-member-count-id', name: 'member_count', formula: '_child.member COUNT' },
-			{ _id: 'sect-name-id', name: 'name' } // no formula
+			{ _id: 'sect-name-id', name: 'name' }, // no formula
 		]);
 
 		const state: PhaseBDbState = await fetchPhaseBDbState(client);
@@ -123,21 +123,19 @@ describe('fetchPhaseBDbState', () => {
 		mockTypesPage(fetchMock, [
 			{ _id: 'work-type-id', name: 'work' },
 			{ _id: 'edition-type-id', name: 'edition' },
-			{ _id: 'section-type-id', name: 'section' }
+			{ _id: 'section-type-id', name: 'section' },
 		]);
 		// work props
 		mockPropertiesPage(fetchMock, [
 			{ _id: 'w-voicing-id', name: 'voicing' },
-			{ _id: 'w-language-id', name: 'language' }
+			{ _id: 'w-language-id', name: 'language' },
 		]);
 		// edition props
 		mockPropertiesPage(fetchMock, [
-			{ _id: 'e-work-id', name: 'work', formula: '_parent.edition.name CONCAT' }
+			{ _id: 'e-work-id', name: 'work', formula: '_parent.edition.name CONCAT' },
 		]);
 		// section props
-		mockPropertiesPage(fetchMock, [
-			{ _id: 's-ordinal-id', name: 'ordinal' }
-		]);
+		mockPropertiesPage(fetchMock, [{ _id: 's-ordinal-id', name: 'ordinal' }]);
 
 		const state: PhaseBDbState = await fetchPhaseBDbState(client);
 
@@ -153,7 +151,7 @@ describe('fetchPhaseBDbState', () => {
 
 		mockTypesPage(fetchMock, [
 			{ _id: 't1', name: 'work' },
-			{ _id: 't2', name: 'section' }
+			{ _id: 't2', name: 'section' },
 		]);
 		mockPropertiesPage(fetchMock, [{ _id: 'p1', name: 'name' }]);
 		mockPropertiesPage(fetchMock, [{ _id: 'p2', name: 'ordinal' }]);

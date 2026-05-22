@@ -20,7 +20,7 @@ export interface MigratePropertyOptions {
 		client: EntuClient,
 		entityId: string,
 		propertyName: string,
-		value: unknown
+		value: unknown,
 	) => Promise<{ _id: string }>;
 	// Q5 multi-value gotcha: POSTing to a property that already has values APPENDS rather
 	// than replacing. The migrator must DELETE all existing target property `_id`s before
@@ -88,7 +88,7 @@ function listsMatch(a: string[], b: string[]): boolean {
 async function pruneExistingTarget(
 	client: EntuClient,
 	targetValues: PropertyValue[] | null,
-	deleteProperty: MigratePropertyOptions['deleteProperty']
+	deleteProperty: MigratePropertyOptions['deleteProperty'],
 ): Promise<void> {
 	if (!targetValues || !deleteProperty) return;
 	for (const v of targetValues) {
@@ -108,24 +108,24 @@ export interface MigratePropertyInjectables {
 		client: EntuClient,
 		entityId: string,
 		propertyName: string,
-		value: unknown
+		value: unknown,
 	) => Promise<{ _id: string }>;
 	deleteProperty?: (client: EntuClient, propertyId: string) => Promise<void>;
 }
 
 export async function migrateProperty(
 	client: EntuClient,
-	opts: MigratePropertyOptions
+	opts: MigratePropertyOptions,
 ): Promise<MigrationResult>;
 export async function migrateProperty(
 	client: EntuClient,
 	op: BackfillDataOp,
-	injectables: MigratePropertyInjectables
+	injectables: MigratePropertyInjectables,
 ): Promise<MigrationResult>;
 export async function migrateProperty(
 	client: EntuClient,
 	optsOrOp: MigratePropertyOptions | BackfillDataOp,
-	injectables?: MigratePropertyInjectables
+	injectables?: MigratePropertyInjectables,
 ): Promise<MigrationResult> {
 	const opts: MigratePropertyOptions = injectables
 		? {
@@ -137,13 +137,13 @@ export async function migrateProperty(
 				parentLookup: injectables.parentLookup,
 				listInstances: injectables.listInstances,
 				writeProperty: injectables.writeProperty,
-				deleteProperty: injectables.deleteProperty
+				deleteProperty: injectables.deleteProperty,
 			}
 		: (optsOrOp as MigratePropertyOptions);
 
 	if (opts.backfillKind === 'parent_copy' && !opts.parentLookup) {
 		throw new Error(
-			"migrateProperty: backfillKind='parent_copy' requires a parentLookup Map injection (source values live on the parent entity, not the same instance)"
+			"migrateProperty: backfillKind='parent_copy' requires a parentLookup Map injection (source values live on the parent entity, not the same instance)",
 		);
 	}
 
@@ -245,9 +245,7 @@ export async function migrateProperty(
 				}
 				const lookup = opts.voiceLookup;
 				const lookupId =
-					typeof lookup === 'function'
-						? await lookup(sourceStr)
-						: lookup?.get(sourceStr);
+					typeof lookup === 'function' ? await lookup(sourceStr) : lookup?.get(sourceStr);
 				if (!lookupId) {
 					result.failed += 1;
 					unmatched.add(sourceStr);

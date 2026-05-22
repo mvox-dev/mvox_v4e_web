@@ -22,7 +22,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 
 	let body: { token?: unknown };
 	try {
-		body = await request.json() as { token?: unknown };
+		body = (await request.json()) as { token?: unknown };
 	} catch {
 		return json({ error: 'invalid_body' }, { status: 400 });
 	}

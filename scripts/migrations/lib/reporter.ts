@@ -22,7 +22,7 @@ export function formatJsonReport(result: ExecutionResult, meta: ReportMeta): str
 			wouldAddProperties: result.wouldAddProperties.length,
 			skipped: result.skipped.length,
 			failed: result.failed.length,
-			formulaTouchSaveDeferred: result.formulaTouchSaveDeferred.length
+			formulaTouchSaveDeferred: result.formulaTouchSaveDeferred.length,
 		},
 		createdTypes: result.createdTypes,
 		addedProperties: result.addedProperties,
@@ -30,7 +30,7 @@ export function formatJsonReport(result: ExecutionResult, meta: ReportMeta): str
 		wouldAddProperties: result.wouldAddProperties,
 		skipped: result.skipped,
 		failed: result.failed,
-		formulaTouchSaveDeferred: result.formulaTouchSaveDeferred
+		formulaTouchSaveDeferred: result.formulaTouchSaveDeferred,
 	};
 	return JSON.stringify(payload, null, 2);
 }
@@ -112,7 +112,7 @@ export function formatMarkdownReport(result: ExecutionResult, meta: ReportMeta):
 		lines.push('## Formula properties needing touch-save');
 		lines.push('');
 		lines.push(
-			'These formula properties were created but existing instances will not show computed values until each instance is re-saved (touch-save). See handbook §5.1.'
+			'These formula properties were created but existing instances will not show computed values until each instance is re-saved (touch-save). See handbook §5.1.',
 		);
 		lines.push('');
 		for (const f of result.formulaTouchSaveDeferred) {

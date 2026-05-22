@@ -6,7 +6,7 @@ import {
 	PHASE_B_FORMULA_UPDATES,
 	PHASE_B_TOUCH_SAVES,
 	isPhaseBRenameTarget,
-	isPhaseBObsoleteDelete
+	isPhaseBObsoleteDelete,
 } from './phase-b-scope';
 
 // §1 renames — 6 total, each described as source→target with backfill semantics
@@ -16,42 +16,42 @@ describe('PHASE_B_RENAMES', () => {
 	});
 
 	it('includes person.photo → person.avatar (file→file)', () => {
-		const op = PHASE_B_RENAMES.find(r => r.source === 'person.photo');
+		const op = PHASE_B_RENAMES.find((r) => r.source === 'person.photo');
 		expect(op).toBeDefined();
 		expect(op?.target).toBe('person.avatar');
 		expect(op?.backfillKind).toBe('file');
 	});
 
 	it('includes section.ordinal → section.display_order (number→number)', () => {
-		const op = PHASE_B_RENAMES.find(r => r.source === 'section.ordinal');
+		const op = PHASE_B_RENAMES.find((r) => r.source === 'section.ordinal');
 		expect(op).toBeDefined();
 		expect(op?.target).toBe('section.display_order');
 		expect(op?.backfillKind).toBe('number');
 	});
 
 	it('includes section.voice_type → section.voice (string→reference)', () => {
-		const op = PHASE_B_RENAMES.find(r => r.source === 'section.voice_type');
+		const op = PHASE_B_RENAMES.find((r) => r.source === 'section.voice_type');
 		expect(op).toBeDefined();
 		expect(op?.target).toBe('section.voice');
 		expect(op?.backfillKind).toBe('string_to_reference');
 	});
 
 	it('includes work.voicing → work.original_voicing (string→string)', () => {
-		const op = PHASE_B_RENAMES.find(r => r.source === 'work.voicing');
+		const op = PHASE_B_RENAMES.find((r) => r.source === 'work.voicing');
 		expect(op).toBeDefined();
 		expect(op?.target).toBe('work.original_voicing');
 		expect(op?.backfillKind).toBe('string');
 	});
 
 	it('includes work.duration → work.original_duration (number→number)', () => {
-		const op = PHASE_B_RENAMES.find(r => r.source === 'work.duration');
+		const op = PHASE_B_RENAMES.find((r) => r.source === 'work.duration');
 		expect(op).toBeDefined();
 		expect(op?.target).toBe('work.original_duration');
 		expect(op?.backfillKind).toBe('number');
 	});
 
 	it('includes work.language → work.original_language (string list→string list)', () => {
-		const op = PHASE_B_RENAMES.find(r => r.source === 'work.language');
+		const op = PHASE_B_RENAMES.find((r) => r.source === 'work.language');
 		expect(op).toBeDefined();
 		expect(op?.target).toBe('work.original_language');
 		expect(op?.backfillKind).toBe('string_list');
@@ -65,14 +65,14 @@ describe('PHASE_B_MIGRATIONS', () => {
 	});
 
 	it('includes work.arranger → edition.arranger', () => {
-		const op = PHASE_B_MIGRATIONS.find(m => m.source === 'work.arranger');
+		const op = PHASE_B_MIGRATIONS.find((m) => m.source === 'work.arranger');
 		expect(op).toBeDefined();
 		expect(op?.target).toBe('edition.arranger');
 		expect(op?.backfillKind).toBe('parent_copy');
 	});
 
 	it('does NOT include person.forename+surname (deferred to Phase D)', () => {
-		const op = PHASE_B_MIGRATIONS.find(m => m.source === 'person.forename+surname');
+		const op = PHASE_B_MIGRATIONS.find((m) => m.source === 'person.forename+surname');
 		expect(op).toBeUndefined();
 	});
 });
@@ -84,9 +84,9 @@ describe('PHASE_B_OBSOLETE_DELETES', () => {
 	});
 
 	it('includes all 6 organization deletions', () => {
-		const orgDeletes = PHASE_B_OBSOLETE_DELETES.filter(d => d.parentType === 'organization');
+		const orgDeletes = PHASE_B_OBSOLETE_DELETES.filter((d) => d.parentType === 'organization');
 		expect(orgDeletes).toHaveLength(6);
-		const props = orgDeletes.map(d => d.propertyName);
+		const props = orgDeletes.map((d) => d.propertyName);
 		expect(props).toContain('contact_email');
 		expect(props).toContain('language');
 		expect(props).toContain('locale');
@@ -96,9 +96,9 @@ describe('PHASE_B_OBSOLETE_DELETES', () => {
 	});
 
 	it('includes all 4 member deletions', () => {
-		const memberDeletes = PHASE_B_OBSOLETE_DELETES.filter(d => d.parentType === 'member');
+		const memberDeletes = PHASE_B_OBSOLETE_DELETES.filter((d) => d.parentType === 'member');
 		expect(memberDeletes).toHaveLength(4);
-		const props = memberDeletes.map(d => d.propertyName);
+		const props = memberDeletes.map((d) => d.propertyName);
 		expect(props).toContain('email');
 		expect(props).toContain('invited_by');
 		expect(props).toContain('joined_at');
@@ -113,26 +113,34 @@ describe('PHASE_B_FORMULA_UPDATES', () => {
 	});
 
 	it('includes section.member_count recursive formula update', () => {
-		const op = PHASE_B_FORMULA_UPDATES.find(f => f.parentType === 'section' && f.propertyName === 'member_count');
+		const op = PHASE_B_FORMULA_UPDATES.find(
+			(f) => f.parentType === 'section' && f.propertyName === 'member_count',
+		);
 		expect(op).toBeDefined();
 		expect(op?.newFormula).toContain('_child');
 		expect(op?.action).toBe('UPDATE_FORMULA');
 	});
 
 	it('includes program_item.name formula add/replace', () => {
-		const op = PHASE_B_FORMULA_UPDATES.find(f => f.parentType === 'program_item' && f.propertyName === 'name');
+		const op = PHASE_B_FORMULA_UPDATES.find(
+			(f) => f.parentType === 'program_item' && f.propertyName === 'name',
+		);
 		expect(op).toBeDefined();
 		expect(op?.action).toBe('UPDATE_FORMULA');
 	});
 
 	it('includes repertoire_item.name formula add/replace', () => {
-		const op = PHASE_B_FORMULA_UPDATES.find(f => f.parentType === 'repertoire_item' && f.propertyName === 'name');
+		const op = PHASE_B_FORMULA_UPDATES.find(
+			(f) => f.parentType === 'repertoire_item' && f.propertyName === 'name',
+		);
 		expect(op).toBeDefined();
 		expect(op?.action).toBe('UPDATE_FORMULA');
 	});
 
 	it('includes season.work_count delete (not an update)', () => {
-		const op = PHASE_B_FORMULA_UPDATES.find(f => f.parentType === 'season' && f.propertyName === 'work_count');
+		const op = PHASE_B_FORMULA_UPDATES.find(
+			(f) => f.parentType === 'season' && f.propertyName === 'work_count',
+		);
 		expect(op).toBeDefined();
 		expect(op?.action).toBe('DELETE_PROPERTY');
 	});
@@ -145,19 +153,19 @@ describe('PHASE_B_TOUCH_SAVES', () => {
 	});
 
 	it('includes lending touch-save (expected 0 instances)', () => {
-		const op = PHASE_B_TOUCH_SAVES.find(t => t.parentType === 'lending');
+		const op = PHASE_B_TOUCH_SAVES.find((t) => t.parentType === 'lending');
 		expect(op).toBeDefined();
 		expect(op?.propertyName).toBeDefined();
 	});
 
 	it('includes organization.member_count_per_section touch-save', () => {
-		const op = PHASE_B_TOUCH_SAVES.find(t => t.parentType === 'organization');
+		const op = PHASE_B_TOUCH_SAVES.find((t) => t.parentType === 'organization');
 		expect(op).toBeDefined();
 		expect(op?.propertyName).toBe('member_count_per_section');
 	});
 
 	it('includes edition touch-save for edition.work formula', () => {
-		const op = PHASE_B_TOUCH_SAVES.find(t => t.parentType === 'edition');
+		const op = PHASE_B_TOUCH_SAVES.find((t) => t.parentType === 'edition');
 		expect(op).toBeDefined();
 		expect(op?.propertyName).toBe('work');
 	});

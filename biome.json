@@ -1,0 +1,43 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.4.15/schema.json",
+	"vcs": {
+		"enabled": true,
+		"clientKind": "git",
+		"useIgnoreFile": true
+	},
+	"files": {
+		"includes": [
+			"**/*.ts",
+			"**/*.js",
+			"!**/*.svelte",
+			"!src/lib/paraglide/**",
+			"!.svelte-kit/**",
+			"!node_modules/**",
+			"!build/**",
+			"!teams/**",
+			"!scripts/migrations/reports/**",
+			"!scripts/migrations/seed-collectives/**",
+			"!scripts/migrations/seed-sources/**",
+			"!scripts/migrations/seed-voices/**",
+			"!scripts/migrations/lib/fixtures/**"
+		]
+	},
+	"formatter": {
+		"enabled": true,
+		"indentStyle": "tab",
+		"lineWidth": 100
+	},
+	"linter": {
+		"enabled": false
+	},
+	"assist": {
+		"enabled": false
+	},
+	"javascript": {
+		"formatter": {
+			"quoteStyle": "single",
+			"trailingCommas": "all",
+			"semicolons": "always"
+		}
+	}
+}

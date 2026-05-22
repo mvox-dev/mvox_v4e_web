@@ -27,9 +27,7 @@ test('Tailwind utility class produces correct computed color', async ({ page }) 
 	const el = page.locator(`.${TAILWIND_CLASS}`).first();
 	await expect(el).toBeVisible();
 
-	const color = await el.evaluate((node) =>
-		window.getComputedStyle(node).color
-	);
+	const color = await el.evaluate((node) => window.getComputedStyle(node).color);
 	expect(color).toBe(EXPECTED_COLOR);
 });
 
@@ -38,8 +36,6 @@ test('Tailwind base styles are applied (body margin reset)', async ({ page }) =>
 
 	// Tailwind v4's preflight resets body margin to 0.
 	// This fails before Tailwind is configured because browsers default to 8px margin.
-	const margin = await page.evaluate(() =>
-		window.getComputedStyle(document.body).margin
-	);
+	const margin = await page.evaluate(() => window.getComputedStyle(document.body).margin);
 	expect(margin).toBe('0px');
 });

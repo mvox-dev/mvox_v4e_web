@@ -2,7 +2,7 @@ import {
 	listEntities,
 	POLYPHONY_META_TYPE_ENTITY_ID,
 	POLYPHONY_META_TYPE_PROPERTY_ID,
-	type EntuClient
+	type EntuClient,
 } from './entu-client';
 
 export interface TypeDbState {
@@ -19,7 +19,7 @@ export async function fetchPhaseBDbState(client: EntuClient): Promise<PhaseBDbSt
 	const typesResp = await listEntities(client, {
 		'_type.reference': POLYPHONY_META_TYPE_ENTITY_ID,
 		props: 'name._id,name.string',
-		limit: '200'
+		limit: '200',
 	});
 
 	const state: PhaseBDbState = {};
@@ -31,7 +31,7 @@ export async function fetchPhaseBDbState(client: EntuClient): Promise<PhaseBDbSt
 			'_type.reference': POLYPHONY_META_TYPE_PROPERTY_ID,
 			'_parent.reference': t._id,
 			props: 'name.string,formula.string',
-			limit: '200'
+			limit: '200',
 		});
 
 		const propertyNames: string[] = [];
@@ -52,7 +52,7 @@ export async function fetchPhaseBDbState(client: EntuClient): Promise<PhaseBDbSt
 			name,
 			propertyNames,
 			propertyIds,
-			currentFormulas
+			currentFormulas,
 		};
 	}
 

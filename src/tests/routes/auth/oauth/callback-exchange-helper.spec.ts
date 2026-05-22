@@ -53,7 +53,8 @@ describe('exchangeSession()', () => {
 	// -------------------------------------------------------------------------
 
 	it('calls Entu auth endpoint with session token as Bearer', async () => {
-		const fetchMock = vi.fn()
+		const fetchMock = vi
+			.fn()
 			.mockResolvedValueOnce(new Response(JSON.stringify({ token: JWT }), { status: 200 }))
 			.mockResolvedValueOnce(new Response(JSON.stringify({ ok: true }), { status: 200 }));
 		vi.stubGlobal('fetch', fetchMock);
@@ -69,7 +70,8 @@ describe('exchangeSession()', () => {
 	});
 
 	it('Entu auth request includes Accept: application/json', async () => {
-		const fetchMock = vi.fn()
+		const fetchMock = vi
+			.fn()
 			.mockResolvedValueOnce(new Response(JSON.stringify({ token: JWT }), { status: 200 }))
 			.mockResolvedValueOnce(new Response(JSON.stringify({ ok: true }), { status: 200 }));
 		vi.stubGlobal('fetch', fetchMock);
@@ -83,7 +85,8 @@ describe('exchangeSession()', () => {
 	});
 
 	it('POSTs JWT to /auth/cookie on successful Entu response', async () => {
-		const fetchMock = vi.fn()
+		const fetchMock = vi
+			.fn()
 			.mockResolvedValueOnce(new Response(JSON.stringify({ token: JWT }), { status: 200 }))
 			.mockResolvedValueOnce(new Response(JSON.stringify({ ok: true }), { status: 200 }));
 		vi.stubGlobal('fetch', fetchMock);
@@ -99,7 +102,8 @@ describe('exchangeSession()', () => {
 	});
 
 	it('returns { ok: true } on full success', async () => {
-		const fetchMock = vi.fn()
+		const fetchMock = vi
+			.fn()
 			.mockResolvedValueOnce(new Response(JSON.stringify({ token: JWT }), { status: 200 }))
 			.mockResolvedValueOnce(new Response(JSON.stringify({ ok: true }), { status: 200 }));
 		vi.stubGlobal('fetch', fetchMock);
@@ -115,9 +119,11 @@ describe('exchangeSession()', () => {
 	// -------------------------------------------------------------------------
 
 	it('returns { ok: false, error: "entu_auth_failed" } on Entu 401', async () => {
-		const fetchMock = vi.fn().mockResolvedValueOnce(
-			new Response(JSON.stringify({ error: 'session expired' }), { status: 401 })
-		);
+		const fetchMock = vi
+			.fn()
+			.mockResolvedValueOnce(
+				new Response(JSON.stringify({ error: 'session expired' }), { status: 401 }),
+			);
 		vi.stubGlobal('fetch', fetchMock);
 
 		const { exchangeSession } = await import('../../../../lib/auth/exchange.ts');
@@ -127,9 +133,9 @@ describe('exchangeSession()', () => {
 	});
 
 	it('does not POST to /auth/cookie on Entu auth failure', async () => {
-		const fetchMock = vi.fn().mockResolvedValueOnce(
-			new Response(JSON.stringify({ error: 'expired' }), { status: 401 })
-		);
+		const fetchMock = vi
+			.fn()
+			.mockResolvedValueOnce(new Response(JSON.stringify({ error: 'expired' }), { status: 401 }));
 		vi.stubGlobal('fetch', fetchMock);
 
 		const { exchangeSession } = await import('../../../../lib/auth/exchange.ts');
@@ -143,7 +149,8 @@ describe('exchangeSession()', () => {
 	// -------------------------------------------------------------------------
 
 	it('returns { ok: false, error: "cookie_set_failed" } when /auth/cookie returns non-200', async () => {
-		const fetchMock = vi.fn()
+		const fetchMock = vi
+			.fn()
 			.mockResolvedValueOnce(new Response(JSON.stringify({ token: JWT }), { status: 200 }))
 			.mockResolvedValueOnce(new Response(JSON.stringify({ error: 'bad token' }), { status: 400 }));
 		vi.stubGlobal('fetch', fetchMock);
@@ -155,7 +162,8 @@ describe('exchangeSession()', () => {
 	});
 
 	it('returns { ok: false, error: "cookie_set_failed" } when /auth/cookie fetch throws', async () => {
-		const fetchMock = vi.fn()
+		const fetchMock = vi
+			.fn()
 			.mockResolvedValueOnce(new Response(JSON.stringify({ token: JWT }), { status: 200 }))
 			.mockRejectedValueOnce(new Error('network failure'));
 		vi.stubGlobal('fetch', fetchMock);

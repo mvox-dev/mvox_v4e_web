@@ -16,7 +16,14 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { Cookies, ServerLoadEvent } from '@sveltejs/kit';
 
-const ORDERED_PROVIDER_IDS = ['smart-id', 'mobile-id', 'id-card', 'google', 'apple', 'e-mail'] as const;
+const ORDERED_PROVIDER_IDS = [
+	'smart-id',
+	'mobile-id',
+	'id-card',
+	'google',
+	'apple',
+	'e-mail',
+] as const;
 
 // Mutable env — reassign per-test to control $env/dynamic/private values
 const mockEnv = { ENTU_BASE_URL: 'https://entu.app/api/', ENTU_DB: 'polyphony' };
@@ -78,7 +85,7 @@ describe('auth/login +page.server.ts load()', () => {
 	it('returns a providers array', async () => {
 		const { load } = await import('../../../../routes/auth/login/+page.server.ts');
 		const event = makeLoadEvent();
-		const result = await load(event) as { providers: unknown[] };
+		const result = (await load(event)) as { providers: unknown[] };
 
 		expect(Array.isArray(result.providers)).toBe(true);
 		expect(result.providers.length).toBeGreaterThan(0);
@@ -87,9 +94,9 @@ describe('auth/login +page.server.ts load()', () => {
 	it('providers array contains all 6 expected provider IDs', async () => {
 		const { load } = await import('../../../../routes/auth/login/+page.server.ts');
 		const event = makeLoadEvent();
-		const result = await load(event) as { providers: Array<{ id: string }> };
+		const result = (await load(event)) as { providers: Array<{ id: string }> };
 
-		const ids = result.providers.map(p => p.id);
+		const ids = result.providers.map((p) => p.id);
 		for (const expected of ORDERED_PROVIDER_IDS) {
 			expect(ids).toContain(expected);
 		}
@@ -98,16 +105,18 @@ describe('auth/login +page.server.ts load()', () => {
 	it('providers appear in correct order: smart-id, mobile-id, id-card, google, apple, e-mail', async () => {
 		const { load } = await import('../../../../routes/auth/login/+page.server.ts');
 		const event = makeLoadEvent();
-		const result = await load(event) as { providers: Array<{ id: string }> };
+		const result = (await load(event)) as { providers: Array<{ id: string }> };
 
-		const ids = result.providers.map(p => p.id);
+		const ids = result.providers.map((p) => p.id);
 		expect(ids).toEqual([...ORDERED_PROVIDER_IDS]);
 	});
 
 	it('each provider has id, label, and url fields', async () => {
 		const { load } = await import('../../../../routes/auth/login/+page.server.ts');
 		const event = makeLoadEvent();
-		const result = await load(event) as { providers: Array<{ id: string; label: string; url: string }> };
+		const result = (await load(event)) as {
+			providers: Array<{ id: string; label: string; url: string }>;
+		};
 
 		for (const provider of result.providers) {
 			expect(typeof provider.id).toBe('string');
@@ -123,7 +132,7 @@ describe('auth/login +page.server.ts load()', () => {
 	it('each provider URL contains the Entu auth base URL', async () => {
 		const { load } = await import('../../../../routes/auth/login/+page.server.ts');
 		const event = makeLoadEvent();
-		const result = await load(event) as { providers: Array<{ url: string }> };
+		const result = (await load(event)) as { providers: Array<{ url: string }> };
 
 		for (const provider of result.providers) {
 			expect(provider.url).toContain('entu.app');
@@ -133,7 +142,7 @@ describe('auth/login +page.server.ts load()', () => {
 	it('each provider URL contains the provider id in the path', async () => {
 		const { load } = await import('../../../../routes/auth/login/+page.server.ts');
 		const event = makeLoadEvent();
-		const result = await load(event) as { providers: Array<{ id: string; url: string }> };
+		const result = (await load(event)) as { providers: Array<{ id: string; url: string }> };
 
 		for (const provider of result.providers) {
 			expect(provider.url).toContain(`/auth/${provider.id}`);
@@ -143,7 +152,7 @@ describe('auth/login +page.server.ts load()', () => {
 	it('each provider URL next param points to /auth/callback on the request origin', async () => {
 		const { load } = await import('../../../../routes/auth/login/+page.server.ts');
 		const event = makeLoadEvent('https://multivox.pages.dev');
-		const result = await load(event) as { providers: Array<{ url: string }> };
+		const result = (await load(event)) as { providers: Array<{ url: string }> };
 
 		for (const provider of result.providers) {
 			const nextMatch = provider.url.match(/[?&]next=([^&]+)/);
@@ -157,7 +166,7 @@ describe('auth/login +page.server.ts load()', () => {
 	it('each provider URL next param ends with key= (Entu appends session token here)', async () => {
 		const { load } = await import('../../../../routes/auth/login/+page.server.ts');
 		const event = makeLoadEvent();
-		const result = await load(event) as { providers: Array<{ url: string }> };
+		const result = (await load(event)) as { providers: Array<{ url: string }> };
 
 		for (const provider of result.providers) {
 			const nextMatch = provider.url.match(/[?&]next=([^&]+)/);
@@ -169,7 +178,7 @@ describe('auth/login +page.server.ts load()', () => {
 	it('each provider URL next param contains the csrf_state value', async () => {
 		const { load } = await import('../../../../routes/auth/login/+page.server.ts');
 		const event = makeLoadEvent();
-		const result = await load(event) as { providers: Array<{ url: string }> };
+		const result = (await load(event)) as { providers: Array<{ url: string }> };
 		const cookies = event.cookies as ReturnType<typeof makeCookies>;
 		const csrfState = cookies.store['csrf_state'];
 
@@ -182,7 +191,7 @@ describe('auth/login +page.server.ts load()', () => {
 	it('uses event.url.origin for callback URL (dev origin works)', async () => {
 		const { load } = await import('../../../../routes/auth/login/+page.server.ts');
 		const event = makeLoadEvent('http://localhost:5173');
-		const result = await load(event) as { providers: Array<{ url: string }> };
+		const result = (await load(event)) as { providers: Array<{ url: string }> };
 
 		const firstNext = result.providers[0].url.match(/[?&]next=([^&]+)/);
 		const next = decodeURIComponent(firstNext![1]);
@@ -226,11 +235,11 @@ describe('auth/login +page.server.ts load()', () => {
 	it('all provider URLs share the same csrf_state value', async () => {
 		const { load } = await import('../../../../routes/auth/login/+page.server.ts');
 		const event = makeLoadEvent();
-		const result = await load(event) as { providers: Array<{ url: string }> };
+		const result = (await load(event)) as { providers: Array<{ url: string }> };
 		const cookies = event.cookies as ReturnType<typeof makeCookies>;
 		const csrfState = cookies.store['csrf_state'];
 
-		const statesInUrls = result.providers.map(p => {
+		const statesInUrls = result.providers.map((p) => {
 			const m = p.url.match(/[?&]state=([^&?]+)/);
 			return m ? m[1] : null;
 		});

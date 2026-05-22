@@ -68,7 +68,7 @@ async function mockOrgsSuccess(page: Page, orgs = ORG_FIXTURES) {
 			status: 200,
 			contentType: 'application/json',
 			body: JSON.stringify({ entities: orgs }),
-		})
+		}),
 	);
 }
 
@@ -78,7 +78,7 @@ async function mockOrgsEmpty(page: Page) {
 			status: 200,
 			contentType: 'application/json',
 			body: JSON.stringify({ entities: [] }),
-		})
+		}),
 	);
 }
 
@@ -88,7 +88,7 @@ async function mockOrgsError(page: Page, status = 500) {
 			status,
 			contentType: 'application/json',
 			body: JSON.stringify({ error: 'upstream_unavailable' }),
-		})
+		}),
 	);
 }
 
@@ -223,7 +223,9 @@ test('signed-in: org card shows description when present', async ({ page }) => {
 	await expect(card).toContainText('Premier choral ensemble');
 });
 
-test.skip('signed-in: page data is SSR-present in initial HTML (no flash-of-empty)', async ({ page }) => {
+test.skip('signed-in: page data is SSR-present in initial HTML (no flash-of-empty)', async ({
+	page,
+}) => {
 	// SKIP: pending CHORE-36 (Entu mock harness) — Playwright cannot intercept SvelteKit's
 	// internal event.fetch, so SSR cannot be tested today without upstream-Entu mocking.
 	// Un-skip when CHORE-36 lands.

@@ -27,9 +27,9 @@ describe('EntuClient', () => {
 
 	describe('fetch behaviour', () => {
 		it('attaches Authorization: Bearer header on outbound requests', async () => {
-			const fetchMock = vi.fn().mockResolvedValue(
-				new Response(JSON.stringify({ entity: {} }), { status: 200 })
-			);
+			const fetchMock = vi
+				.fn()
+				.mockResolvedValue(new Response(JSON.stringify({ entity: {} }), { status: 200 }));
 			vi.stubGlobal('fetch', fetchMock);
 
 			const { EntuClient } = await import('./client.ts');
@@ -44,9 +44,9 @@ describe('EntuClient', () => {
 
 		it('uses ENTU_BASE_URL from $env/dynamic/private as base URL', async () => {
 			mockEnv.ENTU_BASE_URL = 'https://custom.entu.host/api/';
-			const fetchMock = vi.fn().mockResolvedValue(
-				new Response(JSON.stringify({ entity: {} }), { status: 200 })
-			);
+			const fetchMock = vi
+				.fn()
+				.mockResolvedValue(new Response(JSON.stringify({ entity: {} }), { status: 200 }));
 			vi.stubGlobal('fetch', fetchMock);
 
 			const { EntuClient } = await import('./client.ts');
@@ -59,9 +59,9 @@ describe('EntuClient', () => {
 
 		it('uses ENTU_DB from $env/dynamic/private in the request URL path', async () => {
 			mockEnv.ENTU_DB = 'mychoir';
-			const fetchMock = vi.fn().mockResolvedValue(
-				new Response(JSON.stringify({ entity: {} }), { status: 200 })
-			);
+			const fetchMock = vi
+				.fn()
+				.mockResolvedValue(new Response(JSON.stringify({ entity: {} }), { status: 200 }));
 			vi.stubGlobal('fetch', fetchMock);
 
 			const { EntuClient } = await import('./client.ts');
@@ -76,9 +76,9 @@ describe('EntuClient', () => {
 	describe('get(entityId)', () => {
 		it('returns the entity from the Entu response', async () => {
 			const entity = { _id: 'entity-123', name: [{ string: 'Test Entity' }] };
-			const fetchMock = vi.fn().mockResolvedValue(
-				new Response(JSON.stringify({ entity }), { status: 200 })
-			);
+			const fetchMock = vi
+				.fn()
+				.mockResolvedValue(new Response(JSON.stringify({ entity }), { status: 200 }));
 			vi.stubGlobal('fetch', fetchMock);
 
 			const { EntuClient } = await import('./client.ts');
@@ -89,9 +89,12 @@ describe('EntuClient', () => {
 		});
 
 		it('throws on 403 response', async () => {
-			vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
-				new Response(JSON.stringify({ error: 'forbidden' }), { status: 403 })
-			));
+			vi.stubGlobal(
+				'fetch',
+				vi
+					.fn()
+					.mockResolvedValue(new Response(JSON.stringify({ error: 'forbidden' }), { status: 403 })),
+			);
 
 			const { EntuClient } = await import('./client.ts');
 			const client = new EntuClient('my-jwt');
@@ -100,9 +103,12 @@ describe('EntuClient', () => {
 		});
 
 		it('throws on 404 response', async () => {
-			vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
-				new Response(JSON.stringify({ error: 'not found' }), { status: 404 })
-			));
+			vi.stubGlobal(
+				'fetch',
+				vi
+					.fn()
+					.mockResolvedValue(new Response(JSON.stringify({ error: 'not found' }), { status: 404 })),
+			);
 
 			const { EntuClient } = await import('./client.ts');
 			const client = new EntuClient('my-jwt');
@@ -114,9 +120,9 @@ describe('EntuClient', () => {
 	describe('search(query)', () => {
 		it('returns an array of entities', async () => {
 			const entities = [{ _id: 'e1' }, { _id: 'e2' }];
-			const fetchMock = vi.fn().mockResolvedValue(
-				new Response(JSON.stringify({ entities }), { status: 200 })
-			);
+			const fetchMock = vi
+				.fn()
+				.mockResolvedValue(new Response(JSON.stringify({ entities }), { status: 200 }));
 			vi.stubGlobal('fetch', fetchMock);
 
 			const { EntuClient } = await import('./client.ts');
@@ -130,9 +136,9 @@ describe('EntuClient', () => {
 
 	describe('setProperty(entityId, prop, value)', () => {
 		it('makes a POST/PUT request with the property value', async () => {
-			const fetchMock = vi.fn().mockResolvedValue(
-				new Response(JSON.stringify({ _id: 'prop-456' }), { status: 200 })
-			);
+			const fetchMock = vi
+				.fn()
+				.mockResolvedValue(new Response(JSON.stringify({ _id: 'prop-456' }), { status: 200 }));
 			vi.stubGlobal('fetch', fetchMock);
 
 			const { EntuClient } = await import('./client.ts');
@@ -145,9 +151,9 @@ describe('EntuClient', () => {
 		});
 
 		it('attaches Authorization header on setProperty requests', async () => {
-			const fetchMock = vi.fn().mockResolvedValue(
-				new Response(JSON.stringify({ _id: 'prop-456' }), { status: 200 })
-			);
+			const fetchMock = vi
+				.fn()
+				.mockResolvedValue(new Response(JSON.stringify({ _id: 'prop-456' }), { status: 200 }));
 			vi.stubGlobal('fetch', fetchMock);
 
 			const { EntuClient } = await import('./client.ts');

@@ -92,12 +92,16 @@ async function resolveTypeId(client: EntuClient, typeName: string): Promise<stri
 // Step 1: Seed voice lookup map
 // ---------------------------------------------------------------------------
 
-async function buildVoiceMap(client: EntuClient, voiceNames: string[]): Promise<Map<string, string>> {
+async function buildVoiceMap(
+	client: EntuClient,
+	voiceNames: string[],
+): Promise<Map<string, string>> {
 	const map = new Map<string, string>();
 	for (const name of voiceNames) {
 		// Inline check gates the dry-run path; findOrCreateByName re-checks on the live path.
 		const existing = await listInstancesByType(client, 'voice', '_id', { 'name.string': name });
-		if (existing.entities.length === 0) throw new Error(`voice "${name}" not found — run seed-voices.ts first`);
+		if (existing.entities.length === 0)
+			throw new Error(`voice "${name}" not found — run seed-voices.ts first`);
 		map.set(name, existing.entities[0]._id);
 	}
 	return map;
@@ -112,7 +116,7 @@ async function seedPerson(
 	personTypeId: string,
 	name: string,
 	dryRun: boolean,
-	result: SeedResult
+	result: SeedResult,
 ): Promise<string | null> {
 	// Inline check gates the dry-run path; findOrCreateByName re-checks on the live path.
 	const existing = await listInstancesByType(client, 'person', '_id', { 'name.string': name });
@@ -155,10 +159,12 @@ async function seedOrg(
 	founderPersonId: string,
 	dryRun: boolean,
 	result: SeedResult,
-	kind: 'umbrella' | 'collective'
+	kind: 'umbrella' | 'collective',
 ): Promise<string | null> {
 	// Inline check gates the dry-run path; findOrCreateByName re-checks on the live path.
-	const existing = await listInstancesByType(client, 'organization', '_id', { 'name.string': spec.name });
+	const existing = await listInstancesByType(client, 'organization', '_id', {
+		'name.string': spec.name,
+	});
 	if (existing.entities.length > 0) {
 		const id = existing.entities[0]._id;
 		console.log(`  [${kind}] "${spec.name}": EXISTS (${id}) — skip`);
@@ -201,13 +207,19 @@ async function seedSection(
 	spec: SectionSpec,
 	voiceMap: Map<string, string>,
 	dryRun: boolean,
-	result: SeedResult
+	result: SeedResult,
 ): Promise<string | null> {
 	// Scope by parent to avoid name collisions across collectives (e.g., multiple "Bass" sections).
 	// In dry-run, collective._id may be '' (not yet created) — skip the check and log WOULD CREATE.
 	if (dryRun && !collective._id) {
-		console.log(`  [section] "${spec.name}" under "${collective.name}": WOULD CREATE (voice: ${spec.voice})`);
-		result.sections.wouldCreate.push({ name: spec.name, collective: collective.name, voice: spec.voice });
+		console.log(
+			`  [section] "${spec.name}" under "${collective.name}": WOULD CREATE (voice: ${spec.voice})`,
+		);
+		result.sections.wouldCreate.push({
+			name: spec.name,
+			collective: collective.name,
+			voice: spec.voice,
+		});
 		return null;
 	}
 
@@ -217,7 +229,9 @@ async function seedSection(
 	});
 	if (existingResp.entities.length > 0) {
 		const existingId = existingResp.entities[0]._id;
-		console.log(`  [section] "${spec.name}" under "${collective.name}": EXISTS (${existingId}) — skip`);
+		console.log(
+			`  [section] "${spec.name}" under "${collective.name}": EXISTS (${existingId}) — skip`,
+		);
 		result.sections.skipped.push({ name: spec.name, collective: collective.name, _id: existingId });
 		return existingId;
 	}
@@ -226,8 +240,14 @@ async function seedSection(
 	if (!voiceId) throw new Error(`voice "${spec.voice}" not in voice map`);
 
 	if (dryRun) {
-		console.log(`  [section] "${spec.name}" under "${collective.name}": WOULD CREATE (voice: ${spec.voice})`);
-		result.sections.wouldCreate.push({ name: spec.name, collective: collective.name, voice: spec.voice });
+		console.log(
+			`  [section] "${spec.name}" under "${collective.name}": WOULD CREATE (voice: ${spec.voice})`,
+		);
+		result.sections.wouldCreate.push({
+			name: spec.name,
+			collective: collective.name,
+			voice: spec.voice,
+		});
 		return null;
 	}
 
@@ -245,7 +265,9 @@ async function seedSection(
 		console.log(`  [section] "${spec.name}" under "${collective.name}": CREATED (${r._id})`);
 		result.sections.created.push({ name: spec.name, collective: collective.name, _id: r._id });
 	} else {
-		console.log(`  [section] "${spec.name}" under "${collective.name}": EXISTS (${r._id}) — skip (race)`);
+		console.log(
+			`  [section] "${spec.name}" under "${collective.name}": EXISTS (${r._id}) — skip (race)`,
+		);
 		result.sections.skipped.push({ name: spec.name, collective: collective.name, _id: r._id });
 	}
 	return r._id;
@@ -265,12 +287,16 @@ async function seedMember(
 	collectiveName: string,
 	sectionName: string,
 	dryRun: boolean,
-	result: SeedResult
+	result: SeedResult,
 ): Promise<void> {
 	// In dry-run, personId/orgId may be '' (not yet created) — skip idempotency check.
 	if (dryRun) {
 		console.log(`  [member] "${personName}" in "${collectiveName}/${sectionName}": WOULD CREATE`);
-		result.members.wouldCreate.push({ person: personName, collective: collectiveName, section: sectionName });
+		result.members.wouldCreate.push({
+			person: personName,
+			collective: collectiveName,
+			section: sectionName,
+		});
 		return;
 	}
 
@@ -282,8 +308,15 @@ async function seedMember(
 
 	if (existing.entities.length > 0) {
 		const existingId = existing.entities[0]._id;
-		console.log(`  [member] "${personName}" in "${collectiveName}/${sectionName}": EXISTS (${existingId}) — skip`);
-		result.members.skipped.push({ person: personName, collective: collectiveName, section: sectionName, _id: existingId });
+		console.log(
+			`  [member] "${personName}" in "${collectiveName}/${sectionName}": EXISTS (${existingId}) — skip`,
+		);
+		result.members.skipped.push({
+			person: personName,
+			collective: collectiveName,
+			section: sectionName,
+			_id: existingId,
+		});
 		return;
 	}
 
@@ -296,11 +329,25 @@ async function seedMember(
 		{ type: '_sharing', string: 'private' },
 	]);
 	if (r.created) {
-		console.log(`  [member] "${personName}" in "${collectiveName}/${sectionName}": CREATED (${r._id})`);
-		result.members.created.push({ person: personName, collective: collectiveName, section: sectionName, _id: r._id });
+		console.log(
+			`  [member] "${personName}" in "${collectiveName}/${sectionName}": CREATED (${r._id})`,
+		);
+		result.members.created.push({
+			person: personName,
+			collective: collectiveName,
+			section: sectionName,
+			_id: r._id,
+		});
 	} else {
-		console.log(`  [member] "${personName}" in "${collectiveName}/${sectionName}": EXISTS (${r._id}) — skip (race)`);
-		result.members.skipped.push({ person: personName, collective: collectiveName, section: sectionName, _id: r._id });
+		console.log(
+			`  [member] "${personName}" in "${collectiveName}/${sectionName}": EXISTS (${r._id}) — skip (race)`,
+		);
+		result.members.skipped.push({
+			person: personName,
+			collective: collectiveName,
+			section: sectionName,
+			_id: r._id,
+		});
 	}
 }
 
@@ -365,7 +412,9 @@ async function main() {
 		resolveTypeId(client, 'section'),
 		resolveTypeId(client, 'member'),
 	]);
-	console.log(`[seed-collectives] types: person=${personTypeId} org=${orgTypeId} section=${sectionTypeId} member=${memberTypeId}`);
+	console.log(
+		`[seed-collectives] types: person=${personTypeId} org=${orgTypeId} section=${sectionTypeId} member=${memberTypeId}`,
+	);
 
 	// Collect all unique voice names needed
 	const voiceNamesNeeded = new Set<string>();
@@ -411,12 +460,25 @@ async function main() {
 	for (const umbrella of manifest.umbrellas) {
 		const founderPersonId = personIdMap.get(umbrella.founder);
 		if (!founderPersonId && !DRY_RUN) {
-			console.error(`  [umbrella] "${umbrella.name}": SKIP — founder "${umbrella.founder}" has no person id (failed earlier?)`);
-			result.orgs.failed.push({ name: umbrella.name, error: `founder person "${umbrella.founder}" not available` });
+			console.error(
+				`  [umbrella] "${umbrella.name}": SKIP — founder "${umbrella.founder}" has no person id (failed earlier?)`,
+			);
+			result.orgs.failed.push({
+				name: umbrella.name,
+				error: `founder person "${umbrella.founder}" not available`,
+			});
 			continue;
 		}
 		try {
-			const id = await seedOrg(client, orgTypeId, umbrella, founderPersonId ?? '', DRY_RUN, result, 'umbrella');
+			const id = await seedOrg(
+				client,
+				orgTypeId,
+				umbrella,
+				founderPersonId ?? '',
+				DRY_RUN,
+				result,
+				'umbrella',
+			);
 			if (id) umbrellaIdMap.set(umbrella.name, id);
 		} catch (err) {
 			const msg = err instanceof Error ? err.message : String(err);
@@ -428,18 +490,33 @@ async function main() {
 	// -------------------------------------------------------------------------
 	// Phase 3: Seed collectives (founder parent + umbrella parent)
 	// -------------------------------------------------------------------------
-	console.log(`\n[seed-collectives] Phase 3: seeding ${manifest.collectives.length} collectives...`);
+	console.log(
+		`\n[seed-collectives] Phase 3: seeding ${manifest.collectives.length} collectives...`,
+	);
 	const collectiveIdMap = new Map<string, string>(); // name → _id
 
 	for (const collective of manifest.collectives) {
 		const founderPersonId = personIdMap.get(collective.founder);
 		if (!founderPersonId && !DRY_RUN) {
-			console.error(`  [collective] "${collective.name}": SKIP — founder "${collective.founder}" has no person id`);
-			result.orgs.failed.push({ name: collective.name, error: `founder person "${collective.founder}" not available` });
+			console.error(
+				`  [collective] "${collective.name}": SKIP — founder "${collective.founder}" has no person id`,
+			);
+			result.orgs.failed.push({
+				name: collective.name,
+				error: `founder person "${collective.founder}" not available`,
+			});
 			continue;
 		}
 		try {
-			const id = await seedOrg(client, orgTypeId, collective, founderPersonId ?? '', DRY_RUN, result, 'collective');
+			const id = await seedOrg(
+				client,
+				orgTypeId,
+				collective,
+				founderPersonId ?? '',
+				DRY_RUN,
+				result,
+				'collective',
+			);
 			if (id) {
 				collectiveIdMap.set(collective.name, id);
 
@@ -447,7 +524,9 @@ async function main() {
 				const umbrellaId = umbrellaIdMap.get(collective.umbrella);
 				if (umbrellaId) {
 					if (DRY_RUN) {
-						console.log(`  [collective] "${collective.name}": WOULD CHECK umbrella parent "${collective.umbrella}" (skip add if already present)`);
+						console.log(
+							`  [collective] "${collective.name}": WOULD CHECK umbrella parent "${collective.umbrella}" (skip add if already present)`,
+						);
 					} else {
 						// fetchEntity throws on non-200; umbrella-parent check uses the entity's _parent array.
 						const entity = await fetchEntity(client, id);
@@ -459,10 +538,14 @@ async function main() {
 							}
 						}
 						if (existingParentIds.includes(umbrellaId)) {
-							console.log(`  [collective] "${collective.name}": umbrella parent already present — skip`);
+							console.log(
+								`  [collective] "${collective.name}": umbrella parent already present — skip`,
+							);
 						} else {
 							await postProperties(client, id, [{ type: '_parent', reference: umbrellaId }]);
-							console.log(`  [collective] "${collective.name}": umbrella parent "${collective.umbrella}" (${umbrellaId}) added`);
+							console.log(
+								`  [collective] "${collective.name}": umbrella parent "${collective.umbrella}" (${umbrellaId}) added`,
+							);
 						}
 					}
 				}
@@ -496,13 +579,19 @@ async function main() {
 					sectionSpec,
 					voiceMap,
 					DRY_RUN,
-					result
+					result,
 				);
 				if (id) sectionIdMap.set(`${collective.name}/${sectionSpec.name}`, id);
 			} catch (err) {
 				const msg = err instanceof Error ? err.message : String(err);
-				console.error(`  [section] "${sectionSpec.name}" under "${collective.name}": FAILED — ${msg}`);
-				result.sections.failed.push({ name: sectionSpec.name, collective: collective.name, error: msg });
+				console.error(
+					`  [section] "${sectionSpec.name}" under "${collective.name}": FAILED — ${msg}`,
+				);
+				result.sections.failed.push({
+					name: sectionSpec.name,
+					collective: collective.name,
+					error: msg,
+				});
 			}
 		}
 	}
@@ -512,7 +601,7 @@ async function main() {
 	// -------------------------------------------------------------------------
 	const totalMembers = manifest.collectives.reduce(
 		(n, c) => n + c.sections.reduce((m, s) => m + s.persons.length, 0),
-		0
+		0,
 	);
 	console.log(`\n[seed-collectives] Phase 5: seeding ${totalMembers} members...`);
 
@@ -525,14 +614,21 @@ async function main() {
 		for (const sectionSpec of collective.sections) {
 			const sectionId = sectionIdMap.get(`${collective.name}/${sectionSpec.name}`);
 			if (!sectionId && !DRY_RUN) {
-				console.error(`  [member] skipping members for "${collective.name}/${sectionSpec.name}" — section not available`);
+				console.error(
+					`  [member] skipping members for "${collective.name}/${sectionSpec.name}" — section not available`,
+				);
 				continue;
 			}
 			for (const personName of sectionSpec.persons) {
 				const personId = personIdMap.get(personName);
 				if (!personId && !DRY_RUN) {
 					console.error(`  [member] skipping "${personName}" — person not available`);
-					result.members.failed.push({ person: personName, collective: collective.name, section: sectionSpec.name, error: 'person not available' });
+					result.members.failed.push({
+						person: personName,
+						collective: collective.name,
+						section: sectionSpec.name,
+						error: 'person not available',
+					});
 					continue;
 				}
 				try {
@@ -546,12 +642,19 @@ async function main() {
 						collective.name,
 						sectionSpec.name,
 						DRY_RUN,
-						result
+						result,
 					);
 				} catch (err) {
 					const msg = err instanceof Error ? err.message : String(err);
-					console.error(`  [member] "${personName}" in "${collective.name}/${sectionSpec.name}": FAILED — ${msg}`);
-					result.members.failed.push({ person: personName, collective: collective.name, section: sectionSpec.name, error: msg });
+					console.error(
+						`  [member] "${personName}" in "${collective.name}/${sectionSpec.name}": FAILED — ${msg}`,
+					);
+					result.members.failed.push({
+						person: personName,
+						collective: collective.name,
+						section: sectionSpec.name,
+						error: msg,
+					});
 				}
 			}
 		}
@@ -568,15 +671,31 @@ async function main() {
 
 	console.log('\n[seed-collectives] ===== SUMMARY =====');
 	if (DRY_RUN) {
-		console.log(`persons  : ${result.persons.wouldCreate.length} would create, ${result.persons.skipped.length} already exist`);
-		console.log(`orgs     : ${result.orgs.wouldCreate.length} would create, ${result.orgs.skipped.length} already exist`);
-		console.log(`sections : ${result.sections.wouldCreate.length} would create, ${result.sections.skipped.length} already exist`);
-		console.log(`members  : ${result.members.wouldCreate.length} would create, ${result.members.skipped.length} already exist`);
+		console.log(
+			`persons  : ${result.persons.wouldCreate.length} would create, ${result.persons.skipped.length} already exist`,
+		);
+		console.log(
+			`orgs     : ${result.orgs.wouldCreate.length} would create, ${result.orgs.skipped.length} already exist`,
+		);
+		console.log(
+			`sections : ${result.sections.wouldCreate.length} would create, ${result.sections.skipped.length} already exist`,
+		);
+		console.log(
+			`members  : ${result.members.wouldCreate.length} would create, ${result.members.skipped.length} already exist`,
+		);
 	} else {
-		console.log(`persons  : ${result.persons.created.length} created, ${result.persons.skipped.length} skipped, ${result.persons.failed.length} failed`);
-		console.log(`orgs     : ${result.orgs.created.length} created, ${result.orgs.skipped.length} skipped, ${result.orgs.failed.length} failed`);
-		console.log(`sections : ${result.sections.created.length} created, ${result.sections.skipped.length} skipped, ${result.sections.failed.length} failed`);
-		console.log(`members  : ${result.members.created.length} created, ${result.members.skipped.length} skipped, ${result.members.failed.length} failed`);
+		console.log(
+			`persons  : ${result.persons.created.length} created, ${result.persons.skipped.length} skipped, ${result.persons.failed.length} failed`,
+		);
+		console.log(
+			`orgs     : ${result.orgs.created.length} created, ${result.orgs.skipped.length} skipped, ${result.orgs.failed.length} failed`,
+		);
+		console.log(
+			`sections : ${result.sections.created.length} created, ${result.sections.skipped.length} skipped, ${result.sections.failed.length} failed`,
+		);
+		console.log(
+			`members  : ${result.members.created.length} created, ${result.members.skipped.length} skipped, ${result.members.failed.length} failed`,
+		);
 	}
 
 	if (!DRY_RUN) {

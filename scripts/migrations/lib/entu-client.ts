@@ -20,7 +20,7 @@ export async function getJwt(input: {
 	const url = `${input.apiBase}/auth?db=${encodeURIComponent(input.db)}`;
 	const res = await fetch(url, {
 		method: 'GET',
-		headers: { Authorization: `Bearer ${input.apiKey}` }
+		headers: { Authorization: `Bearer ${input.apiKey}` },
 	});
 	if (!res.ok) {
 		throw new Error(`auth failed: ${res.status} ${await res.text()}`);
@@ -44,16 +44,16 @@ export interface CreateEntityResponse {
 
 export async function createEntity(
 	client: EntuClient,
-	properties: EntuProperty[]
+	properties: EntuProperty[],
 ): Promise<CreateEntityResponse> {
 	const url = `${client.apiBase}/${client.db}/entity`;
 	const res = await fetch(url, {
 		method: 'POST',
 		headers: {
 			Authorization: `Bearer ${client.jwt}`,
-			'Content-Type': 'application/json'
+			'Content-Type': 'application/json',
 		},
-		body: JSON.stringify(properties)
+		body: JSON.stringify(properties),
 	});
 	if (!res.ok) {
 		throw new Error(`create failed: ${res.status} ${await res.text()}`);
@@ -68,13 +68,13 @@ export interface ListEntitiesResponse {
 
 export async function listEntities(
 	client: EntuClient,
-	query: Record<string, string>
+	query: Record<string, string>,
 ): Promise<ListEntitiesResponse> {
 	const qs = new URLSearchParams(query).toString();
 	const url = `${client.apiBase}/${client.db}/entity?${qs}`;
 	const res = await fetch(url, {
 		method: 'GET',
-		headers: { Authorization: `Bearer ${client.jwt}` }
+		headers: { Authorization: `Bearer ${client.jwt}` },
 	});
 	if (!res.ok) {
 		throw new Error(`list failed: ${res.status} ${await res.text()}`);
@@ -91,14 +91,11 @@ interface EntityResponse {
 	entity: EntityRecord;
 }
 
-export async function fetchEntity(
-	client: EntuClient,
-	entityId: string
-): Promise<EntityRecord> {
+export async function fetchEntity(client: EntuClient, entityId: string): Promise<EntityRecord> {
 	const url = `${client.apiBase}/${client.db}/entity/${entityId}`;
 	const res = await fetch(url, {
 		method: 'GET',
-		headers: { Authorization: `Bearer ${client.jwt}` }
+		headers: { Authorization: `Bearer ${client.jwt}` },
 	});
 	if (!res.ok) {
 		throw new Error(`entity fetch failed: ${res.status} ${await res.text()}`);
@@ -113,16 +110,16 @@ export async function fetchEntity(
 export async function postProperties(
 	client: EntuClient,
 	entityId: string,
-	properties: EntuProperty[]
+	properties: EntuProperty[],
 ): Promise<void> {
 	const url = `${client.apiBase}/${client.db}/entity/${entityId}`;
 	const res = await fetch(url, {
 		method: 'POST',
 		headers: {
 			Authorization: `Bearer ${client.jwt}`,
-			'Content-Type': 'application/json'
+			'Content-Type': 'application/json',
 		},
-		body: JSON.stringify(properties)
+		body: JSON.stringify(properties),
 	});
 	if (!res.ok) {
 		throw new Error(`entity POST failed: ${res.status} ${await res.text()}`);
@@ -133,14 +130,11 @@ export async function postProperties(
 // an entity. Use this for stale formula values on prop-def entities and for
 // pruneExistingTarget on instance properties. For prop-DEF removal (the def
 // itself, which is an entity), use deleteEntity instead.
-export async function deletePropertyValue(
-	client: EntuClient,
-	propValueId: string
-): Promise<void> {
+export async function deletePropertyValue(client: EntuClient, propValueId: string): Promise<void> {
 	const url = `${client.apiBase}/${client.db}/property/${propValueId}`;
 	const res = await fetch(url, {
 		method: 'DELETE',
-		headers: { Authorization: `Bearer ${client.jwt}` }
+		headers: { Authorization: `Bearer ${client.jwt}` },
 	});
 	if (!res.ok) {
 		throw new Error(`property-value DELETE failed: ${res.status} ${await res.text()}`);
@@ -149,14 +143,11 @@ export async function deletePropertyValue(
 
 // DELETE /entity/{entityId} — removes an entity. Use for prop-def entities too
 // (property-defs ARE entities; /property/{id} returns 404 for prop-def _ids).
-export async function deleteEntity(
-	client: EntuClient,
-	entityId: string
-): Promise<void> {
+export async function deleteEntity(client: EntuClient, entityId: string): Promise<void> {
 	const url = `${client.apiBase}/${client.db}/entity/${entityId}`;
 	const res = await fetch(url, {
 		method: 'DELETE',
-		headers: { Authorization: `Bearer ${client.jwt}` }
+		headers: { Authorization: `Bearer ${client.jwt}` },
 	});
 	if (!res.ok) {
 		throw new Error(`entity DELETE failed: ${res.status} ${await res.text()}`);
@@ -179,10 +170,9 @@ export async function listInstancesByType(
 	typeName: string,
 	props: string,
 	limitOrExtraQuery?: number | Record<string, string>,
-	extraQuery?: Record<string, string>
+	extraQuery?: Record<string, string>,
 ): Promise<ListEntitiesResponse> {
-	const limit =
-		typeof limitOrExtraQuery === 'number' ? limitOrExtraQuery : 500;
+	const limit = typeof limitOrExtraQuery === 'number' ? limitOrExtraQuery : 500;
 	const query =
 		typeof limitOrExtraQuery === 'object' && limitOrExtraQuery !== null
 			? limitOrExtraQuery
@@ -191,13 +181,13 @@ export async function listInstancesByType(
 		'_type.string': typeName,
 		props,
 		limit: String(limit),
-		...(query ?? {})
+		...(query ?? {}),
 	};
 	const qs = new URLSearchParams(params).toString();
 	const url = `${client.apiBase}/${client.db}/entity/?${qs}`;
 	const res = await fetch(url, {
 		method: 'GET',
-		headers: { Authorization: `Bearer ${client.jwt}` }
+		headers: { Authorization: `Bearer ${client.jwt}` },
 	});
 	if (!res.ok) {
 		throw new Error(`list failed: ${res.status} ${await res.text()}`);

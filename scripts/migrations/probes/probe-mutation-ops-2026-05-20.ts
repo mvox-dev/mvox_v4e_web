@@ -74,7 +74,8 @@ const TARGETS = {
 		description: 'Delete last pre-v4E member by _id (name: "Mait Vaher")',
 		entityId: '69c7f88b8489bfcb0e81b5ee',
 		entityName: 'Mait Vaher',
-		rationale: 'Last-created pre-v4E member (highest _id among 116); will be replaced by v4E-clean seed members',
+		rationale:
+			'Last-created pre-v4E member (highest _id among 116); will be replaced by v4E-clean seed members',
 	},
 } as const;
 
@@ -127,14 +128,25 @@ async function main() {
 
 	if (DRY_RUN) {
 		console.log(`  Target entity: ${TARGETS.update.entityId} (${TARGETS.update.entityName})`);
-		console.log(`  Prop: ${TARGETS.update.propName}, current value _id: ${TARGETS.update.existingPropValueId}`);
+		console.log(
+			`  Prop: ${TARGETS.update.propName}, current value _id: ${TARGETS.update.existingPropValueId}`,
+		);
 		console.log(`  Step A: DELETE /property/${TARGETS.update.existingPropValueId}`);
-		console.log(`  Step B: POST entity/${TARGETS.update.entityId} [{type:"display_order", number:${TARGETS.update.intermediateValue}}]`);
+		console.log(
+			`  Step B: POST entity/${TARGETS.update.entityId} [{type:"display_order", number:${TARGETS.update.intermediateValue}}]`,
+		);
 		console.log(`  Step C: verify display_order === ${TARGETS.update.intermediateValue}`);
 		console.log(`  Step D: DELETE /property/<new-prop-value-id>`);
-		console.log(`  Step E: POST entity/${TARGETS.update.entityId} [{type:"display_order", number:${TARGETS.update.finalValue}}]`);
+		console.log(
+			`  Step E: POST entity/${TARGETS.update.entityId} [{type:"display_order", number:${TARGETS.update.finalValue}}]`,
+		);
 		console.log(`  Step F: verify display_order === ${TARGETS.update.finalValue}`);
-		ops.push({ op: 'UPDATE', target: TARGETS.update.entityName, status: 'dry-run', detail: TARGETS.update });
+		ops.push({
+			op: 'UPDATE',
+			target: TARGETS.update.entityName,
+			status: 'dry-run',
+			detail: TARGETS.update,
+		});
 	} else {
 		try {
 			// Pre-state
@@ -144,29 +156,51 @@ async function main() {
 			console.log(`  Pre-state: display_order=${preValue}, prop_value_id=${prePropId}`);
 
 			if (prePropId !== TARGETS.update.existingPropValueId) {
-				console.warn(`  WARNING: expected prop_value_id ${TARGETS.update.existingPropValueId}, got ${prePropId} — proceeding with live id`);
+				console.warn(
+					`  WARNING: expected prop_value_id ${TARGETS.update.existingPropValueId}, got ${prePropId} — proceeding with live id`,
+				);
 			}
 			const actualPropId = prePropId ?? TARGETS.update.existingPropValueId;
 
 			// Steps A+B: replace current value with intermediate
-			await replaceProperty(client, TARGETS.update.entityId, 'display_order', [actualPropId], TARGETS.update.intermediateValue);
-			console.log(`  Steps A+B: replaceProperty display_order → ${TARGETS.update.intermediateValue} — OK`);
+			await replaceProperty(
+				client,
+				TARGETS.update.entityId,
+				'display_order',
+				[actualPropId],
+				TARGETS.update.intermediateValue,
+			);
+			console.log(
+				`  Steps A+B: replaceProperty display_order → ${TARGETS.update.intermediateValue} — OK`,
+			);
 
 			// Step C: verify intermediate
 			const afterIntermediate = await fetchEntity(client, TARGETS.update.entityId);
 			const midValue = extractPropValue(afterIntermediate, 'display_order');
 			const midPropId = extractPropValueId(afterIntermediate, 'display_order');
-			console.log(`  Step C: verify display_order=${midValue} (expected ${TARGETS.update.intermediateValue}) — ${midValue === TARGETS.update.intermediateValue ? 'PASS' : 'FAIL'}`);
+			console.log(
+				`  Step C: verify display_order=${midValue} (expected ${TARGETS.update.intermediateValue}) — ${midValue === TARGETS.update.intermediateValue ? 'PASS' : 'FAIL'}`,
+			);
 
 			// Steps D+E: replace intermediate with final (restore)
 			if (!midPropId) throw new Error('Could not find intermediate prop value _id for cleanup');
-			await replaceProperty(client, TARGETS.update.entityId, 'display_order', [midPropId], TARGETS.update.finalValue);
-			console.log(`  Steps D+E: replaceProperty display_order → ${TARGETS.update.finalValue} (restore) — OK`);
+			await replaceProperty(
+				client,
+				TARGETS.update.entityId,
+				'display_order',
+				[midPropId],
+				TARGETS.update.finalValue,
+			);
+			console.log(
+				`  Steps D+E: replaceProperty display_order → ${TARGETS.update.finalValue} (restore) — OK`,
+			);
 
 			// Step F: verify restored
 			const afterFinal = await fetchEntity(client, TARGETS.update.entityId);
 			const finalValue = extractPropValue(afterFinal, 'display_order');
-			console.log(`  Step F: verify display_order=${finalValue} (expected ${TARGETS.update.finalValue}) — ${finalValue === TARGETS.update.finalValue ? 'PASS' : 'FAIL'}`);
+			console.log(
+				`  Step F: verify display_order=${finalValue} (expected ${TARGETS.update.finalValue}) — ${finalValue === TARGETS.update.finalValue ? 'PASS' : 'FAIL'}`,
+			);
 
 			ops.push({
 				op: 'UPDATE',
@@ -184,7 +218,13 @@ async function main() {
 		} catch (err) {
 			const msg = err instanceof Error ? err.message : String(err);
 			console.error(`  Op 1 FAILED: ${msg}`);
-			ops.push({ op: 'UPDATE', target: TARGETS.update.entityName, status: 'failed', detail: {}, error: msg });
+			ops.push({
+				op: 'UPDATE',
+				target: TARGETS.update.entityName,
+				status: 'failed',
+				detail: {},
+				error: msg,
+			});
 		}
 	}
 
@@ -195,21 +235,35 @@ async function main() {
 
 	if (DRY_RUN) {
 		console.log(`  Target entity: ${TARGETS.remove.entityId} (${TARGETS.remove.entityName})`);
-		console.log(`  Prop: ${TARGETS.remove.propName}, prop value _id: ${TARGETS.remove.propValueId}`);
+		console.log(
+			`  Prop: ${TARGETS.remove.propName}, prop value _id: ${TARGETS.remove.propValueId}`,
+		);
 		console.log(`  Op: DELETE /property/${TARGETS.remove.propValueId}`);
 		console.log(`  Post-verify: GET entity, confirm ordinal absent`);
-		ops.push({ op: 'REMOVE', target: TARGETS.remove.entityName, status: 'dry-run', detail: TARGETS.remove });
+		ops.push({
+			op: 'REMOVE',
+			target: TARGETS.remove.entityName,
+			status: 'dry-run',
+			detail: TARGETS.remove,
+		});
 	} else {
 		try {
 			// Pre-state
 			const pre = await fetchEntity(client, TARGETS.remove.entityId);
 			const ordinalBefore = pre['ordinal'];
 			const actualPropId = extractPropValueId(pre, 'ordinal');
-			console.log(`  Pre-state: ordinal=${JSON.stringify(ordinalBefore)}, prop_value_id=${actualPropId}`);
+			console.log(
+				`  Pre-state: ordinal=${JSON.stringify(ordinalBefore)}, prop_value_id=${actualPropId}`,
+			);
 
 			if (!actualPropId) {
 				console.log(`  ordinal already absent — SKIPPED (idempotent)`);
-				ops.push({ op: 'REMOVE', target: TARGETS.remove.entityName, status: 'skipped', detail: { reason: 'ordinal already absent' } });
+				ops.push({
+					op: 'REMOVE',
+					target: TARGETS.remove.entityName,
+					status: 'skipped',
+					detail: { reason: 'ordinal already absent' },
+				});
 			} else {
 				await deletePropertyValue(client, actualPropId);
 				console.log(`  DELETE /property/${actualPropId} — OK`);
@@ -236,7 +290,13 @@ async function main() {
 		} catch (err) {
 			const msg = err instanceof Error ? err.message : String(err);
 			console.error(`  Op 2 FAILED: ${msg}`);
-			ops.push({ op: 'REMOVE', target: TARGETS.remove.entityName, status: 'failed', detail: {}, error: msg });
+			ops.push({
+				op: 'REMOVE',
+				target: TARGETS.remove.entityName,
+				status: 'failed',
+				detail: {},
+				error: msg,
+			});
 		}
 	}
 
@@ -246,11 +306,18 @@ async function main() {
 	console.log(`\n[probe-mutation-ops] Op 3 — DELETE_ENTITY: ${TARGETS.deleteEntity.description}`);
 
 	if (DRY_RUN) {
-		console.log(`  Target entity: ${TARGETS.deleteEntity.entityId} (${TARGETS.deleteEntity.entityName})`);
+		console.log(
+			`  Target entity: ${TARGETS.deleteEntity.entityId} (${TARGETS.deleteEntity.entityName})`,
+		);
 		console.log(`  Rationale: ${TARGETS.deleteEntity.rationale}`);
 		console.log(`  Op: DELETE /entity/${TARGETS.deleteEntity.entityId}`);
 		console.log(`  Post-verify: GET entity returns 404 or deleted flag`);
-		ops.push({ op: 'DELETE_ENTITY', target: TARGETS.deleteEntity.entityName, status: 'dry-run', detail: TARGETS.deleteEntity });
+		ops.push({
+			op: 'DELETE_ENTITY',
+			target: TARGETS.deleteEntity.entityName,
+			status: 'dry-run',
+			detail: TARGETS.deleteEntity,
+		});
 	} else {
 		try {
 			// Pre-state: verify entity exists
@@ -264,13 +331,16 @@ async function main() {
 			// Verify deleted: GET should return 404
 			let postState: string;
 			try {
-				const postRes = await fetch(`${client.apiBase}/${client.db}/entity/${TARGETS.deleteEntity.entityId}`, {
-					headers: { Authorization: `Bearer ${client.jwt}` },
-				});
+				const postRes = await fetch(
+					`${client.apiBase}/${client.db}/entity/${TARGETS.deleteEntity.entityId}`,
+					{
+						headers: { Authorization: `Bearer ${client.jwt}` },
+					},
+				);
 				if (postRes.status === 404) {
 					postState = '404 (not found — confirmed deleted)';
 				} else {
-					const postBody = await postRes.json() as Record<string, unknown>;
+					const postBody = (await postRes.json()) as Record<string, unknown>;
 					postState = `${postRes.status}: ${JSON.stringify(postBody).slice(0, 100)}`;
 				}
 			} catch {
@@ -280,7 +350,9 @@ async function main() {
 
 			// Verify member count reduced
 			const memberCount = await listEntities(client, { '_type.string': 'member', props: '_id' });
-			console.log(`  Member count after delete: ${memberCount.count} (expected 115 pre-v4E members)`);
+			console.log(
+				`  Member count after delete: ${memberCount.count} (expected 115 pre-v4E members)`,
+			);
 
 			ops.push({
 				op: 'DELETE_ENTITY',
@@ -296,14 +368,20 @@ async function main() {
 		} catch (err) {
 			const msg = err instanceof Error ? err.message : String(err);
 			console.error(`  Op 3 FAILED: ${msg}`);
-			ops.push({ op: 'DELETE_ENTITY', target: TARGETS.deleteEntity.entityName, status: 'failed', detail: {}, error: msg });
+			ops.push({
+				op: 'DELETE_ENTITY',
+				target: TARGETS.deleteEntity.entityName,
+				status: 'failed',
+				detail: {},
+				error: msg,
+			});
 		}
 	}
 
 	// -------------------------------------------------------------------------
 	// Summary + artifact
 	// -------------------------------------------------------------------------
-	const failed = ops.filter(o => o.status === 'failed').length;
+	const failed = ops.filter((o) => o.status === 'failed').length;
 	console.log(`\n[probe-mutation-ops] ===== SUMMARY =====`);
 	for (const op of ops) {
 		console.log(`  ${op.op} (${op.target}): ${op.status}${op.error ? ' — ' + op.error : ''}`);
@@ -322,7 +400,7 @@ async function main() {
 	}
 }
 
-main().catch(err => {
+main().catch((err) => {
 	console.error('[probe-mutation-ops] fatal:', err);
 	process.exit(1);
 });

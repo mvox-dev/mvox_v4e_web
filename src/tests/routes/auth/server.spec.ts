@@ -12,8 +12,12 @@ function makeCookies(): Cookies & { store: Record<string, string> } {
 		store,
 		get: (name: string) => store[name] ?? null,
 		getAll: () => Object.entries(store).map(([name, value]) => ({ name, value })),
-		set: vi.fn((name: string, value: string) => { store[name] = value; }),
-		delete: vi.fn((name: string) => { delete store[name]; }),
+		set: vi.fn((name: string, value: string) => {
+			store[name] = value;
+		}),
+		delete: vi.fn((name: string) => {
+			delete store[name];
+		}),
 		serialize: vi.fn().mockReturnValue(''),
 	} as unknown as Cookies & { store: Record<string, string> };
 }
@@ -52,9 +56,9 @@ describe('POST /auth', () => {
 
 	it('forwards the api-key to Entu auth endpoint', async () => {
 		const jwt = 'entu.issued.jwt';
-		const fetchMock = vi.fn().mockResolvedValue(
-			new Response(JSON.stringify({ token: jwt }), { status: 200 })
-		);
+		const fetchMock = vi
+			.fn()
+			.mockResolvedValue(new Response(JSON.stringify({ token: jwt }), { status: 200 }));
 		vi.stubGlobal('fetch', fetchMock);
 
 		const { POST } = await import('../../../routes/auth/+server.ts');
@@ -69,9 +73,9 @@ describe('POST /auth', () => {
 	});
 
 	it('includes db param in the Entu request URL', async () => {
-		const fetchMock = vi.fn().mockResolvedValue(
-			new Response(JSON.stringify({ token: 'tok' }), { status: 200 })
-		);
+		const fetchMock = vi
+			.fn()
+			.mockResolvedValue(new Response(JSON.stringify({ token: 'tok' }), { status: 200 }));
 		vi.stubGlobal('fetch', fetchMock);
 
 		const { POST } = await import('../../../routes/auth/+server.ts');
@@ -84,9 +88,9 @@ describe('POST /auth', () => {
 
 	it('sets httpOnly entu_jwt cookie on success', async () => {
 		const jwt = 'entu.issued.jwt';
-		const fetchMock = vi.fn().mockResolvedValue(
-			new Response(JSON.stringify({ token: jwt }), { status: 200 })
-		);
+		const fetchMock = vi
+			.fn()
+			.mockResolvedValue(new Response(JSON.stringify({ token: jwt }), { status: 200 }));
 		vi.stubGlobal('fetch', fetchMock);
 
 		const { POST } = await import('../../../routes/auth/+server.ts');
@@ -95,7 +99,11 @@ describe('POST /auth', () => {
 
 		const cookiesSet = event.cookies.set as ReturnType<typeof vi.fn>;
 		expect(cookiesSet).toHaveBeenCalledOnce();
-		const [name, value, opts] = cookiesSet.mock.calls[0] as [string, string, Record<string, unknown>];
+		const [name, value, opts] = cookiesSet.mock.calls[0] as [
+			string,
+			string,
+			Record<string, unknown>,
+		];
 		expect(name).toBe('entu_jwt');
 		expect(value).toBe(jwt);
 		expect(opts?.httpOnly).toBe(true);
@@ -105,9 +113,9 @@ describe('POST /auth', () => {
 	});
 
 	it('returns 200 response on success', async () => {
-		const fetchMock = vi.fn().mockResolvedValue(
-			new Response(JSON.stringify({ token: 'tok' }), { status: 200 })
-		);
+		const fetchMock = vi
+			.fn()
+			.mockResolvedValue(new Response(JSON.stringify({ token: 'tok' }), { status: 200 }));
 		vi.stubGlobal('fetch', fetchMock);
 
 		const { POST } = await import('../../../routes/auth/+server.ts');
@@ -118,9 +126,9 @@ describe('POST /auth', () => {
 	});
 
 	it('does not set cookie on Entu auth failure', async () => {
-		const fetchMock = vi.fn().mockResolvedValue(
-			new Response(JSON.stringify({ error: 'invalid key' }), { status: 401 })
-		);
+		const fetchMock = vi
+			.fn()
+			.mockResolvedValue(new Response(JSON.stringify({ error: 'invalid key' }), { status: 401 }));
 		vi.stubGlobal('fetch', fetchMock);
 
 		const { POST } = await import('../../../routes/auth/+server.ts');
@@ -132,9 +140,9 @@ describe('POST /auth', () => {
 	});
 
 	it('returns an error response on Entu auth failure', async () => {
-		const fetchMock = vi.fn().mockResolvedValue(
-			new Response(JSON.stringify({ error: 'invalid key' }), { status: 401 })
-		);
+		const fetchMock = vi
+			.fn()
+			.mockResolvedValue(new Response(JSON.stringify({ error: 'invalid key' }), { status: 401 }));
 		vi.stubGlobal('fetch', fetchMock);
 
 		const { POST } = await import('../../../routes/auth/+server.ts');

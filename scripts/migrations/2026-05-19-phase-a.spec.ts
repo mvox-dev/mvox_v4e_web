@@ -20,11 +20,11 @@ describe('runPhaseA — E2E', () => {
 		const fetchMock = vi.spyOn(globalThis, 'fetch');
 		// /auth → JWT
 		fetchMock.mockResolvedValueOnce(
-			new Response(JSON.stringify({ token: 'fake-jwt' }), { status: 200 })
+			new Response(JSON.stringify({ token: 'fake-jwt' }), { status: 200 }),
 		);
 		// list entity types (filter: meta-type=entity) → empty
 		fetchMock.mockResolvedValueOnce(
-			new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 })
+			new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 }),
 		);
 
 		const result = await runPhaseA({
@@ -34,7 +34,7 @@ describe('runPhaseA — E2E', () => {
 			schemaPath: resolve(__dirname, 'lib/fixtures/schema-minimal.json'),
 			reportsDir: tempReportsDir,
 			dryRun: true,
-			now: () => '2026-05-19T20:55:00Z'
+			now: () => '2026-05-19T20:55:00Z',
 		});
 
 		expect(result.exitCode).toBe(0);
@@ -52,36 +52,28 @@ describe('runPhaseA — E2E', () => {
 	it('happy path: real (not dry) run posts each addition', async () => {
 		const fetchMock = vi.spyOn(globalThis, 'fetch');
 		fetchMock.mockResolvedValueOnce(
-			new Response(JSON.stringify({ token: 'fake-jwt' }), { status: 200 })
+			new Response(JSON.stringify({ token: 'fake-jwt' }), { status: 200 }),
 		);
 		// Empty db state
 		fetchMock.mockResolvedValueOnce(
-			new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 })
+			new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 }),
 		);
 		// Create season type
 		fetchMock.mockResolvedValueOnce(
-			new Response(JSON.stringify({ _id: 'season-id' }), { status: 200 })
+			new Response(JSON.stringify({ _id: 'season-id' }), { status: 200 }),
 		);
 		// Create season.start_date
-		fetchMock.mockResolvedValueOnce(
-			new Response(JSON.stringify({ _id: 'p1' }), { status: 200 })
-		);
+		fetchMock.mockResolvedValueOnce(new Response(JSON.stringify({ _id: 'p1' }), { status: 200 }));
 		// Create season.end_date
-		fetchMock.mockResolvedValueOnce(
-			new Response(JSON.stringify({ _id: 'p2' }), { status: 200 })
-		);
+		fetchMock.mockResolvedValueOnce(new Response(JSON.stringify({ _id: 'p2' }), { status: 200 }));
 		// Create season.description
-		fetchMock.mockResolvedValueOnce(
-			new Response(JSON.stringify({ _id: 'p3' }), { status: 200 })
-		);
+		fetchMock.mockResolvedValueOnce(new Response(JSON.stringify({ _id: 'p3' }), { status: 200 }));
 		// Create voice type
 		fetchMock.mockResolvedValueOnce(
-			new Response(JSON.stringify({ _id: 'voice-id' }), { status: 200 })
+			new Response(JSON.stringify({ _id: 'voice-id' }), { status: 200 }),
 		);
 		// Create voice.name
-		fetchMock.mockResolvedValueOnce(
-			new Response(JSON.stringify({ _id: 'p4' }), { status: 200 })
-		);
+		fetchMock.mockResolvedValueOnce(new Response(JSON.stringify({ _id: 'p4' }), { status: 200 }));
 
 		const result = await runPhaseA({
 			apiBase: 'https://api.entu.app',
@@ -90,7 +82,7 @@ describe('runPhaseA — E2E', () => {
 			schemaPath: resolve(__dirname, 'lib/fixtures/schema-minimal.json'),
 			reportsDir: tempReportsDir,
 			dryRun: false,
-			now: () => '2026-05-19T20:55:00Z'
+			now: () => '2026-05-19T20:55:00Z',
 		});
 
 		expect(result.exitCode).toBe(0);
@@ -102,17 +94,15 @@ describe('runPhaseA — E2E', () => {
 	it('exits 1 if any operation fails', async () => {
 		const fetchMock = vi.spyOn(globalThis, 'fetch');
 		fetchMock.mockResolvedValueOnce(
-			new Response(JSON.stringify({ token: 'fake-jwt' }), { status: 200 })
+			new Response(JSON.stringify({ token: 'fake-jwt' }), { status: 200 }),
 		);
 		fetchMock.mockResolvedValueOnce(
-			new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 })
+			new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 }),
 		);
 		// First create fails (season type)
 		fetchMock.mockResolvedValueOnce(new Response('Boom', { status: 500 }));
 		// Subsequent calls succeed
-		fetchMock.mockResolvedValue(
-			new Response(JSON.stringify({ _id: 'whatever' }), { status: 200 })
-		);
+		fetchMock.mockResolvedValue(new Response(JSON.stringify({ _id: 'whatever' }), { status: 200 }));
 
 		const result = await runPhaseA({
 			apiBase: 'https://api.entu.app',
@@ -121,7 +111,7 @@ describe('runPhaseA — E2E', () => {
 			schemaPath: resolve(__dirname, 'lib/fixtures/schema-minimal.json'),
 			reportsDir: tempReportsDir,
 			dryRun: false,
-			now: () => '2026-05-19T20:55:00Z'
+			now: () => '2026-05-19T20:55:00Z',
 		});
 
 		expect(result.exitCode).toBe(1);

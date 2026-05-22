@@ -1,5 +1,9 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { migrateProperty, type MigratePropertyOptions, type MigrationResult } from './data-migrator';
+import {
+	migrateProperty,
+	type MigratePropertyOptions,
+	type MigrationResult,
+} from './data-migrator';
 import type { EntuClient } from './entu-client';
 
 // Design assumption (Checkpoint 1 Q3): the migrator receives a pre-built
@@ -11,7 +15,7 @@ import type { EntuClient } from './entu-client';
 const client: EntuClient = {
 	apiBase: 'https://api.entu.app',
 	db: 'polyphony',
-	jwt: 'test-jwt'
+	jwt: 'test-jwt',
 };
 
 afterEach(() => {
@@ -22,9 +26,7 @@ afterEach(() => {
 function makeInstance(id: string, propValues: Record<string, { type: string; value: unknown }[]>) {
 	return {
 		_id: id,
-		...Object.fromEntries(
-			Object.entries(propValues).map(([k, vals]) => [k, vals])
-		)
+		...Object.fromEntries(Object.entries(propValues).map(([k, vals]) => [k, vals])),
 	};
 }
 
@@ -32,7 +34,10 @@ describe('migrateProperty — file→file (person.photo → person.avatar)', () 
 	it('copies file reference from source to target for each instance', async () => {
 		const instances = [
 			// Instance with photo.reference set, avatar absent
-			{ _id: 'person-1', photo: [{ _id: 'file-ref-1', type: 'file', reference: 'file-entity-id-1' }] },
+			{
+				_id: 'person-1',
+				photo: [{ _id: 'file-ref-1', type: 'file', reference: 'file-entity-id-1' }],
+			},
 		];
 
 		const mockListInstances = vi.fn().mockResolvedValue(instances);
@@ -44,14 +49,19 @@ describe('migrateProperty — file→file (person.photo → person.avatar)', () 
 			targetProperty: 'avatar',
 			backfillKind: 'file',
 			listInstances: mockListInstances,
-			writeProperty: mockWriteProperty
+			writeProperty: mockWriteProperty,
 		});
 
 		expect(result.migrated).toBe(1);
 		expect(result.skipped).toBe(0);
 		expect(result.failed).toBe(0);
 		expect(mockWriteProperty).toHaveBeenCalledOnce();
-		const [, entityId, propName, value] = mockWriteProperty.mock.calls[0] as [EntuClient, string, string, unknown];
+		const [, entityId, propName, value] = mockWriteProperty.mock.calls[0] as [
+			EntuClient,
+			string,
+			string,
+			unknown,
+		];
 		expect(entityId).toBe('person-1');
 		expect(propName).toBe('avatar');
 		expect(value).toBe('file-entity-id-1');
@@ -62,8 +72,8 @@ describe('migrateProperty — file→file (person.photo → person.avatar)', () 
 			{
 				_id: 'person-1',
 				photo: [{ type: 'file', reference: 'file-entity-id-1' }],
-				avatar: [{ type: 'file', reference: 'file-entity-id-1' }] // already matches
-			}
+				avatar: [{ type: 'file', reference: 'file-entity-id-1' }], // already matches
+			},
 		];
 
 		const mockListInstances = vi.fn().mockResolvedValue(instances);
@@ -75,7 +85,7 @@ describe('migrateProperty — file→file (person.photo → person.avatar)', () 
 			targetProperty: 'avatar',
 			backfillKind: 'file',
 			listInstances: mockListInstances,
-			writeProperty: mockWriteProperty
+			writeProperty: mockWriteProperty,
 		});
 
 		expect(result.skipped).toBe(1);
@@ -85,7 +95,7 @@ describe('migrateProperty — file→file (person.photo → person.avatar)', () 
 
 	it('skips instances where source property is absent', async () => {
 		const instances = [
-			{ _id: 'person-2' } // no photo property at all
+			{ _id: 'person-2' }, // no photo property at all
 		];
 
 		const mockListInstances = vi.fn().mockResolvedValue(instances);
@@ -97,7 +107,7 @@ describe('migrateProperty — file→file (person.photo → person.avatar)', () 
 			targetProperty: 'avatar',
 			backfillKind: 'file',
 			listInstances: mockListInstances,
-			writeProperty: mockWriteProperty
+			writeProperty: mockWriteProperty,
 		});
 
 		expect(result.skipped).toBe(1);
@@ -107,9 +117,7 @@ describe('migrateProperty — file→file (person.photo → person.avatar)', () 
 
 describe('migrateProperty — string→string (work.voicing → work.original_voicing)', () => {
 	it('copies string value from source to target', async () => {
-		const instances = [
-			{ _id: 'work-1', voicing: [{ type: 'string', string: 'SATB' }] }
-		];
+		const instances = [{ _id: 'work-1', voicing: [{ type: 'string', string: 'SATB' }] }];
 
 		const mockListInstances = vi.fn().mockResolvedValue(instances);
 		const mockWriteProperty = vi.fn().mockResolvedValue({ _id: 'p-id' });
@@ -120,7 +128,7 @@ describe('migrateProperty — string→string (work.voicing → work.original_vo
 			targetProperty: 'original_voicing',
 			backfillKind: 'string',
 			listInstances: mockListInstances,
-			writeProperty: mockWriteProperty
+			writeProperty: mockWriteProperty,
 		});
 
 		expect(result.migrated).toBe(1);
@@ -133,8 +141,8 @@ describe('migrateProperty — string→string (work.voicing → work.original_vo
 			{
 				_id: 'work-1',
 				voicing: [{ type: 'string', string: 'SATB' }],
-				original_voicing: [{ type: 'string', string: 'SATB' }]
-			}
+				original_voicing: [{ type: 'string', string: 'SATB' }],
+			},
 		];
 
 		const mockListInstances = vi.fn().mockResolvedValue(instances);
@@ -146,7 +154,7 @@ describe('migrateProperty — string→string (work.voicing → work.original_vo
 			targetProperty: 'original_voicing',
 			backfillKind: 'string',
 			listInstances: mockListInstances,
-			writeProperty: mockWriteProperty
+			writeProperty: mockWriteProperty,
 		});
 
 		expect(result.skipped).toBe(1);
@@ -156,9 +164,7 @@ describe('migrateProperty — string→string (work.voicing → work.original_vo
 
 describe('migrateProperty — number→number (work.duration → work.original_duration)', () => {
 	it('copies number value from source to target', async () => {
-		const instances = [
-			{ _id: 'work-1', duration: [{ type: 'number', number: 240 }] }
-		];
+		const instances = [{ _id: 'work-1', duration: [{ type: 'number', number: 240 }] }];
 
 		const mockListInstances = vi.fn().mockResolvedValue(instances);
 		const mockWriteProperty = vi.fn().mockResolvedValue({ _id: 'p-id' });
@@ -169,7 +175,7 @@ describe('migrateProperty — number→number (work.duration → work.original_d
 			targetProperty: 'original_duration',
 			backfillKind: 'number',
 			listInstances: mockListInstances,
-			writeProperty: mockWriteProperty
+			writeProperty: mockWriteProperty,
 		});
 
 		expect(result.migrated).toBe(1);
@@ -185,9 +191,9 @@ describe('migrateProperty — string_list (work.language → work.original_langu
 				_id: 'work-1',
 				language: [
 					{ type: 'string', string: 'et' },
-					{ type: 'string', string: 'la' }
-				]
-			}
+					{ type: 'string', string: 'la' },
+				],
+			},
 		];
 
 		const mockListInstances = vi.fn().mockResolvedValue(instances);
@@ -199,7 +205,7 @@ describe('migrateProperty — string_list (work.language → work.original_langu
 			targetProperty: 'original_language',
 			backfillKind: 'string_list',
 			listInstances: mockListInstances,
-			writeProperty: mockWriteProperty
+			writeProperty: mockWriteProperty,
 		});
 
 		// One call per string value in the list
@@ -212,8 +218,8 @@ describe('migrateProperty — string_list (work.language → work.original_langu
 			{
 				_id: 'work-1',
 				language: [{ type: 'string', string: 'et' }],
-				original_language: [{ type: 'string', string: 'et' }]
-			}
+				original_language: [{ type: 'string', string: 'et' }],
+			},
 		];
 
 		const mockListInstances = vi.fn().mockResolvedValue(instances);
@@ -225,7 +231,7 @@ describe('migrateProperty — string_list (work.language → work.original_langu
 			targetProperty: 'original_language',
 			backfillKind: 'string_list',
 			listInstances: mockListInstances,
-			writeProperty: mockWriteProperty
+			writeProperty: mockWriteProperty,
 		});
 
 		expect(result.skipped).toBe(1);
@@ -241,21 +247,21 @@ describe('migrateProperty — string→reference (section.voice_type → section
 
 	// The full live-data lookup map (5 entries, one per distinct voice_type value)
 	const LIVE_VOICE_LOOKUP = new Map([
-		['alto',     'voice-alto-id'],
+		['alto', 'voice-alto-id'],
 		['baritone', 'voice-baritone-id'],
-		['bass',     'voice-bass-id'],
-		['soprano',  'voice-soprano-id'],
-		['tenor',    'voice-tenor-id']
+		['bass', 'voice-bass-id'],
+		['soprano', 'voice-soprano-id'],
+		['tenor', 'voice-tenor-id'],
 	]);
 
 	it('migrates all 5 distinct voice_type values to reference ids', async () => {
 		// One section per distinct value — covers the full live set
 		const instances = [
-			{ _id: 'sec-alto',     voice_type: [{ type: 'string', string: 'alto' }] },
+			{ _id: 'sec-alto', voice_type: [{ type: 'string', string: 'alto' }] },
 			{ _id: 'sec-baritone', voice_type: [{ type: 'string', string: 'baritone' }] },
-			{ _id: 'sec-bass',     voice_type: [{ type: 'string', string: 'bass' }] },
-			{ _id: 'sec-soprano',  voice_type: [{ type: 'string', string: 'soprano' }] },
-			{ _id: 'sec-tenor',    voice_type: [{ type: 'string', string: 'tenor' }] }
+			{ _id: 'sec-bass', voice_type: [{ type: 'string', string: 'bass' }] },
+			{ _id: 'sec-soprano', voice_type: [{ type: 'string', string: 'soprano' }] },
+			{ _id: 'sec-tenor', voice_type: [{ type: 'string', string: 'tenor' }] },
 		];
 
 		const mockListInstances = vi.fn().mockResolvedValue(instances);
@@ -268,7 +274,7 @@ describe('migrateProperty — string→reference (section.voice_type → section
 			backfillKind: 'string_to_reference',
 			voiceLookup: LIVE_VOICE_LOOKUP,
 			listInstances: mockListInstances,
-			writeProperty: mockWriteProperty
+			writeProperty: mockWriteProperty,
 		});
 
 		expect(result.migrated).toBe(5);
@@ -277,9 +283,7 @@ describe('migrateProperty — string→reference (section.voice_type → section
 	});
 
 	it('writes the correct voice entity id for each section', async () => {
-		const instances = [
-			{ _id: 'sec-soprano', voice_type: [{ type: 'string', string: 'soprano' }] }
-		];
+		const instances = [{ _id: 'sec-soprano', voice_type: [{ type: 'string', string: 'soprano' }] }];
 
 		const mockListInstances = vi.fn().mockResolvedValue(instances);
 		const mockWriteProperty = vi.fn().mockResolvedValue({ _id: 'p-id' });
@@ -291,7 +295,7 @@ describe('migrateProperty — string→reference (section.voice_type → section
 			backfillKind: 'string_to_reference',
 			voiceLookup: LIVE_VOICE_LOOKUP,
 			listInstances: mockListInstances,
-			writeProperty: mockWriteProperty
+			writeProperty: mockWriteProperty,
 		});
 
 		const [, , , value] = mockWriteProperty.mock.calls[0] as [EntuClient, string, string, unknown];
@@ -301,22 +305,22 @@ describe('migrateProperty — string→reference (section.voice_type → section
 	it('mirrors the 16-section live distribution: zero unmatched_voice_type failures', async () => {
 		// Full fixture mirroring the live db — 16 sections, 5 distinct values
 		const liveInstances = [
-			{ _id: 's-1',  voice_type: [{ type: 'string', string: 'soprano' }] },
-			{ _id: 's-2',  voice_type: [{ type: 'string', string: 'alto' }] },
-			{ _id: 's-3',  voice_type: [{ type: 'string', string: 'tenor' }] },
-			{ _id: 's-4',  voice_type: [{ type: 'string', string: 'bass' }] },
-			{ _id: 's-5',  voice_type: [{ type: 'string', string: 'soprano' }] },
-			{ _id: 's-6',  voice_type: [{ type: 'string', string: 'soprano' }] },
-			{ _id: 's-7',  voice_type: [{ type: 'string', string: 'alto' }] },
-			{ _id: 's-8',  voice_type: [{ type: 'string', string: 'alto' }] },
-			{ _id: 's-9',  voice_type: [{ type: 'string', string: 'tenor' }] },
+			{ _id: 's-1', voice_type: [{ type: 'string', string: 'soprano' }] },
+			{ _id: 's-2', voice_type: [{ type: 'string', string: 'alto' }] },
+			{ _id: 's-3', voice_type: [{ type: 'string', string: 'tenor' }] },
+			{ _id: 's-4', voice_type: [{ type: 'string', string: 'bass' }] },
+			{ _id: 's-5', voice_type: [{ type: 'string', string: 'soprano' }] },
+			{ _id: 's-6', voice_type: [{ type: 'string', string: 'soprano' }] },
+			{ _id: 's-7', voice_type: [{ type: 'string', string: 'alto' }] },
+			{ _id: 's-8', voice_type: [{ type: 'string', string: 'alto' }] },
+			{ _id: 's-9', voice_type: [{ type: 'string', string: 'tenor' }] },
 			{ _id: 's-10', voice_type: [{ type: 'string', string: 'tenor' }] },
 			{ _id: 's-11', voice_type: [{ type: 'string', string: 'baritone' }] },
 			{ _id: 's-12', voice_type: [{ type: 'string', string: 'bass' }] },
 			{ _id: 's-13', voice_type: [{ type: 'string', string: 'tenor' }] },
 			{ _id: 's-14', voice_type: [{ type: 'string', string: 'tenor' }] },
 			{ _id: 's-15', voice_type: [{ type: 'string', string: 'baritone' }] },
-			{ _id: 's-16', voice_type: [{ type: 'string', string: 'bass' }] }
+			{ _id: 's-16', voice_type: [{ type: 'string', string: 'bass' }] },
 		];
 
 		const mockListInstances = vi.fn().mockResolvedValue(liveInstances);
@@ -329,7 +333,7 @@ describe('migrateProperty — string→reference (section.voice_type → section
 			backfillKind: 'string_to_reference',
 			voiceLookup: LIVE_VOICE_LOOKUP,
 			listInstances: mockListInstances,
-			writeProperty: mockWriteProperty
+			writeProperty: mockWriteProperty,
 		});
 
 		expect(result.migrated).toBe(16);
@@ -343,8 +347,8 @@ describe('migrateProperty — string→reference (section.voice_type → section
 			{
 				_id: 'sec-tenor',
 				voice_type: [{ type: 'string', string: 'tenor' }],
-				voice: [{ type: 'reference', reference: 'voice-tenor-id' }] // already correct
-			}
+				voice: [{ type: 'reference', reference: 'voice-tenor-id' }], // already correct
+			},
 		];
 
 		const mockListInstances = vi.fn().mockResolvedValue(instances);
@@ -357,7 +361,7 @@ describe('migrateProperty — string→reference (section.voice_type → section
 			backfillKind: 'string_to_reference',
 			voiceLookup: LIVE_VOICE_LOOKUP,
 			listInstances: mockListInstances,
-			writeProperty: mockWriteProperty
+			writeProperty: mockWriteProperty,
 		});
 
 		expect(result.skipped).toBe(1);
@@ -367,7 +371,7 @@ describe('migrateProperty — string→reference (section.voice_type → section
 
 	it('records unmatched_voice_type failure when no lookup match found', async () => {
 		const instances = [
-			{ _id: 'section-2', voice_type: [{ type: 'string', string: 'unknown_voice' }] }
+			{ _id: 'section-2', voice_type: [{ type: 'string', string: 'unknown_voice' }] },
 		];
 		const voiceLookup = new Map<string, string>(); // empty — no matches
 
@@ -381,7 +385,7 @@ describe('migrateProperty — string→reference (section.voice_type → section
 			backfillKind: 'string_to_reference',
 			voiceLookup,
 			listInstances: mockListInstances,
-			writeProperty: mockWriteProperty
+			writeProperty: mockWriteProperty,
 		});
 
 		expect(result.failed).toBe(1);
@@ -393,9 +397,7 @@ describe('migrateProperty — string→reference (section.voice_type → section
 	it('does NOT silently drop unmatched voice_type values', async () => {
 		// Safety test: spec requires unmatched values are reported, not silently dropped.
 		// This scenario is not expected in the real db (all values match) but must be handled.
-		const instances = [
-			{ _id: 'section-3', voice_type: [{ type: 'string', string: 'T1' }] }
-		];
+		const instances = [{ _id: 'section-3', voice_type: [{ type: 'string', string: 'T1' }] }];
 		const voiceLookup = new Map([['tenor', 'voice-tenor-id']]); // 'T1' not mapped
 
 		const mockListInstances = vi.fn().mockResolvedValue(instances);
@@ -408,7 +410,7 @@ describe('migrateProperty — string→reference (section.voice_type → section
 			backfillKind: 'string_to_reference',
 			voiceLookup,
 			listInstances: mockListInstances,
-			writeProperty: mockWriteProperty
+			writeProperty: mockWriteProperty,
 		});
 
 		expect(result.failed).toBeGreaterThan(0);
@@ -422,14 +424,14 @@ describe('migrateProperty — string→reference (section.voice_type → section
 describe('migrateProperty — parent_copy (work.arranger → edition.arranger)', () => {
 	it('requires parentLookup injection and uses it to look up the parent value', async () => {
 		const instances = [
-			{ _id: 'edition-1' } // no arranger on the edition itself
+			{ _id: 'edition-1' }, // no arranger on the edition itself
 		];
 
 		const mockListInstances = vi.fn().mockResolvedValue(instances);
 		const mockWriteProperty = vi.fn().mockResolvedValue({ _id: 'p-id' });
 
 		const parentLookup = new Map([
-			['edition-1', 'Arvo Pärt'] // parent work.arranger value for this edition
+			['edition-1', 'Arvo Pärt'], // parent work.arranger value for this edition
 		]);
 
 		const result = await migrateProperty(client, {
@@ -439,7 +441,7 @@ describe('migrateProperty — parent_copy (work.arranger → edition.arranger)',
 			backfillKind: 'parent_copy',
 			parentLookup,
 			listInstances: mockListInstances,
-			writeProperty: mockWriteProperty
+			writeProperty: mockWriteProperty,
 		});
 
 		expect(result.migrated).toBe(1);
@@ -460,8 +462,8 @@ describe('migrateProperty — parent_copy (work.arranger → edition.arranger)',
 				backfillKind: 'parent_copy',
 				// parentLookup deliberately omitted
 				listInstances: mockListInstances,
-				writeProperty: mockWriteProperty
-			})
+				writeProperty: mockWriteProperty,
+			}),
 		).rejects.toThrow(/parentLookup/);
 	});
 
@@ -469,8 +471,8 @@ describe('migrateProperty — parent_copy (work.arranger → edition.arranger)',
 		const instances = [
 			{
 				_id: 'edition-1',
-				arranger: [{ type: 'string', string: 'Arvo Pärt' }] // already set
-			}
+				arranger: [{ type: 'string', string: 'Arvo Pärt' }], // already set
+			},
 		];
 
 		const mockListInstances = vi.fn().mockResolvedValue(instances);
@@ -485,7 +487,7 @@ describe('migrateProperty — parent_copy (work.arranger → edition.arranger)',
 			backfillKind: 'parent_copy',
 			parentLookup,
 			listInstances: mockListInstances,
-			writeProperty: mockWriteProperty
+			writeProperty: mockWriteProperty,
 		});
 
 		expect(result.skipped).toBe(1);
@@ -495,7 +497,7 @@ describe('migrateProperty — parent_copy (work.arranger → edition.arranger)',
 
 	it('skips instances not present in parentLookup (edition has no parent work record)', async () => {
 		const instances = [
-			{ _id: 'edition-orphan' } // not in parentLookup
+			{ _id: 'edition-orphan' }, // not in parentLookup
 		];
 
 		const mockListInstances = vi.fn().mockResolvedValue(instances);
@@ -510,7 +512,7 @@ describe('migrateProperty — parent_copy (work.arranger → edition.arranger)',
 			backfillKind: 'parent_copy',
 			parentLookup,
 			listInstances: mockListInstances,
-			writeProperty: mockWriteProperty
+			writeProperty: mockWriteProperty,
 		});
 
 		expect(result.skipped).toBe(1);
@@ -522,11 +524,12 @@ describe('migrateProperty — error handling', () => {
 	it('records failed writes without aborting other instances', async () => {
 		const instances = [
 			{ _id: 'work-1', voicing: [{ type: 'string', string: 'SATB' }] },
-			{ _id: 'work-2', voicing: [{ type: 'string', string: 'SSA' }] }
+			{ _id: 'work-2', voicing: [{ type: 'string', string: 'SSA' }] },
 		];
 
 		const mockListInstances = vi.fn().mockResolvedValue(instances);
-		const mockWriteProperty = vi.fn()
+		const mockWriteProperty = vi
+			.fn()
 			.mockRejectedValueOnce(new Error('write failed: 500'))
 			.mockResolvedValueOnce({ _id: 'p-id' });
 
@@ -536,7 +539,7 @@ describe('migrateProperty — error handling', () => {
 			targetProperty: 'original_voicing',
 			backfillKind: 'string',
 			listInstances: mockListInstances,
-			writeProperty: mockWriteProperty
+			writeProperty: mockWriteProperty,
 		});
 
 		expect(result.failed).toBe(1);
@@ -558,8 +561,8 @@ describe('migrateProperty — multi-value pre-delete guard (Q5 fix)', () => {
 			{
 				_id: 'work-1',
 				voicing: [{ type: 'string', string: 'SATB' }],
-				original_voicing: [{ _id: 'old-prop-1', type: 'string', string: 'StaleValue' }]
-			}
+				original_voicing: [{ _id: 'old-prop-1', type: 'string', string: 'StaleValue' }],
+			},
 		];
 
 		const mockListInstances = vi.fn().mockResolvedValue(instances);
@@ -573,7 +576,7 @@ describe('migrateProperty — multi-value pre-delete guard (Q5 fix)', () => {
 			backfillKind: 'string',
 			listInstances: mockListInstances,
 			deleteProperty: mockDeleteProperty,
-			writeProperty: mockWriteProperty
+			writeProperty: mockWriteProperty,
 		});
 
 		// DELETE must be called before POST
@@ -594,9 +597,9 @@ describe('migrateProperty — multi-value pre-delete guard (Q5 fix)', () => {
 				original_voicing: [
 					{ _id: 'stale-a', type: 'string', string: 'Old1' },
 					{ _id: 'stale-b', type: 'string', string: 'Old2' },
-					{ _id: 'stale-c', type: 'string', string: 'Old3' }
-				]
-			}
+					{ _id: 'stale-c', type: 'string', string: 'Old3' },
+				],
+			},
 		];
 
 		const mockListInstances = vi.fn().mockResolvedValue(instances);
@@ -610,7 +613,7 @@ describe('migrateProperty — multi-value pre-delete guard (Q5 fix)', () => {
 			backfillKind: 'string',
 			listInstances: mockListInstances,
 			deleteProperty: mockDeleteProperty,
-			writeProperty: mockWriteProperty
+			writeProperty: mockWriteProperty,
 		});
 
 		expect(mockDeleteProperty).toHaveBeenCalledTimes(3);
@@ -624,9 +627,9 @@ describe('migrateProperty — multi-value pre-delete guard (Q5 fix)', () => {
 		const instances = [
 			{
 				_id: 'work-1',
-				voicing: [{ type: 'string', string: 'SATB' }]
+				voicing: [{ type: 'string', string: 'SATB' }],
 				// original_voicing absent
-			}
+			},
 		];
 
 		const mockListInstances = vi.fn().mockResolvedValue(instances);
@@ -640,7 +643,7 @@ describe('migrateProperty — multi-value pre-delete guard (Q5 fix)', () => {
 			backfillKind: 'string',
 			listInstances: mockListInstances,
 			deleteProperty: mockDeleteProperty,
-			writeProperty: mockWriteProperty
+			writeProperty: mockWriteProperty,
 		});
 
 		expect(mockDeleteProperty).not.toHaveBeenCalled();
@@ -652,8 +655,8 @@ describe('migrateProperty — multi-value pre-delete guard (Q5 fix)', () => {
 			{
 				_id: 'work-1',
 				voicing: [{ type: 'string', string: 'SATB' }],
-				original_voicing: [{ _id: 'match-prop', type: 'string', string: 'SATB' }]
-			}
+				original_voicing: [{ _id: 'match-prop', type: 'string', string: 'SATB' }],
+			},
 		];
 
 		const mockListInstances = vi.fn().mockResolvedValue(instances);
@@ -667,7 +670,7 @@ describe('migrateProperty — multi-value pre-delete guard (Q5 fix)', () => {
 			backfillKind: 'string',
 			listInstances: mockListInstances,
 			deleteProperty: mockDeleteProperty,
-			writeProperty: mockWriteProperty
+			writeProperty: mockWriteProperty,
 		});
 
 		expect(mockDeleteProperty).not.toHaveBeenCalled();
@@ -681,8 +684,8 @@ describe('migrateProperty — multi-value pre-delete guard (Q5 fix)', () => {
 			{
 				_id: 'section-1',
 				voice_type: [{ type: 'string', string: 'soprano' }],
-				voice: [{ _id: 'old-voice-ref', type: 'reference', reference: 'voice-old-id' }]
-			}
+				voice: [{ _id: 'old-voice-ref', type: 'reference', reference: 'voice-old-id' }],
+			},
 		];
 
 		const mockListInstances = vi.fn().mockResolvedValue(instances);
@@ -697,7 +700,7 @@ describe('migrateProperty — multi-value pre-delete guard (Q5 fix)', () => {
 			voiceLookup,
 			listInstances: mockListInstances,
 			deleteProperty: mockDeleteProperty,
-			writeProperty: mockWriteProperty
+			writeProperty: mockWriteProperty,
 		});
 
 		expect(mockDeleteProperty).toHaveBeenCalledOnce();
@@ -711,8 +714,8 @@ describe('migrateProperty — multi-value pre-delete guard (Q5 fix)', () => {
 		const instances = [
 			{
 				_id: 'edition-1',
-				arranger: [{ _id: 'old-arranger-prop', type: 'string', string: 'OldArranger' }]
-			}
+				arranger: [{ _id: 'old-arranger-prop', type: 'string', string: 'OldArranger' }],
+			},
 		];
 		const parentLookup = new Map([['edition-1', 'Arvo Pärt']]);
 
@@ -728,7 +731,7 @@ describe('migrateProperty — multi-value pre-delete guard (Q5 fix)', () => {
 			parentLookup,
 			listInstances: mockListInstances,
 			deleteProperty: mockDeleteProperty,
-			writeProperty: mockWriteProperty
+			writeProperty: mockWriteProperty,
 		});
 
 		expect(mockDeleteProperty).toHaveBeenCalledOnce();

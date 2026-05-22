@@ -11,7 +11,7 @@ import {
 	deleteEntity,
 	listInstancesByType,
 	POLYPHONY_META_TYPE_PROPERTY_ID,
-	type EntuClient
+	type EntuClient,
 } from './lib/entu-client';
 import {
 	computePhaseBDiff,
@@ -21,7 +21,7 @@ import {
 	type BackfillDataOp,
 	type DeletePropertyOp,
 	type UpdateFormulaOp,
-	type TouchSaveOp
+	type TouchSaveOp,
 } from './lib/diff';
 import { takeSnapshot, type SnapshotResult } from './lib/snapshotter';
 import { fetchPhaseBDbState, type PhaseBDbState } from './lib/fetch-db-state';
@@ -29,7 +29,7 @@ import { entuTouchSave } from './lib/touch-saver';
 import { translatePropertyDef } from './lib/v4e-translator';
 import {
 	migrateProperty as dataMigratorMigrateProperty,
-	type MigratePropertyInjectables
+	type MigratePropertyInjectables,
 } from './lib/data-migrator';
 import {
 	executePhaseBOps,
@@ -39,7 +39,7 @@ import {
 	type VerifyDeleteSafeFn,
 	type UpdateFormulaFn,
 	type TouchSaveFormulaFn,
-	type PhaseBExecutionResult
+	type PhaseBExecutionResult,
 } from './lib/executor';
 
 export interface RunPhaseBInput {
@@ -95,7 +95,7 @@ function dbStateToArray(state: PhaseBDbState): DbTypeState[] {
 		name: t.name,
 		propertyNames: t.propertyNames,
 		propertyIds: t.propertyIds,
-		currentFormulas: t.currentFormulas
+		currentFormulas: t.currentFormulas,
 	}));
 }
 
@@ -103,7 +103,7 @@ function buildJsonReport(
 	report: PhaseBReport,
 	snapshot: SnapshotResult | null,
 	ops: DiffOp[],
-	executionResult: PhaseBExecutionResult | null
+	executionResult: PhaseBExecutionResult | null,
 ): string {
 	// Bug 3 fix (v12): serialize per-op execution detail so post-incident root-cause analysis
 	// has the failure error strings, the addedProperties[], etc. — instead of just summary.failed.
@@ -115,7 +115,7 @@ function buildJsonReport(
 					sha256: snapshot.sha256,
 					entityCount: snapshot.entityCount,
 					skipped: snapshot.skipped,
-					dryRun: snapshot.dryRun
+					dryRun: snapshot.dryRun,
 				}
 			: undefined,
 		wouldExecute: ops,
@@ -127,14 +127,14 @@ function buildJsonReport(
 		formulaUpdates: executionResult?.formulaUpdates ?? [],
 		touchSaves: executionResult?.touchSaves ?? [],
 		skipped: executionResult?.skipped ?? [],
-		failed: executionResult?.failed ?? []
+		failed: executionResult?.failed ?? [],
 	};
 	return JSON.stringify(payload, null, 2);
 }
 
 function buildMarkdownReport(
 	report: PhaseBReport,
-	executionResult: PhaseBExecutionResult | null
+	executionResult: PhaseBExecutionResult | null,
 ): string {
 	const lines: string[] = [];
 	lines.push('# Phase B migration report');
@@ -203,8 +203,8 @@ export async function runPhaseB(input: RunPhaseBInput): Promise<RunPhaseBOutput>
 			wouldObsoleteDeletes: 0,
 			wouldFormulaUpdates: 0,
 			wouldTouchSaves: 0,
-			failed: 0
-		}
+			failed: 0,
+		},
 	};
 	const warnings: string[] = [];
 	let snapshot: SnapshotResult | null = null;
@@ -216,7 +216,7 @@ export async function runPhaseB(input: RunPhaseBInput): Promise<RunPhaseBOutput>
 		const jwt = await getJwt({
 			apiBase: input.apiBase,
 			db: input.db,
-			apiKey: input.apiKey
+			apiKey: input.apiKey,
 		});
 		const client: EntuClient = { apiBase: input.apiBase, db: input.db, jwt };
 
@@ -225,7 +225,9 @@ export async function runPhaseB(input: RunPhaseBInput): Promise<RunPhaseBOutput>
 
 		report.summary.wouldRenames = ops.filter((o) => o.kind === 'RENAME').length;
 		report.summary.wouldObsoleteDeletes = ops.filter(
-			(o) => o.kind === 'DELETE_PROPERTY' && (o as { verifyPreconditions?: boolean }).verifyPreconditions === true
+			(o) =>
+				o.kind === 'DELETE_PROPERTY' &&
+				(o as { verifyPreconditions?: boolean }).verifyPreconditions === true,
 		).length;
 		report.summary.wouldFormulaUpdates = ops.filter((o) => o.kind === 'UPDATE_FORMULA').length;
 		report.summary.wouldTouchSaves = ops.filter((o) => o.kind === 'TOUCH_SAVE').length;
@@ -236,13 +238,13 @@ export async function runPhaseB(input: RunPhaseBInput): Promise<RunPhaseBOutput>
 				entityCount: 0,
 				snapshotPath: null,
 				sha256: null,
-				skipped: true
+				skipped: true,
 			};
 		} else {
 			snapshot = await takeSnapshot(client, {
 				snapshotDir: input.snapshotDir,
 				dryRun: input.dryRun,
-				now
+				now,
 			});
 		}
 
@@ -255,7 +257,7 @@ export async function runPhaseB(input: RunPhaseBInput): Promise<RunPhaseBOutput>
 				verifyDeleteSafe: input.verifyDeleteSafe,
 				updateFormula: input.updateFormula,
 				touchSaveFormula: input.touchSaveFormula,
-				now
+				now,
 			});
 			report.summary.failed = executionResult.failed.length;
 		}
@@ -275,7 +277,7 @@ export async function runPhaseB(input: RunPhaseBInput): Promise<RunPhaseBOutput>
 				sha256: snapshot.sha256,
 				entityCount: snapshot.entityCount,
 				skipped: snapshot.skipped,
-				dryRun: snapshot.dryRun
+				dryRun: snapshot.dryRun,
 			}
 		: undefined;
 	report.wouldExecute = ops;
@@ -293,7 +295,7 @@ export async function runPhaseB(input: RunPhaseBInput): Promise<RunPhaseBOutput>
 	return {
 		exitCode,
 		report,
-		reportPaths: { json: jsonPath, md: mdPath }
+		reportPaths: { json: jsonPath, md: mdPath },
 	};
 }
 
@@ -337,7 +339,7 @@ export function buildLiveCallbacks(client: EntuClient): PhaseBLiveCallbacks {
 		_c: EntuClient,
 		entityId: string,
 		propertyName: string,
-		value: unknown
+		value: unknown,
 	): Promise<{ _id: string }> => {
 		const property: { type: string; string?: string; number?: number } = { type: propertyName };
 		if (typeof value === 'string') property.string = value;
@@ -352,12 +354,11 @@ export function buildLiveCallbacks(client: EntuClient): PhaseBLiveCallbacks {
 		_c: EntuClient,
 		entityId: string,
 		propertyName: string,
-		value: unknown
+		value: unknown,
 	): Promise<{ _id: string }> => {
 		await postProperties(client, entityId, [{ type: propertyName, reference: String(value) }]);
 		return { _id: 'unknown' };
 	};
-
 
 	// Live voice lookup: for string_to_reference, query by exact name.string=<NFC-value>.
 	const voiceLookupLive = async (sourceValue: string): Promise<string | undefined> => {
@@ -365,7 +366,7 @@ export function buildLiveCallbacks(client: EntuClient): PhaseBLiveCallbacks {
 			`${client.apiBase}/${client.db}/entity?_type.string=voice` +
 			`&name.string=${encodeURIComponent(sourceValue.normalize('NFC'))}&props=_id`;
 		const res = await fetch(url, {
-			headers: { Authorization: `Bearer ${client.jwt}` }
+			headers: { Authorization: `Bearer ${client.jwt}` },
 		});
 		if (!res.ok) return undefined;
 		const body = (await res.json()) as { entities?: Array<{ _id: string }>; count?: number };
@@ -382,12 +383,13 @@ export function buildLiveCallbacks(client: EntuClient): PhaseBLiveCallbacks {
 	// parent_copy on the same code path as every other backfillKind.
 	const buildParentLookup = async (op: BackfillDataOp): Promise<Map<string, string>> => {
 		const parentLookup = new Map<string, string>();
-		const iterateType = (op as BackfillDataOp & { targetParentType?: string }).targetParentType
-			?? op.parentType;
+		const iterateType =
+			(op as BackfillDataOp & { targetParentType?: string }).targetParentType ?? op.parentType;
 		const listResp = await listInstancesByType(client, iterateType, '_id');
 		for (const stub of listResp.entities ?? []) {
 			const child = await fetchEntity(client, stub._id);
-			const parentRef = (child._parent as Array<{ reference?: string }> | undefined)?.[0]?.reference;
+			const parentRef = (child._parent as Array<{ reference?: string }> | undefined)?.[0]
+				?.reference;
 			if (!parentRef) continue;
 			const parent = await fetchEntity(client, parentRef);
 			const sourceVal = (parent[op.sourceProperty] as EntuPropertyValue[] | undefined)?.[0];
@@ -404,7 +406,7 @@ export function buildLiveCallbacks(client: EntuClient): PhaseBLiveCallbacks {
 				const listResp = await listInstancesByType(
 					client,
 					parentType,
-					`_id,${op.sourceProperty},${op.targetProperty}`
+					`_id,${op.sourceProperty},${op.targetProperty}`,
 				);
 				return (listResp.entities ?? []).map((e) => ({ ...e, _id: e._id }));
 			},
@@ -412,7 +414,7 @@ export function buildLiveCallbacks(client: EntuClient): PhaseBLiveCallbacks {
 				op.backfillKind === 'string_to_reference' ? writeReferencePropertyLive : writePropertyLive,
 			deleteProperty: deletePropertyValue,
 			voiceLookup: op.backfillKind === 'string_to_reference' ? voiceLookupLive : undefined,
-			parentLookup: op.backfillKind === 'parent_copy' ? await buildParentLookup(op) : undefined
+			parentLookup: op.backfillKind === 'parent_copy' ? await buildParentLookup(op) : undefined,
 		};
 		return dataMigratorMigrateProperty(client, op, injectables);
 	};
@@ -435,10 +437,10 @@ export function buildLiveCallbacks(client: EntuClient): PhaseBLiveCallbacks {
 			`${client.apiBase}/${client.db}/entity?_type.reference=${POLYPHONY_META_TYPE_PROPERTY_ID}` +
 			`&q=${encodeURIComponent(op.propertyName)}&props=_id,formula.string&limit=50`;
 		const formulaRes = await fetch(formulaProbeUrl, {
-			headers: { Authorization: `Bearer ${client.jwt}` }
+			headers: { Authorization: `Bearer ${client.jwt}` },
 		});
 		if (formulaRes.ok) {
-			const body = await formulaRes.json().catch(() => ({ entities: [] })) as {
+			const body = (await formulaRes.json().catch(() => ({ entities: [] }))) as {
 				entities?: Array<{ formula?: Array<{ string?: string }> }>;
 			};
 			const escaped = op.propertyName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -450,7 +452,7 @@ export function buildLiveCallbacks(client: EntuClient): PhaseBLiveCallbacks {
 			if (matches.length > 0) {
 				return {
 					safe: false,
-					reason: `property is referenced by formula on ${matches.length} property-def(s)`
+					reason: `property is referenced by formula on ${matches.length} property-def(s)`,
 				};
 			}
 		}
@@ -460,10 +462,10 @@ export function buildLiveCallbacks(client: EntuClient): PhaseBLiveCallbacks {
 			`${client.apiBase}/${client.db}/entity?_type.string=${encodeURIComponent(op.parentType)}` +
 			`&props=_id,${encodeURIComponent(op.propertyName)}&limit=500`;
 		const instanceRes = await fetch(instanceProbeUrl, {
-			headers: { Authorization: `Bearer ${client.jwt}` }
+			headers: { Authorization: `Bearer ${client.jwt}` },
 		});
 		if (instanceRes.ok) {
-			const body = await instanceRes.json().catch(() => ({ entities: [], count: 0 })) as {
+			const body = (await instanceRes.json().catch(() => ({ entities: [], count: 0 }))) as {
 				entities?: Array<{ [key: string]: unknown }>;
 				count?: number;
 			};
@@ -474,7 +476,7 @@ export function buildLiveCallbacks(client: EntuClient): PhaseBLiveCallbacks {
 			if (populated.length > 0) {
 				return {
 					safe: false,
-					reason: `${populated.length} instance(s) of ${op.parentType} still have ${op.propertyName} set`
+					reason: `${populated.length} instance(s) of ${op.parentType} still have ${op.propertyName} set`,
 				};
 			}
 		}
@@ -489,10 +491,10 @@ export function buildLiveCallbacks(client: EntuClient): PhaseBLiveCallbacks {
 				`${client.apiBase}/${client.db}/entity?_type.string=${encodeURIComponent(op.parentType)}` +
 				`&props=_id,${encodeURIComponent(materializedProp)}&limit=200`;
 			const nameRes = await fetch(nameProbeUrl, {
-				headers: { Authorization: `Bearer ${client.jwt}` }
+				headers: { Authorization: `Bearer ${client.jwt}` },
 			});
 			if (nameRes.ok) {
-				const body = await nameRes.json().catch(() => ({ entities: [] })) as {
+				const body = (await nameRes.json().catch(() => ({ entities: [] }))) as {
 					entities?: Array<{ _id: string; [key: string]: unknown }>;
 				};
 				const badName = (body.entities ?? []).find((e) => {
@@ -503,7 +505,7 @@ export function buildLiveCallbacks(client: EntuClient): PhaseBLiveCallbacks {
 				if (badName) {
 					return {
 						safe: false,
-						reason: `entity ${badName._id} has whitespace-only or empty materialized ${materializedProp}`
+						reason: `entity ${badName._id} has whitespace-only or empty materialized ${materializedProp}`,
 					};
 				}
 			}
@@ -538,7 +540,7 @@ export function buildLiveCallbacks(client: EntuClient): PhaseBLiveCallbacks {
 		const instancesResp = await listEntities(client, {
 			'_type.string': op.parentType,
 			props: '_id',
-			limit: '200'
+			limit: '200',
 		});
 		let touchSaveCount = 0;
 		let failed = 0;
@@ -553,7 +555,7 @@ export function buildLiveCallbacks(client: EntuClient): PhaseBLiveCallbacks {
 		return {
 			touchSaveCount,
 			noInstances: instancesResp.entities.length === 0,
-			failed
+			failed,
 		};
 	};
 
@@ -563,7 +565,7 @@ export function buildLiveCallbacks(client: EntuClient): PhaseBLiveCallbacks {
 		deleteProperty,
 		verifyDeleteSafe,
 		updateFormula,
-		touchSaveFormula
+		touchSaveFormula,
 	};
 }
 
@@ -602,14 +604,14 @@ async function main() {
 		snapshotDir,
 		dryRun,
 		skipSnapshot,
-		...(dryRun ? {} : liveCallbacks)
+		...(dryRun ? {} : liveCallbacks),
 	});
 
 	console.log(`\nReport: ${out.reportPaths.md}`);
 	console.log(`        ${out.reportPaths.json}`);
 	if (out.report.snapshot && !out.report.snapshot.skipped) {
 		console.log(
-			`\nSnapshot: ${out.report.snapshot.path ?? '(dry-run)'} (sha256: ${out.report.snapshot.sha256})`
+			`\nSnapshot: ${out.report.snapshot.path ?? '(dry-run)'} (sha256: ${out.report.snapshot.sha256})`,
 		);
 	}
 	process.exit(out.exitCode);

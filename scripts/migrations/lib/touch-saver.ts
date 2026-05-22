@@ -5,11 +5,7 @@ export interface TouchSaveOptions {
 	propertyName: string;
 	formulaExpression: string;
 	listInstances: (client: EntuClient, parentType: string) => Promise<Array<{ _id: string }>>;
-	touchSave: (
-		entityId: string,
-		propertyName: string,
-		formulaExpression: string
-	) => Promise<void>;
+	touchSave: (entityId: string, propertyName: string, formulaExpression: string) => Promise<void>;
 }
 
 export interface TouchSaveResult {
@@ -20,7 +16,7 @@ export interface TouchSaveResult {
 
 export async function touchSaveFormula(
 	client: EntuClient,
-	opts: TouchSaveOptions
+	opts: TouchSaveOptions,
 ): Promise<TouchSaveResult> {
 	const instances = await opts.listInstances(client, opts.parentType);
 
@@ -53,7 +49,7 @@ export async function entuTouchSave(client: EntuClient, entityId: string): Promi
 	const getUrl = `${client.apiBase}/${client.db}/entity/${entityId}`;
 	const getRes = await fetch(getUrl, {
 		method: 'GET',
-		headers: { Authorization: `Bearer ${client.jwt}` }
+		headers: { Authorization: `Bearer ${client.jwt}` },
 	});
 	if (!getRes.ok) {
 		throw new Error(`entuTouchSave GET failed: ${getRes.status} ${await getRes.text()}`);
@@ -70,9 +66,9 @@ export async function entuTouchSave(client: EntuClient, entityId: string): Promi
 		method: 'POST',
 		headers: {
 			Authorization: `Bearer ${client.jwt}`,
-			'Content-Type': 'application/json'
+			'Content-Type': 'application/json',
 		},
-		body: JSON.stringify([{ type: '_sharing', string: sharingValue }])
+		body: JSON.stringify([{ type: '_sharing', string: sharingValue }]),
 	});
 	if (!postRes.ok) {
 		throw new Error(`entuTouchSave POST failed: ${postRes.status} ${await postRes.text()}`);

@@ -7,7 +7,7 @@ import {
 	PHASE_B_FORMULA_UPDATES,
 	PHASE_B_TOUCH_SAVES,
 	type BackfillKind,
-	type PhaseBRenameOp
+	type PhaseBRenameOp,
 } from './phase-b-scope';
 
 export interface DbTypeState {
@@ -91,10 +91,7 @@ export type DiffOp =
 	| UpdateFormulaOp
 	| TouchSaveOp;
 
-export function computeAdditiveDiff(
-	v4e: V4eSchema,
-	dbState: DbTypeState[]
-): DiffOp[] {
+export function computeAdditiveDiff(v4e: V4eSchema, dbState: DbTypeState[]): DiffOp[] {
 	const dbByName = new Map(dbState.map((t) => [t.name, t]));
 
 	const creates: CreateTypeOp[] = [];
@@ -109,7 +106,7 @@ export function computeAdditiveDiff(
 				blurb: v4eType.blurb,
 				sharing: v4eType.sharing,
 				inheritsRights: v4eType.inheritsRights,
-				properties: v4eType.properties
+				properties: v4eType.properties,
 			});
 		} else {
 			const existingProps = new Set(existing.propertyNames);
@@ -122,7 +119,7 @@ export function computeAdditiveDiff(
 					parentTypeName: v4eType.name,
 					parentTypeId: existing.typeId,
 					propertyName: prop.name,
-					def: prop
+					def: prop,
 				});
 			}
 		}
@@ -150,7 +147,7 @@ function backfillDefaultDef(propertyName: string, kind: BackfillKind): V4eProper
 
 function computeRenameOps(
 	dbByName: Map<string, DbTypeState>,
-	rename: PhaseBRenameOp
+	rename: PhaseBRenameOp,
 ): { adds: AddPropertyOp[]; backfills: BackfillDataOp[]; deletes: DeletePropertyOp[] } {
 	const [parentType, sourceProp] = splitDotted(rename.source);
 	const [, targetProp] = splitDotted(rename.target);
@@ -170,7 +167,7 @@ function computeRenameOps(
 			parentTypeId: existing.typeId,
 			parentType,
 			propertyName: targetProp,
-			def: backfillDefaultDef(targetProp, rename.backfillKind)
+			def: backfillDefaultDef(targetProp, rename.backfillKind),
 		});
 	}
 
@@ -180,7 +177,7 @@ function computeRenameOps(
 			parentType,
 			sourceProperty: sourceProp,
 			targetProperty: targetProp,
-			backfillKind: rename.backfillKind
+			backfillKind: rename.backfillKind,
 		});
 
 		const sourceId = existing.propertyIds?.[sourceProp];
@@ -189,7 +186,7 @@ function computeRenameOps(
 				kind: 'DELETE_PROPERTY',
 				parentType,
 				propertyName: sourceProp,
-				propertyDefId: sourceId
+				propertyDefId: sourceId,
 			});
 		}
 	}
@@ -214,7 +211,7 @@ export function computePhaseBDiff(dbState: DbTypeState[]): DiffOp[] {
 			kind: 'RENAME',
 			parentType,
 			source: sourceProp,
-			target: targetProp
+			target: targetProp,
 		});
 		renameAdds.push(...adds);
 		renameBackfills.push(...backfills);
@@ -241,7 +238,7 @@ export function computePhaseBDiff(dbState: DbTypeState[]): DiffOp[] {
 					propertyName: propName,
 					propertyDefId,
 					verifyPreconditions: true,
-					materializedNameProperty: 'name'
+					materializedNameProperty: 'name',
 				});
 			}
 		} else if (mig.backfillKind === 'parent_copy' && mig.target) {
@@ -256,7 +253,7 @@ export function computePhaseBDiff(dbState: DbTypeState[]): DiffOp[] {
 				sourceProperty: sourceProp,
 				targetProperty: targetProp,
 				backfillKind: 'parent_copy',
-				targetParentType: targetParent
+				targetParentType: targetParent,
 			});
 			const sourceId = existing.propertyIds?.[sourceProp];
 			if (sourceId) {
@@ -264,7 +261,7 @@ export function computePhaseBDiff(dbState: DbTypeState[]): DiffOp[] {
 					kind: 'DELETE_PROPERTY',
 					parentType: sourceParent,
 					propertyName: sourceProp,
-					propertyDefId: sourceId
+					propertyDefId: sourceId,
 				});
 			}
 		}
@@ -282,7 +279,7 @@ export function computePhaseBDiff(dbState: DbTypeState[]): DiffOp[] {
 			parentType: od.parentType,
 			propertyName: od.propertyName,
 			propertyDefId,
-			verifyPreconditions: true
+			verifyPreconditions: true,
 		});
 	}
 
@@ -299,7 +296,7 @@ export function computePhaseBDiff(dbState: DbTypeState[]): DiffOp[] {
 				kind: 'DELETE_PROPERTY',
 				parentType: fu.parentType,
 				propertyName: fu.propertyName,
-				propertyDefId
+				propertyDefId,
 			});
 		} else {
 			const current = existing.currentFormulas?.[fu.propertyName];
@@ -311,7 +308,7 @@ export function computePhaseBDiff(dbState: DbTypeState[]): DiffOp[] {
 				parentType: fu.parentType,
 				propertyName: fu.propertyName,
 				propertyDefId,
-				newFormula: fu.newFormula ?? ''
+				newFormula: fu.newFormula ?? '',
 			});
 		}
 	}
@@ -325,7 +322,7 @@ export function computePhaseBDiff(dbState: DbTypeState[]): DiffOp[] {
 			kind: 'TOUCH_SAVE',
 			parentType: ts.parentType,
 			propertyName: ts.propertyName,
-			formulaExpression: ts.formulaExpression
+			formulaExpression: ts.formulaExpression,
 		});
 	}
 
@@ -338,6 +335,6 @@ export function computePhaseBDiff(dbState: DbTypeState[]): DiffOp[] {
 		...migrationDeletes,
 		...obsoleteDeletes,
 		...formulaOps,
-		...touchSaves
+		...touchSaves,
 	];
 }

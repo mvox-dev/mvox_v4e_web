@@ -14,7 +14,9 @@ function makeCookies(hasJwt = true): Cookies {
 		get: (name: string) => store[name] ?? null,
 		getAll: () => Object.entries(store).map(([name, value]) => ({ name, value })),
 		set: vi.fn(),
-		delete: vi.fn((name: string) => { delete store[name]; }),
+		delete: vi.fn((name: string) => {
+			delete store[name];
+		}),
 		serialize: vi.fn().mockReturnValue(''),
 	} as unknown as Cookies;
 }
@@ -50,7 +52,10 @@ describe('POST /auth/logout', () => {
 		const event = makeLogoutEvent();
 		await POST(event);
 
-		expect(event.cookies.delete).toHaveBeenCalledWith('entu_jwt', expect.objectContaining({ path: '/' }));
+		expect(event.cookies.delete).toHaveBeenCalledWith(
+			'entu_jwt',
+			expect.objectContaining({ path: '/' }),
+		);
 	});
 
 	it('returns a 303 redirect to /', async () => {
@@ -76,7 +81,7 @@ describe('POST /auth/logout', () => {
 	it('still returns 303 redirect even when no jwt cookie is present', async () => {
 		const { POST } = await import('../../../../routes/auth/logout/+server.ts');
 		const event = makeLogoutEvent();
-		(event.cookies as ReturnType<typeof makeCookies>);
+		event.cookies as ReturnType<typeof makeCookies>;
 		const response = await POST(event);
 
 		expect(response.status).toBe(303);

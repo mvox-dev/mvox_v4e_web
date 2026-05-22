@@ -15,7 +15,7 @@ vi.mock('./data-migrator', async (importOriginal) => {
 	const actual = await importOriginal<typeof import('./data-migrator')>();
 	return {
 		...actual,
-		migrateProperty: vi.fn().mockResolvedValue({ migrated: 1, skipped: 0, failed: 0 })
+		migrateProperty: vi.fn().mockResolvedValue({ migrated: 1, skipped: 0, failed: 0 }),
 	};
 });
 
@@ -26,7 +26,7 @@ import { buildLiveCallbacks } from '../2026-05-20-phase-b';
 const client: EntuClient = {
 	apiBase: 'https://api.entu.app',
 	db: 'polyphony',
-	jwt: 'test-jwt'
+	jwt: 'test-jwt',
 };
 
 beforeEach(() => {
@@ -34,7 +34,7 @@ beforeEach(() => {
 	// When delegation is implemented, data-migrator.migrateProperty (the spy) runs instead
 	// and fetch is never invoked. Either way the test can run to assertion without network I/O.
 	vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-		new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 })
+		new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 }),
 	);
 });
 
@@ -62,28 +62,28 @@ describe('RED v11: buildLiveCallbacks.migrateProperty parent_copy delegates to d
 				new Response(
 					JSON.stringify({
 						entities: [{ _id: 'edition-1' }],
-						count: 1
+						count: 1,
 					}),
-					{ status: 200 }
-				)
+					{ status: 200 },
+				),
 			)
 			.mockResolvedValueOnce(
 				// GET edition-1 — child entity with _parent reference
 				new Response(
 					JSON.stringify({
-						entity: { _id: 'edition-1', _parent: [{ reference: 'work-1' }] }
+						entity: { _id: 'edition-1', _parent: [{ reference: 'work-1' }] },
 					}),
-					{ status: 200 }
-				)
+					{ status: 200 },
+				),
 			)
 			.mockResolvedValueOnce(
 				// GET work-1 — parent entity with source property
 				new Response(
 					JSON.stringify({
-						entity: { _id: 'work-1', arranger: [{ type: 'string', string: 'Arvo Pärt' }] }
+						entity: { _id: 'work-1', arranger: [{ type: 'string', string: 'Arvo Pärt' }] },
 					}),
-					{ status: 200 }
-				)
+					{ status: 200 },
+				),
 			);
 
 		const cbs = buildLiveCallbacks(client);
@@ -93,15 +93,14 @@ describe('RED v11: buildLiveCallbacks.migrateProperty parent_copy delegates to d
 			targetParentType: 'edition',
 			sourceProperty: 'arranger',
 			targetProperty: 'arranger',
-			backfillKind: 'parent_copy'
+			backfillKind: 'parent_copy',
 		};
 
 		await cbs.migrateProperty(client, op);
 
 		expect(migratePropertySpy).toHaveBeenCalledOnce();
-		const [, calledOp, calledInjectables] = (migratePropertySpy as ReturnType<typeof vi.fn>).mock.calls[0] as [
-			EntuClient, BackfillDataOp, Record<string, unknown>
-		];
+		const [, calledOp, calledInjectables] = (migratePropertySpy as ReturnType<typeof vi.fn>).mock
+			.calls[0] as [EntuClient, BackfillDataOp, Record<string, unknown>];
 		expect(calledOp.backfillKind).toBe('parent_copy');
 		expect(calledInjectables.parentLookup).toBeInstanceOf(Map);
 		expect((calledInjectables.parentLookup as Map<string, string>).size).toBeGreaterThan(0);
@@ -115,46 +114,46 @@ describe('RED v11: buildLiveCallbacks.migrateProperty parent_copy delegates to d
 				new Response(
 					JSON.stringify({
 						entities: [{ _id: 'edition-1' }, { _id: 'edition-2' }],
-						count: 2
+						count: 2,
 					}),
-					{ status: 200 }
-				)
+					{ status: 200 },
+				),
 			)
 			.mockResolvedValueOnce(
 				// GET edition-1
 				new Response(
 					JSON.stringify({
-						entity: { _id: 'edition-1', _parent: [{ reference: 'work-1' }] }
+						entity: { _id: 'edition-1', _parent: [{ reference: 'work-1' }] },
 					}),
-					{ status: 200 }
-				)
+					{ status: 200 },
+				),
 			)
 			.mockResolvedValueOnce(
 				// GET work-1
 				new Response(
 					JSON.stringify({
-						entity: { _id: 'work-1', arranger: [{ type: 'string', string: 'Arvo Pärt' }] }
+						entity: { _id: 'work-1', arranger: [{ type: 'string', string: 'Arvo Pärt' }] },
 					}),
-					{ status: 200 }
-				)
+					{ status: 200 },
+				),
 			)
 			.mockResolvedValueOnce(
 				// GET edition-2
 				new Response(
 					JSON.stringify({
-						entity: { _id: 'edition-2', _parent: [{ reference: 'work-2' }] }
+						entity: { _id: 'edition-2', _parent: [{ reference: 'work-2' }] },
 					}),
-					{ status: 200 }
-				)
+					{ status: 200 },
+				),
 			)
 			.mockResolvedValueOnce(
 				// GET work-2
 				new Response(
 					JSON.stringify({
-						entity: { _id: 'work-2', arranger: [{ type: 'string', string: 'Cyrillus Kreek' }] }
+						entity: { _id: 'work-2', arranger: [{ type: 'string', string: 'Cyrillus Kreek' }] },
 					}),
-					{ status: 200 }
-				)
+					{ status: 200 },
+				),
 			);
 
 		const cbs = buildLiveCallbacks(client);
@@ -164,14 +163,13 @@ describe('RED v11: buildLiveCallbacks.migrateProperty parent_copy delegates to d
 			targetParentType: 'edition',
 			sourceProperty: 'arranger',
 			targetProperty: 'arranger',
-			backfillKind: 'parent_copy'
+			backfillKind: 'parent_copy',
 		};
 
 		await cbs.migrateProperty(client, op);
 
-		const [, , calledInjectables] = (migratePropertySpy as ReturnType<typeof vi.fn>).mock.calls[0] as [
-			EntuClient, BackfillDataOp, Record<string, unknown>
-		];
+		const [, , calledInjectables] = (migratePropertySpy as ReturnType<typeof vi.fn>).mock
+			.calls[0] as [EntuClient, BackfillDataOp, Record<string, unknown>];
 		const parentLookup = calledInjectables.parentLookup as Map<string, string>;
 		expect(parentLookup.get('edition-1')).toBe('Arvo Pärt');
 		expect(parentLookup.get('edition-2')).toBe('Cyrillus Kreek');
@@ -185,37 +183,37 @@ describe('RED v11: buildLiveCallbacks.migrateProperty parent_copy delegates to d
 				new Response(
 					JSON.stringify({
 						entities: [{ _id: 'edition-1' }, { _id: 'edition-2' }],
-						count: 2
+						count: 2,
 					}),
-					{ status: 200 }
-				)
+					{ status: 200 },
+				),
 			)
 			.mockResolvedValueOnce(
 				// GET edition-1 — no _parent reference
 				new Response(
 					JSON.stringify({
-						entity: { _id: 'edition-1' }
+						entity: { _id: 'edition-1' },
 					}),
-					{ status: 200 }
-				)
+					{ status: 200 },
+				),
 			)
 			.mockResolvedValueOnce(
 				// GET edition-2
 				new Response(
 					JSON.stringify({
-						entity: { _id: 'edition-2', _parent: [{ reference: 'work-2' }] }
+						entity: { _id: 'edition-2', _parent: [{ reference: 'work-2' }] },
 					}),
-					{ status: 200 }
-				)
+					{ status: 200 },
+				),
 			)
 			.mockResolvedValueOnce(
 				// GET work-2
 				new Response(
 					JSON.stringify({
-						entity: { _id: 'work-2', arranger: [{ type: 'string', string: 'Cyrillus Kreek' }] }
+						entity: { _id: 'work-2', arranger: [{ type: 'string', string: 'Cyrillus Kreek' }] },
 					}),
-					{ status: 200 }
-				)
+					{ status: 200 },
+				),
 			);
 
 		const cbs = buildLiveCallbacks(client);
@@ -225,14 +223,13 @@ describe('RED v11: buildLiveCallbacks.migrateProperty parent_copy delegates to d
 			targetParentType: 'edition',
 			sourceProperty: 'arranger',
 			targetProperty: 'arranger',
-			backfillKind: 'parent_copy'
+			backfillKind: 'parent_copy',
 		};
 
 		await cbs.migrateProperty(client, op);
 
-		const [, , calledInjectables] = (migratePropertySpy as ReturnType<typeof vi.fn>).mock.calls[0] as [
-			EntuClient, BackfillDataOp, Record<string, unknown>
-		];
+		const [, , calledInjectables] = (migratePropertySpy as ReturnType<typeof vi.fn>).mock
+			.calls[0] as [EntuClient, BackfillDataOp, Record<string, unknown>];
 		const parentLookup = calledInjectables.parentLookup as Map<string, string>;
 		// edition-1 (no parent) must not appear in the Map
 		expect(parentLookup.has('edition-1')).toBe(false);
@@ -246,34 +243,33 @@ describe('RED v11: buildLiveCallbacks.migrateProperty parent_copy delegates to d
 		(migratePropertySpy as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
 			migrated: 3,
 			skipped: 7,
-			failed: 2
+			failed: 2,
 		});
 
 		vi.spyOn(globalThis, 'fetch')
 			.mockResolvedValueOnce(
 				// listInstancesByType — 1 edition
-				new Response(
-					JSON.stringify({ entities: [{ _id: 'edition-1' }], count: 1 }),
-					{ status: 200 }
-				)
+				new Response(JSON.stringify({ entities: [{ _id: 'edition-1' }], count: 1 }), {
+					status: 200,
+				}),
 			)
 			.mockResolvedValueOnce(
 				// GET edition-1
 				new Response(
 					JSON.stringify({
-						entity: { _id: 'edition-1', _parent: [{ reference: 'work-1' }] }
+						entity: { _id: 'edition-1', _parent: [{ reference: 'work-1' }] },
 					}),
-					{ status: 200 }
-				)
+					{ status: 200 },
+				),
 			)
 			.mockResolvedValueOnce(
 				// GET work-1
 				new Response(
 					JSON.stringify({
-						entity: { _id: 'work-1', arranger: [{ type: 'string', string: 'Arvo Pärt' }] }
+						entity: { _id: 'work-1', arranger: [{ type: 'string', string: 'Arvo Pärt' }] },
 					}),
-					{ status: 200 }
-				)
+					{ status: 200 },
+				),
 			);
 
 		const cbs = buildLiveCallbacks(client);
@@ -283,7 +279,7 @@ describe('RED v11: buildLiveCallbacks.migrateProperty parent_copy delegates to d
 			targetParentType: 'edition',
 			sourceProperty: 'arranger',
 			targetProperty: 'arranger',
-			backfillKind: 'parent_copy'
+			backfillKind: 'parent_copy',
 		};
 
 		const result = await cbs.migrateProperty(client, op);
@@ -301,7 +297,7 @@ describe('RED v10: buildLiveCallbacks.migrateProperty delegates to data-migrator
 			parentType: 'work',
 			sourceProperty: 'voicing',
 			targetProperty: 'original_voicing',
-			backfillKind: 'string'
+			backfillKind: 'string',
 		};
 
 		await cbs.migrateProperty(client, op);
@@ -318,7 +314,7 @@ describe('RED v10: buildLiveCallbacks.migrateProperty delegates to data-migrator
 			parentType: 'section',
 			sourceProperty: 'voice_type',
 			targetProperty: 'voice',
-			backfillKind: 'string_to_reference'
+			backfillKind: 'string_to_reference',
 		};
 
 		await cbs.migrateProperty(client, op);
@@ -326,7 +322,7 @@ describe('RED v10: buildLiveCallbacks.migrateProperty delegates to data-migrator
 		const [, , options] = (migratePropertySpy as ReturnType<typeof vi.fn>).mock.calls[0] as [
 			EntuClient,
 			BackfillDataOp,
-			Record<string, unknown>
+			Record<string, unknown>,
 		];
 		expect(typeof options.listInstances).toBe('function');
 		expect(typeof options.writeProperty).toBe('function');

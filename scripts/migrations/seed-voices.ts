@@ -47,7 +47,9 @@ async function main() {
 
 	for (const voiceName of VOICE_NAMES) {
 		// Inline check gates the dry-run path; findOrCreateByName re-checks on the live path.
-		const existing = await listInstancesByType(client, 'voice', '_id', { 'name.string': voiceName });
+		const existing = await listInstancesByType(client, 'voice', '_id', {
+			'name.string': voiceName,
+		});
 
 		if (existing.entities.length > 0) {
 			const existingId = existing.entities[0]._id;
@@ -100,9 +102,13 @@ async function main() {
 
 	if (DRY_RUN) {
 		const wouldCreate = VOICE_NAMES.length - skipped.length;
-		console.log(`[seed-voices] dry-run summary: ${wouldCreate} would create, ${skipped.length} already exist`);
+		console.log(
+			`[seed-voices] dry-run summary: ${wouldCreate} would create, ${skipped.length} already exist`,
+		);
 	} else {
-		console.log(`[seed-voices] summary: ${created.length} created, ${skipped.length} skipped, ${failed.length} failed`);
+		console.log(
+			`[seed-voices] summary: ${created.length} created, ${skipped.length} skipped, ${failed.length} failed`,
+		);
 	}
 
 	if (failed.length > 0) {

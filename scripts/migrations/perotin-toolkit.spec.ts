@@ -13,7 +13,7 @@ vi.mock('node:fs', async (importOriginal) => {
 	return {
 		...actual,
 		mkdirSync: vi.fn(),
-		writeFileSync: vi.fn()
+		writeFileSync: vi.fn(),
 	};
 });
 
@@ -25,7 +25,7 @@ vi.mock('./lib/entu-client', async (importOriginal) => {
 		deletePropertyValue: vi.fn().mockResolvedValue(undefined),
 		postProperties: vi.fn().mockResolvedValue(undefined),
 		listInstancesByType: vi.fn().mockResolvedValue({ entities: [], count: 0 }),
-		createEntity: vi.fn().mockResolvedValue({ _id: 'new-entity-id' })
+		createEntity: vi.fn().mockResolvedValue({ _id: 'new-entity-id' }),
 	};
 });
 
@@ -35,19 +35,19 @@ import {
 	postProperties,
 	listInstancesByType,
 	createEntity,
-	type EntuClient
+	type EntuClient,
 } from './lib/entu-client';
 import {
 	isDryRun,
 	writeResultArtifact,
 	replaceProperty,
-	findOrCreateByName
+	findOrCreateByName,
 } from './perotin-toolkit';
 
 const client: EntuClient = {
 	apiBase: 'https://api.entu.app',
 	db: 'polyphony',
-	jwt: 'test-jwt'
+	jwt: 'test-jwt',
 };
 
 afterEach(() => {
@@ -93,7 +93,8 @@ describe('writeResultArtifact', () => {
 		const payload = { voices: ['alto', 'bass'], total: 2 };
 		const returnedPath = await writeResultArtifact('seed-voices', payload);
 		expect(writeFileSync).toHaveBeenCalledOnce();
-		const [writtenPath, writtenContent] = (writeFileSync as ReturnType<typeof vi.fn>).mock.calls[0] as [string, string];
+		const [writtenPath, writtenContent] = (writeFileSync as ReturnType<typeof vi.fn>).mock
+			.calls[0] as [string, string];
 		expect(writtenPath).toBe(returnedPath);
 		expect(JSON.parse(writtenContent)).toEqual(payload);
 	});
@@ -125,7 +126,7 @@ describe('replaceProperty', () => {
 		expect(postProperties).toHaveBeenCalledWith(
 			client,
 			'entity-1',
-			expect.arrayContaining([expect.objectContaining({ type: 'name', string: 'soprano' })])
+			expect.arrayContaining([expect.objectContaining({ type: 'name', string: 'soprano' })]),
 		);
 	});
 
@@ -160,7 +161,7 @@ describe('findOrCreateByName', () => {
 	it('returns existing entity {_id, created: false} when found by name', async () => {
 		(listInstancesByType as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
 			entities: [{ _id: 'existing-section' }],
-			count: 1
+			count: 1,
 		});
 
 		const result = await findOrCreateByName(client, 'section', 'altos', undefined, []);
@@ -173,11 +174,11 @@ describe('findOrCreateByName', () => {
 	it('creates and returns {_id, created: true} when not found', async () => {
 		(listInstancesByType as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
 			entities: [],
-			count: 0
+			count: 0,
 		});
 
 		const result = await findOrCreateByName(client, 'section', 'tenors', undefined, [
-			{ type: 'name', string: 'tenors' }
+			{ type: 'name', string: 'tenors' },
 		]);
 
 		expect(result.created).toBe(true);
@@ -187,21 +188,27 @@ describe('findOrCreateByName', () => {
 	it('(Bentham pin B) passes parentId as _parent.reference filter in lookup query', async () => {
 		(listInstancesByType as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
 			entities: [{ _id: 'org-a-altos' }],
-			count: 1
+			count: 1,
 		});
 
 		await findOrCreateByName(client, 'section', 'altos', 'org-a-id', []);
 
 		const [, , , query] = (listInstancesByType as ReturnType<typeof vi.fn>).mock.calls[0] as [
-			EntuClient, string, string, Record<string, string>?
+			EntuClient,
+			string,
+			string,
+			Record<string, string>?,
 		];
-		expect(query?.['_parent.reference'] ?? (listInstancesByType as ReturnType<typeof vi.fn>).mock.calls[0].join(' ')).toContain('org-a-id');
+		expect(
+			query?.['_parent.reference'] ??
+				(listInstancesByType as ReturnType<typeof vi.fn>).mock.calls[0].join(' '),
+		).toContain('org-a-id');
 	});
 
 	it('(Bentham pin B) without parentId omits _parent.reference from the query', async () => {
 		(listInstancesByType as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
 			entities: [{ _id: 'any-section' }],
-			count: 1
+			count: 1,
 		});
 
 		await findOrCreateByName(client, 'section', 'altos', undefined, []);

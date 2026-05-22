@@ -5,7 +5,7 @@ import {
 	type EntuClient,
 	type EntuProperty,
 	type CreateEntityResponse,
-	createEntity as defaultCreateEntity
+	createEntity as defaultCreateEntity,
 } from './entu-client';
 import type {
 	DiffOp,
@@ -14,7 +14,7 @@ import type {
 	BackfillDataOp,
 	DeletePropertyOp,
 	UpdateFormulaOp,
-	TouchSaveOp
+	TouchSaveOp,
 } from './diff';
 import { translateEntityType, translatePropertyDef } from './v4e-translator';
 
@@ -62,17 +62,14 @@ export interface ExecutionResult {
 
 export interface ExecuteOptions {
 	dryRun: boolean;
-	createEntity?: (
-		client: EntuClient,
-		properties: EntuProperty[]
-	) => Promise<CreateEntityResponse>;
+	createEntity?: (client: EntuClient, properties: EntuProperty[]) => Promise<CreateEntityResponse>;
 	now?: () => string;
 }
 
 export async function executeAdditions(
 	client: EntuClient,
 	ops: DiffOp[],
-	opts: ExecuteOptions
+	opts: ExecuteOptions,
 ): Promise<ExecutionResult> {
 	const createEntity = opts.createEntity ?? defaultCreateEntity;
 	const now = opts.now ?? (() => new Date().toISOString());
@@ -85,7 +82,7 @@ export async function executeAdditions(
 		wouldAddProperties: [],
 		skipped: [],
 		failed: [],
-		formulaTouchSaveDeferred: []
+		formulaTouchSaveDeferred: [],
 	};
 
 	if (opts.dryRun) {
@@ -98,13 +95,13 @@ export async function executeAdditions(
 						parentTypeName: op.typeName,
 						parentTypeId: '(pending — type not yet created)',
 						propertyName: prop.name,
-						def: prop
+						def: prop,
 					});
 					if (prop.formula) {
 						result.formulaTouchSaveDeferred.push({
 							parentType: op.typeName,
 							property: prop.name,
-							formula: prop.formula
+							formula: prop.formula,
 						});
 					}
 				}
@@ -114,7 +111,7 @@ export async function executeAdditions(
 					result.formulaTouchSaveDeferred.push({
 						parentType: op.parentTypeName,
 						property: op.propertyName,
-						formula: op.def.formula
+						formula: op.def.formula,
 					});
 				}
 			}
@@ -131,10 +128,10 @@ export async function executeAdditions(
 						blurb: op.blurb,
 						sharing: op.sharing,
 						inheritsRights: op.inheritsRights,
-						properties: []
+						properties: [],
 					},
 					POLYPHONY_DB_ENTITY_ID,
-					POLYPHONY_META_TYPE_ENTITY_ID
+					POLYPHONY_META_TYPE_ENTITY_ID,
 				);
 				const created = await createEntity(client, typePayload);
 				const typeId = created._id;
@@ -144,26 +141,26 @@ export async function executeAdditions(
 					try {
 						const propCreated = await createEntity(
 							client,
-							translatePropertyDef(prop, typeId, POLYPHONY_META_TYPE_PROPERTY_ID)
+							translatePropertyDef(prop, typeId, POLYPHONY_META_TYPE_PROPERTY_ID),
 						);
 						result.addedProperties.push({
 							parentType: op.typeName,
 							name: prop.name,
 							id: propCreated._id,
-							createdAt: now()
+							createdAt: now(),
 						});
 						if (prop.formula) {
 							result.formulaTouchSaveDeferred.push({
 								parentType: op.typeName,
 								property: prop.name,
-								formula: prop.formula
+								formula: prop.formula,
 							});
 						}
 					} catch (err) {
 						result.failed.push({
 							kind: 'property',
 							name: `${op.typeName}.${prop.name}`,
-							error: err instanceof Error ? err.message : String(err)
+							error: err instanceof Error ? err.message : String(err),
 						});
 					}
 				}
@@ -171,33 +168,33 @@ export async function executeAdditions(
 				result.failed.push({
 					kind: 'type',
 					name: op.typeName,
-					error: err instanceof Error ? err.message : String(err)
+					error: err instanceof Error ? err.message : String(err),
 				});
 			}
 		} else {
 			try {
 				const propCreated = await createEntity(
 					client,
-					translatePropertyDef(op.def, op.parentTypeId, POLYPHONY_META_TYPE_PROPERTY_ID)
+					translatePropertyDef(op.def, op.parentTypeId, POLYPHONY_META_TYPE_PROPERTY_ID),
 				);
 				result.addedProperties.push({
 					parentType: op.parentTypeName,
 					name: op.propertyName,
 					id: propCreated._id,
-					createdAt: now()
+					createdAt: now(),
 				});
 				if (op.def.formula) {
 					result.formulaTouchSaveDeferred.push({
 						parentType: op.parentTypeName,
 						property: op.propertyName,
-						formula: op.def.formula
+						formula: op.def.formula,
 					});
 				}
 			} catch (err) {
 				result.failed.push({
 					kind: 'property',
 					name: `${op.parentTypeName}.${op.propertyName}`,
-					error: err instanceof Error ? err.message : String(err)
+					error: err instanceof Error ? err.message : String(err),
 				});
 			}
 		}
@@ -285,7 +282,10 @@ export interface AddPropertyFn {
 }
 
 export interface MigratePropertyFn {
-	(client: EntuClient, op: BackfillDataOp): Promise<{
+	(
+		client: EntuClient,
+		op: BackfillDataOp,
+	): Promise<{
 		migrated: number;
 		skipped: number;
 		failed: number;
@@ -306,7 +306,10 @@ export interface UpdateFormulaFn {
 }
 
 export interface TouchSaveFormulaFn {
-	(client: EntuClient, op: TouchSaveOp): Promise<{
+	(
+		client: EntuClient,
+		op: TouchSaveOp,
+	): Promise<{
 		touchSaveCount: number;
 		noInstances: boolean;
 		failed: number;
@@ -327,7 +330,7 @@ export interface ExecutePhaseBOptions {
 export async function executePhaseBOps(
 	client: EntuClient,
 	ops: DiffOp[],
-	opts: ExecutePhaseBOptions
+	opts: ExecutePhaseBOptions,
 ): Promise<PhaseBExecutionResult> {
 	const now = opts.now ?? (() => new Date().toISOString());
 
@@ -341,7 +344,7 @@ export async function executePhaseBOps(
 		touchSaves: [],
 		skipped: [],
 		failed: [],
-		wouldExecute: []
+		wouldExecute: [],
 	};
 
 	if (opts.dryRun) {
@@ -350,11 +353,11 @@ export async function executePhaseBOps(
 	}
 
 	const hasVerifyDeletes = ops.some(
-		(o) => o.kind === 'DELETE_PROPERTY' && o.verifyPreconditions === true
+		(o) => o.kind === 'DELETE_PROPERTY' && o.verifyPreconditions === true,
 	);
 	if (hasVerifyDeletes && !opts.verifyDeleteSafe) {
 		throw new Error(
-			'executePhaseBOps: DELETE_PROPERTY ops with verifyPreconditions=true require a verifyDeleteSafe injectable'
+			'executePhaseBOps: DELETE_PROPERTY ops with verifyPreconditions=true require a verifyDeleteSafe injectable',
 		);
 	}
 
@@ -365,7 +368,7 @@ export async function executePhaseBOps(
 					kind: op.kind,
 					parentType: op.parentTypeName,
 					propertyName: op.propertyName,
-					error: 'addProperty not provided'
+					error: 'addProperty not provided',
 				});
 				continue;
 			}
@@ -375,14 +378,14 @@ export async function executePhaseBOps(
 					parentType: op.parentTypeName,
 					propertyName: op.propertyName,
 					propertyDefId: created._id,
-					addedAt: now()
+					addedAt: now(),
 				});
 			} catch (err) {
 				result.failed.push({
 					kind: op.kind,
 					parentType: op.parentTypeName,
 					propertyName: op.propertyName,
-					error: err instanceof Error ? err.message : String(err)
+					error: err instanceof Error ? err.message : String(err),
 				});
 			}
 		} else if (op.kind === 'BACKFILL_DATA') {
@@ -391,7 +394,7 @@ export async function executePhaseBOps(
 					kind: op.kind,
 					parentType: op.parentType,
 					propertyName: op.targetProperty,
-					error: 'migrateProperty not provided'
+					error: 'migrateProperty not provided',
 				});
 				continue;
 			}
@@ -404,14 +407,14 @@ export async function executePhaseBOps(
 					migrated: r.migrated,
 					skipped: r.skipped,
 					failed: r.failed,
-					unmatchedVoiceTypes: r.unmatchedVoiceTypes
+					unmatchedVoiceTypes: r.unmatchedVoiceTypes,
 				});
 			} catch (err) {
 				result.failed.push({
 					kind: op.kind,
 					parentType: op.parentType,
 					propertyName: op.targetProperty,
-					error: err instanceof Error ? err.message : String(err)
+					error: err instanceof Error ? err.message : String(err),
 				});
 			}
 		} else if (op.kind === 'DELETE_PROPERTY') {
@@ -421,7 +424,7 @@ export async function executePhaseBOps(
 					result.blockedDeletes.push({
 						parentType: op.parentType,
 						propertyName: op.propertyName,
-						reason: verify.reason ?? 'verifyDeleteSafe returned unsafe'
+						reason: verify.reason ?? 'verifyDeleteSafe returned unsafe',
 					});
 					continue;
 				}
@@ -431,7 +434,7 @@ export async function executePhaseBOps(
 					kind: op.kind,
 					parentType: op.parentType,
 					propertyName: op.propertyName,
-					error: 'deleteProperty not provided'
+					error: 'deleteProperty not provided',
 				});
 				continue;
 			}
@@ -441,14 +444,14 @@ export async function executePhaseBOps(
 					parentType: op.parentType,
 					propertyName: op.propertyName,
 					propertyDefId: op.propertyDefId,
-					deletedAt: now()
+					deletedAt: now(),
 				});
 			} catch (err) {
 				result.failed.push({
 					kind: op.kind,
 					parentType: op.parentType,
 					propertyName: op.propertyName,
-					error: err instanceof Error ? err.message : String(err)
+					error: err instanceof Error ? err.message : String(err),
 				});
 			}
 		} else if (op.kind === 'UPDATE_FORMULA') {
@@ -457,7 +460,7 @@ export async function executePhaseBOps(
 					kind: op.kind,
 					parentType: op.parentType,
 					propertyName: op.propertyName,
-					reason: 'formula_current'
+					reason: 'formula_current',
 				});
 				continue;
 			}
@@ -466,7 +469,7 @@ export async function executePhaseBOps(
 					kind: op.kind,
 					parentType: op.parentType,
 					propertyName: op.propertyName,
-					error: 'updateFormula not provided'
+					error: 'updateFormula not provided',
 				});
 				continue;
 			}
@@ -476,14 +479,14 @@ export async function executePhaseBOps(
 					parentType: op.parentType,
 					propertyName: op.propertyName,
 					propertyDefId: op.propertyDefId,
-					updatedAt: now()
+					updatedAt: now(),
 				});
 			} catch (err) {
 				result.failed.push({
 					kind: op.kind,
 					parentType: op.parentType,
 					propertyName: op.propertyName,
-					error: err instanceof Error ? err.message : String(err)
+					error: err instanceof Error ? err.message : String(err),
 				});
 			}
 		} else if (op.kind === 'TOUCH_SAVE') {
@@ -492,7 +495,7 @@ export async function executePhaseBOps(
 					kind: op.kind,
 					parentType: op.parentType,
 					propertyName: op.propertyName,
-					error: 'touchSaveFormula not provided'
+					error: 'touchSaveFormula not provided',
 				});
 				continue;
 			}
@@ -503,14 +506,14 @@ export async function executePhaseBOps(
 					propertyName: op.propertyName,
 					count: r.touchSaveCount,
 					noInstances: r.noInstances,
-					failed: r.failed
+					failed: r.failed,
 				});
 			} catch (err) {
 				result.failed.push({
 					kind: op.kind,
 					parentType: op.parentType,
 					propertyName: op.propertyName,
-					error: err instanceof Error ? err.message : String(err)
+					error: err instanceof Error ? err.message : String(err),
 				});
 			}
 		}

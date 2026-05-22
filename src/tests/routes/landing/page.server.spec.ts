@@ -28,7 +28,14 @@ type LoadResult = {
 };
 
 const ORG_FIXTURES: OrgEntity[] = [
-	{ _id: 'org-1', name: 'Test Choir', description: 'A choir', location: 'Tallinn', photo: 'https://s3.example.com/p1', member_count_per_section: 4 },
+	{
+		_id: 'org-1',
+		name: 'Test Choir',
+		description: 'A choir',
+		location: 'Tallinn',
+		photo: 'https://s3.example.com/p1',
+		member_count_per_section: 4,
+	},
 	{ _id: 'org-2', name: 'Sparse Choir' },
 ];
 
@@ -59,7 +66,9 @@ describe('+page.server.ts load()', () => {
 	it('signed-out: no JWT → returns null session, null orgs, no fetch called', async () => {
 		const fetchMock = vi.fn();
 		const { load } = await import('../../../routes/+page.server.ts');
-		const result = await load(makeLoadEvent(null, fetchMock) as unknown as ServerLoadEvent) as LoadResult;
+		const result = (await load(
+			makeLoadEvent(null, fetchMock) as unknown as ServerLoadEvent,
+		)) as LoadResult;
 
 		expect(result.session).toBeNull();
 		expect(result.orgs).toBeNull();
@@ -69,7 +78,9 @@ describe('+page.server.ts load()', () => {
 	it('signed-in: JWT present → session shape returned', async () => {
 		const fetchMock = vi.fn().mockResolvedValue(makeOrgsResponse(ORG_FIXTURES));
 		const { load } = await import('../../../routes/+page.server.ts');
-		const result = await load(makeLoadEvent('my.jwt.token', fetchMock) as unknown as ServerLoadEvent) as LoadResult;
+		const result = (await load(
+			makeLoadEvent('my.jwt.token', fetchMock) as unknown as ServerLoadEvent,
+		)) as LoadResult;
 
 		expect(result.session).not.toBeNull();
 		expect(result.session?.jwt).toBe('my.jwt.token');
@@ -88,7 +99,9 @@ describe('+page.server.ts load()', () => {
 	it('signed-in: returns orgs array from BFF response', async () => {
 		const fetchMock = vi.fn().mockResolvedValue(makeOrgsResponse(ORG_FIXTURES));
 		const { load } = await import('../../../routes/+page.server.ts');
-		const result = await load(makeLoadEvent('my.jwt.token', fetchMock) as unknown as ServerLoadEvent) as LoadResult;
+		const result = (await load(
+			makeLoadEvent('my.jwt.token', fetchMock) as unknown as ServerLoadEvent,
+		)) as LoadResult;
 
 		expect(Array.isArray(result.orgs)).toBe(true);
 		expect(result.orgs).toHaveLength(2);
@@ -98,18 +111,24 @@ describe('+page.server.ts load()', () => {
 	it('signed-in: BFF returns empty array → orgs is [] (not null), no error', async () => {
 		const fetchMock = vi.fn().mockResolvedValue(makeOrgsResponse([]));
 		const { load } = await import('../../../routes/+page.server.ts');
-		const result = await load(makeLoadEvent('my.jwt.token', fetchMock) as unknown as ServerLoadEvent) as LoadResult;
+		const result = (await load(
+			makeLoadEvent('my.jwt.token', fetchMock) as unknown as ServerLoadEvent,
+		)) as LoadResult;
 
 		expect(result.orgs).toEqual([]);
 		expect(result.error).toBeFalsy();
 	});
 
 	it('signed-in: BFF returns 500 → error true, orgs null', async () => {
-		const fetchMock = vi.fn().mockResolvedValue(
-			new Response(JSON.stringify({ error: 'upstream_unavailable' }), { status: 500 })
-		);
+		const fetchMock = vi
+			.fn()
+			.mockResolvedValue(
+				new Response(JSON.stringify({ error: 'upstream_unavailable' }), { status: 500 }),
+			);
 		const { load } = await import('../../../routes/+page.server.ts');
-		const result = await load(makeLoadEvent('my.jwt.token', fetchMock) as unknown as ServerLoadEvent) as LoadResult;
+		const result = (await load(
+			makeLoadEvent('my.jwt.token', fetchMock) as unknown as ServerLoadEvent,
+		)) as LoadResult;
 
 		expect(result.error).toBe(true);
 		expect(result.orgs).toBeNull();
@@ -118,7 +137,9 @@ describe('+page.server.ts load()', () => {
 	it('signed-in: BFF fetch throws (network error) → error true, orgs null', async () => {
 		const fetchMock = vi.fn().mockRejectedValue(new Error('network failure'));
 		const { load } = await import('../../../routes/+page.server.ts');
-		const result = await load(makeLoadEvent('my.jwt.token', fetchMock) as unknown as ServerLoadEvent) as LoadResult;
+		const result = (await load(
+			makeLoadEvent('my.jwt.token', fetchMock) as unknown as ServerLoadEvent,
+		)) as LoadResult;
 
 		expect(result.error).toBe(true);
 		expect(result.orgs).toBeNull();

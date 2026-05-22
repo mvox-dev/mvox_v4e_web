@@ -1,10 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { RequestEvent } from '@sveltejs/kit';
 
-function makeEvent(
-	jwt: string | null,
-	searchParams: Record<string, string> = {}
-): RequestEvent {
+function makeEvent(jwt: string | null, searchParams: Record<string, string> = {}): RequestEvent {
 	const urlParams = new URLSearchParams(searchParams);
 	const url = new URL(`https://example.com/api/organizations?${urlParams.toString()}`);
 	return {
@@ -66,16 +63,19 @@ describe('GET /api/organizations', () => {
 		const { GET } = await import('../../../../routes/api/organizations/+server.ts');
 		const event = makeEvent(null);
 		const response = await GET(event);
-		const body = await response.json() as { error: string };
+		const body = (await response.json()) as { error: string };
 		expect(body.error).toBe('auth_required');
 	});
 
 	it('happy path: returns 200 with entities array', async () => {
-		vi.stubGlobal('fetch', vi.fn().mockResolvedValue(makeEntuSearchResponse([ORG_WITH_THUMB, ORG_SPARSE])));
+		vi.stubGlobal(
+			'fetch',
+			vi.fn().mockResolvedValue(makeEntuSearchResponse([ORG_WITH_THUMB, ORG_SPARSE])),
+		);
 		const { GET } = await import('../../../../routes/api/organizations/+server.ts');
 		const response = await GET(makeEvent('valid-jwt'));
 		expect(response.status).toBe(200);
-		const body = await response.json() as { entities: unknown[] };
+		const body = (await response.json()) as { entities: unknown[] };
 		expect(Array.isArray(body.entities)).toBe(true);
 		expect(body.entities).toHaveLength(2);
 	});
@@ -84,7 +84,7 @@ describe('GET /api/organizations', () => {
 		vi.stubGlobal('fetch', vi.fn().mockResolvedValue(makeEntuSearchResponse([ORG_WITH_THUMB])));
 		const { GET } = await import('../../../../routes/api/organizations/+server.ts');
 		const response = await GET(makeEvent('valid-jwt'));
-		const body = await response.json() as { entities: Array<Record<string, unknown>> };
+		const body = (await response.json()) as { entities: Array<Record<string, unknown>> };
 		const entity = body.entities[0];
 
 		expect(entity._id).toBe('org-1');
@@ -99,13 +99,15 @@ describe('GET /api/organizations', () => {
 		const thumbUrl = 'https://s3.example.com/thumb-abc';
 		vi.stubGlobal(
 			'fetch',
-			vi.fn().mockResolvedValue(
-				makeEntuSearchResponse([{ _id: 'org-3', name: [{ string: 'X' }], _thumbnail: thumbUrl }])
-			)
+			vi
+				.fn()
+				.mockResolvedValue(
+					makeEntuSearchResponse([{ _id: 'org-3', name: [{ string: 'X' }], _thumbnail: thumbUrl }]),
+				),
 		);
 		const { GET } = await import('../../../../routes/api/organizations/+server.ts');
 		const response = await GET(makeEvent('valid-jwt'));
-		const body = await response.json() as { entities: Array<Record<string, unknown>> };
+		const body = (await response.json()) as { entities: Array<Record<string, unknown>> };
 		expect(body.entities[0].photo).toBe(thumbUrl);
 	});
 
@@ -113,7 +115,7 @@ describe('GET /api/organizations', () => {
 		vi.stubGlobal('fetch', vi.fn().mockResolvedValue(makeEntuSearchResponse([ORG_SPARSE])));
 		const { GET } = await import('../../../../routes/api/organizations/+server.ts');
 		const response = await GET(makeEvent('valid-jwt'));
-		const body = await response.json() as { entities: Array<Record<string, unknown>> };
+		const body = (await response.json()) as { entities: Array<Record<string, unknown>> };
 		expect(body.entities[0].description).toBeUndefined();
 	});
 
@@ -121,7 +123,7 @@ describe('GET /api/organizations', () => {
 		vi.stubGlobal('fetch', vi.fn().mockResolvedValue(makeEntuSearchResponse([ORG_SPARSE])));
 		const { GET } = await import('../../../../routes/api/organizations/+server.ts');
 		const response = await GET(makeEvent('valid-jwt'));
-		const body = await response.json() as { entities: Array<Record<string, unknown>> };
+		const body = (await response.json()) as { entities: Array<Record<string, unknown>> };
 		expect(body.entities[0].location).toBeUndefined();
 	});
 
@@ -129,7 +131,7 @@ describe('GET /api/organizations', () => {
 		vi.stubGlobal('fetch', vi.fn().mockResolvedValue(makeEntuSearchResponse([ORG_SPARSE])));
 		const { GET } = await import('../../../../routes/api/organizations/+server.ts');
 		const response = await GET(makeEvent('valid-jwt'));
-		const body = await response.json() as { entities: Array<Record<string, unknown>> };
+		const body = (await response.json()) as { entities: Array<Record<string, unknown>> };
 		expect(body.entities[0].photo).toBeUndefined();
 	});
 
@@ -138,7 +140,7 @@ describe('GET /api/organizations', () => {
 		const { GET } = await import('../../../../routes/api/organizations/+server.ts');
 		const response = await GET(makeEvent('valid-jwt'));
 		expect(response.status).toBe(200);
-		const body = await response.json() as { entities: unknown[] };
+		const body = (await response.json()) as { entities: unknown[] };
 		expect(body.entities).toEqual([]);
 	});
 

@@ -91,7 +91,7 @@ describe('POST /auth/cookie', () => {
 		const response = await POST(event);
 
 		expect(response.status).toBe(200);
-		const json = await response.json() as { ok: boolean };
+		const json = (await response.json()) as { ok: boolean };
 		expect(json.ok).toBe(true);
 	});
 
@@ -103,7 +103,7 @@ describe('POST /auth/cookie', () => {
 
 		const cookies = event.cookies as ReturnType<typeof makeCookies>;
 		const jwtCall = (cookies.set as ReturnType<typeof vi.fn>).mock.calls.find(
-			(c: unknown[]) => c[0] === 'entu_jwt'
+			(c: unknown[]) => c[0] === 'entu_jwt',
 		);
 		expect(jwtCall).toBeDefined();
 		const [, value, opts] = jwtCall as [string, string, Record<string, unknown>];
@@ -119,9 +119,9 @@ describe('POST /auth/cookie', () => {
 
 		const cookies = event.cookies as ReturnType<typeof makeCookies>;
 		const jwtCall = (cookies.set as ReturnType<typeof vi.fn>).mock.calls.find(
-			(c: unknown[]) => c[0] === 'entu_jwt'
+			(c: unknown[]) => c[0] === 'entu_jwt',
 		);
-		const [,, opts] = jwtCall as [string, string, Record<string, unknown>];
+		const [, , opts] = jwtCall as [string, string, Record<string, unknown>];
 		expect(opts?.sameSite).toBe('lax');
 		expect(opts?.maxAge).toBe(48 * 60 * 60);
 	});
@@ -202,7 +202,7 @@ describe('POST /auth/cookie', () => {
 
 		const cookies = event.cookies as ReturnType<typeof makeCookies>;
 		const jwtCall = (cookies.set as ReturnType<typeof vi.fn>).mock.calls.find(
-			(c: unknown[]) => c[0] === 'entu_jwt'
+			(c: unknown[]) => c[0] === 'entu_jwt',
 		);
 		expect(jwtCall).toBeUndefined();
 	});
@@ -217,7 +217,10 @@ describe('POST /auth/cookie', () => {
 		const event = makeCookiePostEvent({ token: jwt });
 		await POST(event);
 
-		expect(event.cookies.delete).toHaveBeenCalledWith('csrf_state', expect.objectContaining({ path: '/auth' }));
+		expect(event.cookies.delete).toHaveBeenCalledWith(
+			'csrf_state',
+			expect.objectContaining({ path: '/auth' }),
+		);
 	});
 
 	it('deletes csrf_state cookie even when JWT is malformed (delete-always)', async () => {
@@ -225,7 +228,10 @@ describe('POST /auth/cookie', () => {
 		const event = makeCookiePostEvent({ token: 'bad' });
 		await POST(event);
 
-		expect(event.cookies.delete).toHaveBeenCalledWith('csrf_state', expect.objectContaining({ path: '/auth' }));
+		expect(event.cookies.delete).toHaveBeenCalledWith(
+			'csrf_state',
+			expect.objectContaining({ path: '/auth' }),
+		);
 	});
 
 	it('deletes csrf_state cookie even when JWT is expired (delete-always)', async () => {
@@ -234,6 +240,9 @@ describe('POST /auth/cookie', () => {
 		const event = makeCookiePostEvent({ token: jwt });
 		await POST(event);
 
-		expect(event.cookies.delete).toHaveBeenCalledWith('csrf_state', expect.objectContaining({ path: '/auth' }));
+		expect(event.cookies.delete).toHaveBeenCalledWith(
+			'csrf_state',
+			expect.objectContaining({ path: '/auth' }),
+		);
 	});
 });

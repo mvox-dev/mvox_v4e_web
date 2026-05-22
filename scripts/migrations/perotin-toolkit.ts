@@ -7,7 +7,7 @@ import {
 	createEntity,
 	type EntuClient,
 	type EntuProperty,
-	type CreateEntityResponse
+	type CreateEntityResponse,
 } from './lib/entu-client';
 
 export function isDryRun(): boolean {
@@ -17,7 +17,7 @@ export function isDryRun(): boolean {
 export async function writeResultArtifact(
 	scriptSlug: string,
 	payload: Record<string, unknown>,
-	opts?: { at?: Date }
+	opts?: { at?: Date },
 ): Promise<string> {
 	const at = opts?.at ?? new Date();
 	const timestamp = at.toISOString().replace(/[:.]/g, '-');
@@ -37,7 +37,7 @@ export async function replaceProperty(
 	entityId: string,
 	propType: string,
 	currentValueIds: string[],
-	newValue: EntuProperty | string | number
+	newValue: EntuProperty | string | number,
 ): Promise<void> {
 	for (const id of currentValueIds) {
 		await deletePropertyValue(client, id);
@@ -56,7 +56,7 @@ export async function findOrCreateByName(
 	typeName: string,
 	name: string,
 	parentId: string | undefined,
-	propsIfCreating: EntuProperty[]
+	propsIfCreating: EntuProperty[],
 ): Promise<{ _id: string; created: boolean }> {
 	const extraQuery: Record<string, string> = { 'name.string': name };
 	if (parentId) extraQuery['_parent.reference'] = parentId;

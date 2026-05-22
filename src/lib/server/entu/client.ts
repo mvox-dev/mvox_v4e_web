@@ -37,7 +37,7 @@ export class EntuClient {
 		if (!res.ok) {
 			throw new Error(`Entu get ${entityId} failed: ${res.status}`);
 		}
-		const body = await res.json() as { entity: EntuEntity };
+		const body = (await res.json()) as { entity: EntuEntity };
 		return body.entity;
 	}
 
@@ -48,7 +48,7 @@ export class EntuClient {
 		}
 		const url = `${this.baseUrl}${this.db}/entity?${params.toString()}`;
 		const res = await fetch(url, { headers: this.authHeaders() });
-		const body = await res.json() as { entities: EntuEntity[] };
+		const body = (await res.json()) as { entities: EntuEntity[] };
 		return body.entities;
 	}
 

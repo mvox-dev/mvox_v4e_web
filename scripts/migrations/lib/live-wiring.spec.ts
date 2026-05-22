@@ -20,7 +20,7 @@ import type { BackfillDataOp, DeletePropertyOp, UpdateFormulaOp } from './diff';
 const client: EntuClient = {
 	apiBase: 'https://api.entu.app',
 	db: 'polyphony',
-	jwt: 'test-jwt'
+	jwt: 'test-jwt',
 };
 
 afterEach(() => {
@@ -40,21 +40,21 @@ describe('RED-1: buildLiveCallbacks.migrateProperty — live wire shape', () => 
 					JSON.stringify({
 						entity: {
 							_id: 'person-1',
-							photo: [{ _id: 'photo-prop-id', type: 'file', reference: 'file-entity-id-1' }]
-						}
+							photo: [{ _id: 'photo-prop-id', type: 'file', reference: 'file-entity-id-1' }],
+						},
 					}),
-					{ status: 200 }
-				)
+					{ status: 200 },
+				),
 			);
 			// POST /entity/{id} — accept target property write
 			fetchMock.mockResolvedValueOnce(
 				new Response(
 					JSON.stringify({
 						_id: 'person-1',
-						properties: [{ _id: 'new-prop-id', type: 'avatar', reference: 'file-entity-id-1' }]
+						properties: [{ _id: 'new-prop-id', type: 'avatar', reference: 'file-entity-id-1' }],
 					}),
-					{ status: 200 }
-				)
+					{ status: 200 },
+				),
 			);
 
 			const cbs = buildLiveCallbacks(client);
@@ -63,7 +63,7 @@ describe('RED-1: buildLiveCallbacks.migrateProperty — live wire shape', () => 
 				parentType: 'person',
 				sourceProperty: 'photo',
 				targetProperty: 'avatar',
-				backfillKind: 'file'
+				backfillKind: 'file',
 			};
 
 			// migrateProperty must not throw "not yet wired" for 'file' kind
@@ -71,7 +71,7 @@ describe('RED-1: buildLiveCallbacks.migrateProperty — live wire shape', () => 
 
 			// Verify GET was called for the source entity
 			const getCall = fetchMock.mock.calls.find(
-				([url]) => typeof url === 'string' && url.includes('/entity/')
+				([url]) => typeof url === 'string' && url.includes('/entity/'),
 			);
 			expect(getCall).toBeDefined();
 		});
@@ -89,33 +89,31 @@ describe('RED-1: buildLiveCallbacks.migrateProperty — live wire shape', () => 
 			fetchMock.mockResolvedValueOnce(
 				new Response(
 					JSON.stringify({
-						entities: [
-							{ _id: 'section-1', voice_type: [{ type: 'string', string: 'soprano' }] }
-						],
-						count: 1
+						entities: [{ _id: 'section-1', voice_type: [{ type: 'string', string: 'soprano' }] }],
+						count: 1,
 					}),
-					{ status: 200 }
-				)
+					{ status: 200 },
+				),
 			);
 			// GET /entity?_type.reference=<voice-type-id>&name.string=soprano
 			fetchMock.mockResolvedValueOnce(
 				new Response(
 					JSON.stringify({
 						entities: [{ _id: 'voice-soprano-id' }],
-						count: 1
+						count: 1,
 					}),
-					{ status: 200 }
-				)
+					{ status: 200 },
+				),
 			);
 			// POST voice reference to section
 			fetchMock.mockResolvedValueOnce(
 				new Response(
 					JSON.stringify({
 						_id: 'section-1',
-						properties: [{ _id: 'new-voice-prop-id', type: 'voice' }]
+						properties: [{ _id: 'new-voice-prop-id', type: 'voice' }],
 					}),
-					{ status: 200 }
-				)
+					{ status: 200 },
+				),
 			);
 
 			const cbs = buildLiveCallbacks(client);
@@ -124,14 +122,14 @@ describe('RED-1: buildLiveCallbacks.migrateProperty — live wire shape', () => 
 				parentType: 'section',
 				sourceProperty: 'voice_type',
 				targetProperty: 'voice',
-				backfillKind: 'string_to_reference'
+				backfillKind: 'string_to_reference',
 			};
 
 			await expect(cbs.migrateProperty(client, op)).resolves.toBeDefined();
 
 			// The name lookup fetch must use name.string=, NOT q=
 			const lookupFetch = fetchMock.mock.calls.find(
-				([url]) => typeof url === 'string' && url.includes('name.string=')
+				([url]) => typeof url === 'string' && url.includes('name.string='),
 			);
 			expect(lookupFetch).toBeDefined();
 			const lookupUrl = String(lookupFetch![0]);
@@ -150,7 +148,7 @@ describe('RED-2 / RED v12.1: buildLiveCallbacks.deleteProperty — DELETE /entit
 	it('calls DELETE /[db]/entity/{propertyDefId} (NOT /property/)', async () => {
 		const fetchMock = vi.spyOn(globalThis, 'fetch');
 		fetchMock.mockResolvedValueOnce(
-			new Response(JSON.stringify({ deleted: true }), { status: 200 })
+			new Response(JSON.stringify({ deleted: true }), { status: 200 }),
 		);
 
 		const cbs = buildLiveCallbacks(client);
@@ -158,7 +156,7 @@ describe('RED-2 / RED v12.1: buildLiveCallbacks.deleteProperty — DELETE /entit
 			kind: 'DELETE_PROPERTY',
 			parentType: 'organization',
 			propertyName: 'contact_email',
-			propertyDefId: 'org-contact-email-prop-id'
+			propertyDefId: 'org-contact-email-prop-id',
 		};
 
 		const result = await cbs.deleteProperty(client, op);
@@ -175,7 +173,7 @@ describe('RED-2 / RED v12.1: buildLiveCallbacks.deleteProperty — DELETE /entit
 	it('succeeds (no throw) on 200 response', async () => {
 		const fetchMock = vi.spyOn(globalThis, 'fetch');
 		fetchMock.mockResolvedValueOnce(
-			new Response(JSON.stringify({ deleted: true }), { status: 200 })
+			new Response(JSON.stringify({ deleted: true }), { status: 200 }),
 		);
 
 		const cbs = buildLiveCallbacks(client);
@@ -183,7 +181,7 @@ describe('RED-2 / RED v12.1: buildLiveCallbacks.deleteProperty — DELETE /entit
 			kind: 'DELETE_PROPERTY',
 			parentType: 'organization',
 			propertyName: 'contact_email',
-			propertyDefId: 'ok-prop-id'
+			propertyDefId: 'ok-prop-id',
 		};
 
 		await expect(cbs.deleteProperty(client, op)).resolves.toEqual({ deleted: true });
@@ -192,7 +190,7 @@ describe('RED-2 / RED v12.1: buildLiveCallbacks.deleteProperty — DELETE /entit
 	it('throws with status + body on non-2xx response', async () => {
 		const fetchMock = vi.spyOn(globalThis, 'fetch');
 		fetchMock.mockResolvedValueOnce(
-			new Response(JSON.stringify({ error: 'Property not found' }), { status: 404 })
+			new Response(JSON.stringify({ error: 'Property not found' }), { status: 404 }),
 		);
 
 		const cbs = buildLiveCallbacks(client);
@@ -200,7 +198,7 @@ describe('RED-2 / RED v12.1: buildLiveCallbacks.deleteProperty — DELETE /entit
 			kind: 'DELETE_PROPERTY',
 			parentType: 'organization',
 			propertyName: 'contact_email',
-			propertyDefId: 'missing-prop-id'
+			propertyDefId: 'missing-prop-id',
 		};
 
 		await expect(cbs.deleteProperty(client, op)).rejects.toThrow(/404/);
@@ -215,19 +213,22 @@ describe('RED-3: buildLiveCallbacks.updateFormula — POST new formula to proper
 		// v12 Bug 2 fix: updateFormula does a pre-GET to read existing formula values.
 		// Mock the GET as returning a "fresh" prop-def (no formula values), so no DELETE fires.
 		fetchMock.mockResolvedValueOnce(
-			new Response(
-				JSON.stringify({ entity: { _id: 'member-count-prop-id' } }),
-				{ status: 200 }
-			)
+			new Response(JSON.stringify({ entity: { _id: 'member-count-prop-id' } }), { status: 200 }),
 		);
 		fetchMock.mockResolvedValueOnce(
 			new Response(
 				JSON.stringify({
 					_id: 'member-count-prop-id',
-					properties: [{ _id: 'new-formula-prop-id', type: 'formula', string: '(_child.member COUNT) (_child.section.member_count SUM) +' }]
+					properties: [
+						{
+							_id: 'new-formula-prop-id',
+							type: 'formula',
+							string: '(_child.member COUNT) (_child.section.member_count SUM) +',
+						},
+					],
 				}),
-				{ status: 200 }
-			)
+				{ status: 200 },
+			),
 		);
 
 		const cbs = buildLiveCallbacks(client);
@@ -236,7 +237,7 @@ describe('RED-3: buildLiveCallbacks.updateFormula — POST new formula to proper
 			parentType: 'section',
 			propertyName: 'member_count',
 			propertyDefId: 'member-count-prop-id',
-			newFormula: '(_child.member COUNT) (_child.section.member_count SUM) +'
+			newFormula: '(_child.member COUNT) (_child.section.member_count SUM) +',
 		};
 
 		const result = await cbs.updateFormula(client, op);
@@ -245,7 +246,7 @@ describe('RED-3: buildLiveCallbacks.updateFormula — POST new formula to proper
 		// v12 Bug 2 fix: updateFormula now GETs first (to pre-delete existing formula values),
 		// then POSTs. Find the POST call by method rather than asserting calls[0].
 		const postCall = fetchMock.mock.calls.find(
-			([, init]) => (init as RequestInit | undefined)?.method === 'POST'
+			([, init]) => (init as RequestInit | undefined)?.method === 'POST',
 		);
 		expect(postCall).toBeDefined();
 		const [url, init] = postCall as [string, RequestInit];
@@ -260,9 +261,7 @@ describe('RED-3: buildLiveCallbacks.updateFormula — POST new formula to proper
 
 	it('throws on non-2xx response from formula POST', async () => {
 		const fetchMock = vi.spyOn(globalThis, 'fetch');
-		fetchMock.mockResolvedValueOnce(
-			new Response('Forbidden', { status: 403 })
-		);
+		fetchMock.mockResolvedValueOnce(new Response('Forbidden', { status: 403 }));
 
 		const cbs = buildLiveCallbacks(client);
 		const op: UpdateFormulaOp = {
@@ -270,7 +269,7 @@ describe('RED-3: buildLiveCallbacks.updateFormula — POST new formula to proper
 			parentType: 'section',
 			propertyName: 'member_count',
 			propertyDefId: 'member-count-prop-id',
-			newFormula: '(_child.member COUNT) (_child.section.member_count SUM) +'
+			newFormula: '(_child.member COUNT) (_child.section.member_count SUM) +',
 		};
 
 		await expect(cbs.updateFormula(client, op)).rejects.toThrow();
@@ -299,10 +298,10 @@ describe('RED v12.2: buildLiveCallbacks.updateFormula — pre-delete existing fo
 					JSON.stringify({
 						entity: {
 							_id: 'member-count-prop-id',
-							formula: [{ _id: 'stale-formula-id', string: '_referrer.member.name COUNT' }]
-						}
+							formula: [{ _id: 'stale-formula-id', string: '_referrer.member.name COUNT' }],
+						},
 					}),
-					{ status: 200 }
+					{ status: 200 },
 				);
 			}
 			if (init?.method === 'DELETE') {
@@ -311,7 +310,7 @@ describe('RED v12.2: buildLiveCallbacks.updateFormula — pre-delete existing fo
 			if (init?.method === 'POST') {
 				return new Response(
 					JSON.stringify({ _id: 'member-count-prop-id', properties: [{ _id: 'new-formula-id' }] }),
-					{ status: 200 }
+					{ status: 200 },
 				);
 			}
 			return new Response(JSON.stringify({}), { status: 200 });
@@ -323,7 +322,7 @@ describe('RED v12.2: buildLiveCallbacks.updateFormula — pre-delete existing fo
 			parentType: 'section',
 			propertyName: 'member_count',
 			propertyDefId: 'member-count-prop-id',
-			newFormula: '(_child.member COUNT) (_child.section.member_count SUM) +'
+			newFormula: '(_child.member COUNT) (_child.section.member_count SUM) +',
 		};
 
 		await cbs.updateFormula(client, op);
@@ -332,7 +331,7 @@ describe('RED v12.2: buildLiveCallbacks.updateFormula — pre-delete existing fo
 		const deleteCall = fetchMock.mock.calls.find(
 			([url, init]) =>
 				(init as RequestInit)?.method === 'DELETE' &&
-				String(url).includes('/property/stale-formula-id')
+				String(url).includes('/property/stale-formula-id'),
 		);
 		expect(deleteCall).toBeDefined();
 
@@ -340,10 +339,10 @@ describe('RED v12.2: buildLiveCallbacks.updateFormula — pre-delete existing fo
 		const deleteIdx = fetchMock.mock.calls.findIndex(
 			([url, init]) =>
 				(init as RequestInit)?.method === 'DELETE' &&
-				String(url).includes('/property/stale-formula-id')
+				String(url).includes('/property/stale-formula-id'),
 		);
 		const postIdx = fetchMock.mock.calls.findIndex(
-			([, init]) => (init as RequestInit)?.method === 'POST'
+			([, init]) => (init as RequestInit)?.method === 'POST',
 		);
 		expect(deleteIdx).toBeLessThan(postIdx);
 	});
@@ -361,21 +360,18 @@ describe('RED v12.2: buildLiveCallbacks.updateFormula — pre-delete existing fo
 							formula: [
 								{ _id: 'stale-1', string: 'old-formula-a' },
 								{ _id: 'stale-2', string: 'old-formula-b' },
-								{ _id: 'stale-3', string: 'old-formula-c' }
-							]
-						}
+								{ _id: 'stale-3', string: 'old-formula-c' },
+							],
+						},
 					}),
-					{ status: 200 }
+					{ status: 200 },
 				);
 			}
 			if (init?.method === 'DELETE') {
 				return new Response(JSON.stringify({ deleted: true }), { status: 200 });
 			}
 			if (init?.method === 'POST') {
-				return new Response(
-					JSON.stringify({ _id: 'member-count-prop-id' }),
-					{ status: 200 }
-				);
+				return new Response(JSON.stringify({ _id: 'member-count-prop-id' }), { status: 200 });
 			}
 			return new Response(JSON.stringify({}), { status: 200 });
 		});
@@ -386,13 +382,13 @@ describe('RED v12.2: buildLiveCallbacks.updateFormula — pre-delete existing fo
 			parentType: 'section',
 			propertyName: 'member_count',
 			propertyDefId: 'member-count-prop-id',
-			newFormula: '(_child.member COUNT) (_child.section.member_count SUM) +'
+			newFormula: '(_child.member COUNT) (_child.section.member_count SUM) +',
 		};
 
 		await cbs.updateFormula(client, op);
 
 		const deleteCalls = fetchMock.mock.calls.filter(
-			([, init]) => (init as RequestInit)?.method === 'DELETE'
+			([, init]) => (init as RequestInit)?.method === 'DELETE',
 		);
 		expect(deleteCalls).toHaveLength(3);
 		const deleteUrls = deleteCalls.map(([url]) => String(url));
@@ -409,16 +405,12 @@ describe('RED v12.2: buildLiveCallbacks.updateFormula — pre-delete existing fo
 			const urlStr = String(url);
 			if (!init?.method || init.method === 'GET') {
 				// No existing formula values
-				return new Response(
-					JSON.stringify({ entity: { _id: 'member-count-prop-id' } }),
-					{ status: 200 }
-				);
+				return new Response(JSON.stringify({ entity: { _id: 'member-count-prop-id' } }), {
+					status: 200,
+				});
 			}
 			if (init?.method === 'POST') {
-				return new Response(
-					JSON.stringify({ _id: 'member-count-prop-id' }),
-					{ status: 200 }
-				);
+				return new Response(JSON.stringify({ _id: 'member-count-prop-id' }), { status: 200 });
 			}
 			return new Response(JSON.stringify({}), { status: 200 });
 		});
@@ -429,14 +421,14 @@ describe('RED v12.2: buildLiveCallbacks.updateFormula — pre-delete existing fo
 			parentType: 'section',
 			propertyName: 'member_count',
 			propertyDefId: 'member-count-prop-id',
-			newFormula: '(_child.member COUNT) (_child.section.member_count SUM) +'
+			newFormula: '(_child.member COUNT) (_child.section.member_count SUM) +',
 		};
 
 		await cbs.updateFormula(client, op);
 
 		// No DELETEs should be called — nothing to prune
 		const deleteCalls = fetchMock.mock.calls.filter(
-			([, init]) => (init as RequestInit)?.method === 'DELETE'
+			([, init]) => (init as RequestInit)?.method === 'DELETE',
 		);
 		expect(deleteCalls).toHaveLength(0);
 	});
@@ -451,18 +443,12 @@ describe('RED-4: buildLiveCallbacks.verifyDeleteSafe — formula reference + ins
 		// Probe 1: search all property-def entities for formula.string containing 'contact_email'
 		// Returns 0 — no formula references it
 		fetchMock.mockResolvedValueOnce(
-			new Response(
-				JSON.stringify({ entities: [], count: 0 }),
-				{ status: 200 }
-			)
+			new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 }),
 		);
 		// Probe 2: query instances of parent type with this property in result
 		// Returns 0 — no instances have it set
 		fetchMock.mockResolvedValueOnce(
-			new Response(
-				JSON.stringify({ entities: [], count: 0 }),
-				{ status: 200 }
-			)
+			new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 }),
 		);
 
 		const cbs = buildLiveCallbacks(client);
@@ -471,7 +457,7 @@ describe('RED-4: buildLiveCallbacks.verifyDeleteSafe — formula reference + ins
 			parentType: 'organization',
 			propertyName: 'contact_email',
 			propertyDefId: 'org-contact-email-prop-id',
-			verifyPreconditions: true
+			verifyPreconditions: true,
 		};
 
 		const result = await cbs.verifyDeleteSafe(client, op);
@@ -485,11 +471,13 @@ describe('RED-4: buildLiveCallbacks.verifyDeleteSafe — formula reference + ins
 		fetchMock.mockResolvedValueOnce(
 			new Response(
 				JSON.stringify({
-					entities: [{ _id: 'some-prop-def-id', formula: [{ string: 'organization.contact_email' }] }],
-					count: 1
+					entities: [
+						{ _id: 'some-prop-def-id', formula: [{ string: 'organization.contact_email' }] },
+					],
+					count: 1,
 				}),
-				{ status: 200 }
-			)
+				{ status: 200 },
+			),
 		);
 
 		const cbs = buildLiveCallbacks(client);
@@ -498,7 +486,7 @@ describe('RED-4: buildLiveCallbacks.verifyDeleteSafe — formula reference + ins
 			parentType: 'organization',
 			propertyName: 'contact_email',
 			propertyDefId: 'org-contact-email-prop-id',
-			verifyPreconditions: true
+			verifyPreconditions: true,
 		};
 
 		const result = await cbs.verifyDeleteSafe(client, op);
@@ -511,17 +499,17 @@ describe('RED-4: buildLiveCallbacks.verifyDeleteSafe — formula reference + ins
 
 		// Probe 1: no formula references it
 		fetchMock.mockResolvedValueOnce(
-			new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 })
+			new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 }),
 		);
 		// Probe 2: some organization instances still have contact_email set
 		fetchMock.mockResolvedValueOnce(
 			new Response(
 				JSON.stringify({
 					entities: [{ _id: 'org-1', contact_email: [{ string: 'info@example.com' }] }],
-					count: 1
+					count: 1,
 				}),
-				{ status: 200 }
-			)
+				{ status: 200 },
+			),
 		);
 
 		const cbs = buildLiveCallbacks(client);
@@ -530,7 +518,7 @@ describe('RED-4: buildLiveCallbacks.verifyDeleteSafe — formula reference + ins
 			parentType: 'organization',
 			propertyName: 'contact_email',
 			propertyDefId: 'org-contact-email-prop-id',
-			verifyPreconditions: true
+			verifyPreconditions: true,
 		};
 
 		const result = await cbs.verifyDeleteSafe(client, op);
@@ -545,7 +533,7 @@ describe('RED-4: buildLiveCallbacks.verifyDeleteSafe — formula reference + ins
 
 		// Both probes return empty (safe scenario)
 		fetchMock.mockResolvedValue(
-			new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 })
+			new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 }),
 		);
 
 		const cbs = buildLiveCallbacks(client);
@@ -554,7 +542,7 @@ describe('RED-4: buildLiveCallbacks.verifyDeleteSafe — formula reference + ins
 			parentType: 'organization',
 			propertyName: 'contact_email',
 			propertyDefId: 'org-contact-email-prop-id',
-			verifyPreconditions: true
+			verifyPreconditions: true,
 		};
 
 		const result = await cbs.verifyDeleteSafe(client, op);
@@ -572,21 +560,21 @@ describe('RED-4: buildLiveCallbacks.verifyDeleteSafe — formula reference + ins
 			const fetchMock = vi.spyOn(globalThis, 'fetch');
 			// Probe 1 (formula ref check): no formula references 'forename'
 			fetchMock.mockResolvedValueOnce(
-				new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 })
+				new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 }),
 			);
 			// Probe 2 (instance set): no instances still have forename set
 			fetchMock.mockResolvedValueOnce(
-				new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 })
+				new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 }),
 			);
 			// Probe 3 (materialized name check): instances with their name property
 			fetchMock.mockResolvedValueOnce(
 				new Response(
 					JSON.stringify({
 						entities: [{ _id: 'person-1', name: [{ string: 'Test User' }] }],
-						count: 1
+						count: 1,
 					}),
-					{ status: 200 }
-				)
+					{ status: 200 },
+				),
 			);
 
 			const cbs = buildLiveCallbacks(client);
@@ -596,7 +584,7 @@ describe('RED-4: buildLiveCallbacks.verifyDeleteSafe — formula reference + ins
 				propertyName: 'forename',
 				propertyDefId: 'person-forename-prop-id',
 				verifyPreconditions: true,
-				materializedNameProperty: 'name'
+				materializedNameProperty: 'name',
 			};
 
 			const result = await cbs.verifyDeleteSafe(client, op);
@@ -607,21 +595,21 @@ describe('RED-4: buildLiveCallbacks.verifyDeleteSafe — formula reference + ins
 			const fetchMock = vi.spyOn(globalThis, 'fetch');
 			// Probe 1: no formula ref
 			fetchMock.mockResolvedValueOnce(
-				new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 })
+				new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 }),
 			);
 			// Probe 2: no instances with prop set
 			fetchMock.mockResolvedValueOnce(
-				new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 })
+				new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 }),
 			);
 			// Probe 3: person has whitespace-only materialized name
 			fetchMock.mockResolvedValueOnce(
 				new Response(
 					JSON.stringify({
 						entities: [{ _id: 'person-2', name: [{ string: ' ' }] }],
-						count: 1
+						count: 1,
 					}),
-					{ status: 200 }
-				)
+					{ status: 200 },
+				),
 			);
 
 			const cbs = buildLiveCallbacks(client);
@@ -631,7 +619,7 @@ describe('RED-4: buildLiveCallbacks.verifyDeleteSafe — formula reference + ins
 				propertyName: 'forename',
 				propertyDefId: 'person-forename-prop-id',
 				verifyPreconditions: true,
-				materializedNameProperty: 'name'
+				materializedNameProperty: 'name',
 			};
 
 			const result = await cbs.verifyDeleteSafe(client, op);
@@ -642,19 +630,19 @@ describe('RED-4: buildLiveCallbacks.verifyDeleteSafe — formula reference + ins
 		it('returns {safe: false, reason} when person.name is "" (empty string)', async () => {
 			const fetchMock = vi.spyOn(globalThis, 'fetch');
 			fetchMock.mockResolvedValueOnce(
-				new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 })
+				new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 }),
 			);
 			fetchMock.mockResolvedValueOnce(
-				new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 })
+				new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 }),
 			);
 			fetchMock.mockResolvedValueOnce(
 				new Response(
 					JSON.stringify({
 						entities: [{ _id: 'person-3', name: [{ string: '' }] }],
-						count: 1
+						count: 1,
 					}),
-					{ status: 200 }
-				)
+					{ status: 200 },
+				),
 			);
 
 			const cbs = buildLiveCallbacks(client);
@@ -664,7 +652,7 @@ describe('RED-4: buildLiveCallbacks.verifyDeleteSafe — formula reference + ins
 				propertyName: 'forename',
 				propertyDefId: 'person-forename-prop-id',
 				verifyPreconditions: true,
-				materializedNameProperty: 'name'
+				materializedNameProperty: 'name',
 			};
 
 			const result = await cbs.verifyDeleteSafe(client, op);
@@ -674,19 +662,19 @@ describe('RED-4: buildLiveCallbacks.verifyDeleteSafe — formula reference + ins
 		it('returns {safe: true} when person.name is "A" (single non-whitespace char)', async () => {
 			const fetchMock = vi.spyOn(globalThis, 'fetch');
 			fetchMock.mockResolvedValueOnce(
-				new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 })
+				new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 }),
 			);
 			fetchMock.mockResolvedValueOnce(
-				new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 })
+				new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 }),
 			);
 			fetchMock.mockResolvedValueOnce(
 				new Response(
 					JSON.stringify({
 						entities: [{ _id: 'person-4', name: [{ string: 'A' }] }],
-						count: 1
+						count: 1,
 					}),
-					{ status: 200 }
-				)
+					{ status: 200 },
+				),
 			);
 
 			const cbs = buildLiveCallbacks(client);
@@ -696,7 +684,7 @@ describe('RED-4: buildLiveCallbacks.verifyDeleteSafe — formula reference + ins
 				propertyName: 'forename',
 				propertyDefId: 'person-forename-prop-id',
 				verifyPreconditions: true,
-				materializedNameProperty: 'name'
+				materializedNameProperty: 'name',
 			};
 
 			const result = await cbs.verifyDeleteSafe(client, op);
@@ -725,11 +713,11 @@ describe('RED-4: buildLiveCallbacks.verifyDeleteSafe — formula reference + ins
 					JSON.stringify({
 						entities: [
 							{ _id: 'name-prop-def', formula: [{ string: "forename ' ' surname" }] },
-							{ _id: 'display-prop-def', formula: [{ string: 'forename CONCAT' }] }
+							{ _id: 'display-prop-def', formula: [{ string: 'forename CONCAT' }] },
 						],
-						count: 2
+						count: 2,
 					}),
-					{ status: 200 }
+					{ status: 200 },
 				);
 			}
 			// Probe 2 (instance check) — not reached if Probe 1 already returns unsafe
@@ -742,7 +730,7 @@ describe('RED-4: buildLiveCallbacks.verifyDeleteSafe — formula reference + ins
 			parentType: 'person',
 			propertyName: 'forename',
 			propertyDefId: 'person-forename-prop-id',
-			verifyPreconditions: true
+			verifyPreconditions: true,
 		};
 
 		const result = await cbs.verifyDeleteSafe(client, op);
@@ -752,19 +740,19 @@ describe('RED-4: buildLiveCallbacks.verifyDeleteSafe — formula reference + ins
 
 		// The fetch that found the formulas must use q=, not formula.string=
 		const formulaProbeCall = fetchMock.mock.calls.find(
-			([url]) => typeof url === 'string' && String(url).includes('q=forename')
+			([url]) => typeof url === 'string' && String(url).includes('q=forename'),
 		);
 		expect(formulaProbeCall).toBeDefined();
 		// Must NOT have used formula.string= as the finding mechanism
 		const exactMatchCall = fetchMock.mock.calls.find(
-			([url]) => typeof url === 'string' && String(url).includes('formula.string=forename')
+			([url]) => typeof url === 'string' && String(url).includes('formula.string=forename'),
 		);
 		// If safe is false AND only formula.string= was used, the result is a false negative
 		// (formula.string= always returns 0 in production → verifyDeleteSafe would wrongly return safe:true)
 		if (exactMatchCall && !formulaProbeCall) {
 			throw new Error(
 				'verifyDeleteSafe used formula.string= exact match — will return safe:true in production ' +
-				'because no formula value literally equals the property name'
+					'because no formula value literally equals the property name',
 			);
 		}
 	});
@@ -785,11 +773,11 @@ describe('RED-4: buildLiveCallbacks.verifyDeleteSafe — formula reference + ins
 							// Real match: "person.email" contains "email" as a whole token (bounded by ".")
 							{ _id: 'contact-prop-def', formula: [{ string: 'person.email CONCAT' }] },
 							// Substring-only: "email" appears inside "member_email_legacy" — NOT a ref to "email" prop
-							{ _id: 'legacy-prop-def', formula: [{ string: 'member_email_legacy' }] }
+							{ _id: 'legacy-prop-def', formula: [{ string: 'member_email_legacy' }] },
 						],
-						count: 2
+						count: 2,
 					}),
-					{ status: 200 }
+					{ status: 200 },
 				);
 			}
 			return new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 });
@@ -801,7 +789,7 @@ describe('RED-4: buildLiveCallbacks.verifyDeleteSafe — formula reference + ins
 			parentType: 'member',
 			propertyName: 'email',
 			propertyDefId: 'member-email-prop-id',
-			verifyPreconditions: true
+			verifyPreconditions: true,
 		};
 
 		const result = await cbs.verifyDeleteSafe(client, op);
@@ -837,20 +825,19 @@ describe('RED v10 integration: live-mode multi-value pre-delete guard', () => {
 								_id: 'section-1',
 								voice_type: [{ type: 'string', string: 'soprano' }],
 								// Stale voice reference already present — triggers pruneExistingTarget
-								voice: [{ _id: 'stale-voice-ref', type: 'reference', reference: 'old-voice-id' }]
-							}
+								voice: [{ _id: 'stale-voice-ref', type: 'reference', reference: 'old-voice-id' }],
+							},
 						],
-						count: 1
+						count: 1,
 					}),
-					{ status: 200 }
+					{ status: 200 },
 				);
 			}
 			// Voice name lookup
 			if (urlStr.includes('name.string=soprano')) {
-				return new Response(
-					JSON.stringify({ entities: [{ _id: 'soprano-voice-id' }], count: 1 }),
-					{ status: 200 }
-				);
+				return new Response(JSON.stringify({ entities: [{ _id: 'soprano-voice-id' }], count: 1 }), {
+					status: 200,
+				});
 			}
 			// DELETE /property/{id} — property-VALUE delete (pruneExistingTarget path)
 			if (init?.method === 'DELETE' && urlStr.includes('/property/')) {
@@ -860,7 +847,7 @@ describe('RED v10 integration: live-mode multi-value pre-delete guard', () => {
 			if (init?.method === 'POST' && urlStr.includes('/entity/section-1')) {
 				return new Response(
 					JSON.stringify({ _id: 'section-1', properties: [{ _id: 'new-voice-prop-id' }] }),
-					{ status: 200 }
+					{ status: 200 },
 				);
 			}
 			return new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 });
@@ -872,7 +859,7 @@ describe('RED v10 integration: live-mode multi-value pre-delete guard', () => {
 			parentType: 'section',
 			sourceProperty: 'voice_type',
 			targetProperty: 'voice',
-			backfillKind: 'string_to_reference'
+			backfillKind: 'string_to_reference',
 		};
 
 		await cbs.migrateProperty(client, op);
@@ -881,22 +868,23 @@ describe('RED v10 integration: live-mode multi-value pre-delete guard', () => {
 		const deleteCall = fetchMock.mock.calls.find(
 			([url, init]) =>
 				(init as RequestInit)?.method === 'DELETE' &&
-				String(url).includes('/property/stale-voice-ref')
+				String(url).includes('/property/stale-voice-ref'),
 		);
 		expect(deleteCall).toBeDefined();
 
 		// DELETE must come before POST to /entity/section-1
 		const deleteCalls = fetchMock.mock.calls
 			.map((call, i) => ({ call, i }))
-			.filter(({ call: [url, init] }) =>
-				(init as RequestInit)?.method === 'DELETE' &&
-				String(url).includes('/property/stale-voice-ref')
+			.filter(
+				({ call: [url, init] }) =>
+					(init as RequestInit)?.method === 'DELETE' &&
+					String(url).includes('/property/stale-voice-ref'),
 			);
 		const postCalls = fetchMock.mock.calls
 			.map((call, i) => ({ call, i }))
-			.filter(({ call: [url, init] }) =>
-				(init as RequestInit)?.method === 'POST' &&
-				String(url).includes('/entity/section-1')
+			.filter(
+				({ call: [url, init] }) =>
+					(init as RequestInit)?.method === 'POST' && String(url).includes('/entity/section-1'),
 			);
 
 		expect(deleteCalls[0].i).toBeLessThan(postCalls[0].i);
@@ -917,20 +905,21 @@ describe('RED v10 integration: live-mode multi-value pre-delete guard', () => {
 								_id: 'section-1',
 								voice_type: [{ type: 'string', string: 'soprano' }],
 								// voice already points to soprano-voice-id — idempotent skip path
-								voice: [{ _id: 'current-voice-ref', type: 'reference', reference: 'soprano-voice-id' }]
-							}
+								voice: [
+									{ _id: 'current-voice-ref', type: 'reference', reference: 'soprano-voice-id' },
+								],
+							},
 						],
-						count: 1
+						count: 1,
 					}),
-					{ status: 200 }
+					{ status: 200 },
 				);
 			}
 			// Voice name lookup — returns same entity that's already in voice
 			if (urlStr.includes('name.string=soprano')) {
-				return new Response(
-					JSON.stringify({ entities: [{ _id: 'soprano-voice-id' }], count: 1 }),
-					{ status: 200 }
-				);
+				return new Response(JSON.stringify({ entities: [{ _id: 'soprano-voice-id' }], count: 1 }), {
+					status: 200,
+				});
 			}
 			return new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 });
 		});
@@ -941,22 +930,21 @@ describe('RED v10 integration: live-mode multi-value pre-delete guard', () => {
 			parentType: 'section',
 			sourceProperty: 'voice_type',
 			targetProperty: 'voice',
-			backfillKind: 'string_to_reference'
+			backfillKind: 'string_to_reference',
 		};
 
 		await cbs.migrateProperty(client, op);
 
 		// Must NOT have called DELETE — no stale cleanup on idempotent instances
 		const deleteCall = fetchMock.mock.calls.find(
-			([, init]) => (init as RequestInit)?.method === 'DELETE'
+			([, init]) => (init as RequestInit)?.method === 'DELETE',
 		);
 		expect(deleteCall).toBeUndefined();
 
 		// Must NOT have called POST to write a new property
 		const postCall = fetchMock.mock.calls.find(
 			([url, init]) =>
-				(init as RequestInit)?.method === 'POST' &&
-				String(url).includes('/entity/section-1')
+				(init as RequestInit)?.method === 'POST' && String(url).includes('/entity/section-1'),
 		);
 		expect(postCall).toBeUndefined();
 	});
@@ -975,11 +963,11 @@ describe('RED YELLOW-13: verifyDeleteSafe Probe 2 must use limit=500 (not limit=
 
 		// Probe 1: no formula references the property
 		fetchMock.mockResolvedValueOnce(
-			new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 })
+			new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 }),
 		);
 		// Probe 2: instance scan — return empty (safe)
 		fetchMock.mockResolvedValueOnce(
-			new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 })
+			new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 }),
 		);
 
 		const cbs = buildLiveCallbacks(client);
@@ -988,7 +976,7 @@ describe('RED YELLOW-13: verifyDeleteSafe Probe 2 must use limit=500 (not limit=
 			parentType: 'member',
 			propertyName: 'joined_at',
 			propertyDefId: 'member-joined-at-prop-id',
-			verifyPreconditions: true
+			verifyPreconditions: true,
 		};
 
 		await cbs.verifyDeleteSafe(client, op);
@@ -1023,21 +1011,19 @@ describe('RED YELLOW-12: updateFormula must propagate DELETE failures (not swall
 						_id: 'section-member-count-prop-id',
 						formula: [
 							{ _id: 'f1', string: 'old-formula-a' },
-							{ _id: 'f2', string: 'old-formula-b' }
-						]
-					}
+							{ _id: 'f2', string: 'old-formula-b' },
+						],
+					},
 				}),
-				{ status: 200 }
-			)
+				{ status: 200 },
+			),
 		);
 		// DELETE f1: succeeds
 		fetchMock.mockResolvedValueOnce(
-			new Response(JSON.stringify({ deleted: true }), { status: 200 })
+			new Response(JSON.stringify({ deleted: true }), { status: 200 }),
 		);
 		// DELETE f2: fails (non-2xx triggers throw inside deletePropertyByIdLive)
-		fetchMock.mockResolvedValueOnce(
-			new Response('Internal Server Error', { status: 500 })
-		);
+		fetchMock.mockResolvedValueOnce(new Response('Internal Server Error', { status: 500 }));
 
 		const cbs = buildLiveCallbacks(client);
 		const op: UpdateFormulaOp = {
@@ -1045,7 +1031,7 @@ describe('RED YELLOW-12: updateFormula must propagate DELETE failures (not swall
 			parentType: 'section',
 			propertyName: 'member_count',
 			propertyDefId: 'section-member-count-prop-id',
-			newFormula: '(_child.member COUNT) (_child.section.member_count SUM) +'
+			newFormula: '(_child.member COUNT) (_child.section.member_count SUM) +',
 		};
 
 		// The DELETE failure must propagate — updateFormula must reject
@@ -1053,7 +1039,7 @@ describe('RED YELLOW-12: updateFormula must propagate DELETE failures (not swall
 
 		// POST must NOT be called — no formula appended over stale values
 		const postCall = fetchMock.mock.calls.find(
-			([, init]) => (init as RequestInit)?.method === 'POST'
+			([, init]) => (init as RequestInit)?.method === 'POST',
 		);
 		expect(postCall).toBeUndefined();
 	});
@@ -1079,22 +1065,22 @@ describe('RED v13.1: updateFormula pre-delete loop uses DELETE /property/{id} fo
 				JSON.stringify({
 					entity: {
 						_id: 'member-count-prop-id',
-						formula: [{ _id: 'fv1', string: '_referrer.member.name COUNT' }]
-					}
+						formula: [{ _id: 'fv1', string: '_referrer.member.name COUNT' }],
+					},
 				}),
-				{ status: 200 }
-			)
+				{ status: 200 },
+			),
 		);
 		// DELETE response (whatever endpoint is called)
 		fetchMock.mockResolvedValueOnce(
-			new Response(JSON.stringify({ deleted: true }), { status: 200 })
+			new Response(JSON.stringify({ deleted: true }), { status: 200 }),
 		);
 		// POST response
 		fetchMock.mockResolvedValueOnce(
 			new Response(
 				JSON.stringify({ _id: 'member-count-prop-id', properties: [{ _id: 'new-formula-id' }] }),
-				{ status: 200 }
-			)
+				{ status: 200 },
+			),
 		);
 
 		const cbs = buildLiveCallbacks(client);
@@ -1103,13 +1089,13 @@ describe('RED v13.1: updateFormula pre-delete loop uses DELETE /property/{id} fo
 			parentType: 'section',
 			propertyName: 'member_count',
 			propertyDefId: 'member-count-prop-id',
-			newFormula: '(_child.member COUNT) (_child.section.member_count SUM) +'
+			newFormula: '(_child.member COUNT) (_child.section.member_count SUM) +',
 		};
 
 		await cbs.updateFormula(client, op);
 
 		const deleteCall = fetchMock.mock.calls.find(
-			([, init]) => (init as RequestInit)?.method === 'DELETE'
+			([, init]) => (init as RequestInit)?.method === 'DELETE',
 		);
 		expect(deleteCall).toBeDefined();
 		const deleteUrl = String(deleteCall![0]);
@@ -1134,20 +1120,19 @@ describe('RED v13.2: migrateProperty injectables.deleteProperty uses DELETE /pro
 								{
 									_id: 'section-1',
 									voice_type: [{ type: 'string', string: 'soprano' }],
-									voice: [{ _id: 'stale-pv1', type: 'reference', reference: 'old-voice-id' }]
-								}
+									voice: [{ _id: 'stale-pv1', type: 'reference', reference: 'old-voice-id' }],
+								},
 							],
-							count: 1
+							count: 1,
 						}),
-						{ status: 200 }
+						{ status: 200 },
 					);
 				}
 			}
 			if (urlStr.includes('name.string=soprano')) {
-				return new Response(
-					JSON.stringify({ entities: [{ _id: 'soprano-voice-id' }], count: 1 }),
-					{ status: 200 }
-				);
+				return new Response(JSON.stringify({ entities: [{ _id: 'soprano-voice-id' }], count: 1 }), {
+					status: 200,
+				});
 			}
 			if (init?.method === 'DELETE') {
 				return new Response(JSON.stringify({ deleted: true }), { status: 200 });
@@ -1155,7 +1140,7 @@ describe('RED v13.2: migrateProperty injectables.deleteProperty uses DELETE /pro
 			if (init?.method === 'POST') {
 				return new Response(
 					JSON.stringify({ _id: 'section-1', properties: [{ _id: 'new-voice-prop-id' }] }),
-					{ status: 200 }
+					{ status: 200 },
 				);
 			}
 			return new Response(JSON.stringify({ entities: [], count: 0 }), { status: 200 });
@@ -1167,13 +1152,13 @@ describe('RED v13.2: migrateProperty injectables.deleteProperty uses DELETE /pro
 			parentType: 'section',
 			sourceProperty: 'voice_type',
 			targetProperty: 'voice',
-			backfillKind: 'string_to_reference'
+			backfillKind: 'string_to_reference',
 		};
 
 		await cbs.migrateProperty(client, op);
 
 		const deleteCall = fetchMock.mock.calls.find(
-			([, init]) => (init as RequestInit)?.method === 'DELETE'
+			([, init]) => (init as RequestInit)?.method === 'DELETE',
 		);
 		expect(deleteCall).toBeDefined();
 		const deleteUrl = String(deleteCall![0]);
@@ -1187,7 +1172,7 @@ describe('RED v13.3 (regression): op-level deleteProperty still uses DELETE /ent
 	it('DELETE URL ends with /entity/{propertyDefId} — the v12 Bug-1 fix must be preserved', async () => {
 		const fetchMock = vi.spyOn(globalThis, 'fetch');
 		fetchMock.mockResolvedValueOnce(
-			new Response(JSON.stringify({ deleted: true }), { status: 200 })
+			new Response(JSON.stringify({ deleted: true }), { status: 200 }),
 		);
 
 		const cbs = buildLiveCallbacks(client);
@@ -1195,7 +1180,7 @@ describe('RED v13.3 (regression): op-level deleteProperty still uses DELETE /ent
 			kind: 'DELETE_PROPERTY',
 			parentType: 'organization',
 			propertyName: 'contact_email',
-			propertyDefId: 'org-contact-email-prop-id'
+			propertyDefId: 'org-contact-email-prop-id',
 		};
 
 		await cbs.deleteProperty(client, op);

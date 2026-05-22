@@ -7,24 +7,20 @@ const meta: ReportMeta = {
 	executedAt: '2026-05-19T20:55:00Z',
 	schemaSourcePath: '/home/x/v4E/schema.json',
 	schemaFileHash: 'sha256:abc123',
-	db: 'polyphony'
+	db: 'polyphony',
 };
 
 const baseResult: ExecutionResult = {
 	dryRun: false,
-	createdTypes: [
-		{ name: 'voice', id: 'voice-id', createdAt: '2026-05-19T20:55:01Z' }
-	],
+	createdTypes: [{ name: 'voice', id: 'voice-id', createdAt: '2026-05-19T20:55:01Z' }],
 	addedProperties: [
-		{ parentType: 'season', name: 'end_date', id: 'p-id', createdAt: '2026-05-19T20:55:02Z' }
+		{ parentType: 'season', name: 'end_date', id: 'p-id', createdAt: '2026-05-19T20:55:02Z' },
 	],
 	wouldCreateTypes: [],
 	wouldAddProperties: [],
 	skipped: [{ kind: 'type', name: 'organization', reason: 'already exists' }],
 	failed: [],
-	formulaTouchSaveDeferred: [
-		{ parentType: 'edition', property: 'work', formula: 'x.*.y CONCAT' }
-	]
+	formulaTouchSaveDeferred: [{ parentType: 'edition', property: 'work', formula: 'x.*.y CONCAT' }],
 };
 
 describe('formatJsonReport', () => {
@@ -53,10 +49,10 @@ describe('formatJsonReport', () => {
 					kind: 'CREATE_TYPE',
 					typeName: 'voice',
 					blurb: 'Vocal range taxonomy',
-					properties: []
-				}
+					properties: [],
+				},
 			],
-			wouldAddProperties: []
+			wouldAddProperties: [],
 		};
 		const json = JSON.parse(formatJsonReport(dryResult, meta));
 		expect(json.executedAt).toBeNull();
@@ -92,7 +88,7 @@ describe('formatMarkdownReport', () => {
 			createdTypes: [],
 			addedProperties: [],
 			wouldCreateTypes: [
-				{ kind: 'CREATE_TYPE', typeName: 'voice', blurb: 'Vocal range', properties: [] }
+				{ kind: 'CREATE_TYPE', typeName: 'voice', blurb: 'Vocal range', properties: [] },
 			],
 			wouldAddProperties: [
 				{
@@ -100,12 +96,12 @@ describe('formatMarkdownReport', () => {
 					parentTypeName: 'season',
 					parentTypeId: 'season-id',
 					propertyName: 'end_date',
-					def: { name: 'end_date', type: 'date' }
-				}
+					def: { name: 'end_date', type: 'date' },
+				},
 			],
 			skipped: [],
 			failed: [],
-			formulaTouchSaveDeferred: []
+			formulaTouchSaveDeferred: [],
 		};
 		const md = formatMarkdownReport(dryResult, meta);
 		expect(md).toContain('## Would create entity types');

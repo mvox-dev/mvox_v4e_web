@@ -4,7 +4,7 @@ import type { V4eEntityTypeDef, V4ePropertyDef } from './schema-loader';
 import {
 	POLYPHONY_DB_ENTITY_ID,
 	POLYPHONY_META_TYPE_ENTITY_ID,
-	POLYPHONY_META_TYPE_PROPERTY_ID
+	POLYPHONY_META_TYPE_PROPERTY_ID,
 } from './entu-client';
 
 describe('translateEntityType', () => {
@@ -15,7 +15,7 @@ describe('translateEntityType', () => {
 			{ type: '_type', reference: POLYPHONY_META_TYPE_ENTITY_ID },
 			{ type: '_parent', reference: POLYPHONY_DB_ENTITY_ID },
 			{ type: 'name', string: 'voice' },
-			{ type: 'label', string: 'voice' } // fallback when no blurb
+			{ type: 'label', string: 'voice' }, // fallback when no blurb
 		]);
 	});
 
@@ -23,7 +23,7 @@ describe('translateEntityType', () => {
 		const v4e: V4eEntityTypeDef = {
 			name: 'voice',
 			blurb: 'Vocal range taxonomy',
-			properties: []
+			properties: [],
 		};
 		const payload = translateEntityType(v4e, POLYPHONY_DB_ENTITY_ID, POLYPHONY_META_TYPE_ENTITY_ID);
 		expect(payload).toContainEqual({ type: 'label', string: 'Vocal range taxonomy' });
@@ -50,7 +50,7 @@ describe('translateEntityType', () => {
 			recursion: 'self',
 			creators: ['_owner'],
 			roleMapping: { conductor: '_editor' },
-			notes: 'see polyphony case study'
+			notes: 'see polyphony case study',
 		} as V4eEntityTypeDef;
 		const payload = translateEntityType(v4e, POLYPHONY_DB_ENTITY_ID, POLYPHONY_META_TYPE_ENTITY_ID);
 		// None of the docs-only fields should appear in payload
@@ -73,7 +73,7 @@ describe('translatePropertyDef', () => {
 			{ type: '_parent', reference: 'season-id' },
 			{ type: 'name', string: 'end_date' },
 			{ type: 'label', string: 'end_date' }, // fallback when no blurb
-			{ type: 'type', string: 'date' }
+			{ type: 'type', string: 'date' },
 		]);
 	});
 
@@ -119,7 +119,7 @@ describe('translatePropertyDef', () => {
 			type: 'string',
 			note: 'denormalization',
 			system: true,
-			sharing: 'private'
+			sharing: 'private',
 		} as V4ePropertyDef;
 		const payload = translatePropertyDef(v4e, 'edition-id', POLYPHONY_META_TYPE_PROPERTY_ID);
 		const keys = payload.map((p) => p.type);

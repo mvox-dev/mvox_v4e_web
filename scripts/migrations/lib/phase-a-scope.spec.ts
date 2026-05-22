@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { PHASE_A_PROPERTY_ADDITIONS, isInPhaseAScope, PHASE_A_NEW_TYPES, isPhaseANewType } from './phase-a-scope';
+import {
+	PHASE_A_PROPERTY_ADDITIONS,
+	isInPhaseAScope,
+	PHASE_A_NEW_TYPES,
+	isPhaseANewType,
+} from './phase-a-scope';
 
 describe('PHASE_A_PROPERTY_ADDITIONS', () => {
 	it('contains the 35 properties from divergence §4.2 (excluding section.member_count formula-update)', () => {

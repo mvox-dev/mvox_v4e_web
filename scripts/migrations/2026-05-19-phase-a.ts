@@ -8,7 +8,7 @@ import {
 	listEntities,
 	POLYPHONY_META_TYPE_ENTITY_ID,
 	POLYPHONY_META_TYPE_PROPERTY_ID,
-	type EntuClient
+	type EntuClient,
 } from './lib/entu-client';
 import { computeAdditiveDiff, type DbTypeState } from './lib/diff';
 import { executeAdditions, type ExecutionResult } from './lib/executor';
@@ -35,7 +35,7 @@ async function fetchDbState(client: EntuClient): Promise<DbTypeState[]> {
 	const typesResp = await listEntities(client, {
 		'_type.reference': POLYPHONY_META_TYPE_ENTITY_ID,
 		props: 'name._id,name.string',
-		limit: '200'
+		limit: '200',
 	});
 
 	const dbTypes: DbTypeState[] = [];
@@ -46,7 +46,7 @@ async function fetchDbState(client: EntuClient): Promise<DbTypeState[]> {
 		const propsResp = await listEntities(client, {
 			'_type.reference': POLYPHONY_META_TYPE_PROPERTY_ID,
 			'_parent.reference': typeId,
-			props: 'name.string'
+			props: 'name.string',
 		});
 		const propertyNames = propsResp.entities
 			.map((p) => (p as { name?: Array<{ string?: string }> }).name?.[0]?.string)
@@ -70,7 +70,7 @@ export async function runPhaseA(input: RunPhaseAInput): Promise<RunPhaseAOutput>
 	const jwt = await getJwt({
 		apiBase: input.apiBase,
 		db: input.db,
-		apiKey: input.apiKey
+		apiKey: input.apiKey,
 	});
 	const client: EntuClient = { apiBase: input.apiBase, db: input.db, jwt };
 
@@ -80,7 +80,7 @@ export async function runPhaseA(input: RunPhaseAInput): Promise<RunPhaseAOutput>
 
 	const result = await executeAdditions(client, ops, {
 		dryRun: input.dryRun,
-		now
+		now,
 	});
 
 	const meta: ReportMeta = {
@@ -88,7 +88,7 @@ export async function runPhaseA(input: RunPhaseAInput): Promise<RunPhaseAOutput>
 		executedAt: now(),
 		schemaSourcePath: input.schemaPath,
 		schemaFileHash: schemaHash,
-		db: input.db
+		db: input.db,
 	};
 	const json = formatJsonReport(result, meta);
 	const md = formatMarkdownReport(result, meta);
@@ -105,7 +105,7 @@ export async function runPhaseA(input: RunPhaseAInput): Promise<RunPhaseAOutput>
 		exitCode,
 		report: JSON.parse(json),
 		reportPaths: { json: jsonPath, md: mdPath },
-		result
+		result,
 	};
 }
 
@@ -121,7 +121,7 @@ async function main() {
 		process.env.V4E_SCHEMA_PATH ??
 		resolve(
 			process.env.HOME ?? '/home/michelek',
-			'projects/entu-research/docs/schema/v4E/schema.json'
+			'projects/entu-research/docs/schema/v4E/schema.json',
 		);
 	const reportsDir = resolve(__dirname, 'reports');
 
@@ -141,13 +141,13 @@ async function main() {
 		apiKey,
 		schemaPath,
 		reportsDir,
-		dryRun
+		dryRun,
 	});
 
 	console.log(`\nReport: ${out.reportPaths.md}`);
 	console.log(`        ${out.reportPaths.json}`);
 	console.log(
-		`\nSummary: ${out.result.createdTypes.length} type(s) created, ${out.result.addedProperties.length} property(ies) added, ${out.result.failed.length} failure(s)`
+		`\nSummary: ${out.result.createdTypes.length} type(s) created, ${out.result.addedProperties.length} property(ies) added, ${out.result.failed.length} failure(s)`,
 	);
 	process.exit(out.exitCode);
 }

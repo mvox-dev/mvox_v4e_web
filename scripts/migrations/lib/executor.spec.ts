@@ -1,12 +1,24 @@
 import { describe, it, expect, vi } from 'vitest';
-import { executeAdditions, executePhaseBOps, type ExecutionResult, type PhaseBExecutionResult } from './executor';
-import type { DiffOp, AddPropertyOp, BackfillDataOp, DeletePropertyOp, UpdateFormulaOp, TouchSaveOp } from './diff';
+import {
+	executeAdditions,
+	executePhaseBOps,
+	type ExecutionResult,
+	type PhaseBExecutionResult,
+} from './executor';
+import type {
+	DiffOp,
+	AddPropertyOp,
+	BackfillDataOp,
+	DeletePropertyOp,
+	UpdateFormulaOp,
+	TouchSaveOp,
+} from './diff';
 import type { EntuClient } from './entu-client';
 
 const client: EntuClient = {
 	apiBase: 'https://api.entu.app',
 	db: 'polyphony',
-	jwt: 'jwt'
+	jwt: 'jwt',
 };
 
 const ops: DiffOp[] = [
@@ -14,15 +26,15 @@ const ops: DiffOp[] = [
 		kind: 'CREATE_TYPE',
 		typeName: 'voice',
 		blurb: 'Vocal range taxonomy',
-		properties: [{ name: 'name', type: 'string' }]
+		properties: [{ name: 'name', type: 'string' }],
 	},
 	{
 		kind: 'ADD_PROPERTY',
 		parentTypeName: 'season',
 		parentTypeId: 'season-db-id',
 		propertyName: 'end_date',
-		def: { name: 'end_date', type: 'date' }
-	}
+		def: { name: 'end_date', type: 'date' },
+	},
 ];
 
 describe('executeAdditions', () => {
@@ -36,7 +48,7 @@ describe('executeAdditions', () => {
 		const result = await executeAdditions(client, ops, {
 			dryRun: false,
 			createEntity: createMock,
-			now: () => '2026-05-19T20:00:00Z'
+			now: () => '2026-05-19T20:00:00Z',
 		});
 
 		expect(result.createdTypes).toHaveLength(1);
@@ -53,7 +65,7 @@ describe('executeAdditions', () => {
 		const result = await executeAdditions(client, ops, {
 			dryRun: true,
 			createEntity: createMock,
-			now: () => '2026-05-19T20:00:00Z'
+			now: () => '2026-05-19T20:00:00Z',
 		});
 
 		expect(createMock).not.toHaveBeenCalled();
@@ -72,7 +84,7 @@ describe('executeAdditions', () => {
 		const result = await executeAdditions(client, ops, {
 			dryRun: false,
 			createEntity: createMock,
-			now: () => '2026-05-19T20:00:00Z'
+			now: () => '2026-05-19T20:00:00Z',
 		});
 
 		expect(result.failed).toHaveLength(1);
@@ -88,21 +100,21 @@ describe('executeAdditions', () => {
 				parentTypeName: 'edition',
 				parentTypeId: 'edition-db-id',
 				propertyName: 'work',
-				def: { name: 'work', type: 'string', formula: 'edition_work.*.name CONCAT' }
-			}
+				def: { name: 'work', type: 'string', formula: 'edition_work.*.name CONCAT' },
+			},
 		];
 		const createMock = vi.fn().mockResolvedValue({ _id: 'edition-work-prop-id' });
 
 		const result = await executeAdditions(client, formulaOps, {
 			dryRun: false,
 			createEntity: createMock,
-			now: () => '2026-05-19T20:00:00Z'
+			now: () => '2026-05-19T20:00:00Z',
 		});
 
 		expect(result.formulaTouchSaveDeferred).toHaveLength(1);
 		expect(result.formulaTouchSaveDeferred[0]).toMatchObject({
 			parentType: 'edition',
-			property: 'work'
+			property: 'work',
 		});
 	});
 
@@ -113,15 +125,15 @@ describe('executeAdditions', () => {
 				parentTypeName: 'season',
 				parentTypeId: 'season-id',
 				propertyName: 'end_date',
-				def: { name: 'end_date', type: 'date', required: true, blurb: 'When the season ends' }
-			}
+				def: { name: 'end_date', type: 'date', required: true, blurb: 'When the season ends' },
+			},
 		];
 		const createMock = vi.fn().mockResolvedValue({ _id: 'p-id' });
 
 		await executeAdditions(client, v4eOps, {
 			dryRun: false,
 			createEntity: createMock,
-			now: () => '2026-05-19T20:00:00Z'
+			now: () => '2026-05-19T20:00:00Z',
 		});
 
 		const [, payload] = createMock.mock.calls[0];
@@ -138,7 +150,7 @@ describe('executePhaseBOps', () => {
 		parentType: 'work',
 		sourceProperty: 'voicing',
 		targetProperty: 'original_voicing',
-		backfillKind: 'string'
+		backfillKind: 'string',
 	};
 
 	const deleteOp: DeletePropertyOp = {
@@ -146,7 +158,7 @@ describe('executePhaseBOps', () => {
 		parentType: 'organization',
 		propertyName: 'contact_email',
 		propertyDefId: 'ce-prop-id',
-		verifyPreconditions: true
+		verifyPreconditions: true,
 	};
 
 	const updateFormulaOp: UpdateFormulaOp = {
@@ -154,32 +166,28 @@ describe('executePhaseBOps', () => {
 		parentType: 'section',
 		propertyName: 'member_count',
 		propertyDefId: 'mc-prop-id',
-		newFormula: '(_child.member COUNT) (_child.section.member_count SUM) +'
+		newFormula: '(_child.member COUNT) (_child.section.member_count SUM) +',
 	};
 
 	const touchSaveOp: TouchSaveOp = {
 		kind: 'TOUCH_SAVE',
 		parentType: 'organization',
 		propertyName: 'member_count_per_section',
-		formulaExpression: '(_child.member COUNT) (_child.section.member_count SUM) +'
+		formulaExpression: '(_child.member COUNT) (_child.section.member_count SUM) +',
 	};
 
 	it('executes BACKFILL_DATA via migrateProperty', async () => {
 		const mockMigrateProperty = vi.fn().mockResolvedValue({
 			migrated: 5,
 			skipped: 0,
-			failed: 0
+			failed: 0,
 		});
 
-		const result: PhaseBExecutionResult = await executePhaseBOps(
-			client,
-			[backfillOp],
-			{
-				dryRun: false,
-				migrateProperty: mockMigrateProperty,
-				now: () => '2026-05-20T04:00:00Z'
-			}
-		);
+		const result: PhaseBExecutionResult = await executePhaseBOps(client, [backfillOp], {
+			dryRun: false,
+			migrateProperty: mockMigrateProperty,
+			now: () => '2026-05-20T04:00:00Z',
+		});
 
 		expect(mockMigrateProperty).toHaveBeenCalledOnce();
 		expect(result.backfilled).toHaveLength(1);
@@ -191,16 +199,12 @@ describe('executePhaseBOps', () => {
 		const mockDeleteProperty = vi.fn().mockResolvedValue({ deleted: true });
 		const mockVerifyDelete = vi.fn().mockResolvedValue({ safe: true });
 
-		const result: PhaseBExecutionResult = await executePhaseBOps(
-			client,
-			[deleteOp],
-			{
-				dryRun: false,
-				deleteProperty: mockDeleteProperty,
-				verifyDeleteSafe: mockVerifyDelete,
-				now: () => '2026-05-20T04:00:00Z'
-			}
-		);
+		const result: PhaseBExecutionResult = await executePhaseBOps(client, [deleteOp], {
+			dryRun: false,
+			deleteProperty: mockDeleteProperty,
+			verifyDeleteSafe: mockVerifyDelete,
+			now: () => '2026-05-20T04:00:00Z',
+		});
 
 		expect(mockVerifyDelete).toHaveBeenCalledOnce();
 		expect(mockDeleteProperty).toHaveBeenCalledOnce();
@@ -211,19 +215,15 @@ describe('executePhaseBOps', () => {
 		const mockDeleteProperty = vi.fn();
 		const mockVerifyDelete = vi.fn().mockResolvedValue({
 			safe: false,
-			reason: 'property still referenced in formula'
+			reason: 'property still referenced in formula',
 		});
 
-		const result: PhaseBExecutionResult = await executePhaseBOps(
-			client,
-			[deleteOp],
-			{
-				dryRun: false,
-				deleteProperty: mockDeleteProperty,
-				verifyDeleteSafe: mockVerifyDelete,
-				now: () => '2026-05-20T04:00:00Z'
-			}
-		);
+		const result: PhaseBExecutionResult = await executePhaseBOps(client, [deleteOp], {
+			dryRun: false,
+			deleteProperty: mockDeleteProperty,
+			verifyDeleteSafe: mockVerifyDelete,
+			now: () => '2026-05-20T04:00:00Z',
+		});
 
 		expect(mockDeleteProperty).not.toHaveBeenCalled();
 		expect(result.blockedDeletes).toHaveLength(1);
@@ -233,15 +233,11 @@ describe('executePhaseBOps', () => {
 	it('executes UPDATE_FORMULA op', async () => {
 		const mockUpdateFormula = vi.fn().mockResolvedValue({ updated: true });
 
-		const result: PhaseBExecutionResult = await executePhaseBOps(
-			client,
-			[updateFormulaOp],
-			{
-				dryRun: false,
-				updateFormula: mockUpdateFormula,
-				now: () => '2026-05-20T04:00:00Z'
-			}
-		);
+		const result: PhaseBExecutionResult = await executePhaseBOps(client, [updateFormulaOp], {
+			dryRun: false,
+			updateFormula: mockUpdateFormula,
+			now: () => '2026-05-20T04:00:00Z',
+		});
 
 		expect(mockUpdateFormula).toHaveBeenCalledOnce();
 		expect(result.formulaUpdates).toHaveLength(1);
@@ -250,20 +246,16 @@ describe('executePhaseBOps', () => {
 	it('skips UPDATE_FORMULA when formula is already current', async () => {
 		const alreadyCurrentOp: UpdateFormulaOp = {
 			...updateFormulaOp,
-			alreadyCurrent: true // diff layer set this flag
+			alreadyCurrent: true, // diff layer set this flag
 		};
 
 		const mockUpdateFormula = vi.fn();
 
-		const result: PhaseBExecutionResult = await executePhaseBOps(
-			client,
-			[alreadyCurrentOp],
-			{
-				dryRun: false,
-				updateFormula: mockUpdateFormula,
-				now: () => '2026-05-20T04:00:00Z'
-			}
-		);
+		const result: PhaseBExecutionResult = await executePhaseBOps(client, [alreadyCurrentOp], {
+			dryRun: false,
+			updateFormula: mockUpdateFormula,
+			now: () => '2026-05-20T04:00:00Z',
+		});
 
 		expect(mockUpdateFormula).not.toHaveBeenCalled();
 		expect(result.skipped).toHaveLength(1);
@@ -274,18 +266,14 @@ describe('executePhaseBOps', () => {
 		const mockTouchSave = vi.fn().mockResolvedValue({
 			touchSaveCount: 6,
 			noInstances: false,
-			failed: 0
+			failed: 0,
 		});
 
-		const result: PhaseBExecutionResult = await executePhaseBOps(
-			client,
-			[touchSaveOp],
-			{
-				dryRun: false,
-				touchSaveFormula: mockTouchSave,
-				now: () => '2026-05-20T04:00:00Z'
-			}
-		);
+		const result: PhaseBExecutionResult = await executePhaseBOps(client, [touchSaveOp], {
+			dryRun: false,
+			touchSaveFormula: mockTouchSave,
+			now: () => '2026-05-20T04:00:00Z',
+		});
 
 		expect(mockTouchSave).toHaveBeenCalledOnce();
 		expect(result.touchSaves).toHaveLength(1);
@@ -296,16 +284,12 @@ describe('executePhaseBOps', () => {
 		const mockMigrateProperty = vi.fn();
 		const mockDeleteProperty = vi.fn();
 
-		const result: PhaseBExecutionResult = await executePhaseBOps(
-			client,
-			[backfillOp, deleteOp],
-			{
-				dryRun: true,
-				migrateProperty: mockMigrateProperty,
-				deleteProperty: mockDeleteProperty,
-				now: () => '2026-05-20T04:00:00Z'
-			}
-		);
+		const result: PhaseBExecutionResult = await executePhaseBOps(client, [backfillOp, deleteOp], {
+			dryRun: true,
+			migrateProperty: mockMigrateProperty,
+			deleteProperty: mockDeleteProperty,
+			now: () => '2026-05-20T04:00:00Z',
+		});
 
 		expect(mockMigrateProperty).not.toHaveBeenCalled();
 		expect(mockDeleteProperty).not.toHaveBeenCalled();
@@ -324,8 +308,8 @@ describe('executePhaseBOps', () => {
 				dryRun: false,
 				migrateProperty: mockMigrateProperty,
 				updateFormula: mockUpdateFormula,
-				now: () => '2026-05-20T04:00:00Z'
-			}
+				now: () => '2026-05-20T04:00:00Z',
+			},
 		);
 
 		expect(result.failed).toHaveLength(1);
@@ -341,18 +325,14 @@ describe('executePhaseBOps', () => {
 			const mockMigrateProperty = vi.fn().mockResolvedValue({
 				migrated: 3,
 				skipped: 3, // 3 already done
-				failed: 0
+				failed: 0,
 			});
 
-			const result: PhaseBExecutionResult = await executePhaseBOps(
-				client,
-				[backfillOp],
-				{
-					dryRun: false,
-					migrateProperty: mockMigrateProperty,
-					now: () => '2026-05-20T04:00:00Z'
-				}
-			);
+			const result: PhaseBExecutionResult = await executePhaseBOps(client, [backfillOp], {
+				dryRun: false,
+				migrateProperty: mockMigrateProperty,
+				now: () => '2026-05-20T04:00:00Z',
+			});
 
 			expect(result.backfilled[0].migrated).toBe(3);
 			expect(result.backfilled[0].skipped).toBe(3);
@@ -370,21 +350,17 @@ describe('executePhaseBOps', () => {
 			parentTypeId: 'person-type-id',
 			parentType: 'person',
 			propertyName: 'avatar',
-			def: { name: 'avatar', type: 'file' }
+			def: { name: 'avatar', type: 'file' },
 		};
 
 		it('calls addProperty when an ADD_PROPERTY op is present', async () => {
 			const mockAddProperty = vi.fn().mockResolvedValue({ _id: 'avatar-prop-def-id' });
 
-			const result: PhaseBExecutionResult = await executePhaseBOps(
-				client,
-				[addAvatarOp],
-				{
-					dryRun: false,
-					addProperty: mockAddProperty,
-					now: () => '2026-05-20T04:00:00Z'
-				}
-			);
+			const result: PhaseBExecutionResult = await executePhaseBOps(client, [addAvatarOp], {
+				dryRun: false,
+				addProperty: mockAddProperty,
+				now: () => '2026-05-20T04:00:00Z',
+			});
 
 			expect(mockAddProperty).toHaveBeenCalledOnce();
 			// Op must appear in result — not silently dropped
@@ -394,15 +370,11 @@ describe('executePhaseBOps', () => {
 		it('records ADD_PROPERTY result so the op is not silently dropped', async () => {
 			const mockAddProperty = vi.fn().mockResolvedValue({ _id: 'avatar-prop-def-id' });
 
-			const result: PhaseBExecutionResult = await executePhaseBOps(
-				client,
-				[addAvatarOp],
-				{
-					dryRun: false,
-					addProperty: mockAddProperty,
-					now: () => '2026-05-20T04:00:00Z'
-				}
-			);
+			const result: PhaseBExecutionResult = await executePhaseBOps(client, [addAvatarOp], {
+				dryRun: false,
+				addProperty: mockAddProperty,
+				now: () => '2026-05-20T04:00:00Z',
+			});
 
 			// Must appear in an "added" bucket, not in failed
 			expect(result.failed).toHaveLength(0);
@@ -422,8 +394,8 @@ describe('executePhaseBOps', () => {
 					dryRun: false,
 					addProperty: mockAddProperty,
 					migrateProperty: mockMigrateProperty,
-					now: () => '2026-05-20T04:00:00Z'
-				}
+					now: () => '2026-05-20T04:00:00Z',
+				},
 			);
 
 			expect(result.failed).toHaveLength(1);
@@ -436,24 +408,55 @@ describe('executePhaseBOps', () => {
 			// Confirmed from Phase A execution report: these 5 targets were NOT in Phase A scope.
 			// The §1 diff must emit ADD_PROPERTY for each; executePhaseBOps must call addProperty 5×.
 			const renameTargetOps: AddPropertyOp[] = [
-				{ kind: 'ADD_PROPERTY', parentTypeName: 'person',   parentTypeId: 'person-tid',   parentType: 'person',   propertyName: 'avatar',            def: { name: 'avatar',            type: 'file'   } },
-				{ kind: 'ADD_PROPERTY', parentTypeName: 'section',  parentTypeId: 'section-tid',  parentType: 'section',  propertyName: 'voice',             def: { name: 'voice',             type: 'reference' } },
-				{ kind: 'ADD_PROPERTY', parentTypeName: 'work',     parentTypeId: 'work-tid',     parentType: 'work',     propertyName: 'original_voicing',  def: { name: 'original_voicing',  type: 'string' } },
-				{ kind: 'ADD_PROPERTY', parentTypeName: 'work',     parentTypeId: 'work-tid',     parentType: 'work',     propertyName: 'original_duration', def: { name: 'original_duration', type: 'number' } },
-				{ kind: 'ADD_PROPERTY', parentTypeName: 'work',     parentTypeId: 'work-tid',     parentType: 'work',     propertyName: 'original_language', def: { name: 'original_language', type: 'string' } },
+				{
+					kind: 'ADD_PROPERTY',
+					parentTypeName: 'person',
+					parentTypeId: 'person-tid',
+					parentType: 'person',
+					propertyName: 'avatar',
+					def: { name: 'avatar', type: 'file' },
+				},
+				{
+					kind: 'ADD_PROPERTY',
+					parentTypeName: 'section',
+					parentTypeId: 'section-tid',
+					parentType: 'section',
+					propertyName: 'voice',
+					def: { name: 'voice', type: 'reference' },
+				},
+				{
+					kind: 'ADD_PROPERTY',
+					parentTypeName: 'work',
+					parentTypeId: 'work-tid',
+					parentType: 'work',
+					propertyName: 'original_voicing',
+					def: { name: 'original_voicing', type: 'string' },
+				},
+				{
+					kind: 'ADD_PROPERTY',
+					parentTypeName: 'work',
+					parentTypeId: 'work-tid',
+					parentType: 'work',
+					propertyName: 'original_duration',
+					def: { name: 'original_duration', type: 'number' },
+				},
+				{
+					kind: 'ADD_PROPERTY',
+					parentTypeName: 'work',
+					parentTypeId: 'work-tid',
+					parentType: 'work',
+					propertyName: 'original_language',
+					def: { name: 'original_language', type: 'string' },
+				},
 			];
 
 			const mockAddProperty = vi.fn().mockResolvedValue({ _id: 'new-prop-id' });
 
-			const result: PhaseBExecutionResult = await executePhaseBOps(
-				client,
-				renameTargetOps,
-				{
-					dryRun: false,
-					addProperty: mockAddProperty,
-					now: () => '2026-05-20T04:00:00Z'
-				}
-			);
+			const result: PhaseBExecutionResult = await executePhaseBOps(client, renameTargetOps, {
+				dryRun: false,
+				addProperty: mockAddProperty,
+				now: () => '2026-05-20T04:00:00Z',
+			});
 
 			// All 5 must be dispatched — currently fails because ADD_PROPERTY falls through
 			expect(mockAddProperty).toHaveBeenCalledTimes(5);
@@ -464,15 +467,11 @@ describe('executePhaseBOps', () => {
 		it('dry-run: ADD_PROPERTY ops appear in wouldExecute plan', async () => {
 			const mockAddProperty = vi.fn();
 
-			const result: PhaseBExecutionResult = await executePhaseBOps(
-				client,
-				[addAvatarOp],
-				{
-					dryRun: true,
-					addProperty: mockAddProperty,
-					now: () => '2026-05-20T04:00:00Z'
-				}
-			);
+			const result: PhaseBExecutionResult = await executePhaseBOps(client, [addAvatarOp], {
+				dryRun: true,
+				addProperty: mockAddProperty,
+				now: () => '2026-05-20T04:00:00Z',
+			});
 
 			expect(mockAddProperty).not.toHaveBeenCalled();
 			expect(result.dryRun).toBe(true);
@@ -488,15 +487,15 @@ describe('executePhaseBOps', () => {
 				executePhaseBOps(client, [deleteOp], {
 					dryRun: false,
 					deleteProperty: vi.fn(),
-					now: () => '2026-05-20T04:00:00Z'
-				})
+					now: () => '2026-05-20T04:00:00Z',
+				}),
 			).rejects.toThrow(/verifyDeleteSafe/);
 		});
 
 		it('does not throw when verifyPreconditions=true DELETEs are present in a dry-run', async () => {
 			const result = await executePhaseBOps(client, [deleteOp], {
 				dryRun: true,
-				now: () => '2026-05-20T04:00:00Z'
+				now: () => '2026-05-20T04:00:00Z',
 			});
 			expect(result.dryRun).toBe(true);
 			expect(result.wouldExecute).toHaveLength(1);
@@ -507,7 +506,7 @@ describe('executePhaseBOps', () => {
 				kind: 'DELETE_PROPERTY',
 				parentType: 'section',
 				propertyName: 'ordinal',
-				propertyDefId: 'ordinal-id'
+				propertyDefId: 'ordinal-id',
 				// no verifyPreconditions flag
 			};
 			const mockDeleteProperty = vi.fn().mockResolvedValue({ deleted: true });
@@ -515,7 +514,7 @@ describe('executePhaseBOps', () => {
 			const result = await executePhaseBOps(client, [renameDeleteOp], {
 				dryRun: false,
 				deleteProperty: mockDeleteProperty,
-				now: () => '2026-05-20T04:00:00Z'
+				now: () => '2026-05-20T04:00:00Z',
 			});
 			expect(result.deleted).toHaveLength(1);
 		});
