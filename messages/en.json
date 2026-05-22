@@ -1,6 +1,16 @@
 {
 	"actions_cancel": "Cancel",
 	"actions_save": "Save",
+	"auth_login_cta": "Continue with Entu",
+	"auth_login_heading": "Sign in to mvox",
 	"common_error": "An error occurred",
-	"common_loading": "Loading…"
+	"common_loading": "Loading…",
+	"landing_empty_state": "You are not a member of any choir yet.",
+	"landing_error_state": "Could not load your choirs. Try again.",
+	"landing_retry_button": "Try again",
+	"landing_signed_in_heading": "Your choirs",
+	"landing_signed_out_cta": "Sign in with Entu",
+	"landing_signed_out_headline": "Sing together, share music",
+	"nav_sign_in": "Sign in",
+	"nav_sign_out": "Sign out"
 }

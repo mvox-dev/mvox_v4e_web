@@ -1,6 +1,16 @@
 {
 	"actions_cancel": "Tühista",
 	"actions_save": "Salvesta",
+	"auth_login_cta": "Jätka Entuga",
+	"auth_login_heading": "Logi mvox-i sisse",
 	"common_error": "Tekkis viga",
-	"common_loading": "Laadimine…"
+	"common_loading": "Laadimine…",
+	"landing_empty_state": "Sa ei ole veel ühegi koori liige.",
+	"landing_error_state": "Kooride laadimine ebaõnnestus. Proovi uuesti.",
+	"landing_retry_button": "Proovi uuesti",
+	"landing_signed_in_heading": "Sinu koorid",
+	"landing_signed_out_cta": "Logi sisse Entuga",
+	"landing_signed_out_headline": "Laula koos, jaga muusikat",
+	"nav_sign_in": "Logi sisse",
+	"nav_sign_out": "Logi välja"
 }

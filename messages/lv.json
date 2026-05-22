@@ -1,6 +1,16 @@
 {
 	"actions_cancel": "Atcelt",
 	"actions_save": "Saglabāt",
+	"auth_login_cta": "Turpināt ar Entu",
+	"auth_login_heading": "Pierakstīties mvox",
 	"common_error": "Radās kļūda",
-	"common_loading": "Ielādē…"
+	"common_loading": "Ielādē…",
+	"landing_empty_state": "Jūs vēl neesat neviena kora loceklis.",
+	"landing_error_state": "Neizdevās ielādēt jūsu korus. Mēģiniet vēlreiz.",
+	"landing_retry_button": "Mēģināt vēlreiz",
+	"landing_signed_in_heading": "Jūsu kori",
+	"landing_signed_out_cta": "Pierakstīties ar Entu",
+	"landing_signed_out_headline": "Dziediet kopā, dalieties ar mūziku",
+	"nav_sign_in": "Pierakstīties",
+	"nav_sign_out": "Izrakstīties"
 }

@@ -65,7 +65,10 @@ Choral-music terms that have no idiomatic translation should stay in English (or
 
 | Term | Policy | Rationale |
 |---|---|---|
-| (none yet) | — | — |
+| choir | et: `koor`, lv: `koris`, uk: `хор` | Standard choral-community term in each language; not the more formal "ensemble" or "kollektiiv" |
+| Sign in | et: `Logi sisse`, lv: `Pierakstīties`, uk: `Увійти` | Standard UI login verb per locale; consistent across nav + login page |
+| Sign out | et: `Logi välja`, lv: `Izrakstīties`, uk: `Вийти` | Paired with Sign in convention |
+| Continue with [brand] | et: `Jätka [brand]uga`, lv: `Turpināt ar [brand]`, uk: `Продовжити з [brand]` | OAuth CTA pattern — infinitive in lv/uk, imperative in et |
 
 ### Proper nouns and brand names
 
@@ -85,5 +88,10 @@ Append entries here when a non-obvious translation choice is made. Format: key, 
 | `common_error` | lv | `Radās kļūda` | "An error arose" — past tense, standard Latvian UI error phrasing. |
 | `common_loading` | uk | `Завантаження…` | Noun/verbal noun; standard Ukrainian UI loading indicator text. |
 | `common_error` | uk | `Сталася помилка` | "An error occurred" — standard Ukrainian UI error phrasing, feminine agreement with `помилка`. |
+| `landing_signed_out_headline` | et | `Laula koos, jaga muusikat` | Imperative 2nd-sg ("Sing together, share music"); direct and energetic, natural Estonian marketing tone. |
+| `landing_signed_out_headline` | lv | `Dziediet kopā, dalieties ar mūziku` | Imperative 2nd-pl (formal); Latvian UI prefers formal plural for address. |
+| `landing_signed_out_headline` | uk | `Співайте разом, діліться музикою` | Imperative 2nd-pl; standard Ukrainian informal-friendly register. |
+| `landing_retry_button` | en | `Try again` | Changed from Byrd stub "Retry" — "Try again" is more conversational, mirrors `landing_error_state` phrasing. |
+| `landing_error_state` | en | `Could not load your choirs. Try again.` | Added "Try again." hint to match retry button text and make the error actionable inline. |
 
 (*MVOX:Comenius*)
