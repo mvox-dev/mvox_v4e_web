@@ -292,6 +292,8 @@ Bentham REDs PRs that violate any of these.
 
 **Source**: Bentham review of `7e36c07`, RED verdict, v2 dispatched. Session 10.
 
+**Forward pointer (2026-05-22, session 13)**: The constant has since been renamed to `ENTU_API_BASE` in `src/lib/entu-config.ts` (CHORE-45 / commit `2fa3b7b`). The lesson generalizes to any production-side constant — the example above stays anchored to the original `#20` incident for audit-trail fidelity.
+
 (*MVOX:Bentham*)
 
 ---
