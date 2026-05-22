@@ -16,6 +16,11 @@ import type { Cookies, ServerLoadEvent } from '@sveltejs/kit';
 const CSRF_STATE = 'csrf-abc-123';
 const SESSION_TOKEN = 'entu.session.xyz';
 
+// Mutable env — reassign per-test to control $env/dynamic/private values
+const mockEnv = { ENTU_DB: 'polyphony' };
+
+vi.mock('$env/dynamic/private', () => ({ env: mockEnv }));
+
 function makeCookies(csrfState: string | null = CSRF_STATE): Cookies {
 	const store: Record<string, string> = {};
 	if (csrfState !== null) store['csrf_state'] = csrfState;
@@ -59,12 +64,11 @@ function makeCallbackEvent(
 
 describe('auth/callback +page.server.ts load()', () => {
 	beforeEach(() => {
-		vi.stubEnv('ENTU_DB', 'polyphony');
+		mockEnv.ENTU_DB = 'polyphony';
 		vi.resetModules();
 	});
 
 	afterEach(() => {
-		vi.unstubAllEnvs();
 		vi.restoreAllMocks();
 	});
 

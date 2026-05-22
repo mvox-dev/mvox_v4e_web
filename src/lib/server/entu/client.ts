@@ -1,3 +1,4 @@
+import { env } from '$env/dynamic/private';
 import { ENTU_API_BASE } from '../../entu-config.ts';
 
 export interface EntuEntity {
@@ -17,8 +18,8 @@ export class EntuClient {
 
 	constructor(jwt: string) {
 		this.jwt = jwt;
-		this.baseUrl = process.env.ENTU_BASE_URL ?? ENTU_API_BASE;
-		this.db = process.env.ENTU_DB ?? '';
+		this.baseUrl = env.ENTU_BASE_URL ?? ENTU_API_BASE;
+		this.db = env.ENTU_DB ?? '';
 	}
 
 	private authHeaders(): HeadersInit {

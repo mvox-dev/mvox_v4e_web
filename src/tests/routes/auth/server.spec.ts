@@ -1,6 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { Cookies, RequestEvent } from '@sveltejs/kit';
 
+// Mutable env — reassign per-test to control $env/dynamic/private values
+const mockEnv = { ENTU_BASE_URL: 'https://entu.app/api/' };
+
+vi.mock('$env/dynamic/private', () => ({ env: mockEnv }));
+
 function makeCookies(): Cookies & { store: Record<string, string> } {
 	const store: Record<string, string> = {};
 	return {
@@ -37,11 +42,11 @@ function makeAuthEvent(apiKey: string | null, db: string = 'testdb'): RequestEve
 
 describe('POST /auth', () => {
 	beforeEach(() => {
-		vi.stubEnv('ENTU_BASE_URL', 'https://entu.app/api/');
+		mockEnv.ENTU_BASE_URL = 'https://entu.app/api/';
+		vi.resetModules();
 	});
 
 	afterEach(() => {
-		vi.unstubAllEnvs();
 		vi.restoreAllMocks();
 	});
 

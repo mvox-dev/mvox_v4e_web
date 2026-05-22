@@ -1,5 +1,6 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import { json } from '@sveltejs/kit';
+import { env } from '$env/dynamic/private';
 import { ENTU_API_BASE } from '../../lib/entu-config.ts';
 
 export const POST: RequestHandler = async ({ request, cookies, url }) => {
@@ -9,7 +10,7 @@ export const POST: RequestHandler = async ({ request, cookies, url }) => {
 	}
 
 	const db = url.searchParams.get('db') ?? '';
-	const baseUrl = process.env.ENTU_BASE_URL ?? ENTU_API_BASE;
+	const baseUrl = env.ENTU_BASE_URL ?? ENTU_API_BASE;
 	const entuAuthUrl = `${baseUrl}${db}/auth`;
 
 	const res = await fetch(entuAuthUrl, {

@@ -18,6 +18,11 @@ import type { Cookies, ServerLoadEvent } from '@sveltejs/kit';
 
 const ORDERED_PROVIDER_IDS = ['smart-id', 'mobile-id', 'id-card', 'google', 'apple', 'e-mail'] as const;
 
+// Mutable env — reassign per-test to control $env/dynamic/private values
+const mockEnv = { ENTU_BASE_URL: 'https://entu.app/api/', ENTU_DB: 'polyphony' };
+
+vi.mock('$env/dynamic/private', () => ({ env: mockEnv }));
+
 function makeCookies(): Cookies & { store: Record<string, string>; opts: Record<string, unknown> } {
 	const store: Record<string, string> = {};
 	const opts: Record<string, unknown> = {};
@@ -57,13 +62,12 @@ function makeLoadEvent(origin = 'https://multivox.pages.dev'): ServerLoadEvent {
 
 describe('auth/login +page.server.ts load()', () => {
 	beforeEach(() => {
-		vi.stubEnv('ENTU_BASE_URL', 'https://entu.app/api/');
-		vi.stubEnv('ENTU_DB', 'polyphony');
+		mockEnv.ENTU_BASE_URL = 'https://entu.app/api/';
+		mockEnv.ENTU_DB = 'polyphony';
 		vi.resetModules();
 	});
 
 	afterEach(() => {
-		vi.unstubAllEnvs();
 		vi.restoreAllMocks();
 	});
 

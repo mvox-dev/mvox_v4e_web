@@ -1,14 +1,19 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { EntuClient } from './client.ts';
 
+// Mutable env object — reassign fields per-test to control what $env/dynamic/private exposes
+const mockEnv = { ENTU_BASE_URL: 'https://entu.app/api/', ENTU_DB: 'testdb' };
+
+vi.mock('$env/dynamic/private', () => ({ env: mockEnv }));
+
 describe('EntuClient', () => {
 	beforeEach(() => {
-		vi.stubEnv('ENTU_BASE_URL', 'https://entu.app/api/');
-		vi.stubEnv('ENTU_DB', 'testdb');
+		mockEnv.ENTU_BASE_URL = 'https://entu.app/api/';
+		mockEnv.ENTU_DB = 'testdb';
+		vi.resetModules();
 	});
 
 	afterEach(() => {
-		vi.unstubAllEnvs();
 		vi.restoreAllMocks();
 	});
 
@@ -37,8 +42,8 @@ describe('EntuClient', () => {
 			expect(headers.get('Authorization')).toBe('Bearer my-jwt');
 		});
 
-		it('uses ENTU_BASE_URL env var as base URL', async () => {
-			vi.stubEnv('ENTU_BASE_URL', 'https://custom.entu.host/api/');
+		it('uses ENTU_BASE_URL from $env/dynamic/private as base URL', async () => {
+			mockEnv.ENTU_BASE_URL = 'https://custom.entu.host/api/';
 			const fetchMock = vi.fn().mockResolvedValue(
 				new Response(JSON.stringify({ entity: {} }), { status: 200 })
 			);
@@ -52,8 +57,8 @@ describe('EntuClient', () => {
 			expect(url).toContain('custom.entu.host');
 		});
 
-		it('includes ENTU_DB in the request URL path', async () => {
-			vi.stubEnv('ENTU_DB', 'mychoir');
+		it('uses ENTU_DB from $env/dynamic/private in the request URL path', async () => {
+			mockEnv.ENTU_DB = 'mychoir';
 			const fetchMock = vi.fn().mockResolvedValue(
 				new Response(JSON.stringify({ entity: {} }), { status: 200 })
 			);

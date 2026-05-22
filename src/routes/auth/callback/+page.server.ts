@@ -1,5 +1,6 @@
 import type { ServerLoad } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
+import { env } from '$env/dynamic/private';
 
 export const load: ServerLoad = async ({ url, cookies }) => {
 	const stateInUrl = url.searchParams.get('state');
@@ -16,6 +17,6 @@ export const load: ServerLoad = async ({ url, cookies }) => {
 
 	return {
 		sessionToken: key,
-		db: process.env.ENTU_DB ?? 'polyphony',
+		db: env.ENTU_DB ?? 'polyphony',
 	};
 };
