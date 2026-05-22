@@ -1,6 +1,11 @@
 {
 	"actions_cancel": "Atcelt",
 	"actions_save": "Saglabāt",
+	"auth_callback_failed": "Pierakstīšanās neizdevās. Lūdzu, mēģiniet vēlreiz.",
+	"auth_callback_pending": "Pierakstīšanās notiek…",
+	"auth_callback_success": "Pierakstīšanās veiksmīga. Novirzīšana…",
+	"auth_error_csrf_mismatch": "Pierakstīšanās drošības pārbaude neizdevās. Lūdzu, sāciet no jauna.",
+	"auth_error_missing_session_token": "Pierakstīšanās netika pabeigta. Lūdzu, mēģiniet vēlreiz.",
 	"auth_login_cta": "Turpināt ar Entu",
 	"auth_login_heading": "Pierakstīties mvox",
 	"common_error": "Radās kļūda",

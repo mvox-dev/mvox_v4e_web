@@ -1,6 +1,11 @@
 {
 	"actions_cancel": "Tühista",
 	"actions_save": "Salvesta",
+	"auth_callback_failed": "Sisselogimine ebaõnnestus. Palun proovi uuesti.",
+	"auth_callback_pending": "Sisselogimine käib…",
+	"auth_callback_success": "Sisse logitud. Suunamine…",
+	"auth_error_csrf_mismatch": "Sisselogimise turbekontroll ebaõnnestus. Palun alusta uuesti.",
+	"auth_error_missing_session_token": "Sisselogimine ei lõppenud. Palun proovi uuesti.",
 	"auth_login_cta": "Jätka Entuga",
 	"auth_login_heading": "Logi mvox-i sisse",
 	"common_error": "Tekkis viga",

@@ -1,6 +1,11 @@
 {
 	"actions_cancel": "Cancel",
 	"actions_save": "Save",
+	"auth_callback_failed": "Sign-in failed.",
+	"auth_callback_pending": "Completing sign-in…",
+	"auth_callback_success": "Signed in.",
+	"auth_error_csrf_mismatch": "The sign-in request could not be verified. Please try again.",
+	"auth_error_missing_session_token": "No session token received. Please try again.",
 	"auth_login_cta": "Continue with Entu",
 	"auth_login_heading": "Sign in to mvox",
 	"common_error": "An error occurred",

@@ -93,5 +93,14 @@ Append entries here when a non-obvious translation choice is made. Format: key, 
 | `landing_signed_out_headline` | uk | `Співайте разом, діліться музикою` | Imperative 2nd-pl; standard Ukrainian informal-friendly register. |
 | `landing_retry_button` | en | `Try again` | Changed from Byrd stub "Retry" — "Try again" is more conversational, mirrors `landing_error_state` phrasing. |
 | `landing_error_state` | en | `Could not load your choirs. Try again.` | Added "Try again." hint to match retry button text and make the error actionable inline. |
+| `auth_callback_success` | et | `Sisse logitud. Suunamine…` | "Redirecting" as `Suunamine` (verbal noun); brief for a transient screen. |
+| `auth_callback_success` | lv | `Pierakstīšanās veiksmīga. Novirzīšana…` | `Novirzīšana` = redirecting (noun form); standard Latvian UI pattern. |
+| `auth_callback_success` | uk | `Вхід виконано. Перенаправлення…` | `Перенаправлення` = redirecting (verbal noun); standard Ukrainian UI pattern. |
+| `auth_error_csrf_mismatch` | et | `Sisselogimise turbekontroll ebaõnnestus. Palun alusta uuesti.` | `turbekontroll` = security check; `alusta uuesti` = start again (implies full flow restart, not just retry). |
+| `auth_error_csrf_mismatch` | lv | `Pierakstīšanās drošības pārbaude neizdevās. Lūdzu, sāciet no jauna.` | `drošības pārbaude` = security check; `sāciet no jauna` = start again (formal plural). |
+| `auth_error_csrf_mismatch` | uk | `Перевірка безпеки входу не вдалася. Будь ласка, почніть знову.` | `Перевірка безпеки` = security check; `почніть знову` = start again (imperative plural). |
+| `auth_error_missing_session_token` | et | `Sisselogimine ei lõppenud. Palun proovi uuesti.` | `ei lõppenud` = did not complete; softer/less technical than "no token received". |
+| `auth_error_missing_session_token` | lv | `Pierakstīšanās netika pabeigta. Lūdzu, mēģiniet vēlreiz.` | `netika pabeigta` = was not completed (past passive); matches English final-copy tone. |
+| `auth_error_missing_session_token` | uk | `Вхід не завершено. Будь ласка, спробуйте ще раз.` | `не завершено` = was not completed (short passive); consistent with English final copy. |
 
 (*MVOX:Comenius*)

@@ -1,6 +1,11 @@
 {
 	"actions_cancel": "Скасувати",
 	"actions_save": "Зберегти",
+	"auth_callback_failed": "Вхід не вдався. Будь ласка, спробуйте ще раз.",
+	"auth_callback_pending": "Виконується вхід…",
+	"auth_callback_success": "Вхід виконано. Перенаправлення…",
+	"auth_error_csrf_mismatch": "Перевірка безпеки входу не вдалася. Будь ласка, почніть знову.",
+	"auth_error_missing_session_token": "Вхід не завершено. Будь ласка, спробуйте ще раз.",
 	"auth_login_cta": "Продовжити з Entu",
 	"auth_login_heading": "Увійти в mvox",
 	"common_error": "Сталася помилка",
