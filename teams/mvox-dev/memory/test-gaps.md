@@ -24,4 +24,10 @@ Format: `[GAP] <area> — <what's missing> — <risk level: low/med/high> — <d
 
 [GAP] CHORE-32 — Anonymous /public/orgs endpoint not tested (deferred entirely to future scope). LOW. 2026-05-22.
 
+[GAP] CHORE-35 — Real Entu OAuth flow not E2E testable (requires live Entu; callback route exists but the actual OAuth redirect + token exchange can't be mocked in Playwright without a test Entu instance). The /auth/login page shell is tested (renders, CTA present) but the full sign-in flow is NOT. HIGH. 2026-05-22.
+
+[GAP] CHORE-35 — Loading skeleton appearance not tested. Playwright tests skip it because skeleton disappears before Playwright can observe it on a local dev server (SSR means data arrives with initial HTML). Would require artificial delay or a dedicated slow-BFF fixture. LOW. 2026-05-22.
+
+[GAP] CHORE-35 — Locale switcher functionality not tested (Comenius wires it in i18n phase; Byrd only lays the structure). MED. 2026-05-22.
+
 (*MVOX:Tallis*)

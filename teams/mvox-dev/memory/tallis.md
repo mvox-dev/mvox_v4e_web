@@ -110,4 +110,26 @@ Both RED on "Cannot find module" (route files don't exist yet). Total test count
 - `src/routes/api/organizations/[id]/sections/+server.ts`
 - Property extractor helpers (`extractStringProp`, `extractTextProp`, `extractNumberProp`, pagination clamp)
 
+## [CHECKPOINT] 2026-05-22 — Session 13: CHORE-35 RED phase
+
+[DECISION] 25 tests written. 2 files:
+- `tests/frontend-scaffolding.spec.ts` (18 Playwright E2E tests) — signed-out landing, /auth/login, signed-in orgs list, empty state, error state, SSR presence check
+- `src/tests/routes/landing/page.server.spec.ts` (7 Vitest unit tests) — `+page.server.ts` load() contract
+
+Vitest tests: 7 RED on "Cannot find module '../../routes/+page.server.ts'". Total: 335 Vitest (7 RED, 328 pass).
+Playwright: 18 new E2E tests collected; will fail when run (needs built app + .svelte files).
+Commit: `c727f2f` on `feat/frontend-scaffolding-mvp`.
+
+[PATTERN] Playwright BFF mock: `page.route('/api/organizations**', handler)` intercepts at the network level. Auth state simulation: `page.context().addCookies([{ name: 'entu_jwt', ... }])` sets the httpOnly cookie that hooks.server reads.
+
+[PATTERN] SSR presence test: attach `page.on('response', ...)` before `page.goto('/')`, read the raw HTML, assert org name appears in initial HTML. Pins that data is SSR-rendered (not injected post-hydration by JS).
+
+[PATTERN] Vitest component-level tests for Svelte pages: test the `+page.server.ts` load() function only (pure TS, no Svelte transform needed). .svelte rendering is Playwright's territory — standalone vitest.config.ts has no Svelte transform.
+
+[DECISION] Pinned data-testid contract (Byrd must implement): `signed-out-cta` (href=/auth/login), `nav-sign-in`, `nav-sign-out`, `orgs-heading`, `org-card`, `org-photo-placeholder`, `orgs-empty-state`, `orgs-error-state`, `orgs-retry-button`, `login-cta`
+
+[DECISION] Pinned message keys (Comenius must create in all 4 locales): `landing_signed_out_headline`, `landing_signed_out_cta`, `landing_signed_in_heading`, `landing_empty_state`, `landing_error_state`, `landing_retry_button`, `nav_sign_in`, `nav_sign_out`, `auth_login_heading`, `auth_login_cta`
+
+[OPEN] CHORE-35 GREEN — Josquin: `src/routes/+page.server.ts` load(). Byrd: `+layout.svelte`, `+page.svelte`, `src/routes/auth/login/+page.svelte`.
+
 (*MVOX:Tallis*)
