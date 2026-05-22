@@ -1,42 +1,40 @@
-# sv
+# mvox
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+**mvox** is a choral music sharing web app built on the [v4E schema](https://github.com/entu/research/tree/main/docs/schema/v4E). It acts as a BFF in front of [Entu](https://entu.app/) (entity-property database platform) — no own database. Scaffolding is live and evolving: BFF MVP and OAuth flow are wired; the app is deployed at **https://multivox.pages.dev/** on Cloudflare Pages.
 
-## Creating a project
+## Setup
 
-If you're seeing this, you've probably already done this step. Congrats!
-
-```sh
-# create a new project
-npx sv create my-app
+```bash
+git clone https://github.com/mvox-dev/mvox_v4e_web
+cd mvox_v4e_web
+pnpm install
 ```
 
-To recreate this project with the same configuration:
-
-```sh
-# recreate this project
-npx sv@0.15.3 create --template minimal --types ts --no-install mvox-scaffold
+```bash
+pnpm dev        # development server (localhost:5173)
+pnpm test       # Vitest (unit + integration) then Playwright (E2E)
+pnpm check      # type-check (svelte-check + tsc)
+pnpm lint       # Biome + ESLint (format + Svelte compile check)
+pnpm lint:fix   # autofix
+pnpm i18n:gen   # regenerate Paraglide message types from messages/*.json
 ```
 
-## Developing
+Use `pnpm` only — never `npm` or `yarn`.
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+## Development conventions
 
-```sh
-npm run dev
+Team configuration, agent prompts, shared memory, and architecture decisions live under `teams/mvox-dev/`:
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+- `teams/mvox-dev/common-prompt.md` — stack, quality gates, TDD chain, known pitfalls
+- `teams/mvox-dev/memory/architecture-decisions.md` — settled decisions + rationale
+- `teams/mvox-dev/prompts/` — per-agent role definitions
 
-## Building
+## Schema source-of-truth
 
-To create a production version of your app:
+The v4E entity schema is maintained in the [`entu/research`](https://github.com/entu/research) repo under `docs/schema/v4E/`:
 
-```sh
-npm run build
-```
+- `schema.ts` — typed TypeScript definition
+- `README.md` — narrative description of entity types and relationships
+- `editor.html` — single-file diagram editor
 
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+mvox PRs that mutate the schema require a PR against `entu/research` first. See `teams/mvox-dev/memory/architecture-decisions.md` for the procedure.
