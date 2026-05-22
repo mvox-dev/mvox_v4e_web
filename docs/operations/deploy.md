@@ -73,6 +73,8 @@ Expected: HTTP `200` and the response body should be the SvelteKit landing page 
 
 If the response is `404` or a Cloudflare placeholder, the deploy uploaded an empty/wrong directory — check `pnpm build` output and the contents of `.svelte-kit/cloudflare/` before re-deploying.
 
+> *TLS may take ~60s to provision on a fresh unique-URL alias (`<hash>.multivox.pages.dev`); retry once before treating cert errors as deploy failures.*
+
 ## Failure modes
 
 - **`Authentication error [code: 10000]`** — the API token is missing, expired, or lacks `Pages:Edit` scope. Re-issue the token from the Cloudflare dashboard (My Profile → API Tokens), update `~/.config/mvox/credentials.env`, and re-source.
