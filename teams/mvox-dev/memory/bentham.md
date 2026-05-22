@@ -7,9 +7,23 @@ metadata:
 
 # Bentham scratchpad
 
+## 2026-05-22 — Session 13: photo-rename Layer 1 post-exec
+
+[DECISION] **Post-exec verdict on `82727ca` (Layer 1 live execution): GREEN.** Result artifact `cleanup-rename-photo-prop-def-only-2026-05-22T13-31-58-658.json`: 2 prop-def renames (`person.avatar`→`photo`, `organization.logo`→`photo`), exit 0, errors=[], summary `{renames: 2, skipped: 0, failed: 0}`. Both `propDefEntityId` + `nameValueId` IDs round-trip from manifest to results consistently. Wire-shape pattern matches the codified DELETE-then-POST for single-value string properties — `nameValueId` captured pre-DELETE as the property-value `_id` (distinct from `propDefEntityId` as the entity `_id`), honoring the entity-vs-property split. Commit carries `Schema-Change: entu/research@f52adc4` + `PO-Approved` trailers per the mutation gate. No anomalies. Layer 1 closed cleanly.
+
+[CHECKPOINT] **Session-12 patterns lifted to `architecture-decisions.md`** per team-lead's stewardship nudge:
+- "Bundled-migration RED → split-by-blast-radius" (covers task #12→#15→`82727ca` arc)
+- "File-property mutations must round-trip full file payload" (covers Layer 2 / task #14 RED triggers + open question on Entu file-POST semantics)
+
+Session-12 narrative (RED-1 reasoning, EntuProperty type gap, probe undersample) reachable via `git show 929ec3b:teams/mvox-dev/memory/bentham.md` if ever needed; load-bearing rules now live in the settled-patterns file where future-Bentham finds them on startup.
+
+[LEARNED] **Scratchpad prune timing — prune at session END, not session START.** Session 12's work was still mid-flight at start of session 13 (branch parked at `ea1a2b1`, Layer 1 live execution pending). My startup prune dropped the session-12 narrative before that work fully landed. Correct cadence: keep current-arc entries in the scratchpad until the work they document is closed, then prune at shutdown. Patterns broad enough to deserve permanent capture go to `architecture-decisions.md` BEFORE pruning from the scratchpad — that's the steward's actual carry-forward path, not a `[PROCESSED]` block.
+
+---
+
 ## Open at session-13 start (2026-05-22)
 
-**Parked branch**: `chore/perotin-rename-photo-prestage-2026-05-21` at `ea1a2b1` — GREEN Option A split (Layer 1 only, prop-def rename). Ready-to-merge pending entu/research upstream PR + PO "I authorize."
+**Photo-rename status**: Layer 1 **merged as `82727ca`** 2026-05-22 13:33. Layer 2 (instance file-value migration) remains deferred under task #14.
 
 **Carryforward YELLOWs**:
 - **#19** — CSRF gate. Fires on first cookie-authed BFF POST/PUT/DELETE route. Demand explicit Origin check or token-pair CSRF.
@@ -94,6 +108,6 @@ Pre-`db3c224` commits don't carry `Co-authored-by: Mihkel Putrinš` — accepted
 - **Phase B.1** (instance cleanup of blocked deletes): merged.
 - **Phase C** (structural: inventory_copy→copy+lending; participation→rsvp+attendance; affiliation/role retirement): closed 2026-05-21 (`f3529b7`, task #6 done).
 - **Phase D** (rights flips + sharing alignment + DEPRECATED cleanup): closed 2026-05-21, fixup #64 GREEN.
-- **Photo-rename pre-stage**: Layer 1 (prop-def rename) parked at `ea1a2b1` pending entu/research PR + PO auth. Layer 2 (instance values) deferred to task #14.
+- **Photo-rename pre-stage**: Layer 1 (prop-def rename) merged as `82727ca` 2026-05-22. Layer 2 (instance values) deferred to task #14.
 
 (*MVOX:Bentham*)

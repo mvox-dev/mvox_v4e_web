@@ -6,6 +6,45 @@ Format per entry: short title, decision, rationale, date. Most recent at the top
 
 ---
 
+## Bundled-migration RED → split-by-blast-radius (2026-05-22, session 13)
+
+**Decision**: When a bundled migration script has a clean Layer N and a problematic Layer N+1, the recommended fix path is **split the script into two** — one ships now (the clean layer), one defers behind its own task (the problematic layer). This wins over fix-in-place when:
+
+1. The clean layer unblocks downstream consumers immediately (no pessimization waiting on the broken layer).
+2. The deferred layer's open questions get their own probe/empirical-verification budget without timeline pressure.
+3. The audit trail is cleaner — one PR = one clearly-bounded migration outcome, instead of a single PR carrying mixed "this worked, this didn't, here's why" semantics.
+
+Bentham's standing recommendation on bundled-migration RED-1 verdicts: **lead with "split here" before "fix in place,"** unless the layers are genuinely coupled (the same op cannot be safely run without the other half).
+
+**Rationale**: First exercised on the photo-rename pre-stage (task #12 → #15). Combined Layer 1 (prop-def rename) + Layer 2 (instance-value migration with DELETE-then-POST on file properties) script was RED on Layer 2's file-payload-round-trip bug. Option A split landed Layer 1 only as `cleanup-rename-photo-prop-def-only-2026-05-21.ts`; Layer 2 deferred to task #14 pending empirical probe of Entu's POST-with-file-fields semantics (does it re-link to a pre-existing S3 object, or always require a fresh upload?). Layer 1 live-executed cleanly 2026-05-22 (`82727ca`); Layer 2 remains deferred without blocking downstream work. Total split cost ~50 lines of Pérotin work vs. open-ended fix-in-place + Entu-probe budget on the combined script.
+
+**Source**: Task #12 RED + task #15 GREEN (Option A split); live execution `82727ca` 2026-05-22; task #14 carries the deferred Layer 2 work.
+
+(*MVOX:Bentham*)
+
+---
+
+## File-property mutations must round-trip full file payload (2026-05-22, session 13)
+
+**Decision**: Any DELETE-then-POST migration on file-typed properties (`type: 'photo'`, `type: 'file'`, etc.) must round-trip the COMPLETE file payload — at minimum `filename`, `md5`, `filesize`, S3 key, content-type — from the DELETEd value to the POST body. Posting `[{type: 'photo'}]` (empty file property) silently destroys the S3 file binding.
+
+**RED triggers**:
+- Any DELETE-then-POST script touching file properties whose POST body lacks ANY of the file payload fields (`md5`, S3 key, content-type, filesize, filename).
+- Any probe script enumerating file-typed property values that captures only a subset of file fields. The probe's captured-data shape is the upper bound on what a downstream live-run can reconstitute.
+- `EntuProperty` (`src/lib/server/entu/client.ts:32-38` or equivalent) used as the POST body type for file mutations — it currently declares only `string`/`number`/`boolean`/`reference` and is incomplete for file values. Extend or split into `EntuFileProperty` before any file-property mutation lands.
+
+**Open question (gates Layer 2 / task #14)**: Does Entu's POST-with-file-fields path re-link to a pre-existing S3 object, or does it always require a fresh upload? Until verified via `_probe_` against a throwaway entity with a real file value, NO DELETE-then-POST migration on file properties is GREEN-eligible. If Entu requires fresh upload, the rename CAN'T be done as DELETE-then-POST on file properties at all — would need an Entu-side property-rename API, or accept-data-loss.
+
+**Empty-probe-today ≠ safe-to-defer**: Any script whose manifest is built at runtime from a live `listEntities` call must have its dead-code paths correct, because the gap between dry-run and live-run is exactly when uploads can land. Reviewer posture: code-review the dead path AS IF it will fire; don't carry it forward as YELLOW just because the count is zero today.
+
+**Rationale**: Surfaced in the photo-rename pre-stage RED-1 (task #12). The combined script's `executeMigration` path posted `[{type: 'photo'}]` (empty body) — would have silently dropped the S3 file binding if any avatar/logo value existed at live-run time. Today's dead code, but the runtime manifest enumeration in `buildInstanceEntries` is the explicit safety net for "value uploaded between dry-run and live-run."
+
+**Source**: Bentham RED on `chore/perotin-rename-photo-prestage-2026-05-21` `05eb5df` (task #12). Findings doc `docs/migration/findings/v4e-rename-avatar-logo-to-photo-2026-05-21.md:85` prescribes the correct POST shape. Layer 2 deferred to task #14.
+
+(*MVOX:Bentham*)
+
+---
+
 ## Entu formula-to-plain conversion mechanic (2026-05-21, session 9)
 
 **Decision**: To convert a formula property to a plain writable string on a type, DELETE the `formula` property VALUE from the prop-def entity (not the prop-def itself). Wire shape: `DELETE /property/{formulaValueId}` where `formulaValueId` is the `_id` of the formula value on the prop-def entity (not the prop-def entity `_id`).
