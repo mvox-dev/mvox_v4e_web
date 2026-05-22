@@ -87,6 +87,28 @@ describe('EntuClient', () => {
 
 			expect(result).toEqual(entity);
 		});
+
+		it('throws on 403 response', async () => {
+			vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+				new Response(JSON.stringify({ error: 'forbidden' }), { status: 403 })
+			));
+
+			const { EntuClient } = await import('./client.ts');
+			const client = new EntuClient('my-jwt');
+
+			await expect(client.get('entity-123')).rejects.toThrow('403');
+		});
+
+		it('throws on 404 response', async () => {
+			vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+				new Response(JSON.stringify({ error: 'not found' }), { status: 404 })
+			));
+
+			const { EntuClient } = await import('./client.ts');
+			const client = new EntuClient('my-jwt');
+
+			await expect(client.get('entity-123')).rejects.toThrow('404');
+		});
 	});
 
 	describe('search(query)', () => {
