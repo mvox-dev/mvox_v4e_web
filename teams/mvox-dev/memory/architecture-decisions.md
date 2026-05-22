@@ -115,7 +115,27 @@ A PR that closes drift between live data and an *already-landed* v4E `EntityDef`
 
 First exercised by Phase D sub-ops 1+3+4 (forename/surname retirement; `person.name` formula→plain; commit `adc41e8`) and sub-op 5 (`_inheritrights: false` on 6 orgs; commit `88595c7`). All four had no Schema-Change trailer on the justification that v4E `schema.ts` already declared the target shape; live polyphony was the drift to close.
 
-**Source**: Bentham proposal session 2 + PO confirmation.
+### Upstream-PR ownership shift (2026-05-22, session 13)
+
+**Update to step 1:** team-lead authors and opens the `entu/research` PR directly. No more "PO submits via the upstream GitHub UI" relay.
+
+Procedure: branch in `~/projects/entu-research/`, edit `docs/schema/v4E/schema.ts`, run `pnpm build-schema` to regenerate `schema.json`, sweep `docs/schema/v4E/README.md` for narrative refs, commit with PO email trailer, push, `gh pr create`. PO reviews on the GitHub side.
+
+Rationale: the earlier finding-doc → paste-into-UI relay stranded schema work across session boundaries (session 12 wrote the draft for the `avatar/logo → photo` rename; session 13 still needed PO action before any consumer could move). PO directive 2026-05-22: "from here forward — this schema is ours to maintain at entu-research". First exercised on entu/research#49 (the rename), opened by team-lead end-to-end.
+
+What this changes:
+- The session-12 finding-doc pattern (`docs/migration/findings/v4e-rename-*.md`) remains useful as **design rationale capture**, but is no longer the gating artifact.
+- Mechanical changes (renames, note clarifications, regenerated artifacts) are team-lead's to execute.
+- **Structural changes** (new entity types, new rights model, new sharing semantics) still consult PO before the upstream PR opens. "Ours to maintain" ≠ "ours to design unilaterally."
+
+What stays unchanged:
+- The `Schema-Change: entu/research@<sha>` + `PO-Approved: <date> ...` trailer convention on the consuming mvox PR.
+- Bentham REDs mvox PRs missing either trailer.
+- The schema-alignment carve-out above.
+
+**Source**: PO directive, session 13, immediately after entu/research#49 opened.
+
+**Source for the umbrella decision**: Bentham proposal session 2 + PO confirmation.
 
 ---
 

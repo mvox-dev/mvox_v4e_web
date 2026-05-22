@@ -190,9 +190,9 @@ git push origin --delete <feature-branch>
 
 ### v4E Schema Mutations
 
-The v4E schema lives in `entu/research` (`docs/schema/v4E/`), outside this repo. When a mvox feature requires a schema change:
+The v4E schema lives in `entu/research` (`docs/schema/v4E/`), outside this repo, but as of 2026-05-22 it is ours to maintain — team-lead authors + opens the upstream PR directly (no PO relay). When a mvox feature requires a schema change:
 
-1. Open a PR against `entu/research` first; get PO approval there
+1. **Team-lead** opens a PR against `entu/research` first. Procedure: branch in `~/projects/entu-research/`, edit `docs/schema/v4E/schema.ts`, run `pnpm build-schema` to regenerate `schema.json`, sweep `docs/schema/v4E/README.md` for narrative refs, commit, push, `gh pr create`. PO reviews + merges upstream.
 2. After it lands, open the mvox PR with a commit trailer citing the change:
    ```
    Schema-Change: entu/research@<sha> "<short title>"
@@ -200,7 +200,9 @@ The v4E schema lives in `entu/research` (`docs/schema/v4E/`), outside this repo.
    ```
 3. Bentham REDs any mvox PR whose diff references new/changed v4E entity types, properties, formulas, or rights defaults without both trailers.
 
-See `memory/architecture-decisions.md` for full rationale.
+**Structural changes** (new entity types, new rights model, new sharing semantics) still consult PO **before** the upstream PR opens. Mechanical changes (renames, note clarifications, regenerated artifacts) are team-lead's to execute end-to-end.
+
+See `memory/architecture-decisions.md` for full rationale + the schema-alignment carve-out (drift-closing PRs don't need the trailer).
 
 ## Research Support
 
