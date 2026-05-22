@@ -7,6 +7,20 @@ metadata:
 
 # Bentham scratchpad
 
+## 2026-05-22 — Session 13: #32 BFF MVP review (commit `49ee037`, merged as `8fd3ed0`)
+
+[DECISION] **#32 verdict: GREEN with 2 follow-up YELLOWs.** 27/27 RED tests at `9087a1f` mapped exactly to AC §§5.1+5.2; impl at `49ee037` satisfies them. 328/328 tests pass; `pnpm check` 0. TDD ordering monotonic. Schema-mutation trailers present (depends on `82727ca` Layer 1 + `entu/research@f52adc4`). Security-critical surface (two new `+server.ts` + `client.ts` throw addition) reviewed line-by-line.
+
+[PATTERN] **Consistent JSON-envelope errors > SvelteKit `throw error()`.** Design doc §5.2 prescribed `throw error(404, 'not_found')` (returns SvelteKit's HTML/JSON-mixed page). Impl chose `return json({ error: 'not_found' }, { status: 404 })` consistently across all error paths. This is a strict improvement: frontend consumers get a predictable JSON shape regardless of error code; tests can pin `body.error === 'auth_required'` etc. Carry forward as the preferred BFF error shape: **all BFF error responses use `json({ error: '<code>' }, { status })`, not `throw error(...)`** — unless we explicitly want SvelteKit's page-level error UX (which we don't for API routes).
+
+[PATTERN] **Library wire-shape change pinned indirectly via consumer test → YELLOW follow-up for direct lib test.** `EntuClient.get` got `if (!res.ok) throw ...` added at `49ee037`. The sections route's `client.get(orgId).catch(() => null)` is the consumer that depends on it. Sections spec mocks `fetch` to return status 403/404 and asserts route returns 404 — so the throw IS exercised end-to-end. But `client.spec.ts` has no direct test pinning `client.get(badId)` against a 403/404 mock. Per PR #58/YELLOW-14 calibration: consumer-side indirect test ≠ direct lib-side test, but IS GREEN-eligible with direct test as follow-up YELLOW. Carry forward as YELLOW-32.2 (GH #34); ~10 lines for Tallis.
+
+[PATTERN] **Helper-duplication threshold: 4 helpers × 2 routes is past "three similar lines."** CLAUDE.md says "three similar lines is better than a premature abstraction." That bar applies to a single helper. Once you have 4 byte-identical helpers (`parseLimit`, `parseSkip`, `extractStringProp`, `extractNumberProp`) duplicated across 2 routes, the abstraction has earned its keep — but only when route #3 lands (don't pay now for a binary "is there route #3 yet" condition). Right factor-out: `src/lib/server/bff/{pagination,props}.ts`. YELLOW follow-up (GH #33). **Encode for future BFF route reviews: when a 3rd `+server.ts` lands with the same shape, YELLOW becomes RED.**
+
+[GOTCHA] **`rewriteRelativeImportExtensions: true` + `.ts` imports.** mvox's tsconfig.json enables `rewriteRelativeImportExtensions`, so relative imports keep the `.ts` extension. Existing convention confirmed via `src/routes/auth/+server.ts:3`. Watch for: any new file using extensionless relative imports (`from '../../lib/server/entu/client'`) is inconsistent even though it works — cosmetic YELLOW for consistency.
+
+---
+
 ## 2026-05-22 — Session 13: photo-rename Layer 1 post-exec
 
 [DECISION] **Post-exec verdict on `82727ca` (Layer 1 live execution): GREEN.** Result artifact `cleanup-rename-photo-prop-def-only-2026-05-22T13-31-58-658.json`: 2 prop-def renames (`person.avatar`→`photo`, `organization.logo`→`photo`), exit 0, errors=[], summary `{renames: 2, skipped: 0, failed: 0}`. Both `propDefEntityId` + `nameValueId` IDs round-trip from manifest to results consistently. Wire-shape pattern matches the codified DELETE-then-POST for single-value string properties — `nameValueId` captured pre-DELETE as the property-value `_id` (distinct from `propDefEntityId` as the entity `_id`), honoring the entity-vs-property split. Commit carries `Schema-Change: entu/research@f52adc4` + `PO-Approved` trailers per the mutation gate. No anomalies. Layer 1 closed cleanly.

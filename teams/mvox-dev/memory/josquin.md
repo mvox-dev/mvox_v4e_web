@@ -4,6 +4,24 @@ Personal notes. Only Josquin writes here.
 
 ---
 
+## [CHECKPOINT] 2026-05-22 session 13 — #32 GREEN landed on `feat/bff-orgs-sections-mvp` @ `49ee037`
+
+27 RED → 27 GREEN, 328/328 total, `pnpm check` 0 errors. Two routes + one client tweak:
+
+- `src/routes/api/organizations/+server.ts` — orgs list, narrow §5.1 shape
+- `src/routes/api/organizations/[id]/sections/+server.ts` — sections under org, narrow §5.2
+- `src/lib/server/entu/client.ts` — `get()` now throws on `!res.ok`; the route uses `.catch(() => null)` to collapse 403+404 → 404. Existing client.spec.ts unaffected (all happy-path cases).
+
+[PATTERN] **Vitest doesn't resolve `$lib`** — confirmed again here. Use relative imports in route handlers tested via vitest (`../../../lib/server/entu/client.ts`). Same gotcha I logged on 2026-05-21 for client.spec.ts; here it surfaced via `+server.ts` imports inside `vi.resetModules()` dynamic-import test pattern. Mental model: if a file is reachable from a vitest spec via `import()`, it must use relative paths to traverse cross-tree.
+
+[PATTERN] **Property extractor helpers inlined per-route, not factored.** Two routes; the extractor set (string/number/reference/thumbnail/voice composite) is small and shape-identical. A `src/lib/server/bff/props.ts` module would be premature here — revisit when route 3 lands and the duplication becomes real.
+
+[GOTCHA] **Voice is a composite multi-value, not a simple reference.** v4E declares section.voice as a `reference` property, but Entu surfaces `{ reference: 'voice-id', string: 'voice-name' }` on the value. Tests pin `{ _id: 'voice-1', name: 'Soprano' }` in the response — both pieces come from the same property value, no second fetch. If other reference properties in future routes need the same shape, name the helper `extractReferenceWithLabel` not `extractVoice`.
+
+Handed off to Bentham at this commit.
+
+---
+
 ## [DECISION] 2026-05-22 session 12 — BFF rights-aware design APPROVED, merged to main at `e42cb1e`
 
 PO walked Q1-Q5 in session 12. All five answered, design doc finalized + `docs/migration/findings/v4e-rename-avatar-logo-to-photo-2026-05-21.md` written as a paste-ready entu/research PR draft. Both files merged to main at `e42cb1e` (team-lead per the shutdown note). Implementation now gated on the upstream rename PR landing + Pérotin migrating polyphony db; mvox impl PR (first to consume `organization.photo` + `_thumbnail`) must carry the `Schema-Change:` + `PO-Approved:` trailers per session-2 convention.
