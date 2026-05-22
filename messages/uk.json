@@ -12,6 +12,7 @@
 	"common_loading": "Завантаження…",
 	"landing_empty_state": "Ви ще не є членом жодного хору.",
 	"landing_error_state": "Не вдалося завантажити ваші хори. Спробуйте ще раз.",
+	"landing_members_per_section": "{count} учасників на секцію",
 	"landing_retry_button": "Спробуйте ще раз",
 	"landing_signed_in_heading": "Ваші хори",
 	"landing_signed_out_cta": "Увійти з Entu",

@@ -12,6 +12,7 @@
 	"common_loading": "Ielādē…",
 	"landing_empty_state": "Jūs vēl neesat neviena kora loceklis.",
 	"landing_error_state": "Neizdevās ielādēt jūsu korus. Mēģiniet vēlreiz.",
+	"landing_members_per_section": "{count} locekļi katrā sekcijā",
 	"landing_retry_button": "Mēģināt vēlreiz",
 	"landing_signed_in_heading": "Jūsu kori",
 	"landing_signed_out_cta": "Pierakstīties ar Entu",

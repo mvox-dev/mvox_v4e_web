@@ -12,6 +12,7 @@
 	"common_loading": "Laadimine…",
 	"landing_empty_state": "Sa ei ole veel ühegi koori liige.",
 	"landing_error_state": "Kooride laadimine ebaõnnestus. Proovi uuesti.",
+	"landing_members_per_section": "{count} liiget häälerühmas",
 	"landing_retry_button": "Proovi uuesti",
 	"landing_signed_in_heading": "Sinu koorid",
 	"landing_signed_out_cta": "Logi sisse Entuga",

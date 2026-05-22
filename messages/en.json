@@ -12,6 +12,7 @@
 	"common_loading": "Loading…",
 	"landing_empty_state": "You are not a member of any choir yet.",
 	"landing_error_state": "Could not load your choirs. Try again.",
+	"landing_members_per_section": "{count} members/section",
 	"landing_retry_button": "Try again",
 	"landing_signed_in_heading": "Your choirs",
 	"landing_signed_out_cta": "Sign in with Entu",

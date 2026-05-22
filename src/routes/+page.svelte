@@ -91,7 +91,7 @@
 							<p class="text-sm text-gray-400 mt-1">{org.location}</p>
 						{/if}
 						{#if org.member_count_per_section != null}
-							<p class="text-xs text-gray-400 mt-1">{org.member_count_per_section} members/section</p>
+							<p class="text-xs text-gray-400 mt-1">{m.landing_members_per_section({ count: org.member_count_per_section })}</p>
 						{/if}
 					</article>
 				{/each}
