@@ -1,6 +1,85 @@
 # Palestrina — Team Lead Scratchpad
 
-### [NEXT SESSION] 2026-05-22 — session-12 → session-13
+### [NEXT SESSION] 2026-05-22 — session-13 → session-14
+
+**Session 13 outcome:** Big productive session. Six issues closed (#32 BFF MVP, #35 frontend scaffolding) or moved to closed-when-trigger-fires state; six follow-up issues filed. Schema PR opened + merged on entu/research end-to-end by team-lead for the first time (entu/research#49 — the new norm). Photo-rename Layer 1 executed live on polyphony. Schema-mutation upstream-ownership norm encoded in common-prompt + architecture-decisions. Two settled patterns added to architecture-decisions.md.
+
+**Session 13 commit chain on main (chronological):**
+1. `a011af0` chore(mvox-dev): encode upstream schema-PR ownership norm + bentham prune
+2. `82727ca` chore(migration): rename person.avatar + organization.logo to photo on polyphony (Layer 1 live execution; Schema-Change + PO-Approved trailers)
+3. `14859cb` chore(mvox-dev): lift bentham patterns to architecture-decisions + prune-timing nudge
+4. `4711d58` chore(tallis): session-13 checkpoint — CHORE-32 RED phase complete
+5. `8fd3ed0` feat(#32): BFF MVP — GET /api/organizations + GET /api/organizations/[id]/sections (squashes feat/bff-orgs-sections-mvp; closes #32)
+6. `d543f35` chore(mvox-dev): session-13 scratchpad updates — Bentham #32 review + Josquin merge
+7. `809de20` chore(tallis): session-13 checkpoint — CHORE-35 RED phase complete
+8. `db2040e` feat(#35): frontend scaffolding MVP — shared layout + landing page + login shell (squashes feat/frontend-scaffolding-mvp; closes #35)
+9. `5249eca` chore(mvox-dev): session-13 scratchpads — Bentham #35 review + Byrd GREEN notes
+10. (this session's shutdown commit — final commit of session 13)
+
+**Upstream entu/research commit:**
+- `f52adc4` feat(schema): rename person.avatar + organization.logo to photo (PR #49, merged 2026-05-22). This is the canonical Schema-Change SHA for the photo-rename trailer.
+
+**Live polyphony Entu state at end of session 13:**
+- `person.photo` + `organization.photo` are the canonical prop-def names (renamed from `avatar`/`logo` via `82727ca`)
+- 0 file values exist on either property today — `_thumbnail` returns absent for all entities
+- Otherwise UNCHANGED from session 12 (122 persons, 6 orgs, 16 sections, 5 voices)
+
+**Headline session-14 goal (PO call this session):**
+
+**C (primary) — Deployment pipeline + smoke deploy.** Add `deploy` script to package.json, verify/create Cloudflare Pages `multivox` project, set up env vars on the Cloudflare side, optional `.github/workflows/` for CI. First time mvox is reachable via a public URL — turns it from "merge stack on main" into "thing PO can demo." Single-PR scope, ~half-day to full day.
+
+**D (fold in if scope allows) — Real OAuth wiring.** `/auth/login` currently a shell. Wire actual Entu OAuth handoff + JWT cookie reception. Pairs naturally with C (need stable callback URL = deploy first). Pull from CHORE-5's groundwork (Entu API key exchange) and connect to the cookie-set path so signed-in landing branch works in the deployed app.
+
+**Carry-forward queue for session 14 (priority order):**
+
+1. **CHORE-C/D deployment + OAuth** (this session's headline; file as new GH issues at session start — likely CHORE-40 deploy + CHORE-41 OAuth wiring)
+2. **CHORE-36** — Entu mock harness + SSR flip on landing page (~1 day, single PR). Authoring convention: new BFF-consuming pages default to SSR consumption + `.skip()` SSR-presence tests pending #36. Becomes more expensive the more CSR-drift pages we add.
+3. **#39 (YELLOW-35.4)** — lift session population to `+layout.server.ts`. Becomes RED for next authenticated route, so probably bundles with whatever next auth-aware page lands (section drill-down or otherwise).
+4. **Section drill-down** — new `/orgs/[id]/+page` consuming `GET /api/organizations/[id]/sections` (the second BFF endpoint from #32, currently unused). Phase 3 of the BFF/frontend stack. Pairs naturally with #38 (Byrd cleanup) + #37 (Comenius i18n gap fix; the residual `members/section` hardcoded string in landing).
+5. **Task #14 — Layer 2 photo file-payload probe + impl** — still deferred. Fires when (a) real photos uploaded OR (b) BFF needs `_thumbnail` on real data. Not yet triggered. Pérotin handles when fires.
+6. **Loose YELLOWs to fold opportunistically:**
+   - #19/#30 — CSRF gate (fires on first cookie-authed mutation route)
+   - #31 — Tailwind OKLCH regex (fires on next Tailwind upgrade)
+   - #33 (YELLOW-32.1) — BFF helper factor-out (`src/lib/server/bff/{pagination,props}.ts`) on next BFF route
+   - #34 (YELLOW-32.2) — direct `client.spec.ts` tests for `EntuClient.get()` 403/404 throws (Tallis, ~10 lines)
+   - #38 (YELLOW-35.2 + 35.3) — Byrd cleanup (types lift + `$app/state` flip)
+7. **CHORE-6 Email** (#6) — still blocked on PO SPF + DKIM DNS records. Re-check at session 14 start.
+8. **CONTRIBUTING.md follow-ups** (#29) — low priority.
+
+**Expected first action session 14:**
+1. Verify statusline on launch (`cd ~/workspace && claude`).
+2. Read this seed + recent commits since `5249eca` (or shutdown commit, whichever is last).
+3. Spawn finn + bentham + perotin per Phase 5 (always-on).
+4. Confirm with PO: file CHORE for deploy pipeline (likely CHORE-40) + dispatch Josquin to implement. Ask whether D (OAuth wiring) lands in the same PR or follows. Pérotin standing concerns scan as usual.
+5. Pre-deploy preflight: confirm `wrangler` is in `node_modules/.bin/` (or globally available); confirm PO has Cloudflare auth set up locally OR has a CI-side token plan; verify `multivox` Pages project name doesn't already collide with an existing project on PO's Cloudflare account.
+
+**Process lessons from session 13 (worth carrying forward):**
+
+- **L40 — Spec defects vs spec drift, the discipline difference.** When Josquin caught two clerical spec defects (import path 2-vs-3 dots + RequestEvent vs ServerLoadEvent cast), he correctly halted and surfaced rather than fixing the spec himself. Tallis fixed in two passes (`2b0d0f8` then `b5ef037`). The reason it worked: the contract assertions in the spec were unambiguous, so Josquin could implement GREEN against the intended contract while Tallis fixed the spec mechanics in parallel. Pattern: **clerical defects ≠ contract drift** — preserve spec ownership for the latter, parallelize the former. Carry this distinction in future sub-agent dispatches.
+
+- **L41 — Architectural pre-emption by implementer (Byrd's CSR choice) needs Bentham-style framing, not pushback.** Byrd shipped CSR (`$effect`-fetch) rather than SSR (`data.orgs` consumption) because Playwright can't intercept SvelteKit's internal `event.fetch`. His framing initially read as "valid trade-off" but Josquin initially read it as architectural drift and proposed pulling him back to SSR. Two messages later Josquin reconciled — Byrd was right about the test-infra constraint; the architecture wasn't drifting (server-load still in prod path); CSR was the CI accommodation, not the destination. Pattern: when an implementer deviates from design without breaking the production contract, frame as "what infra would let us restore the design?" — file as a follow-up CHORE (CHORE-36 here), don't force back-pedaling. Saved ~1 hour of re-implementation.
+
+- **L42 — Schema PR end-to-end (the new norm).** First exercise of the upstream-PR ownership shift. Wrote it, regenerated `schema.json` via `pnpm build-schema`, swept narrative `README.md`, opened + merged in one Bash session. Took ~10 minutes including 2 PO confirmations. PO directive "from here forward this schema is ours to maintain at entu-research" was the right call; the previous PO-as-submitter relay had stranded the rename across two sessions. Memory: `project_v4e_schema_ours.md`. Document in `architecture-decisions.md` (Upstream-PR ownership shift sub-section, session-13 dated).
+
+- **L43 — Bentham prune at session START, not END (re-confirmed nudge).** Bentham pruned ~22 lines from his scratchpad at startup, dropping the session-12 photo-rename pre-stage review section. The patterns were recoverable from team-lead seed L35 + task #14 description + git history, but the prune was premature on timing (the live execution it informed happened ~30 minutes after the prune). PO flagged; nudge sent; Bentham took it, promoted the two load-bearing patterns ("split-by-blast-radius" + "file-property full-payload-round-trip") to architecture-decisions.md (commit `14859cb`), and added a [LEARNED] entry about prune-at-session-END. **Stewardship rule for steward-of-shared-files (Bentham for architecture-decisions, Comenius for i18n-conventions, Tallis for test-gaps): if a session-N pattern is load-bearing for session-N+1 work, promote to settled-patterns BEFORE pruning the scratchpad entry.**
+
+- **L44 — Task subject ≠ task assignment (Tallis confusion).** When I named task #2 "Byrd frontend scaffolding" (using the seed's shorthand), Tallis saw the subject and thought it meant a Byrd-only assignment had landed in his inbox — even though my actual 14:02 SendMessage had clearly briefed him on the RED phase he was supposed to write. Quick clarification + rename to "CHORE-35 Frontend scaffolding — full TDD chain" resolved. **Rule:** task subjects should name the **work item**, not the implicit owner. "CHORE-N — full TDD chain" pattern beats "Byrd X" pattern. Carry forward.
+
+- **L45 — Bentham flag-list adjudication is a useful artifact to request.** Both #32 and #35 GREEN reviews used Bentham's structured "flag-list adjudication" where he picked each of Josquin's pre-flagged YELLOW candidates and called it: confirmed-YELLOW, dismissed, or rerouted to a different file. The 4 YELLOWs that landed on #35 plus the 2 on #32 all fit a pattern: small follow-up scope, owner identified, becomes-RED trigger noted (for #39's session-lift; for #34's lib-test pin). Carry: keep asking implementers to pre-flag concerns in their handoffs (Josquin started this with his #32 GREEN), and ask Bentham to adjudicate explicitly per-flag.
+
+**Brilliant KB updates (deferred — session 14 or whenever PO has bandwidth):**
+- New: `Patterns/upstream-pr-ownership-shift` — codify L42 + cross-link to `project_v4e_schema_ours` memory + architecture-decisions session-13 entry
+- New: `Patterns/clerical-defect-vs-spec-drift` — codify L40
+- New: `Patterns/architectural-pre-emption-as-followup-chore` — codify L41 + CHORE-36 as the case study
+- New: `Patterns/promote-before-prune-stewardship` — codify L43; applies to all shared-file stewards
+- Update: `Projects/mvox` — first user-facing surface live (#35); BFF surface live (#32); next: deploy pipeline + OAuth
+- New: `Decisions/mvox/csr-as-ci-accommodation` — codify the session-13 SSR-vs-CSR fork + the CHORE-36 path back to SSR
+
+(*MVOX:Palestrina*)
+
+---
+
+### [PROCESSED 2026-05-22 end-of-session-13] session-12 → session-13
 
 **Session 12 outcome:** Clean carryforward sweep + BFF design review end-to-end + photo-rename pre-stage GREEN-ready. No production source code touched (per scope). All work either merged to main or parked on a clearly-gated branch.
 

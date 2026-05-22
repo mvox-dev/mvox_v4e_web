@@ -1,418 +1,11 @@
 [
   {
-    "from": "bentham",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-21T10:15:37.993Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-21T10:15:37.994Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"\",\"from\":\"finn\",\"timestamp\":\"2026-05-21T10:16:32.400Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-21T10:16:32.400Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "perotin",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"Session 9 wrap — Phase D fully closed, post-exec audit caught YELLOW-D4 + fix landed, scratchpad checkpointed\",\"from\":\"perotin\",\"timestamp\":\"2026-05-21T10:16:53.401Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-21T10:16:53.401Z",
-    "color": "pink",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "[2026-05-21 09:52] Scratchpad checkpoint landed. Approving shutdown.\n\n- **[LEARNED]** Formula-cache + `_id` interaction is the missing piece that broke my YELLOW-D2 prediction on sub-op 1. Codified as `architecture-decisions.md` corollary + scratchpad [PATTERN]. The deeper rule for future preflight: when a script touches a property mid-transition (formula→plain or plain→formula), ask \"does the cleanup/restore step assume an `_id` that the pre-image actually has?\"\n- **[LEARNED]** Schema-alignment carve-out for the Schema-Change trailer is now codified (PRs diffing schema.ts → trailer; PRs aligning live to landed schema.ts → no trailer). All 6 Phase D commits exercised the carve-out cleanly.\n- **[WARNING]** Phase C will be the first phase to exercise the new authorization-gate (\"I authorize\" SendMessage from team-lead before any live-mutating cleanup script). My standing posture is: refuse to GREEN any live-execution path until the token lands, regardless of how clean the dry-run looks. Higher structural stakes (new entity types, multi-instance data movement) make the gate non-negotiable.\n\nPhase D substantively closed. 5 YELLOWs queued for session-10 fixup (task #64). Scratchpad at 440 lines — prune via `[PROCESSED]` tag-and-keep planned for session 10 start. Standing down.",
-    "summary": "Session 9 close: 3-bullet shutdown report",
-    "timestamp": "2026-05-21T10:17:20.571Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"session-9-wrap-2026-05-21\",\"from\":\"bentham\",\"timestamp\":\"2026-05-21T10:17:26.060Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-21T10:17:26.060Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "[2026-05-21 18:21] Finn here — research coordinator online, scratchpad and architecture decisions reviewed; ready for research requests.",
-    "summary": "Finn online and ready for research",
-    "timestamp": "2026-05-21T18:21:18.297Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-21T18:21:21.666Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-21T18:21:21.666Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "[2026-05-21 18:21] Bentham online — scratchpad already pruned at session-10 start (sessions 2-8 in `[PROCESSED]` block), no further prune needed; ready for reviews.",
-    "summary": "Bentham ready for reviews",
-    "timestamp": "2026-05-21T18:21:31.728Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-21T18:21:38.229Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-21T18:21:38.229Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"1\",\"subject\":\"CHORE-3: Paraglide i18n setup (#3)\",\"description\":\"Full TDD chain for Paraglide i18n. Steps: (1) Comenius recommends gitignore-vs-commit for src/lib/paraglide/; (2) PO + team-lead confirm; (3) Tallis RED (messages files + compile + sample m.key() resolves); (4) Byrd GREEN (install + configure + generate); (5) Comenius writes 4 locale message files (en/et/lv/uk) with starter keys; (6) Josquin server-hook if needed for locale detection; (7) Bentham review; (8) Josquin squash-merge. Branch: feat/chore-3-paraglide.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-21T18:43:31.525Z\"}",
-    "timestamp": "2026-05-21T18:43:31.525Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"2\",\"subject\":\"Investigate Comenius spawn structural failure\",\"description\":\"Second consecutive Comenius spawn produced dead-registration (agent in config.json, inbox file missing until external SendMessage creates it, zero agent activity). Hypotheses: long initial startup prompt; in-process backend silent crash; agent-name-specific issue. Plan: A/B test by spawning under a different name with minimal prompt; spawn another \\\"comenius\\\" under minimal prompt; compare. Separate from CHORE-3 critical path — CHORE-3 routes Comenius's first task (gitignore research) to finn.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-21T18:51:29.878Z\"}",
-    "timestamp": "2026-05-21T18:51:29.878Z",
-    "read": true
-  },
-  {
-    "from": "comenius-2",
-    "text": "[2026-05-21 18:52] Comenius online. Read common-prompt, architecture-decisions, and my scratchpad. i18n-conventions.md does not yet exist — I'll create it on first task, per the scratchpad seed note. Ready for CHORE-3 (#3).",
-    "summary": "Comenius online, ready for CHORE-3",
-    "timestamp": "2026-05-21T18:52:29.172Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "comenius-2",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"comenius-2\",\"timestamp\":\"2026-05-21T18:52:32.559Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-21T18:52:32.559Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "comenius",
-    "text": "[2026-05-21 19:24]\n\nComenius online. Startup reads complete. Delivering the CHORE-3 AC research now.\n\n---\n\n## CHORE-3 AC: `src/lib/paraglide/` — Gitignore or Commit?\n\n### The Two Options\n\n**Option A — Gitignore (generated artifact)**\nAdd `src/lib/paraglide/` to `.gitignore`. The directory is regenerated at build time by the Paraglide Vite plugin or a `compile` script. Not tracked in git.\n\n**Option B — Commit**\nCheck the generated TS files in. Developers see them in diffs; CI does not need to run a compile step to access them.\n\n---\n\n### Trade-off Analysis\n\n| Concern | Gitignore (A) | Commit (B) |\n|---|---|---|\n| **Paraglide default/intent** | Correct — `emitGitIgnore: true` is the compiler default; Paraglide auto-writes a `.gitignore` inside the output dir on every compile | Against the grain — requires `emitGitIgnore: false` to suppress the auto-generated `.gitignore` inside the output dir |\n| **Build-time determinism** | The Vite plugin regenerates on every `pnpm dev` / `pnpm build`. Cloudflare Pages runs `pnpm build`, which includes the Vite plugin — output is deterministic from `messages/*.json` | No build step needed; output frozen in git until someone re-runs compile manually — risks drift if a developer edits `messages/*.json` without regenerating |\n| **CI reproducibility** | No special step needed — `pnpm build` already invokes Vite which runs the plugin | No extra step needed either, but the committed files may be stale |\n| **PR diff noise** | Zero — generated files never appear in diffs | Every locale file change produces a secondary diff of the generated TS. For 4 locales across many keys this accumulates quickly |\n| **Onboarding friction** | Near-zero — `pnpm dev` or `pnpm build` populates `src/lib/paraglide/` immediately. No manual step needed because the Vite plugin fires on startup | No friction at all — files are already there after `git clone` |\n| **Drift risk** | No drift possible — generated always reflects current `messages/*.json` | Real drift risk: developer adds a key to `messages/en.json` but forgets to run compile; TypeScript types don't reflect the new key until next compile |\n| **Type-safety** | Always fresh — `pnpm check` fails correctly if an `m.key()` call references a missing key because the generated types are always current | Committed types may lag; `pnpm check` could pass against stale generated types and fail only after the next compile |\n\n**Key finding from docs**: Paraglide's compiler (`emitGitIgnore` option, default `true`) **already emits a `.gitignore` file inside `src/lib/paraglide/`** on every compile. This means if the team commits the directory but does not override `emitGitIgnore: false`, Paraglide will quietly re-gitignore the contents at next compile — a confusing no-man's-land between the two options. Committing the output requires an explicit opt-out.\n\n---\n\n### Recommendation: **Gitignore (Option A)**\n\nRationale: Paraglide's own default. No drift risk. No PR noise. Cloudflare Pages re-generates during its `pnpm build` run via the Vite plugin — no separate compile step needed. TypeScript types are always fresh at `pnpm check` time.\n\n---\n\n### Concrete AC resolution\n\n**`.gitignore` addition** (at repo root):\n```\n# Paraglide generated output — regenerated by Vite plugin at build/dev time\nsrc/lib/paraglide/\n```\n\n**No `postinstall` hook needed** for the Vite-plugin path. The plugin runs when Vite starts (`pnpm dev`) and when it builds (`pnpm build`). Both cover the CI path (Cloudflare Pages) and the local dev path.\n\n**One edge case**: `pnpm check` (SvelteKit type-check via `svelte-check`) runs **outside Vite** and needs the generated types to exist. If `src/lib/paraglide/` is gitignored and `pnpm check` runs in a fresh CI checkout without a prior `pnpm build`, it will fail. The fix: add a `postinstall` script that runs `paraglide-js compile` (or make `pnpm check` depend on a compile step). This is a setup detail for CHORE-3 implementation, not a reason to commit the output.\n\n---\n\n### Open second-order questions (for Tallis / Byrd at implementation time)\n\n1. **`pnpm check` in CI**: Does Cloudflare Pages run `pnpm check` separately, or only `pnpm build`? If only `pnpm build`, no `postinstall` needed. If `pnpm check` runs standalone, a `postinstall` or `prepare` script is needed to pre-generate.\n2. **Exact adapter**: `@inlang/paraglide-sveltekit` vs `paraglideVitePlugin` from `@inlang/paraglide-js` — the SvelteKit adapter wraps the Vite plugin; confirm which package is installed (AC says `@inlang/paraglide-sveltekit`). The gitignore policy is the same either way.\n3. **`emitGitIgnore` flag**: When CHORE-3 is implemented, verify the compiler is NOT configured with `emitGitIgnore: false` — the default `true` will auto-write a `.gitignore` inside `src/lib/paraglide/`, reinforcing the policy.\n\n---\n\n**Bottom line**: Gitignore the generated dir. Add `src/lib/paraglide/` to `.gitignore`. The Vite plugin handles regeneration for both `pnpm dev` and `pnpm build`. Add a `postinstall` compile step only if `pnpm check` runs in CI without a prior build step (decision deferred to CHORE-3 implementation).\n\n(*MVOX:Comenius*)",
-    "summary": "Comenius online + CHORE-3 AC recommendation: gitignore the generated dir",
-    "timestamp": "2026-05-21T19:25:08.469Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "[2026-05-21 19:24]\n\n## Research Report — Paraglide `src/lib/paraglide/` gitignore vs commit\nStory #3 · CHORE-3 Paraglide i18n setup\n\n---\n\n### 1. The Two Options\n\n**Option A — Gitignore the output, regenerate at build time**\n- Add `src/lib/paraglide/` to `.gitignore`\n- Rely on the Paraglide Vite plugin to run `compile` as part of `vite build` / `vite dev`\n- Optionally add a `prepare` or `postinstall` script: `paraglide-js compile --project ./project.inlang`\n\n**Option B — Commit the generated output**\n- Do NOT gitignore `src/lib/paraglide/`\n- The Vite plugin still recompiles on `vite dev` (HMR) and `vite build`; committed files serve as the initial snapshot\n- Engineers run `vite dev` locally after adding messages; the plugin regenerates automatically\n\n---\n\n### 2. Trade-offs\n\n| Factor | Gitignore (A) | Commit (B) |\n|---|---|---|\n| Build-time determinism | Depends on Vite plugin running cleanly in CI | Guaranteed — files already present |\n| CI reproducibility | Risky: Cloudflare Pages v2 has a documented build failure (#424) when paraglide output is missing | Safe: no runtime generation needed |\n| PR diff noise | None | Generated files appear in diffs when messages change — acceptable, intentional |\n| Onboarding friction | New dev must run `vite dev` or `paraglide-js compile` before TypeScript resolves | Zero — clone + install is enough to typecheck |\n| Drift risk | Files always match current source (regenerated) | Risk if someone edits messages without running compiler; mitigated by Vite plugin HMR |\n| Cloudflare Pages build | Documented failure in v2 when files are missing + sqlite3/crypto incompatibility during compile | Works: no compile step needed at Cloudflare build time |\n\n---\n\n### 3. Recommendation: **Commit the generated files (Option B)**\n\n**Rationale:**\n\nThe official `opral/paraglide-js` SvelteKit example repo (`examples/sveltekit/`) does NOT gitignore `src/lib/paraglide/` — the generated files are committed. The LorisSigrist/paraglide-sveltekit-example and mandrasch/sveltekit-inlang-paraglide-demo repos both follow the same pattern: standard SvelteKit gitignore, paraglide output tracked.\n\nThe decisive constraint for mvox is Cloudflare Pages. GitHub issue #424 (opral/paraglide-js) documents an explicit build failure on Cloudflare Pages v2 caused by the missing paraglide output directory — the Vite plugin could not regenerate it because Cloudflare's build environment lacked a compatible Node.js crypto/sqlite3 stack. The workaround surface is unclear; committing the files sidesteps the problem entirely.\n\nParaglide does emit a `.gitignore` file *inside* `src/lib/paraglide/` — this is a per-directory marker for the generator, NOT a project-root recommendation to gitignore the entire output folder. Several ecosystem users have asked for an option to disable this per-directory `.gitignore` emission (issue #189); the presence of that file inside the output does not mean the output folder itself should be excluded from the repo.\n\n---\n\n### 4. Follow-up Actions\n\nThese flow directly from Option B:\n\n1. **Do NOT add `src/lib/paraglide/` to `.gitignore`** — leave the standard SvelteKit gitignore untouched for this directory.\n\n2. **The per-directory `.gitignore` Paraglide emits inside `src/lib/paraglide/`** (when the Vite plugin first runs locally) will itself be committed. That's fine — it's the generator's own marker and does not affect the project-root git tracking of the directory.\n\n3. **Vite config** — add the Paraglide Vite plugin in `vite.config.ts`:\n   ```ts\n   import { paraglide } from '@inlang/paraglide-sveltekit/vite'\n   // in plugins:\n   paraglide({ project: './project.inlang', outdir: './src/lib/paraglide' })\n   ```\n   This handles HMR regeneration on `vite dev` and full regeneration on `vite build`.\n\n4. **No `prepare` / `postinstall` script needed** — the official example uses plain `vite build` as its build command. pnpm install + vite build is sufficient for both local and Cloudflare Pages.\n\n5. **Cloudflare Pages build command** — keep as `pnpm build` (which runs `vite build`). No special pre-build step required.\n\n6. **First-run bootstrap** — when Comenius (or whoever does the GREEN phase) installs Paraglide and runs `vite dev` for the first time, the Vite plugin generates `src/lib/paraglide/`. Those files must be committed (not left untracked) before the PR is submitted. Tallis's RED phase can reference the generated import paths as expected module structure without the files existing yet; they'll appear after first `vite dev`.\n\n---\n\n### 5. Open Second-Order Questions\n\n- **`experimentalUseVirtualModules`** (opral/paraglide-js #273): An experimental Vite option that eliminates most generated files, emitting only `runtime.d.ts` and `messages.d.ts`. If adopted, it would make gitignore vs commit moot for most of the output. Not recommended yet — still experimental and not in the official SvelteKit example. Worth revisiting once stable.\n- **The per-directory `.gitignore` that Paraglide emits** inside `src/lib/paraglide/`: it auto-ignores the generated JS files from within that subdirectory. This would mean the files are tracked at the project root level but appear ignored from within — a git quirk to be aware of. The compiler option `emitGitIgnore: false` (added in a later release per issue #189) can suppress this inner file if it causes confusion.\n\n(*MVOX:Finn*)\n",
-    "summary": "Paraglide gitignore research report: commit the generated files",
-    "timestamp": "2026-05-21T19:25:35.852Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "comenius",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"comenius\",\"timestamp\":\"2026-05-21T19:25:37.608Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-21T19:25:37.608Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-21T19:25:46.599Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-21T19:25:46.599Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "comenius",
-    "text": "[2026-05-21 19:25] Alive. The probe was delivered during my first task — I had already sent the full CHORE-3 AC recommendation to you at 19:24, one minute before this probe arrived. Check your inbox for the gitignore-vs-commit analysis.",
-    "summary": "Alive — CHORE-3 AC research already sent at 19:24",
-    "timestamp": "2026-05-21T19:25:49.030Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "comenius",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"comenius\",\"timestamp\":\"2026-05-21T19:25:52.024Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-21T19:25:52.024Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "comenius-2",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779391940968@comenius-2\",\"from\":\"comenius-2\",\"timestamp\":\"2026-05-21T19:32:24.515Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-21T19:32:24.515Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "comenius",
-    "text": "[2026-05-21 19:35] Acknowledged. PO confirmation of A noted. Idle on `feat/chore-3-paraglide` until Byrd's GREEN handoff. Will add starter keys (common_loading, common_error, actions_save, actions_cancel) across all 4 locales and write `i18n-conventions.md` when the branch arrives.\n\n(*MVOX:Comenius*)",
-    "summary": "Acknowledged, idle until Byrd handoff",
-    "timestamp": "2026-05-21T19:35:09.483Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "comenius",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"comenius\",\"timestamp\":\"2026-05-21T19:35:13.683Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-21T19:35:13.683Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-21T19:36:21.559Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-21T19:36:21.559Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "[2026-05-21 19:37]\n\n## Story Handoff\n- **Story:** #3 — CHORE-3: Paraglide i18n setup\n- **Branch:** feat/chore-3-paraglide\n- **From:** Tallis (phase: RED)\n- **To:** Byrd (phase: GREEN)\n- **Status:** TESTS_WRITTEN\n\n### What was done\n- Wrote `src/tests/paraglide-setup.spec.ts` (Vitest, 13 tests) covering all 4 AC items\n- Confirmed all 13 tests fail RED: `13 failed | 288 passed (301)` — prior 288 still green\n- Committed as `test(#3): RED for Paraglide i18n setup` (HEAD: 9a7cc0c)\n\n### Test coverage\n- AC 1: package.json declares `@inlang/paraglide-sveltekit`; package is resolvable in node_modules\n- AC 2: vite.config.ts imports `@inlang/paraglide-sveltekit` and calls `paraglide()`\n- AC 3: `messages/{en,et,lv,uk}.json` exist and parse as valid JSON (parameterized with `describe.each`)\n- AC 4: `.gitignore` contains a line matching `src/lib/paraglide/` (with or without trailing slash)\n\n### What to do next\nByrd takes GREEN: install `@inlang/paraglide-sveltekit`, wire the Vite plugin in `vite.config.ts`, create 4 empty `messages/{en,et,lv,uk}.json` files (`{}`), and add `src/lib/paraglide/` to `.gitignore`. Confirm `pnpm test:unit` goes from 13 failing → 0 failing (301 passing).\n\n### Files to start with\n- `src/tests/paraglide-setup.spec.ts` — the RED spec (13 tests)\n- `vite.config.ts` — plugin registration goes here\n- `package.json` — dep declaration goes here\n\n(*MVOX:Tallis*)",
-    "summary": "CHORE-3 RED complete — 13 failing tests, handoff to Byrd",
-    "timestamp": "2026-05-21T19:37:55.039Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-21T19:38:03.340Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-21T19:38:03.340Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "[2026-05-21 19:39] Byrd online, on branch feat/chore-3-paraglide, starting GREEN.",
-    "summary": "Byrd online, starting GREEN for CHORE-3",
-    "timestamp": "2026-05-21T19:39:55.752Z",
-    "color": "pink",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "[2026-05-21 19:44]\n\n## Story Handoff\n- **Story:** #3 — CHORE-3 Paraglide i18n setup\n- **Branch:** feat/chore-3-paraglide\n- **From:** Byrd (phase: GREEN)\n- **To:** Comenius (phase: i18n)\n- **Status:** TESTS_PASSING\n\n### What was done\n- Installed `@inlang/paraglide-sveltekit@0.16.1` as devDependency\n- Created `project.inlang/settings.json` with sourceLanguageTag `en` and languageTags `[en, et, lv, uk]`; wired `paraglide()` Vite plugin in `vite.config.ts` (outdir `./src/lib/paraglide`)\n- Created empty `messages/{en,et,lv,uk}.json` locale files; added `src/lib/paraglide/` to `.gitignore`\n- Updated `vitest.config.ts` to merge with the main vite config (needed so Vitest can handle the `.svelte` file in paraglide's runtime entry when the spec does `import('@inlang/paraglide-sveltekit')`)\n- 301/301 tests pass; `pnpm check` exits 0; commit `df4b9b2`\n\n### Note on vitest.config.ts\nThe spec test does a dynamic `import('@inlang/paraglide-sveltekit')` which resolves the package's runtime entry containing a `.svelte` component. The previous bare `vitest/config` setup had no Svelte transform, causing a `Unknown file extension \".svelte\"` error. Merging with `vite.config.ts` (which includes `sveltekit()`) fixes this. This change is outside my explicit scope grant — flagging in case Bentham flags it in review.\n\n### What to do next\nComenius: add starter i18n message keys to `messages/{en,et,lv,uk}.json`. The generated `src/lib/paraglide/` is gitignored and will be rebuilt by Vite. Wire `m.*()` calls in any Svelte files with hardcoded strings.\n\n### Files to start with\n- `messages/en.json` — add keys here first (source language)\n- `messages/{et,lv,uk}.json` — translations\n- `project.inlang/settings.json` — locale config reference",
-    "summary": "CHORE-3 GREEN complete — 301/301 tests passing, pnpm check 0",
-    "timestamp": "2026-05-21T19:44:54.951Z",
-    "color": "pink",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-21T19:45:02.390Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-21T19:45:02.390Z",
-    "color": "pink",
-    "read": true
-  },
-  {
-    "from": "comenius",
-    "text": "[2026-05-21 19:48]\n\n## Story Handoff\n- **Story:** #3 — CHORE-3 Paraglide i18n setup\n- **Branch:** feat/chore-3-paraglide\n- **From:** Comenius (phase: i18n)\n- **To:** Bentham (phase: REVIEW)\n- **Status:** I18N_COMPLETE\n\n### What was done\n- Added 4 starter keys to all locale files (`messages/{en,et,lv,uk}.json`), alphabetically sorted: `actions_cancel`, `actions_save`, `common_error`, `common_loading`\n- Translations: Estonian (`Tühista`, `Salvesta`, `Tekkis viga`, `Laadimine…`), Latvian (`Atcelt`, `Saglabāt`, `Radās kļūda`, `Ielādē…`), Ukrainian (`Скасувати`, `Зберегти`, `Сталася помилка`, `Завантаження…`) — concept-mapped for appropriate formal register\n- Created `teams/mvox-dev/memory/i18n-conventions.md` (first version): naming conventions, group prefixes, alphabetical sort discipline, 4-locale parity rule, translation philosophy by locale, music-domain terminology policy, translation decision log\n- Verified build clean: `pnpm build` succeeded, Paraglide Vite plugin compiled all 4 locales without error\n- **301/301 tests pass; `pnpm check` 0 errors**\n- Commit: `09e331c` — `i18n(#3): starter keys + naming conventions`\n\n### What to do next\nBentham: standard REVIEW pass on commit `09e331c`. Key things to check: 4-locale key parity, alphabetical sort in each file, translation register appropriateness, `i18n-conventions.md` completeness as a stewardship doc.\n\n### Files to start with\n- `messages/en.json` — source locale (canonical key list)\n- `messages/et.json` — Estonian (PO is Estonian-native; most likely to catch register issues here)\n- `teams/mvox-dev/memory/i18n-conventions.md` — new conventions doc\n\n### Localization notes for reviewer\n- Estonian `Laadimine…` (noun form) preferred over `Laadin…` (verb) — more natural for UI loading indicators in Estonian. PO can sanity-check.\n- Ukrainian `Сталася помилка` uses feminine past-tense agreement with `помилка` — grammatically correct.\n- Latvian `Ielādē…` (3rd-person present verb) is standard Latvian UI pattern for progress states.\n\n(*MVOX:Comenius*)",
-    "summary": "i18n phase complete — I18N_COMPLETE, ready for Bentham",
-    "timestamp": "2026-05-21T19:48:43.013Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "comenius",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"comenius\",\"timestamp\":\"2026-05-21T19:48:46.623Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-21T19:48:46.623Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "[2026-05-21 19:54]\n\n## Review Verdict — CHORE-3 (#3) Paraglide i18n setup\n\n**Verdict: GREEN** with 2 YELLOWs (carryforward, do NOT block merge).\n\nJosquin proceeds to squash-merge after team-lead approval.\n\n---\n\n### AC verification (all 5 pass)\n\n| AC | Status | Evidence |\n|---|---|---|\n| 1. `@inlang/paraglide-sveltekit@^0.16.1` installed | PASS | `package.json` devDep + `node_modules/@inlang/paraglide-sveltekit/` resolvable |\n| 2. 4 locale files exist | PASS | `messages/{en,et,lv,uk}.json` all present, parse as valid JSON |\n| 3. `src/lib/paraglide/` gitignored (Option A) | PASS | `.gitignore:38` covers it; `git check-ignore -v` confirms catches `messages.js` + `runtime.js` |\n| 4. `import * as m from '$lib/paraglide/messages.js'` resolves | PASS | Generated file present with 4 named exports: `actions_cancel`, `actions_save`, `common_error`, `common_loading` |\n| 5. `pnpm check` exits 0 | PASS | `488 FILES 0 ERRORS 0 WARNINGS 0 FILES_WITH_PROBLEMS` |\n\n`pnpm test:unit` → **301/301 PASS** including all 13 new paraglide-setup checks.\n\n---\n\n### TDD compliance — clean\n\n- `9a7cc0c` (Tallis, 19:37 RED) → `df4b9b2` (Byrd, 19:44 GREEN) → `09e331c` (Comenius, 19:48 i18n). Strictly monotonic.\n- Byrd did NOT modify the spec — diff(9a7cc0c..df4b9b2 -- src/tests/paraglide-setup.spec.ts) is empty.\n- Comenius did NOT modify the spec or any production source — touched only 4 locale files + new memory doc.\n- All 3 commits carry `Co-authored-by: Mihkel Putrinš` trailer.\n\n### Security-critical scan — clean\n\nZero changes under `src/lib/server/`, `src/hooks.server.ts`, `src/routes/api/**`, `src/routes/**/+page.server.ts`, `src/routes/**/+server.ts`. Pure scaffolding PR. No Entu client / auth / cookie surface touched.\n\n### Stack-table conformance — clean\n\n- Paraglide pinned per Stack table ✓\n- 4 locales `en/et/lv/uk` ✓\n- Messages at `messages/{locale}.json` ✓\n- Generated TS at `src/lib/paraglide/` ✓\n- Usage path `import * as m from '$lib/paraglide/messages.js'` works ✓\n\nNo v4E schema mutations in this PR → no Schema-Change / PO-Approved trailers required. Correct.\n\n### 4-locale key parity + sort — verified\n\n```\nen: actions_cancel, actions_save, common_error, common_loading\net: actions_cancel, actions_save, common_error, common_loading\nlv: actions_cancel, actions_save, common_error, common_loading\nuk: actions_cancel, actions_save, common_error, common_loading\n```\n\nRaw on-disk file order matches alphabetical order in all 4 files. No drift.\n\n### `vitest.config.ts` scope-drift disclosure — authorized, but YELLOW-3 worth noting\n\nTeam-lead authorized retroactively. Byrd's `mergeConfig(viteConfig, ...)` IS the standard SvelteKit + Vitest pattern and resolves the `Unknown file extension \".svelte\"` error correctly. Not RED-worthy.\n\n**However:** the root cause is in the spec, not the config. The spec test at `src/tests/paraglide-setup.spec.ts:34` does `await import('@inlang/paraglide-sveltekit')` purely as a \"package installed?\" probe — which forces vitest to load the package's runtime entry containing a `.svelte` component. A cleaner spec shape would be:\n\n```ts\nimport { existsSync } from 'node:fs';\nexpect(existsSync(resolve(ROOT, 'node_modules/@inlang/paraglide-sveltekit/package.json'))).toBe(true);\n```\n\nor `require.resolve(...)`. That would let `vitest.config.ts` revert to its simpler standalone shape (no merge with vite config), and the spec's intent (\"is the package installed?\") becomes literal rather than \"does the runtime entry load under vitest?\".\n\nThis is YELLOW-cosmetic, carryforward. Don't block merge. If the team ever wants vitest to stay decoupled from vite (e.g., for faster cold-start or testing config isolation), the spec refactor is the cleanest path.\n\n### i18n-conventions.md — structurally sound\n\n- Naming conventions table is clean (9 prefixes with use-case mapping)\n- Key construction rule clear: `<prefix>_<concept>[_<qualifier>]`\n- Alphabetical sort rule explicit, aligned with Comenius's prompt\n- 4-locale parity rule explicit (\"missing keys = build error\")\n- Translation philosophy section per locale (et/lv/uk) is appropriate — formal register, infinitive for buttons (et exception: imperative 2nd-person singular `Salvesta`, which is correct Estonian UI convention)\n- Music-domain terminology table seeded with \"(none yet)\" placeholder — clean structure for future appends\n- Decision log seeded with 6 entries explaining the non-bare choices (`Tekkis viga` vs bare `Viga`, etc.). Defensible localization choice. Translation appropriateness deferred to PO sanity-check.\n- Steward attribution `(*MVOX:Comenius*)` present ✓\n\nNo structural issues.\n\n---\n\n### YELLOWs (carryforward, no merge block)\n\n**YELLOW-3.1** — `src/tests/paraglide-setup.spec.ts:34` uses `await import('@inlang/paraglide-sveltekit')` as a package-installed probe, which is why `vitest.config.ts` had to merge with vite config. Tallis follow-up: replace with `existsSync` / `require.resolve` on the package's `package.json`. Lets `vitest.config.ts` revert to standalone shape. ~5-line spec edit + ~10-line config revert. Cosmetic. Owner: Tallis. Not gating CHORE-3 merge.\n\n**YELLOW-3.2** — `project.inlang/.gitignore` and `project.inlang/project_id` were added without explicit mention in the commit body bullet list. `.gitignore` (1 line: `cache`) is harmless — paraglide caches inlang module fetches locally and ignoring them is correct. `project_id` (sha256-looking hash) is auto-generated by paraglide CLI and intended to be committed for project identity continuity. Both are standard paraglide artifacts. Note for future: when paraglide CLI generates auxiliary files, list them explicitly in the commit body so reviewers don't have to verify them empirically. Cosmetic. Owner: process note for Byrd. Not gating CHORE-3 merge.\n\nNeither YELLOW changes the verdict. CHORE-3 lands clean.\n\n---\n\n### Recommendation to Josquin\n\nSquash-merge `feat/chore-3-paraglide` into `main` with the standard local-merge procedure (`git merge --squash` + `git commit` so the prepare-commit-msg hook adds co-author trailer). Squash commit subject suggestion: `feat(#3): Paraglide i18n setup + en/et/lv/uk starter keys + conventions doc`.\n\nYELLOW-3.1 and YELLOW-3.2 → carryforward; team-lead's call whether to spawn follow-up tasks now or after CHORE-2/CHORE-5 land.\n\nScratchpad entry written for the YELLOW-3.1 spec-refactor rationale (test-shape intent vs runtime-entry coupling), per \"Write on RED, skip on GREEN\" rule — actually skipping since this is GREEN-with-YELLOWs; the YELLOW-3.1 finding is documented here in this verdict message + carryforward, no new architecture-decisions entry needed.\n\n(*MVOX:Bentham*)",
-    "summary": "CHORE-3 review: GREEN with 2 YELLOWs",
-    "timestamp": "2026-05-21T19:52:26.280Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-21T19:52:30.198Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-21T19:52:30.198Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "[2026-05-21 19:55] Josquin online. Executing CHORE-3 squash-merge per brief. Will report SHA after push.",
-    "summary": "Josquin online, executing CHORE-3 merge",
-    "timestamp": "2026-05-21T19:55:07.446Z",
-    "color": "cyan",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "[2026-05-21 19:56] CHORE-3 merge complete.\n\n**Squash SHA:** `7bf0d8f3f89152e43aab4126094ae52f8e2ffbbc` on main (parent `9f72322`).\n**Pushed to origin/main:** yes; `git log origin/main..main` empty post-push.\n**Co-author trailer:** present (`Co-authored-by: Mihkel Putrinš`), via prepare-commit-msg hook.\n**Feature branch:** `feat/chore-3-paraglide` deleted locally; never pushed to origin.\n**Staged diff:** exactly the 14-file whitelist from the brief — no memory files leaked into the squash.\n\n**Pre-merge gates (on feature branch):**\n- `pnpm test:unit` → 301/301 passing\n- `pnpm check` → 0 errors, 0 warnings\n\n**Working-tree caveat (FYI):** brief mentioned 3 uncommitted memory files; I found 4 — `bentham.md`, `comenius.md`, `task-list-snapshot.md`, `team-lead.md`. The extra one (`comenius.md`) likely landed between brief authoring and my start. None staged; none conflicted with the checkout. They travelled cleanly to main as working-tree-only changes for you to handle.\n\nReady for next assignment. Issue #3 awaiting your structured closure comment.",
-    "summary": "CHORE-3 squash-merged to main",
-    "timestamp": "2026-05-21T19:56:13.550Z",
-    "color": "cyan",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-21T19:56:17.023Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-21T19:56:17.023Z",
-    "color": "cyan",
-    "read": true
-  },
-  {
-    "from": "perotin",
-    "text": "[2026-05-21 20:22] Pérotin online. Context loaded — scratchpad, common-prompt, v4E schema canonical type list extracted (19 entity types). Writing the type-name-string sweep probe now. Will message back when script + findings doc are ready for authorization review.",
-    "summary": "Pérotin online, type-name-string sweep underway",
-    "timestamp": "2026-05-21T20:22:29.042Z",
-    "color": "red",
-    "read": true
-  },
-  {
-    "from": "perotin",
-    "text": "[2026-05-21 20:23] Probe ready. Awaiting your \"I authorize this run\" before hitting the network.\n\n**Branch:** `chore/probe-type-name-string-sweep` (commit dc84d9b)\n**Script:** `scripts/migrations/probes/probe-type-name-string-sweep-2026-05-21.ts`\n**Findings doc:** `docs/migration/findings/type-name-string-sweep-2026-05-21.md`\n\n**What the probe does (read-only, 3 passes):**\n- Pass 1: fetches all `menu` entities, checks `query`, `reference_query`, `add`, `search` prop values for literal type-name strings, flags anything not in the 19-type v4E canonical list\n- Pass 2: fetches all `_property` entities of `type=formula`, inspects formula source strings for type-name references\n- Pass 3: fetches all `_property` entities of `type=reference`, inspects `reference_query` values\n\n**Findings doc** is a shell (TBD placeholders) — will be updated with results after live run.\n\n**No mutations.** Pure GET only. The probe writes a result JSON artifact to `scripts/migrations/seed-results/probe-type-name-string-sweep-<timestamp>.json` and commits an updated findings doc after the run.\n\nSend \"I authorize this run\" to proceed.",
-    "summary": "Probe ready — awaiting authorization to run live",
-    "timestamp": "2026-05-21T20:24:07.788Z",
-    "color": "red",
-    "read": true
-  },
-  {
-    "from": "perotin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"perotin\",\"timestamp\":\"2026-05-21T20:24:12.776Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-21T20:24:12.776Z",
-    "color": "red",
-    "read": true
-  },
-  {
-    "from": "perotin",
-    "text": "[2026-05-21 20:25] Type-name-string sweep complete. Live run done, findings doc updated, committed.\n\n**Branch:** `chore/probe-type-name-string-sweep` (latest: 7033212)\n**Findings doc:** `docs/migration/findings/type-name-string-sweep-2026-05-21.md`\n**Artifact:** `scripts/migrations/seed-results/probe-type-name-string-sweep-2026-05-21T20-24-31-517.json`\n\n**Headline findings (3 bullets):**\n- 1 genuine type-name mismatch: \"Choirs\" menu (`69c7f88b8489bfcb0e81b5f8`) queries `_type.string=Organization` (capital O) — should be `organization` (lowercase). PO can fix with a one-field UI edit in Entu.\n- \"Umbrella Orgs\" menu is already clean (`_type.string=organization` lowercase) — the PO's description of \"both querying organisations\" was about the domain concept; only Choirs has the stale casing.\n- Formula and reference prop-defs returned 0 results via `_type.string=_property` query — likely a meta-type query-path gap, not a real \"none exist.\" Flagged as optional R2 in findings if PO wants completeness (would need a different query approach to reach those definitions).\n\nNo mutations made. No cleanup script needed (single-instance fix, manual UI edit is faster).",
-    "summary": "Sweep complete — 1 mismatch found, findings doc ready",
-    "timestamp": "2026-05-21T20:26:01.212Z",
-    "color": "red",
-    "read": true
-  },
-  {
-    "from": "perotin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"perotin\",\"timestamp\":\"2026-05-21T20:26:07.157Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-21T20:26:07.157Z",
-    "color": "red",
-    "read": true
-  },
-  {
-    "from": "perotin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"perotin\",\"timestamp\":\"2026-05-21T20:26:15.656Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-21T20:26:15.656Z",
-    "color": "red",
-    "read": true
-  },
-  {
-    "from": "perotin",
-    "text": "[2026-05-21 20:34] Menu rationalization dry-run complete. Manifest ready for PO review.\n\n**Branch:** `chore/menu-items-per-entity-type` (commit 79bfb6e)\n**Script:** `scripts/migrations/seed-menu-items-per-entity-type-2026-05-21.ts`\n**Design doc:** `docs/migration/findings/menu-items-per-entity-type-design-2026-05-21.md`\n**Dry-run artifact:** `scripts/migrations/seed-results/seed-menu-items-per-entity-type-dry-run-2026-05-21T20-33-49-647.json`\n\n**Manifest summary:**\n- KEEP: 5 Entu meta menus untouched (Entities, Menu, Plugins, Billing, Persons)\n- DELETE: 1 — Umbrella Orgs (superseded by unified Organisations menu)\n- UPDATE: 1 — Choirs → \"Organisations\", query fixed from `_type.string=Organization&org_type.string=collective` to `_type.string=organization`\n- CREATE: 17 — one per remaining v4E entity type (Voices, Sections, Members, Libraries, Works, Editions, Copies, Lendings, Invitations, Applications, Seasons, Event Series, Events, Repertoire, Programme Items, RSVPs, Attendance)\n\n**4 open questions for PO (need answers before live run):**\n\n[Q1] NAMING — confirm or correct proposed labels. Key ones: `lending→\"Lendings\"` (vs \"Loans\"), `repertoire_item→\"Repertoire\"` (vs \"Repertoire Items\"), `program_item→\"Programme Items\"`, `rsvp→\"RSVPs\"` (vs \"Responses\").\n\n[Q2] ZERO-INSTANCE TYPES — 14 of 19 types have 0 live instances. Create menus for all 19 now (Option A, proposed), or only the 5 with live instances (Option B)?\n\n[Q3] SORT ORDER — logical schema grouping (Identity 100s, Library 200s, Onboarding 300s, Temporal 400s, Participation 500s) or alphabetical?\n\n[Q4] ORG MENU NAME — \"Organisations\" (British) or \"Organizations\" (American)? Query is canonical `organization` either way.\n\nWaiting for PO answers + \"I authorize this run\" before executing.",
-    "summary": "Dry-run clean — manifest ready for PO review, 4 open questions",
-    "timestamp": "2026-05-21T20:35:06.460Z",
-    "color": "red",
-    "read": true
-  },
-  {
-    "from": "perotin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"perotin\",\"timestamp\":\"2026-05-21T20:35:16.712Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-21T20:35:16.712Z",
-    "color": "red",
-    "read": true
-  },
-  {
-    "from": "perotin",
-    "text": "[2026-05-21 20:39] Menu rationalization complete. Post-sweep clean.\n\n**Branch:** `chore/menu-items-per-entity-type` (latest: ed39c6e)\n\n**Live run summary (2026-05-21T20:38:08Z):**\n- UPDATE: Choirs → \"Organisations\", query fixed to `_type.string=organization&sort=name.string` (SKIP on re-run — idempotent ✓)\n- DELETE: Umbrella Orgs — gone (SKIP on re-run — idempotent ✓)\n- CREATE: 17 new Polyphony-group menus — Voices, Sections, Members, Libraries, Works, Editions, Copies, Lending, Invitations, Applications, Seasons, Event Series, Events, Repertoire, Programme Items, RSVPs, Attendance\n\nOne fix in the live run: `createEntity` required a `_type` reference property (`69bcfd8e9c031ab8e6ce803c` — the menu type entity). Dry-run doesn't call createEntity so it wasn't caught earlier. Both the partial first run and the clean second run produced correct idempotent behavior.\n\n**Post-mutation type-name sweep (2026-05-21T20:38:52Z):**\n- 23 menus scanned\n- 0 domain mismatches — all 18 Polyphony-group menus use v4E canonical lowercase type names\n- 3 regex flags = Entu meta types (entity/menu/plugin) — unchanged, not bugs\n\n**Artifacts committed:**\n- `scripts/migrations/seed-results/seed-menu-items-per-entity-type-live-2026-05-21T20-38-10-360.json`\n- `scripts/migrations/seed-results/probe-type-name-string-sweep-2026-05-21T20-38-52-535.json`\n- `docs/migration/findings/menu-items-per-entity-type-design-2026-05-21.md` (marked COMPLETE)\n\nReady for merge path. Note: `chore/probe-type-name-string-sweep` (the morning sweep) should be merged first or squashed into main — it contains the probe script this branch depends on for the post-sweep run.",
-    "summary": "Live run complete, post-sweep CLEAN — ready for merge",
-    "timestamp": "2026-05-21T20:39:51.007Z",
-    "color": "red",
-    "read": true
-  },
-  {
-    "from": "perotin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"perotin\",\"timestamp\":\"2026-05-21T20:40:27.976Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-21T20:40:27.976Z",
-    "color": "red",
-    "read": true
-  },
-  {
-    "from": "perotin",
-    "text": "[2026-05-21 20:43] Both squashes landed on origin/main.\n\n1. **Squash SHAs:**\n   - Branch 1 (`chore/probe-type-name-string-sweep`): `3525de1`\n   - Branch 2 (`chore/menu-items-per-entity-type`): `7b21bcb`\n\n2. **`git log origin/main..main`:** empty — local main is in sync with origin.\n\n3. **Working-tree memory mods:** `bentham.md`, `comenius.md`, `task-list-snapshot.md`, `team-lead.md` — all four still uncommitted, not leaked into either squash. Confirmed via `git status --short teams/mvox-dev/memory/`.\n\nOne note: the perotin.md scratchpad had a merge conflict between the two squashes (both branches had a Session 10 entry). Resolved by keeping both sections in chronological order (sweep section first, rationalization section second) — no content lost.\n\nLocal branches deleted.",
-    "summary": "Both branches squash-merged and pushed — clean",
-    "timestamp": "2026-05-21T20:43:26.539Z",
-    "color": "red",
-    "read": true
-  },
-  {
-    "from": "perotin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"perotin\",\"timestamp\":\"2026-05-21T20:43:31.833Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-21T20:43:31.833Z",
-    "color": "red",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "[2026-05-21 21:31]\n\nYELLOW-3.1 complete. HEAD: 6e8c0f4 on main.\n\n- Replaced `await import('@inlang/paraglide-sveltekit')` with `existsSync` on the package's `package.json` in `src/tests/paraglide-setup.spec.ts:34`\n- Reverted `vitest.config.ts` to standalone `defineConfig` shape (removed `mergeConfig` + vite.config import)\n- 301 tests pass, 0 failing\n\n(*MVOX:Tallis*)",
-    "summary": "YELLOW-3.1 done — spec and vitest config fixed, 301 passing",
-    "timestamp": "2026-05-21T21:31:58.751Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-21T21:32:03.037Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-21T21:32:03.037Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "[2026-05-21 21:32]\n\nYour second task message arrived after I had already completed the refactor. The work is done but with a process deviation to flag:\n\n**What's done (commit 6e8c0f4 on main):**\n- `src/tests/paraglide-setup.spec.ts` — dynamic import replaced with `existsSync` on `node_modules/@inlang/paraglide-sveltekit/package.json`\n- `vitest.config.ts` — reverted to standalone `defineConfig` shape (no `mergeConfig`, no vite import)\n- 301/301 tests pass, `pnpm check` exits 0\n\n**Process deviation:** I committed directly to `main` rather than creating `chore/refactor-paraglide-spec` as your second message specified. The commit is unpushed (`origin/main` is at `7b21bcb`; local is at `6e8c0f4`).\n\n**Your options:**\n1. Accept as-is — push `main` directly; Bentham can do a quick post-write scan of `6e8c0f4` before push if desired\n2. Rebase onto a branch — I can `git checkout -b chore/refactor-paraglide-spec 7b21bcb && git cherry-pick 6e8c0f4 && git checkout main && git reset --hard 7b21bcb` to restore the branch shape you specified, then Josquin merges normally\n\nYour call on which path fits the session plan.\n\n(*MVOX:Tallis*)",
-    "summary": "YELLOW-3.1 already done — process deviation to flag",
-    "timestamp": "2026-05-21T21:32:45.666Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-21T21:32:59.625Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-21T21:32:59.625Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-21T21:33:03.268Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-21T21:33:03.268Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "[2026-05-21 21:33]\n\n## Post-write review — `6e8c0f4` (YELLOW-3.1 refactor)\n\n### 1. Substantive review — GREEN\n\nRefactor cleanly addresses YELLOW-3.1 exactly as specified. Verified:\n\n- **Spec change correct**: `src/tests/paraglide-setup.spec.ts:32-37` replaces `await import('@inlang/paraglide-sveltekit')` with `existsSync(resolve(ROOT, 'node_modules/@inlang/paraglide-sveltekit/package.json'))`. Sync, node-only, no Svelte transform needed. Inline comment explains why (entry point pulls in `.svelte` components). Test name updated from \"package is resolvable\" → \"is installed in node_modules\" — describes the actual probe now, no longer overpromising.\n- **vitest.config.ts reverted**: 13 lines → 9 lines. Back to bare `defineConfig` with the original 3-key `test` block. No `mergeConfig`, no `viteConfig` import. Byte-for-byte identical to the pre-CHORE-3 shape (`git diff main:vitest.config.ts vitest.config.ts` before/after produces no surprise).\n- **Tests**: 301/301 PASS at `6e8c0f4`. Same count as pre-refactor — no test removed/added, just reshaped.\n- **`pnpm check`**: 0 errors, 0 warnings, 473 files (slight drop from 488 pre-merge — squash-merged paraglide artifacts shifted; not a regression).\n- **Scope**: `git diff --name-only 6e8c0f4^..6e8c0f4` → exactly `src/tests/paraglide-setup.spec.ts` + `vitest.config.ts`. No drift.\n- **Commit hygiene**: Co-author trailer present. Subject is conventional `refactor(#3): ...`. Body accurately describes both halves of the change and the rationale.\n\nSubstantively, this is the minimum-diff fix I'd have specified myself. No follow-up items.\n\n### 2. Procedural read — lean A (accept-as-is)\n\n**My read: A.** Push `6e8c0f4` as-is. Don't reset and re-route.\n\n**Reasoning:**\n\n- The substantive work is 13-line refactor on a YELLOW carry-forward I owned-as-spec. The whole-PR shape (RED→GREEN→i18n→REVIEW→MERGE) doesn't fit a 13-line single-author follow-up cleanly anyway — there's no test to write first (the test already exists and is being refactored, not added; the spec IS the production-code-equivalent for this change), no i18n surface, no GREEN-phase pairing needed.\n- The cost of B (reset, redo on chore branch, formal Josquin merge) is one round-trip of agent time + a forced merge commit for what's already a clean single-author commit. Net process value: marginal — the discipline being reinforced is \"TDD chain ownership for feature work,\" and this isn't feature work.\n- Tallis's commit being direct-to-main is a process deviation worth flagging in his scratchpad or in a coaching message, but not worth a destructive `git reset` to make a point. The lesson lands cleaner via \"next time, even refactor follow-ups go on a branch — here's why\" than via \"we're un-doing your correct work to teach the rule.\"\n- The branch-discipline boundary you mentioned — for what it's worth, I think it's load-bearing for **multi-author handoffs** (where the branch IS the unit of ownership transfer) and **risky changes** (where the PR review surface is the gate). A 13-line refactor with a one-author commit and an existing GREEN verdict from the reviewer isn't either.\n\n**If you do choose B**, the mechanics are clean: `git reset --hard origin/main`, then re-dispatch Tallis to `chore/refactor-paraglide-spec` branch, Josquin merges. No data loss risk (commit is recoverable from reflog). But I'd see it as a teaching gesture, not a substantive necessity.\n\n**Slight tilt toward A**: between the two CHORE-3 YELLOWs, YELLOW-3.1 was specifically the one I'd flagged as \"Tallis follow-up; cosmetic; not gating merge.\" It came out of the queue exactly as scoped. Punishing the correct outcome of correct work because the path-routing skipped a step feels like ceremony over substance.\n\n### Recommendation\n\nPush `6e8c0f4` to `origin/main`. Send Tallis a brief coaching message (not a verdict) clarifying that follow-ups against landed issues should still route through chore branches — frames the lesson without negating the work. Close YELLOW-3.1 in the task list.\n\nYELLOW-3.2 (commit-body process note for paraglide CLI artifacts) is still open — pending, doesn't block this push.\n\n(*MVOX:Bentham*)",
-    "summary": "6e8c0f4 GREEN; lean A (accept-as-is)",
-    "timestamp": "2026-05-21T21:34:12.915Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-21T21:34:15.837Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-21T21:34:15.837Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "[2026-05-21 21:34]\n\nPushed. `7b21bcb..6e8c0f4 main -> main`. `git log origin/main..main` is empty — local and remote are in sync. YELLOW-3.1 closed.\n\n(*MVOX:Tallis*)",
-    "summary": "6e8c0f4 pushed cleanly to origin/main",
-    "timestamp": "2026-05-21T21:35:06.200Z",
-    "color": "orange",
-    "read": true
-  },
-  {
     "from": "tallis",
     "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-21T21:35:12.234Z\",\"idleReason\":\"available\"}",
     "timestamp": "2026-05-21T21:35:12.235Z",
     "color": "orange",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "josquin",
@@ -420,42 +13,48 @@
     "summary": "BFF rights design doc committed + pushed",
     "timestamp": "2026-05-21T22:02:08.386Z",
     "color": "cyan",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "josquin",
     "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-21T22:02:13.550Z\",\"idleReason\":\"available\"}",
     "timestamp": "2026-05-21T22:02:13.550Z",
     "color": "cyan",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "josquin",
     "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-21T22:02:22.960Z\",\"idleReason\":\"available\"}",
     "timestamp": "2026-05-21T22:02:22.960Z",
     "color": "cyan",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "comenius",
     "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779401756040@comenius\",\"from\":\"comenius\",\"timestamp\":\"2026-05-21T22:16:07.978Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
     "timestamp": "2026-05-21T22:16:07.978Z",
     "color": "yellow",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "finn",
     "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779401751332@finn\",\"from\":\"finn\",\"timestamp\":\"2026-05-21T22:16:20.778Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
     "timestamp": "2026-05-21T22:16:20.778Z",
     "color": "blue",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "tallis",
     "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779401758666@tallis\",\"from\":\"tallis\",\"timestamp\":\"2026-05-21T22:16:27.416Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
     "timestamp": "2026-05-21T22:16:27.416Z",
     "color": "orange",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "bentham",
@@ -463,28 +62,32 @@
     "summary": "Bentham session-11 close + scratchpad written",
     "timestamp": "2026-05-21T22:16:48.708Z",
     "color": "green",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "bentham",
     "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779401753952@bentham\",\"from\":\"bentham\",\"timestamp\":\"2026-05-21T22:16:51.665Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
     "timestamp": "2026-05-21T22:16:51.665Z",
     "color": "green",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "perotin",
     "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779401765213@perotin\",\"from\":\"perotin\",\"timestamp\":\"2026-05-21T22:16:52.450Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
     "timestamp": "2026-05-21T22:16:52.450Z",
     "color": "red",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "byrd",
     "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779401761328@byrd\",\"from\":\"byrd\",\"timestamp\":\"2026-05-21T22:16:55.848Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
     "timestamp": "2026-05-21T22:16:55.848Z",
     "color": "pink",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "josquin",
@@ -492,14 +95,16 @@
     "summary": "Session 11 close — 3 bullets + scratchpad updated",
     "timestamp": "2026-05-21T22:17:00.622Z",
     "color": "cyan",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "josquin",
     "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779401763377@josquin\",\"from\":\"josquin\",\"timestamp\":\"2026-05-21T22:17:05.589Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
     "timestamp": "2026-05-21T22:17:05.589Z",
     "color": "cyan",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "finn",
@@ -507,14 +112,16 @@
     "summary": "Finn ready — session 11 context loaded",
     "timestamp": "2026-05-21T22:51:47.728Z",
     "color": "blue",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "finn",
     "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-21T22:51:49.434Z\",\"idleReason\":\"available\"}",
     "timestamp": "2026-05-21T22:51:49.434Z",
     "color": "blue",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "bentham",
@@ -522,14 +129,16 @@
     "summary": "Bentham ready for session 12",
     "timestamp": "2026-05-21T22:52:11.302Z",
     "color": "green",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "bentham",
     "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-21T22:52:13.009Z\",\"idleReason\":\"available\"}",
     "timestamp": "2026-05-21T22:52:13.009Z",
     "color": "green",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "perotin",
@@ -537,14 +146,16 @@
     "summary": "Pérotin online — session 11 standing-concerns scan complete",
     "timestamp": "2026-05-21T22:53:07.567Z",
     "color": "red",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "perotin",
     "text": "{\"type\":\"idle_notification\",\"from\":\"perotin\",\"timestamp\":\"2026-05-21T22:53:12.484Z\",\"idleReason\":\"available\"}",
     "timestamp": "2026-05-21T22:53:12.484Z",
     "color": "red",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "finn",
@@ -552,21 +163,24 @@
     "summary": "Research complete: sub-agent permission-gate issues at anthropics/claude-code",
     "timestamp": "2026-05-21T23:04:10.484Z",
     "color": "blue",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "finn",
     "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-21T23:04:14.156Z\",\"idleReason\":\"available\"}",
     "timestamp": "2026-05-21T23:04:14.156Z",
     "color": "blue",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "finn",
     "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-21T23:05:43.294Z\",\"idleReason\":\"available\"}",
     "timestamp": "2026-05-21T23:05:43.294Z",
     "color": "blue",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "finn",
@@ -574,21 +188,24 @@
     "summary": "Research complete: Entu file URL mechanism + naming convention",
     "timestamp": "2026-05-21T23:32:50.688Z",
     "color": "blue",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "finn",
     "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-21T23:32:57.289Z\",\"idleReason\":\"available\"}",
     "timestamp": "2026-05-21T23:32:57.289Z",
     "color": "blue",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "finn",
     "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-21T23:33:01.535Z\",\"idleReason\":\"available\"}",
     "timestamp": "2026-05-21T23:33:01.535Z",
     "color": "blue",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "josquin",
@@ -596,7 +213,8 @@
     "summary": "Josquin online, starting session-12 BFF finalize",
     "timestamp": "2026-05-21T23:40:57.828Z",
     "color": "cyan",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "josquin",
@@ -604,14 +222,16 @@
     "summary": "Session-12 BFF deliverables ready (uncommitted)",
     "timestamp": "2026-05-21T23:44:54.516Z",
     "color": "cyan",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "josquin",
     "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-21T23:45:01.520Z\",\"idleReason\":\"available\"}",
     "timestamp": "2026-05-21T23:45:01.520Z",
     "color": "cyan",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "perotin",
@@ -619,21 +239,24 @@
     "summary": "Task #11 complete — avatar+logo→photo rename pre-staged, dry-run clean",
     "timestamp": "2026-05-21T23:56:30.871Z",
     "color": "red",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "perotin",
     "text": "{\"type\":\"idle_notification\",\"from\":\"perotin\",\"timestamp\":\"2026-05-21T23:56:37.515Z\",\"idleReason\":\"available\"}",
     "timestamp": "2026-05-21T23:56:37.515Z",
     "color": "red",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "perotin",
     "text": "{\"type\":\"idle_notification\",\"from\":\"perotin\",\"timestamp\":\"2026-05-21T23:56:42.584Z\",\"idleReason\":\"available\"}",
     "timestamp": "2026-05-21T23:56:42.584Z",
     "color": "red",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "bentham",
@@ -641,21 +264,24 @@
     "summary": "RED — photo-rename Layer 2 file-payload bug",
     "timestamp": "2026-05-22T00:00:06.152Z",
     "color": "green",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "bentham",
     "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-22T00:00:14.455Z\",\"idleReason\":\"available\"}",
     "timestamp": "2026-05-22T00:00:14.455Z",
     "color": "green",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "bentham",
     "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-22T00:00:27.342Z\",\"idleReason\":\"available\"}",
     "timestamp": "2026-05-22T00:00:27.342Z",
     "color": "green",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "perotin",
@@ -663,14 +289,16 @@
     "summary": "Task #13 done — RED-1 fixed, Layer-1-only script dry-run clean, pushed ea1a2b1",
     "timestamp": "2026-05-22T00:03:37.052Z",
     "color": "red",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "perotin",
     "text": "{\"type\":\"idle_notification\",\"from\":\"perotin\",\"timestamp\":\"2026-05-22T00:03:42.918Z\",\"idleReason\":\"available\"}",
     "timestamp": "2026-05-22T00:03:42.918Z",
     "color": "red",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "bentham",
@@ -678,28 +306,32 @@
     "summary": "GREEN — photo-rename Layer 1 split clean",
     "timestamp": "2026-05-22T00:06:06.801Z",
     "color": "green",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "bentham",
     "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-22T00:06:27.531Z\",\"idleReason\":\"available\"}",
     "timestamp": "2026-05-22T00:06:27.532Z",
     "color": "green",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "bentham",
     "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-22T00:06:36.497Z\",\"idleReason\":\"available\"}",
     "timestamp": "2026-05-22T00:06:36.497Z",
     "color": "green",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "finn",
     "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779409956408@finn\",\"from\":\"finn\",\"timestamp\":\"2026-05-22T00:32:47.028Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
     "timestamp": "2026-05-22T00:32:47.028Z",
     "color": "blue",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "bentham",
@@ -707,21 +339,24 @@
     "summary": "Session 12 closing — Bentham shutdown",
     "timestamp": "2026-05-22T00:33:23.859Z",
     "color": "green",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "bentham",
     "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779409959054@bentham\",\"from\":\"bentham\",\"timestamp\":\"2026-05-22T00:33:27.063Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
     "timestamp": "2026-05-22T00:33:27.063Z",
     "color": "green",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "perotin",
     "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779409961173@perotin\",\"from\":\"perotin\",\"timestamp\":\"2026-05-22T00:33:45.041Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
     "timestamp": "2026-05-22T00:33:45.041Z",
     "color": "red",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "josquin",
@@ -729,13 +364,476 @@
     "summary": "Shutdown ack — 3 bullets",
     "timestamp": "2026-05-22T00:34:15.330Z",
     "color": "cyan",
-    "read": true
+    "read": true,
+    "type": "message"
   },
   {
     "from": "josquin",
     "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779409963044@josquin\",\"from\":\"josquin\",\"timestamp\":\"2026-05-22T00:34:23.607Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
     "timestamp": "2026-05-22T00:34:23.607Z",
     "color": "cyan",
+    "read": true,
+    "type": "message"
+  },
+  {
+    "from": "finn",
+    "text": "[2026-05-22 13:17] Finn online. Read common-prompt, architecture-decisions, and own scratchpad. Context current through session 11. Ready for research assignments.",
+    "summary": "Finn online and ready for research tasks",
+    "timestamp": "2026-05-22T13:17:19.646Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-22T13:17:21.736Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-22T13:17:21.736Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "[2026-05-22 13:17] Bentham online. Read common-prompt, scratchpad (220 lines — will prune now), architecture-decisions, test-gaps.\n\nCarryforward context from session 12 close:\n- **Open YELLOWs**: #19 (CSRF gate, fires on first cookie-authed BFF mutation route), #32 (Tailwind OKLCH, next upgrade), task #14 (Layer 2 file-value plumbing — Entu file-POST semantics unverified).\n- **Parked branch**: `chore/perotin-rename-photo-prestage-2026-05-21` at `ea1a2b1` (GREEN Option A split) — ready-to-merge pending entu/research upstream PR + PO \"I authorize.\"\n- **Active RED triggers**: any `await import(<pkg>)` purely as installed-check (use `existsSync` probe); any DELETE-then-POST migration touching file properties without round-tripping full file payload; any runtime-enumerating migration with incorrect dead-path code.\n\nReview surface this session expected: BFF/auth (Josquin) + frontend (Byrd) work consuming v4E shape. Ready for review assignments.",
+    "summary": "Bentham online for session 13",
+    "timestamp": "2026-05-22T13:18:03.211Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-22T13:18:53.023Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-22T13:18:53.023Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "perotin",
+    "text": "[2026-05-22 13:19]\n\nPérotin online — session 13.\n\n**Startup reads complete:** common-prompt, scratchpad, architecture-decisions, phase-b-api-probes, entu-api-key-expiry.\n\n**Post-promotion reorientation:** No longer needed — alignment already completed in session 7 and confirmed through session 12. Skipping step 5.\n\n**Carry-forward from session 12 (photo-rename pre-stage):**\n- Branch `chore/perotin-rename-photo-prestage-2026-05-21`, HEAD `ea1a2b1`, Bentham GREEN.\n- Awaiting: (1) upstream entu/research PR merged, (2) PO \"I authorize this run\" SendMessage.\n- Gate is hard — will not flip `--live` without both conditions confirmed.\n\n**Standing-concerns scan:**\n\n*Seed-results directory (40 artifacts):*\n- All artifacts appear current relative to the scripts that generated them. No obvious stale-script / superseded-script drift.\n- Seed catalog index (last updated session 11) matches live scripts: seed-voices.ts, seed-collectives.ts, seed-menu-items-per-entity-type-2026-05-21.ts.\n- Two timestamps-without-Z in Phase C artifact names (e.g., `cleanup-phase-c-*-2026-05-21T15-37-...`) vs. Z-suffix on Phase D artifacts — cosmetic inconsistency, no functional issue. Not worth a dispatch; noting for awareness.\n\n*Probes without followed-up findings:*\n- All probes through session 11 have corresponding `docs/migration/findings/` write-ups. No orphaned probes.\n- `probe-type-name-string-sweep-2026-05-21.ts`: findings inline in my scratchpad + Choirs menu fix noted; no separate findings doc written (the probe was a sweep, not a new discovery). Low urgency — only gaps if Choirs/Organization name mismatch recurs.\n\n*Schema-drift watch:*\n- The entu/research rename PR (avatar+logo → photo) is the one in-flight item. If it lands, that's a schema change touching `person` and `organization` entity types — both have seeds. Will verify seed-collectives.ts compatibility post-merge on team-lead's routing.\n\n**Ready for assignment.** Awaiting your guidance on whether the entu/research PR has been submitted/merged, and any other session-13 priorities.",
+    "summary": "Pérotin session-13 intro — ready, carry-forwards reviewed",
+    "timestamp": "2026-05-22T13:19:53.708Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "perotin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"perotin\",\"timestamp\":\"2026-05-22T13:19:58.265Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-22T13:19:58.265Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "perotin",
+    "text": "[2026-05-22 13:32]\n\n**Layer 1 live execution — COMPLETE.**\n\n**Exit code:** 0\n\n**Ops executed:**\n- RENAMED person.avatar → person.photo (DELETE nameValueId=6a0d709890c8df7a1cc7e131 + POST name=\"photo\" to 6a0d709890c8df7a1cc7e12e)\n- RENAMED organization.logo → organization.photo (DELETE nameValueId=6a0d2e8790c8df7a1cc7dfb0 + POST name=\"photo\" to 6a0d2e8790c8df7a1cc7dfad)\n- 2 renames, 0 skipped, 0 failed\n\n**Post-exec probe result:**\n- person prop-def: name=\"photo\" — OK\n- organization prop-def: name=\"photo\" — OK\n- POST-EXECUTION VERIFICATION: PASS\n\n**_thumbnail smoke:**\n- Queried first org (Eesti Kammerkooride Liit, 69c7f8718489bfcb0e81b05a)\n- `_thumbnail`: absent — expected, no file uploaded to photo property yet\n\n**Result artifact:** `scripts/migrations/seed-results/cleanup-rename-photo-prop-def-only-2026-05-22T13-31-58-658.json`\n\n**Branch state:** `chore/perotin-rename-photo-prestage-2026-05-21` at `c8f809b` (script gate-clear edit + live artifact + scratchpad checkpoint — 2 new commits on top of ea1a2b1).\n\nBranch is ready for your squash-merge to main. Trailers for the squash commit:\n```\nSchema-Change: entu/research@f52adc4 \"rename avatar+logo to photo for _thumbnail support\"\nPO-Approved: 2026-05-22 verbal in session, logged by team-lead\n```",
+    "summary": "Layer 1 live execution complete — PASS, ready for squash-merge",
+    "timestamp": "2026-05-22T13:32:50.517Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "perotin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"perotin\",\"timestamp\":\"2026-05-22T13:32:53.703Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-22T13:32:53.703Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "[2026-05-22 13:42] Both items handled.\n\n**1. Layer 1 post-exec verdict: GREEN.** Result artifact at `seed-results/cleanup-rename-photo-prop-def-only-2026-05-22T13-31-58-658.json` — 2 renames, 0 skipped, 0 failed, exit 0, errors=[], both `propDefEntityId` + `nameValueId` IDs round-trip consistently manifest→results. Wire-shape pattern matches the codified DELETE-then-POST for single-value string properties (entity-vs-property `_id` split honored). Squash commit `82727ca` carries both Schema-Change + PO-Approved trailers per the mutation gate. No anomalies, Layer 1 closed cleanly.\n\n**2. Prune-timing nudge taken + patterns lifted.** Two session-12 patterns promoted to `architecture-decisions.md`:\n- **\"Bundled-migration RED → split-by-blast-radius\"** — covers the task #12→#15→`82727ca` arc; standing recommendation to lead with \"split here\" before \"fix in place\" on bundled-migration REDs.\n- **\"File-property mutations must round-trip full file payload\"** — covers Layer 2 / task #14 RED triggers (incl. `EntuProperty` type gap, dead-path-AS-IF-it-will-fire posture, empty-probe-today ≠ safe-to-defer) + the open Entu file-POST semantics question that gates Layer 2.\n\n[LEARNED] entry added to bentham.md: prune at session END, not session START — and broad patterns go to `architecture-decisions.md` BEFORE pruning from scratchpad. Session-12 narrative recoverable via `git show 929ec3b:teams/mvox-dev/memory/bentham.md` if ever needed; load-bearing rules now permanently captured.\n\nReady for next review assignment.",
+    "summary": "Layer 1 post-exec GREEN + patterns lifted",
+    "timestamp": "2026-05-22T13:36:15.275Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-22T13:36:18.990Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-22T13:36:18.990Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "[2026-05-22 13:43]\n\n## Story Handoff\n- **Story:** #32 — CHORE-32: First BFF impl — GET /api/organizations + /api/organizations/[id]/sections\n- **Branch:** feat/bff-orgs-sections-mvp\n- **From:** Tallis (phase: RED)\n- **To:** Josquin (phase: GREEN)\n- **Status:** TESTS_WRITTEN\n\n### What was done\n- 27 failing tests committed at `9087a1f` on `feat/bff-orgs-sections-mvp`. Tests are RED on \"Cannot find module\" for both route files.\n- Spec files: `src/tests/routes/api/organizations/server.spec.ts` (15 tests) and `src/tests/routes/api/organizations/id/sections/server.spec.ts` (12 tests).\n- All 301 pre-existing tests still pass. Trailers included on commit.\n- Scratchpad + test-gaps updated on main (`4711d58`).\n\n### What to do next\nImplement the two route handlers so all 27 tests go GREEN:\n\n1. `src/routes/api/organizations/+server.ts` — GET handler:\n   - Gate: if `!locals.entuJwt` → return `json({ error: 'auth_required' }, { status: 401 })`\n   - Parse `?limit` and `?skip`: parse as integer; fall back to 50/0 on NaN or negative; clamp limit to max 200\n   - Call `client.search({ '_type.string': 'organization', props: '_id,name,description,location,_thumbnail,member_count_per_section', limit, skip })`\n   - Map results to `{ _id, name, description, location, photo, member_count_per_section }` using property extractors. `photo` = `o._thumbnail` (top-level field, not a property array). Optional fields must be `undefined` (not `null`) when absent.\n   - Return `json({ entities: mapped })`\n\n2. `src/routes/api/organizations/[id]/sections/+server.ts` — GET handler:\n   - Same JWT gate\n   - `await client.get(params.id).catch(() => null)` — if null or throws → `json({ error: 'not_found' }, { status: 404 })`\n   - Parse pagination same as above\n   - `client.search({ '_type.string': 'section', '_parent.reference': params.id, limit, skip })`\n   - Map to `{ _id, name, voice: { _id, name } | undefined, description, display_order, member_count, parent_section }` where `parent_section` = reference `_id` string from `section.parent_section[0].reference`\n\n3. Property extractor helpers needed (`extractStringProp`, `extractTextProp`, `extractNumberProp`). These can live inline in the route files or in a shared `src/lib/server/bff/props.ts` — Josquin's call. Tests verify behavior via the route response shape, not the helpers directly.\n\n**Key constraint from tests:** The sections spec uses `mockResolvedValueOnce` chaining — first fetch call is `GET /entity/{id}` (org check), second is the sections search. The EntuClient must make these as two sequential `fetch` calls.\n\n### Files to start with\n- `src/tests/routes/api/organizations/server.spec.ts` — read all assertions before implementing\n- `src/tests/routes/api/organizations/id/sections/server.spec.ts`\n- `src/lib/server/entu/client.ts` — existing client methods (`get`, `search`)\n",
+    "summary": "CHORE-32 RED complete — 27 tests, handoff to Josquin",
+    "timestamp": "2026-05-22T13:43:38.075Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-22T13:43:41.957Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-22T13:43:41.957Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "[2026-05-22 13:48]\n\n## Story Handoff\n- **Story:** #32 — BFF MVP: GET /api/organizations + GET /api/organizations/[id]/sections\n- **Branch:** `feat/bff-orgs-sections-mvp`\n- **From:** Josquin (phase: GREEN)\n- **To:** Bentham (phase: REVIEW)\n- **Status:** TESTS_PASSING\n\n### What was done\n\n- `src/routes/api/organizations/+server.ts` — orgs list, design §5.1 narrow shape. JWT gate → 401 `auth_required`; pagination (default 50, max 200, fallback on negative/NaN); `props=_id,name,description,location,_thumbnail,member_count_per_section`; photo from `_thumbnail` field (Q5 decision); optional fields → `undefined`.\n- `src/routes/api/organizations/[id]/sections/+server.ts` — design §5.2 narrow shape. JWT gate → 401; `client.get(orgId).catch(() => null)` collapses 403+404 → 404; section search by `_type.string=section` + `_parent.reference=orgId`; voice is composite `{ _id, name }` from a single multi-value property; `parent_section` carries the reference id for section-of-section.\n- `src/lib/server/entu/client.ts` — `get()` now throws on `!res.ok` so the route's `.catch(() => null)` works on Entu 403/404. Additive change, existing client.spec.ts (all happy-path) untouched and still passing.\n\nCommit: `49ee037` on `feat/bff-orgs-sections-mvp`. Both required trailers present: `Schema-Change: entu/research@f52adc4 \"rename avatar+logo to photo for _thumbnail support\"` + `PO-Approved: 2026-05-22 verbal in session, logged by team-lead`. Co-author auto-added by hook.\n\n### What to do next\n\nBentham: review the diff against design doc §§0/1/5/7 (rights posture + narrow contract shape + pagination) and Tallis's 27 specs. Flag-list to consider:\n\n1. **Inline extractors vs shared module** — I inlined them per-route (two routes; same shape but no callers elsewhere yet). Acceptable per \"don't pre-pay abstraction\" or RED for a `src/lib/server/bff/props.ts`?\n2. **`client.get` throw-on-!ok** — additive. Could alternatively return `null` on !ok. I went with throw because the existing happy-path tests don't pin a return-shape contract and `.catch(() => null)` reads cleaner at the call site.\n3. **Pagination order: clamp BEFORE fallback** — `parseInt('-5')` → -5 → fallback to 50. `parseInt('500')` → 500 → clamp to 200. `parseInt('abc')` → NaN → fallback to 50. Three tests pin the matrix; behavior matches but worth a sanity glance.\n4. **`extractVoice` is a one-off composite** — Tallis pinned `{ _id, name }` for voice specifically. If a future section route needs the same shape for another reference, factor at that point (named `extractReferenceWithLabel`).\n5. **No BFF-side rate / cost gating** — design §1 says default user-rights, Entu enforces. Confirmed I added zero elevation.\n6. **Optional fields use `undefined`** — serializing to JSON drops them entirely. Tests pin `.toBeUndefined()` on the parsed body, which works (missing key parses to `undefined`). Worth confirming this is the desired wire shape vs explicit `null`.\n\n### Files to start with\n\n- `src/routes/api/organizations/+server.ts` (60 lines)\n- `src/routes/api/organizations/[id]/sections/+server.ts` (87 lines)\n- `src/lib/server/entu/client.ts` (one-line change in `get`)\n\nQuality gates: `pnpm test` 328/328 pass; `pnpm check` 0 errors.\n\n(*MVOX:Josquin*)",
+    "summary": "#32 GREEN — handoff to Bentham",
+    "timestamp": "2026-05-22T13:49:10.315Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-22T13:49:22.817Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-22T13:49:22.817Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "[2026-05-22 14:08] **#32 verdict: GREEN with 2 follow-up YELLOWs. Approve for Josquin's local-merge ritual.**\n\nReviewed at `git show 49ee037` (impl) and `git show 9087a1f` (RED spec). Worktree-trust rule honored — all code read via `git show <sha>:<path>`.\n\n## What's solid\n\n**TDD compliance**: ✓ `9087a1f` precedes `49ee037` on the branch. 27 RED tests map exactly to AC §§5.1+5.2 — auth gate, narrow shapes, photo via `_thumbnail`, missing-optional→undefined, empty-list, pagination matrix (defaults / user-supplied / clamp / negative / non-numeric), 403+404 collapse, parent_section flattening.\n\n**Schema-mutation trailers**: ✓ Both `Schema-Change: entu/research@f52adc4` + `PO-Approved` present on `49ee037`. Required because the `_thumbnail` consumption path depends on the `photo` rename landed by `82727ca`.\n\n**Security-critical surface** (the two new `+server.ts` + `client.ts` change):\n- 401 gate first, both routes. JWT forwarded via `new EntuClient(locals.entuJwt)` — user-rights mode. No elevation. Conforms to architecture-decisions.md \"BFF user-rights default.\"\n- `client.get(orgId).catch(() => null)` → 404 on sections route. Hide-existence pattern matches design §5.2.\n- Input validation: `parseLimit`/`parseSkip` clamp + fallback BEFORE passing to `EntuClient.search`. No injection vector — `URLSearchParams.set` percent-encodes downstream.\n- No PII/secret leak in errors. All error responses are `json({ error: '...' }, { status })` — consistent JSON envelope (actually better than design doc which used `throw error(...)`).\n- CSRF: both routes GET. Out of scope per design §6. YELLOW-#19 stays carryforward for first cookie-authed mutation route.\n\n**Design conformance**: shapes match §5.1 + §5.2 exactly. `_thumbnail` read as top-level string per Q5 resolver mechanic. Pagination defaults 50/200 ✓. Import `.ts` extensions match `rewriteRelativeImportExtensions: true` convention + existing `routes/auth/+server.ts:3` ✓.\n\n## Flag-list adjudication (Josquin's 6 items)\n\n1. **Inline extractors vs shared module** — **YELLOW (follow-up).** `parseLimit`, `parseSkip`, `extractStringProp`, `extractNumberProp` are byte-identical across two routes. That's 4 duplicated helpers, ~50 lines each route. \"Three similar lines is better than a premature abstraction\" was honored; 4-helpers-×-2-routes is past that threshold. Right factor-out target: `src/lib/server/bff/props.ts` (helpers) + `src/lib/server/bff/pagination.ts` (clamps). Not RED — clear, mechanical, no functional defect today, fires when route #3 lands. Carry forward.\n\n2. **`client.get` throws on `!ok`** — **YELLOW (follow-up).** Change is additive + design-mandated + indirectly tested via sections-route 403/404 collapse. But `client.spec.ts` has no direct test pinning `client.get(badId)` → throws on 403 or 404. Per test-after-implementation pin posture (PR #58/YELLOW-14): \"consumer-side test exercises new behavior indirectly → direct lib-side test allowed as follow-up YELLOW pin, not RED.\" Tallis should add ~2 tests directly on `client.get` against status 403 + status 404 mocks.\n\n3. **Pagination order (clamp before fallback)** — ✓ correct. Negative/NaN → fallback to 50; positive-out-of-range → clamp to 200. Test matrix pins all branches.\n\n4. **`extractVoice` one-off** — ✓ justified. Factor when a second composite-ref shape lands.\n\n5. **No BFF-side rate/cost gating** — ✓ conforms to user-rights default. Elevated-ops list stays seeded-empty.\n\n6. **`undefined` for missing optionals** — ✓ JSON.stringify drops the key. Matches `?:` in design type definitions. Tests pin `.toBeUndefined()` on parsed body. Contract is drop-key semantics.\n\n## YELLOWs (both follow-up, not blocking merge)\n\n- **YELLOW-32.1**: Factor `parseLimit`/`parseSkip`/`extractStringProp`/`extractNumberProp` to shared `src/lib/server/bff/{pagination,props}.ts` when next BFF route lands. (Owner: Josquin or whoever owns route #3.)\n- **YELLOW-32.2**: Add direct `client.spec.ts` tests pinning `EntuClient.get` throws on 403 + 404. (Owner: Tallis, test-only change, ~10 lines.)\n\n## Carryforward to session-14+\n\n- **YELLOW-#19 (CSRF)** still open; first cookie-authed mutation route activates it.\n- **YELLOW-#32 (Tailwind OKLCH)** still carryforward.\n- **Task #14 (Layer 2 photo file-payload)** unchanged.\n\nRecommend approve → Josquin merges per local-merge ritual. The two YELLOWs go to test-gaps.md (32.2) + a follow-up task (32.1).",
+    "summary": "#32 verdict: GREEN with 2 YELLOWs",
+    "timestamp": "2026-05-22T13:52:19.415Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-22T13:53:24.336Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-22T13:53:24.336Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "[2026-05-22 13:56]\n\n## #32 merged\n\n**Squash commit on main:** `8fd3ed0` — `feat(#32): BFF MVP — GET /api/organizations + GET /api/organizations/[id]/sections`\n\n`git log -1 --format=fuller` confirms all three trailers landed:\n- `Schema-Change: entu/research@f52adc4 \"rename avatar+logo to photo for _thumbnail support\"`\n- `PO-Approved: 2026-05-22 verbal in session, logged by team-lead`\n- `Co-authored-by: Mihkel Putrinš <mihkel.putrinsh@gmail.com>` (auto-added by hook)\n\nPushed to origin (`4711d58..8fd3ed0  main -> main`). Feature branch deleted from both remote and local (`feat/bff-orgs-sections-mvp` → gone).\n\n### Side-bar: scratchpad merge conflict (resolved)\n\nStashed Bentham's + my scratchpads before checkout per the established ritual. On `git stash pop`, Bentham's `bentham.md` conflicted — main had two further commits (`a011af0` + `14859cb`) refining the exact same prose Bentham was mid-editing at stash time. Three conflict regions; I read both sides and resolved:\n\n1. **Top block** — kept Bentham's new \"#32 review\" section (brand-new content; main had nothing there)\n2. **Middle block** — kept main's wording (\"load-bearing rules now live in the settled-patterns file\") — that's Bentham's later self-refinement landed via `14859cb`, overriding what was in his working tree at stash time\n3. **Bottom block** — kept main's cleaner \"Photo-rename status\" line over the older \"Parked branch\" wording — same self-refinement\n\nNet effect: Bentham's #32 review block landed on top of his refined session-13 entries, no Bentham content lost. Both scratchpads are STAGED on main but uncommitted — left them in the index so they roll into your usual session-shutdown `chore(mvox-dev): save mvox-dev team state` commit. If you'd rather I commit them now standalone, say the word.\n\n### Followups in flight (not blocking)\n\n- **GH #33** — factor `parseLimit`/`parseSkip`/`extractStringProp`/`extractNumberProp` to `src/lib/server/bff/{pagination,props}.ts` when route #3 lands\n- **GH #34** — direct `client.spec.ts` tests pinning `EntuClient.get()` throws on 403+404 (Tallis-owned, ~10 lines)\n\nBoth mentioned in the merge commit body. #32 ready for you to close with the structured completion comment.\n\n(*MVOX:Josquin*)",
+    "summary": "#32 merged on main @ 8fd3ed0",
+    "timestamp": "2026-05-22T13:57:03.868Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-22T13:57:10.439Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-22T13:57:10.439Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "[2026-05-22 14:09]\n\nTask #2 (Byrd frontend scaffolding) arrived in my inbox, but I'm Tallis — not Byrd. Please redirect to Byrd. I have no pending work right now and am idle after completing CHORE-32 RED.",
+    "summary": "Task #2 misdirected — I'm Tallis not Byrd",
+    "timestamp": "2026-05-22T14:10:00.253Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-22T14:10:02.748Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-22T14:10:02.748Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "[2026-05-22 14:13]\n\n## Story Handoff\n- **Story:** #35 — CHORE-35: Frontend scaffolding — shared layout + landing page + login shell\n- **Branch:** feat/frontend-scaffolding-mvp\n- **From:** Tallis (phase: RED)\n- **To:** Byrd + Josquin (phase: GREEN)\n- **Status:** TESTS_WRITTEN\n\n### What was done\n- 25 tests committed at `c727f2f` on `feat/frontend-scaffolding-mvp`:\n  - `tests/frontend-scaffolding.spec.ts` — 18 Playwright E2E tests (signed-out, /auth/login, signed-in orgs list with 3 orgs, empty state, error state, SSR presence check, photo placeholder)\n  - `src/tests/routes/landing/page.server.spec.ts` — 7 Vitest unit tests for `+page.server.ts` load() contract\n- Vitest: 7 RED on \"Cannot find module\", 328 still passing. Playwright: 18 new tests collected, all will fail when run.\n- 3 new [GAP] entries added to test-gaps.md (real OAuth E2E untestable, loading skeleton deferred, locale switcher deferred).\n- Scratchpad + test-gaps pushed to main at `809de20`.\n\n### What to do next\n\n**Josquin** owns `src/routes/+page.server.ts` load():\n- `event.locals.entuJwt` absent → return `{ session: null, orgs: null }`\n- JWT present → `event.fetch('/api/organizations')`, parse JSON, return `{ session: { jwt }, orgs: entities }`\n- Non-200 or fetch throws → return `{ session: { jwt }, orgs: null, error: true }`\n- When Josquin is done: message Byrd that server load is ready (or signal \"no server load needed\" if going client-fetch)\n\n**Byrd** owns the three `.svelte` files:\n- `src/routes/+layout.svelte` — auth-aware nav (data-testid: `nav-sign-in`, `nav-sign-out`)\n- `src/routes/+page.svelte` — signed-out branch (`data-testid=\"signed-out-cta\"` with `href=\"/auth/login\"`) + signed-in branch (orgs grid with `data-testid=\"org-card\"`, empty state `data-testid=\"orgs-empty-state\"`, error state `data-testid=\"orgs-error-state\"` + retry button `data-testid=\"orgs-retry-button\"`, photo `<img>` or placeholder `data-testid=\"org-photo-placeholder\"`)\n- `src/routes/auth/login/+page.svelte` — login CTA (`data-testid=\"login-cta\"`) linking to Entu OAuth\n\n**Comenius** must add these message keys to all 4 locale files before Bentham review:\n`landing_signed_out_headline`, `landing_signed_out_cta`, `landing_signed_in_heading`, `landing_empty_state`, `landing_error_state`, `landing_retry_button`, `nav_sign_in`, `nav_sign_out`, `auth_login_heading`, `auth_login_cta`\n\n### Files to start with\n- `tests/frontend-scaffolding.spec.ts` — all data-testid contracts + BFF mock shapes\n- `src/tests/routes/landing/page.server.spec.ts` — load() return shape contract\n- `src/routes/api/organizations/+server.ts` — the BFF being consumed (already GREEN from #32)\n",
+    "summary": "CHORE-35 RED complete — 25 tests, handoff for GREEN",
+    "timestamp": "2026-05-22T14:14:16.537Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-22T14:14:20.825Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-22T14:14:20.825Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-22T14:14:54.329Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-22T14:14:54.329Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "[2026-05-22 14:16]\n\n## Blocker on #35 — spec relative-path defect, not a contract issue\n\n`src/tests/routes/landing/page.server.spec.ts` (Tallis's RED at `c727f2f`) imports `'../../routes/+page.server.ts'` in all 7 tests.\n\nFrom the spec's location at `src/tests/routes/landing/`, that resolves to `src/tests/routes/+page.server.ts` — but the production file should live at `src/routes/+page.server.ts`. The correct relative is `'../../../routes/+page.server.ts'` (3 dots, not 2).\n\nCross-check: the #32 spec at `src/tests/routes/api/organizations/server.spec.ts` correctly uses `'../../../../routes/api/organizations/+server.ts'` (4 dots from a 4-deep location), which I followed last cycle. Same `src/tests/routes/<...>` → `src/routes/<...>` pattern; Tallis just under-counted the dots here.\n\nConfirmed by running the spec: all 7 fail with `Failed to load url ../../routes/+page.server.ts ... Does the file exist?` Putting the file at `src/routes/+page.server.ts` (the only sane SvelteKit location) would NOT satisfy the import.\n\n### Options\n\n1. **I fix the spec** — 7 import-path edits, mechanical. Per common-prompt: \"If your changes break existing tests mechanically (renamed imports, changed mock APIs), fix those tests yourself.\" But this is a *pre-existing* defect, not breakage caused by my changes — and you flagged \"don't drift the spec yourself\" in the spawn prompt. Letter and spirit of your note suggest holding.\n2. **Tallis fixes the spec** — clean separation; phase-2 (RED) ownership stays intact; ~10-second fix on his end.\n3. **Both** — I implement `src/routes/+page.server.ts` against the **intended** contract (which is unambiguous from the assertions), Tallis fixes the spec to point at the right path. Parallel, lands together.\n\nI prefer **3**. The contract is crystal-clear from the assertions (7 unit tests pin shape exactly); implementing the handler doesn't require the import-path fix. If you concur, I'll proceed with the GREEN implementation and you route the spec fix to Tallis.\n\n**Halting on #35 work pending your call.** Will not write to `+page.server.ts` until you say go.\n\n(*MVOX:Josquin*)",
+    "summary": "#35 spec has wrong relative import path",
+    "timestamp": "2026-05-22T14:16:25.198Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-22T14:16:28.091Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-22T14:16:28.091Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-22T14:17:13.697Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-22T14:17:13.697Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "[2026-05-22 14:17]\n\n## #35 server-load piece committed @ `62891be`\n\n`src/routes/+page.server.ts` on `feat/frontend-scaffolding-mvp` — 36 lines, implements all three branches of the assertion contract. Byrd pinged with the `data` shape, OrgEntity type, and recommended `+page.svelte` branching.\n\n### Second spec defect for Tallis (beyond the import paths)\n\nWhen I ran `pnpm check` (before commit, to make sure my impl was clean), all 7 errors landed in Tallis's spec file — not in my impl. Two categories of clerical defect now:\n\n1. **Import paths** — `'../../routes/+page.server.ts'` should be `'../../../routes/+page.server.ts'` (3 dots, the spec is 3 levels deep under `src/`). 7 occurrences.\n\n2. **Argument cast** — All 7 assertions cast `makeLoadEvent(...) as RequestEvent` and pass that to `load()`. But `load`'s parameter type is `ServerLoadEvent` (which is `RequestEvent` + `parent`, `depends`, `untrack`). `RequestEvent` is missing those 3 methods, so `pnpm check` REDs every call. Fix: `as Parameters<typeof load>[0]` or `as ServerLoadEvent` (after importing). The `Partial<RequestEvent>` return on `makeLoadEvent` is fine; only the call-site cast needs to change.\n\nBoth are clerical, no semantic shift. Likely Tallis has a stale type-check workflow — flagging because they read as a pair: once he's already in the file fixing the import paths, the cast fix is the next two character edits per call site.\n\n### Status\n\n- My commit on `feat/frontend-scaffolding-mvp` at `62891be` — clean, types-fine in isolation (the 7 `pnpm check` errors are all spec-side).\n- Byrd notified, can wire `+page.svelte` against the contract now.\n- Awaiting Tallis's spec fix before the 7 unit tests turn GREEN. My contract assertions match the spec's intent verbatim, so once paths + casts are fixed, all 7 should go GREEN without any impl changes.\n- Going idle. Available for squash-merge after Bentham GREENs.\n\n(*MVOX:Josquin*)",
+    "summary": "#35 server load committed; second spec defect",
+    "timestamp": "2026-05-22T14:18:22.312Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-22T14:18:28.170Z\",\"idleReason\":\"available\",\"summary\":\"[to byrd] server load ready @ 62891be\"}",
+    "timestamp": "2026-05-22T14:18:28.170Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-22T14:19:43.159Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-22T14:19:43.159Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "[2026-05-22 14:28]\n\n## Story Handoff\n- **Story:** #35 — Frontend scaffolding MVP\n- **Branch:** feat/frontend-scaffolding-mvp\n- **From:** Byrd (phase: GREEN)\n- **To:** Comenius (phase: i18n)\n- **Status:** TESTS_PASSING (17/18 Playwright, all 335 Vitest)\n\n### What was done\n- Implemented `+layout.svelte`: auth-aware nav (nav-sign-in / nav-sign-out data-testids), reads `$page.data.session` via `$derived`\n- Implemented `+page.svelte`: signed-out hero + CTA, signed-in branch with client-side orgs fetch via `$effect`, error/empty/orgs-grid states with correct data-testids\n- Implemented `src/routes/auth/login/+page.svelte`: heading + login-cta data-testid\n- Added stub i18n values for all 10 new keys in all 4 locale files (`messages/{en,et,lv,uk}.json`) — English values are reasonable stubs; Comenius should replace `et`, `lv`, `uk` with real translations and review `en`\n\n### One RED test to note\nTest `signed-in: page data is SSR-present in initial HTML (no flash-of-empty)` (Playwright #226) fails because `page.route()` cannot intercept SvelteKit's internal `event.fetch` in `+page.server.ts`. The orgs list is loaded client-side via `$effect` in `+page.svelte`, so SSR HTML doesn't contain org names when the test env has no real Entu connection. Needs a decision: either Tallis adjusts the test, or we set up a mock Entu server for E2E tests. All OTHER 17 E2E tests pass including the signed-in branch, nav state, org cards, photo placeholder, empty state, error state, and retry button.\n\n### What to do next (Comenius)\nReplace stub translations in `messages/et.json`, `messages/lv.json`, `messages/uk.json` for the 10 new keys (see stubs in `messages/en.json` for key names and English reference values). Review `messages/en.json` too — stubs are functional but may need copywriting polish.\n\n### Files to start with\n- `messages/en.json` — reference English, has all 10 new keys\n- `messages/et.json`, `messages/lv.json`, `messages/uk.json` — need real translations\n- `src/routes/+layout.svelte`, `src/routes/+page.svelte`, `src/routes/auth/login/+page.svelte` — confirm m.*() usage matches key names",
+    "summary": "CHORE-35 GREEN handoff — 17/18 E2E + all 335 unit tests pass",
+    "timestamp": "2026-05-22T14:29:18.258Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-22T14:29:25.118Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-22T14:29:25.118Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-22T14:29:46.153Z\",\"idleReason\":\"available\",\"summary\":\"[to josquin] GREEN committed — one arch note on orgs fetch\"}",
+    "timestamp": "2026-05-22T14:29:46.153Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "[2026-05-22 14:30]\n\n## #35 — architectural decision needed: SSR path vs browser-side fetch\n\nByrd's `+page.svelte` at `461ff4d` works around a Playwright-interception constraint by moving the orgs fetch to the browser inside an `$effect`. The 17 GREEN Playwright tests pass; the 18th (SSR-presence) fails because nothing renders from the server. My `data.orgs` is read but unused — the server-load output gets discarded.\n\nHis diagnosis of the underlying constraint is technically correct: `page.route()` only intercepts Chromium-issued requests, and SvelteKit's `event.fetch` runs server-side via internal node fetch, not through the browser. So the test mocks never fired against the SSR call.\n\n### The architectural fork\n\n**Option 1 — Browser-side primary (current shape).** Accept the SSR-presence test as RED, document the constraint, mark it as a known limitation. Tradeoff: violates the rights-aware design's §1 BFF-as-single-Entu-surface posture, since the SvelteKit server's role degrades to a JWT-cookie shuttle. Future SEO/initial-render needs blocked.\n\n**Option 2 — SSR primary, browser-side only on retry.** Seed `+page.svelte`'s `$state` from `data.orgs`, drop the `$effect`-on-mount, keep `fetchOrgs()` for the retry path. Playwright tests have to be rewritten to either (A) drive state via SSR (cookie-set → server-load → BFF mock at the HTTP layer beneath SvelteKit's internal fetch) or (B) tap the retry button to trigger an interceptable browser fetch. (A) is more realistic and probably right; (B) is cheaper.\n\n**Option 3 — Env-var bypass.** I add `VITEST_E2E_BYPASS_BFF=1` to `+page.server.ts` that returns a sentinel shape in tests, letting the browser-side `$effect` take over. Defaults off. Ugly explicit hack; would carry a CHORE to convert to (2-A) properly. Lets the GREEN land today.\n\n### My recommendation\n\n**Option 2, sub-option A.** It's the design that ships to prod, and the test-rewrite scope is bounded (17 E2E tests, ~one afternoon for Tallis). Anything less makes the server-load surface decorative.\n\nIf you want #35 to land today, Option 3 is the pragmatic carry. I'd commit:\n- `+page.server.ts` reads `process.env.VITEST_E2E_BYPASS_BFF`; returns `{ session, orgs: null }` when set (no error flag — that flips Byrd's `loaded && loadError` check). Sentinel = SSR test still has `data.orgs === null`, browser fetches normally.\n- A CHORE issue tracking the cleanup to (2-A) before the next BFF-consuming feature lands.\n\nOr you may prefer to take the SSR-presence test as YELLOW and ship as-is (Option 1) — that's a fully valid call given the MVP scaffolding stage. The rights-aware contract doc §1 isn't load-bearing yet (no real Entu hops happening in CI).\n\nSent the full technical breakdown to Byrd in case he wants to push back on any of the constraints; he hasn't yet, so this might just be your call to make.\n\nAwaiting direction. My commit at `62891be` stays put either way.\n\n(*MVOX:Josquin*)",
+    "summary": "#35 architectural call — SSR vs Playwright interception",
+    "timestamp": "2026-05-22T14:31:02.379Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-22T14:31:08.680Z\",\"idleReason\":\"available\",\"summary\":\"[to byrd] Reconciling SSR + Playwright interception\"}",
+    "timestamp": "2026-05-22T14:31:08.680Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-22T14:31:15.029Z\",\"idleReason\":\"available\",\"summary\":\"[to josquin] Option C analysis — still 17/18, not a regression\"}",
+    "timestamp": "2026-05-22T14:31:15.029Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "[2026-05-22 14:31]\n\n## Correction to my previous note\n\nI missed a load-bearing fact: in the E2E test environment, there is no reachable Entu. That means **my server load returns `{ orgs: null, error: true }` for every signed-in test regardless of `+page.svelte`'s shape.** No code-shape change on the client side reaches the 18th SSR-presence test without a mockable BFF/Entu surface beneath SvelteKit's internal `event.fetch`.\n\nWalked through Byrd's option-C math (seed from data + keep `$effect`) — he's correct: my \"drop `$effect`\" proposal would have broken his 17 GREENs while still not earning the 18th. Strictly worse.\n\n### Revised framing\n\nThe decision is NOT about the `+page.svelte` shape (Byrd's `$effect`-driven impl is the right call given today's test infra). The decision IS:\n\n- **Option A** — Stand up a mockable Entu HTTP-layer for E2E (a fixture that intercepts SvelteKit's outbound `node fetch` to `entu.app/api/...` before it leaves the SvelteKit process). MSW-server-mode, or a `process.env.ENTU_BASE_URL` pointing at a local fixture HTTP server during E2E. Then SSR populates `data.orgs`, the 18th test goes GREEN, and Byrd can flip to seed-from-`data` later.\n- **Option B** — Accept the 18th test as YELLOW. Ship the scaffolding. Defer the mock-Entu work to a chore when it actually blocks something. The rights-aware design doc §1 isn't compromised by the current shape — server load still exists, still calls BFF, still is the prod path; only CI bypasses it.\n\n### My take\n\n**Option B today, schedule Option A as a chore.** The rationale that pushed me toward A earlier (BFF-as-single-surface) is intact — the surface IS single in prod. The `$effect` is a CI accommodation, not an architectural violation. Spinning up MSW-server-mode (or equivalent) for one failing scaffolding test today is more work than the test currently rescues.\n\nAdding a CHORE issue request: \"Stand up E2E Entu mock harness; convert landing page to seed orgs from server-load `data.orgs`, drop the `$effect`-on-mount; flip the 18th SSR-presence test GREEN.\"\n\n### Apologies for the earlier framing\n\nI over-indexed on the rights-aware doc and missed that the test infra is the real bottleneck. Byrd called it correctly. Withdrawing Options 2 and 3 from my prior note.\n\nGoing idle. Available for the squash-merge after Bentham reviews.\n\n(*MVOX:Josquin*)",
+    "summary": "Correction — Byrd's impl is right, decision is mock-Entu",
+    "timestamp": "2026-05-22T14:31:49.822Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-22T14:31:56.460Z\",\"idleReason\":\"available\",\"summary\":\"[to byrd] Conceded — your analysis is correct\"}",
+    "timestamp": "2026-05-22T14:31:56.460Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-22T14:31:59.190Z\",\"idleReason\":\"available\",\"summary\":\"[to josquin] Agreed, standing down\"}",
+    "timestamp": "2026-05-22T14:31:59.190Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-22T14:32:05.198Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-22T14:32:05.198Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-22T14:32:12.984Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-22T14:32:12.984Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-22T14:35:50.518Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-22T14:35:50.518Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "comenius",
+    "text": "[2026-05-22 14:38]\n\n## Story Handoff\n- **Story:** #35 — CHORE-35: Frontend scaffolding — shared layout + landing page\n- **Branch:** feat/frontend-scaffolding-mvp\n- **From:** Comenius (phase: i18n)\n- **To:** Bentham (phase: REVIEW)\n- **Status:** I18N_COMPLETE\n\n### What was done\n- Replaced all 10 stub locale values with real translations in `messages/et.json`, `messages/lv.json`, `messages/uk.json`\n- Improved two English values: `landing_retry_button` \"Retry\" → \"Try again\" and `landing_error_state` gains \"Try again.\" suffix for inline actionability — both updated in `messages/en.json`\n- Keys re-sorted alphabetically in all 4 files (Paraglide canonical order)\n- Appended vocabulary decisions (koor/koris/хор, Sign in/out patterns, OAuth CTA pattern) to `teams/mvox-dev/memory/i18n-conventions.md`\n- Commit: `98eaa33` — `i18n(#35): real translations for landing + nav + login locale strings`\n\n### Test results\n- `pnpm check`: 0 errors, 0 warnings (Paraglide regenerated cleanly)\n- `pnpm test`: 1 failed (tailwind color test — pre-existing, confirmed present before my changes), 1 skipped (SSR-presence, Tallis's `.skip()` for #36), 19 passed — no regressions from locale changes\n\n### What to do next\nBentham: full RED/YELLOW/GREEN review of the `feat/frontend-scaffolding-mvp` branch. Key areas: layout discipline (no overflow ancestor of sticky), no hardcoded English strings remaining in `.svelte` files, no server import in client, Svelte 5 Runes only.\n\n### Files to start with\n- `src/routes/+layout.svelte`\n- `src/routes/+page.svelte`\n- `src/routes/auth/login/+page.svelte`",
+    "summary": "i18n handoff for #35 — I18N_COMPLETE",
+    "timestamp": "2026-05-22T14:39:02.368Z",
+    "color": "cyan",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "comenius",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"comenius\",\"timestamp\":\"2026-05-22T14:39:11.013Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-22T14:39:11.013Z",
+    "color": "cyan",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "[2026-05-22 14:58] **#35 verdict: GREEN with 4 follow-up YELLOWs. Approve for Josquin's local-merge ritual.**\n\nReviewed at branch tip `98eaa33` (all source via `git show <sha>:<path>`). Worktree-trust honored.\n\n## What's solid\n\n**TDD compliance**: ✓ `c727f2f` (RED, 25 tests) precedes `62891be` (Josquin server load) + `461ff4d` (Byrd UI). Monotonic. 7 Vitest unit + 17 Playwright E2E GREEN + 1 deliberate `.skip()` (`e77c280`) with explicit CHORE-36 TODO. Skip is the right shape per the PO Option B decision.\n\n**Security-critical surface**:\n- `+page.server.ts` reads `locals.entuJwt` (populated by `hooks.server.ts:5`). User-rights mode. No elevation.\n- `+page.svelte` `fetch('/api/organizations')` is same-origin → mvox BFF, NOT `entu.app`. No direct client→Entu call. ✓ canonical RED trigger #6 not fired.\n- No `src/lib/server/**` import in client. ✓\n- All user-supplied values rendered via Svelte interpolation (auto-escapes). `<img src={org.photo}>` uses attribute binding. No `{@html}`. ✓\n- Layout nav line 14 `{session.jwt ? '●' : ''}` renders a decorative bullet — does NOT leak the JWT value. ✓\n- No `overflow` on layout ancestors; no sticky descendants. ✓\n\n**Svelte 5 runes**: ✓ `$props()`, `$state()`, `$effect()`, `$derived()` throughout. No `export let`. No `$:`. Reassignment-not-mutation honored (`orgs = null`, `loadError = true`).\n\n**i18n**: 10 keys requested in Tallis's spec, 10 keys delivered in all 4 locales (en/et/lv/uk). 14 total keys per file, alphabetically sorted, full key parity. Translations are coherent natural-language (Estonian/Latvian/Ukrainian); none look machine-pasted.\n\n**CSR-over-SSR accommodation**: documented and reasoned. `+page.server.ts` provides the contract shape (`{ session, orgs, error? }`) that CHORE-36 will flip to. `$effect` consumption is the CSR shim. Not an architectural shift — the rights-aware contract §1 BFF-as-single-surface posture is intact in prod.\n\n## YELLOWs (all follow-up, none blocking merge)\n\n**YELLOW-35.1 (i18n gap — REAL)**: `+page.svelte:95`:\n```svelte\n<p class=\"text-xs text-gray-400 mt-1\">{org.member_count_per_section} members/section</p>\n```\nHardcoded English `members/section` slipped past Comenius. Should be `m.landing_members_per_section({ count: org.member_count_per_section })` or similar. **Owner: Comenius.** Per common-prompt \"Hardcoded English strings in new UI code → should be `m.key_name()` calls\" — this is the canonical YELLOW shape, not RED. ~10-line fix (new key in 4 locales + the substitution). All other user-facing strings are correctly behind `m.*()`. The string \"mvox\" in layout/footer is a brand name, not translation-needed.\n\n**YELLOW-35.2 (type duplication)**: `OrgEntity` declared identically in 3 files (`+page.server.ts:3-10`, `+page.svelte:5-12`, `src/tests/routes/landing/page.server.spec.ts:11-18`). Byrd's scope per common-prompt §TDD-Workflow row 3 explicitly includes `src/lib/types.ts`. Lift to `src/lib/types.ts` with an `OrgEntity` export. Owner: Byrd (or whoever does YELLOW-32.1 factor-out — natural pairing).\n\n**YELLOW-35.3 ($app/stores → $app/state, Svelte 5 + SvelteKit 2 convention)**: `+layout.svelte:3` uses `import { page } from '$app/stores'` (legacy SvelteKit store API). Svelte 5 + SvelteKit 2 prefer `import { page } from '$app/state'` (the new state-based equivalent). Both work; the new form is the forward-looking convention. This is the FIRST `$app/*` import in the codebase, so it sets the convention — worth flipping before more files copy the legacy form. Owner: Byrd. ~2-line change.\n\n**YELLOW-35.4 (session derivation fragility — UX, not security)**: Layout's `$derived($page.data?.session ?? null)` only sees `session` when the active route's `+page.server.ts` supplies it. Today only `/` provides it. Navigating to `/auth/login` while signed-in will incorrectly show \"Sign in\" in nav. **Fix**: lift session population to `src/routes/+layout.server.ts` (returns `{ session }`); then every route inherits it; `+page.server.ts` keeps only `{ orgs, error? }`. Owner: Josquin. Defer to a follow-up task because the only currently-affected route is `/auth/login` and the UX there is \"user already signed in clicks Sign in again\" — minor, not blocking. **Will become RED for any future authenticated route that doesn't supply its own `+page.server.ts` with session.**\n\n## Flag-list adjudication (your \"same shape as YELLOW-32.1?\")\n\nConfirmed — see YELLOW-35.2. Type duplication is the new instance of the helper-duplication concern. The runtime fetch logic duplication between `+page.server.ts` and `+page.svelte` is *deliberate transient* (the CSR shim) and disappears when CHORE-36 lands → no YELLOW for that.\n\n## v4E mutation gate\n\nNot triggered. Diff doesn't reference v4E entity types/properties/formulas/rights defaults. Trailers correctly absent. ✓\n\n## Other observations (no action)\n\n- `/auth/entu-redirect` href in login shell points to a route that doesn't exist yet — intentional shell scope.\n- `+page.server.ts` does a server-side fetch even though `+page.svelte` re-fetches client-side — one redundant request per signed-in landing-page request. Per Option B this is deliberate (server load preserves prod contract); flips when CHORE-36 lands. Accept-as-is.\n- `as unknown as ServerLoadEvent` cast in spec L67 is appropriate minimal-stub pattern for unit-testing load() without full SvelteKit fixture machinery. Same shape as the `+server.ts` `RequestEvent` casts. ✓\n\n## Carryforward to session-14+\n\n- **YELLOW-#19 (CSRF)**: still open, fires on first cookie-authed mutation route.\n- **YELLOW-#32 (Tailwind OKLCH)**: still carryforward; not a #35 regression.\n- **YELLOW-32.1**: helper factor-out (`src/lib/server/bff/{pagination,props}.ts`) — naturally pairs with YELLOW-35.2 (`src/lib/types.ts` for `OrgEntity`).\n- **YELLOW-32.2**: direct `client.get` 403/404 tests — still open for Tallis.\n- **Task #14 (Layer 2 photo file-payload)**: still pending.\n\n**CHORE-36 (E2E Entu mock harness)** is now a real downstream task — Tallis's `.skip()` references it. Confirm it's been opened as a GH issue (per #36 in the i18n logged-in commit).\n\nRecommend approve → Josquin merges per local-merge ritual. The 4 YELLOWs go to test-gaps.md (35.4 architecture) + follow-up tasks (35.1 i18n, 35.2+35.3 grouped under a \"Svelte 5 + types cleanup\" task).",
+    "summary": "#35 verdict: GREEN with 4 YELLOWs",
+    "timestamp": "2026-05-22T14:42:51.372Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-22T14:43:52.734Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-22T14:43:52.734Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "[2026-05-22 14:45]\n\n## #35 merged\n\n**Squash commit on main:** `db2040e` — `feat(#35): frontend scaffolding MVP — shared layout + landing page + login shell`\n\n`git log -1 --format=fuller` confirms:\n- No schema trailers (none required — no v4E diff in this PR)\n- `Co-authored-by: Mihkel Putrinš <mihkel.putrinsh@gmail.com>` auto-added by hook\n- Commit body lists all four follow-ups (#37, #38, #39, CHORE-36) for searchable history\n\nPushed (`809de20..db2040e  main -> main`). Feature branch `feat/frontend-scaffolding-mvp` deleted from both remote and local.\n\n### Scratchpad merge: clean this time\n\nStashed Bentham's + Byrd's scratchpads pre-checkout per ritual. Pop succeeded without conflict — both scratchpads back in the working tree, unstaged. Leaving them there for your session-shutdown roll-up commit (same pattern as #32).\n\n### Final state\n\n- 11 files changed, 643 insertions / 13 deletions in the squash\n- 335/335 Vitest GREEN; 17/18 Playwright GREEN (the 18th is the SSR-presence YELLOW, deferred to CHORE-36 per PO)\n- All four follow-ups tracked in the merge commit body\n\n#35 ready for you to close with the structured completion comment.\n\nGoing idle.\n\n(*MVOX:Josquin*)",
+    "summary": "#35 merged on main @ db2040e",
+    "timestamp": "2026-05-22T14:46:07.881Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-22T14:46:13.766Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-22T14:46:13.766Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779461582578@finn\",\"from\":\"finn\",\"timestamp\":\"2026-05-22T14:53:05.789Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-22T14:53:05.789Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779461585149@tallis\",\"from\":\"tallis\",\"timestamp\":\"2026-05-22T14:53:12.583Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-22T14:53:12.583Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779461586744@byrd\",\"from\":\"byrd\",\"timestamp\":\"2026-05-22T14:53:14.057Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-22T14:53:14.057Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "perotin",
+    "text": "[2026-05-22 14:53]\n\nPérotin closing — session 13.\n\n- [LEARNED] Gate-clear discipline held clean this session. The authorization comment in the script source (gate cleared 2026-05-22, SHA + team-lead auth logged) is the pattern to follow for future gated live scripts.\n- [DEFERRED] Task #14 (Layer 2 file-payload probe + instance migration) — still deferred; 0 avatar/logo instance values exist on polyphony today so no urgency. Fires when BFF needs _thumbnail working on real uploaded files.\n- No warnings.\n\nScratchpad written at c8f809b. Ready to terminate.",
+    "summary": "Pérotin closing — session 13 clean",
+    "timestamp": "2026-05-22T14:53:16.107Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "perotin",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779461584268@perotin\",\"from\":\"perotin\",\"timestamp\":\"2026-05-22T14:53:18.686Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-22T14:53:18.686Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "[2026-05-22 15:02] Session-13 close, three bullets:\n\n- **[LEARNED]** Prune the scratchpad at session END, not session START. Did it backwards at session-13 start; recovered by lifting two session-12 patterns into `architecture-decisions.md` (split-by-blast-radius, file-property round-trip). Stewardship rule encoded: load-bearing patterns go to settled-patterns file BEFORE pruning from scratchpad — that's the actual carry-forward path, not a `[PROCESSED]` block.\n\n- **[LEARNED]** Three reviews delivered (`82727ca` Layer 1 post-exec GREEN, `49ee037` #32 BFF MVP GREEN+2Y, `98eaa33` #35 frontend GREEN+4Y). Six new patterns logged in scratchpad: JSON-envelope errors > `throw error()`, library-wire-shape change YELLOW pin, helper-duplication-threshold (4×2 is past \"three lines\"), session-derivation-fragility-RED-trigger, `$app/stores` legacy convention, `OrgEntity`-style type-duplication → `src/lib/types.ts`, hardcoded-English-as-suffix gotcha.\n\n- **[DEFERRED]** Active carryforward into session 14: YELLOW-#19 (CSRF — fires on first cookie-authed mutation route), YELLOW-#32 (Tailwind OKLCH), YELLOW-32.1 (BFF helper factor-out → fires when route #3 lands, becomes RED at that point), YELLOW-32.2 (direct `client.get` 403/404 tests for Tallis), YELLOW-35.1/2/3/4 (i18n suffix gap / OrgEntity dup / `$app/state` / `+layout.server.ts` session lift — the last becomes RED when the second auth-gated route lands), Task #14 (Layer 2 photo file-payload). New downstream: CHORE-36 (E2E Entu mock harness) gates un-skipping the SSR-presence test.\n\nReady for shutdown approval.",
+    "summary": "Bentham session-13 close",
+    "timestamp": "2026-05-22T14:53:28.936Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779461583632@bentham\",\"from\":\"bentham\",\"timestamp\":\"2026-05-22T14:53:32.597Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-22T14:53:32.597Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "comenius",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779461587462@comenius\",\"from\":\"comenius\",\"timestamp\":\"2026-05-22T14:53:35.243Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-22T14:53:35.243Z",
+    "color": "cyan",
+    "type": "message",
     "read": true
   }
 ]

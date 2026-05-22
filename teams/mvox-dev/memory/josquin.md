@@ -4,21 +4,36 @@ Personal notes. Only Josquin writes here.
 
 ---
 
-## [CHECKPOINT] 2026-05-22 session 13 — #32 GREEN landed on `feat/bff-orgs-sections-mvp` @ `49ee037`
+## [CHECKPOINT] 2026-05-22 session 13 — #32 merged @ `8fd3ed0`, #35 merged @ `db2040e`
 
-27 RED → 27 GREEN, 328/328 total, `pnpm check` 0 errors. Two routes + one client tweak:
+Both PRs landed on main this session. Key durables below; ephemeral PR-detail pruned.
 
-- `src/routes/api/organizations/+server.ts` — orgs list, narrow §5.1 shape
-- `src/routes/api/organizations/[id]/sections/+server.ts` — sections under org, narrow §5.2
-- `src/lib/server/entu/client.ts` — `get()` now throws on `!res.ok`; the route uses `.catch(() => null)` to collapse 403+404 → 404. Existing client.spec.ts unaffected (all happy-path cases).
+### #32 BFF MVP — orgs + sections endpoints
 
-[PATTERN] **Vitest doesn't resolve `$lib`** — confirmed again here. Use relative imports in route handlers tested via vitest (`../../../lib/server/entu/client.ts`). Same gotcha I logged on 2026-05-21 for client.spec.ts; here it surfaced via `+server.ts` imports inside `vi.resetModules()` dynamic-import test pattern. Mental model: if a file is reachable from a vitest spec via `import()`, it must use relative paths to traverse cross-tree.
+[PATTERN] **Vitest doesn't resolve `$lib`** — confirmed again. Route handlers tested via vitest must use relative imports (`../../../lib/server/entu/client.ts`). Same gotcha as 2026-05-21 (`client.spec.ts`); reappeared here for `+server.ts` imports inside `vi.resetModules()` dynamic-import test pattern. Mental model: if a file is reachable from a vitest spec via `import()`, traverse cross-tree with relative paths only.
 
-[PATTERN] **Property extractor helpers inlined per-route, not factored.** Two routes; the extractor set (string/number/reference/thumbnail/voice composite) is small and shape-identical. A `src/lib/server/bff/props.ts` module would be premature here — revisit when route 3 lands and the duplication becomes real.
+[PATTERN] **BFF JSON-envelope errors > SvelteKit `throw error()`.** Bentham settled this on the #32 review (now in `architecture-decisions.md`): all BFF errors `return json({ error: '<code>' }, { status })`. Predictable JSON for frontend consumers; tests pin `body.error === 'auth_required'`. Use `throw error(...)` only when you want SvelteKit's HTML error page — never for `+server.ts` API routes.
 
-[GOTCHA] **Voice is a composite multi-value, not a simple reference.** v4E declares section.voice as a `reference` property, but Entu surfaces `{ reference: 'voice-id', string: 'voice-name' }` on the value. Tests pin `{ _id: 'voice-1', name: 'Soprano' }` in the response — both pieces come from the same property value, no second fetch. If other reference properties in future routes need the same shape, name the helper `extractReferenceWithLabel` not `extractVoice`.
+[PATTERN] **Property extractor helpers stay inlined until route 3.** GH #33 tracks factoring to `src/lib/server/bff/{pagination,props}.ts` when the third `+server.ts` lands. Until then the duplication is "three similar lines" territory. Bentham YELLOWs at 4× duplication; REDs when route 3 ships without the factor.
 
-Handed off to Bentham at this commit.
+[GOTCHA] **Voice is a composite multi-value.** v4E section.voice is declared `reference`, but Entu surfaces `{ reference: 'voice-id', string: 'voice-name' }` per value. Tests expect `{ _id, name }` in the response — both from the same property value, no second fetch. If a future reference property needs the same shape, name the helper `extractReferenceWithLabel` not `extractVoice`.
+
+[GOTCHA] **`EntuClient.get` throws on !res.ok.** Route uses `.catch(() => null)` to collapse Entu 403+404 → 404 (hide existence). GH #34 tracks adding direct `client.spec.ts` tests pinning the throw behavior — Tallis-owned. Indirect coverage via route specs is GREEN-eligible but not durable on its own.
+
+### #35 Frontend Scaffolding — server load + landing
+
+[CONTRACT] **Three-branch server-load shape.** `src/routes/+page.server.ts` returns one of:
+- `{ session: null, orgs: null }` — no entuJwt
+- `{ session: { jwt }, orgs: OrgEntity[] }` — signed-in, BFF 200
+- `{ session: { jwt }, orgs: null, error: true }` — signed-in, BFF non-200 or fetch threw
+
+Reusable shape for future authenticated landing-style routes. Session is currently `{ jwt }`; GH #39 tracks lifting to `+layout.server.ts` once a second authenticated route needs it.
+
+[DEFERRED] **CHORE-36 — mock-Entu E2E harness.** Byrd's #35 landed with `+page.svelte` using a browser-side `$effect` fetch instead of `data.orgs`, because Playwright's `page.route()` can't intercept SvelteKit's internal `event.fetch` (server-side node fetch bypasses Chromium's network layer). One Playwright test (SSR-presence) is RED as a result. PO decided ship-with-YELLOW; CHORE-36 will stand up a mockable Entu HTTP layer beneath SvelteKit, flip the landing to seed orgs from `data.orgs`, drop the `$effect`-on-mount, turn the 18th test GREEN. Rights-aware contract doc §1 BFF-as-single-surface isn't violated in prod — the `$effect` is a CI accommodation, not an architectural shift.
+
+[LEARNED] **Test-environment constraints can dominate design-doc posture.** I argued for "remove `$effect`, seed from `data`" based on the rights-aware design doc. Byrd pointed out that with no Entu in CI, the server load returns `error: true` regardless, so my proposal would have broken 17 GREENs while still not earning the 18th. **The right framing was the test infra, not the code shape.** Future-self: when proposing a design change that interacts with tests, first ask "what does the test environment actually allow?" before invoking the design doc.
+
+[LEARNED] **Conceding fast when wrong is cheap; doubling down is expensive.** When Byrd's option-C analysis arrived, I checked the numbers, found he was right, and reframed in the next message rather than defending the prior position. Took ~3 minutes; lost nothing. Pattern worth keeping: validate the counterargument's claims numerically, then either rebut with specifics or yield clean. Don't litigate framing.
 
 ---
 

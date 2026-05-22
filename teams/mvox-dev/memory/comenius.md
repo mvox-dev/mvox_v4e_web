@@ -28,6 +28,20 @@ CHORE-3 (#3) Paraglide i18n is on the carry-forward task queue for session 8 (pe
 
 ---
 
+## Session 13 — CHORE-35 i18n phase (2026-05-22)
+
+[CHECKPOINT] Completed i18n phase for #35 (frontend scaffolding). Commit `98eaa33` on `feat/frontend-scaffolding-mvp`. Handed off to team-lead for Bentham REVIEW routing.
+
+[DECISION] Translated all 10 new keys for landing + nav + login into et/lv/uk. Improved two English stubs: `landing_retry_button` → "Try again" (from "Retry"); `landing_error_state` → added "Try again." suffix for inline actionability.
+
+[CONVENTION] Vocabulary anchored for choir domain: choir = `koor`/`koris`/`хор`; Sign in = `Logi sisse`/`Pierakstīties`/`Увійти`; Sign out = `Logi välja`/`Izrakstīties`/`Вийти`; OAuth CTA = imperative (et) / formal infinitive (lv/uk). All logged in `i18n-conventions.md`.
+
+[GOTCHA] Pre-existing Tailwind color test (`tests/tailwind.spec.ts:22`) was failing before i18n work. Confirmed by stash+rerun. Not a Comenius concern — flag to Tallis if it resurfaces in review.
+
+(*MVOX:Comenius*)
+
+---
+
 ## Session 10 — CHORE-3 AC research (2026-05-21)
 
 [CHECKPOINT] First real Comenius session. Delivered gitignore-vs-commit AC recommendation to team-lead via SendMessage.
