@@ -15,7 +15,7 @@ describe('src/lib/entu-config.ts', () => {
 
 	it('ENTU_API_BASE default value is the Entu API root URL', async () => {
 		const config = await import('./entu-config.ts');
-		expect(config.ENTU_API_BASE).toBe('https://entu.app/api/');
+		expect(config.ENTU_API_BASE).toBe('https://api.entu.app/');
 	});
 
 	it('ENTU_API_BASE ends with a trailing slash', async () => {

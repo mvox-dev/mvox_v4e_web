@@ -240,11 +240,120 @@ describe('auth/login +page.server.ts load()', () => {
 		const csrfState = cookies.store['csrf_state'];
 
 		const statesInUrls = result.providers.map((p) => {
-			const m = p.url.match(/[?&]state=([^&?]+)/);
-			return m ? m[1] : null;
+			const nextMatch = p.url.match(/[?&]next=([^&]+)/);
+			if (!nextMatch) return null;
+			const next = decodeURIComponent(nextMatch[1]);
+			const stateMatch = next.match(/[?&]state=([^&]+)/);
+			return stateMatch ? stateMatch[1] : null;
 		});
 		for (const stateInUrl of statesInUrls) {
 			expect(stateInUrl).toBe(csrfState);
 		}
+	});
+});
+
+// ---------------------------------------------------------------------------
+// #50 — Corrected OAuth URL shape: host + path + single state
+// These tests pin the FIXED shape and FAIL against the current buggy code.
+// Unset ENTU_BASE_URL so the code falls through to ENTU_API_BASE in
+// entu-config.ts — GREEN fixes entu-config.ts to 'https://api.entu.app/'.
+// ---------------------------------------------------------------------------
+describe('auth/login +page.server.ts load() — #50 corrected URL shape', () => {
+	beforeEach(() => {
+		// Force code to use ENTU_API_BASE constant (not env override) so the
+		// host assertion targets the constant's value, which GREEN must fix.
+		mockEnv.ENTU_BASE_URL = undefined as unknown as string;
+		mockEnv.ENTU_DB = 'polyphony';
+		vi.resetModules();
+	});
+
+	afterEach(() => {
+		vi.restoreAllMocks();
+	});
+
+	it('smart-id URL host is api.entu.app (not entu.app)', async () => {
+		const { load } = await import('../../../../routes/auth/login/+page.server.ts');
+		const event = makeLoadEvent();
+		const result = (await load(event)) as { providers: Array<{ id: string; url: string }> };
+
+		const smartId = result.providers.find((p) => p.id === 'smart-id')!;
+		const parsed = new URL(smartId.url);
+		expect(parsed.host).toBe('api.entu.app');
+	});
+
+	it('google URL host is api.entu.app (not entu.app)', async () => {
+		const { load } = await import('../../../../routes/auth/login/+page.server.ts');
+		const event = makeLoadEvent();
+		const result = (await load(event)) as { providers: Array<{ id: string; url: string }> };
+
+		const google = result.providers.find((p) => p.id === 'google')!;
+		const parsed = new URL(google.url);
+		expect(parsed.host).toBe('api.entu.app');
+	});
+
+	it('smart-id URL path is /auth/smart-id (no /api/ prefix)', async () => {
+		const { load } = await import('../../../../routes/auth/login/+page.server.ts');
+		const event = makeLoadEvent();
+		const result = (await load(event)) as { providers: Array<{ id: string; url: string }> };
+
+		const smartId = result.providers.find((p) => p.id === 'smart-id')!;
+		const parsed = new URL(smartId.url);
+		expect(parsed.pathname).toBe('/auth/smart-id');
+	});
+
+	it('google URL path is /auth/google (no /api/ prefix)', async () => {
+		const { load } = await import('../../../../routes/auth/login/+page.server.ts');
+		const event = makeLoadEvent();
+		const result = (await load(event)) as { providers: Array<{ id: string; url: string }> };
+
+		const google = result.providers.find((p) => p.id === 'google')!;
+		const parsed = new URL(google.url);
+		expect(parsed.pathname).toBe('/auth/google');
+	});
+
+	it('smart-id URL has no top-level state query parameter (state lives only inside encoded next)', async () => {
+		const { load } = await import('../../../../routes/auth/login/+page.server.ts');
+		const event = makeLoadEvent();
+		const result = (await load(event)) as { providers: Array<{ id: string; url: string }> };
+
+		const smartId = result.providers.find((p) => p.id === 'smart-id')!;
+		const parsed = new URL(smartId.url);
+		expect(parsed.searchParams.has('state')).toBe(false);
+	});
+
+	it('google URL has no top-level state query parameter (state lives only inside encoded next)', async () => {
+		const { load } = await import('../../../../routes/auth/login/+page.server.ts');
+		const event = makeLoadEvent();
+		const result = (await load(event)) as { providers: Array<{ id: string; url: string }> };
+
+		const google = result.providers.find((p) => p.id === 'google')!;
+		const parsed = new URL(google.url);
+		expect(parsed.searchParams.has('state')).toBe(false);
+	});
+
+	it('smart-id URL state value appears inside the decoded next param', async () => {
+		const { load } = await import('../../../../routes/auth/login/+page.server.ts');
+		const event = makeLoadEvent('https://multivox.pages.dev');
+		const result = (await load(event)) as { providers: Array<{ id: string; url: string }> };
+		const cookies = event.cookies as ReturnType<typeof makeCookies>;
+		const csrfState = cookies.store['csrf_state'];
+
+		const smartId = result.providers.find((p) => p.id === 'smart-id')!;
+		const parsed = new URL(smartId.url);
+		const next = decodeURIComponent(parsed.searchParams.get('next') ?? '');
+		expect(next).toContain(`state=${csrfState}`);
+	});
+
+	it('smart-id URL next param decodes to callback URL shape with state and key=', async () => {
+		const { load } = await import('../../../../routes/auth/login/+page.server.ts');
+		const event = makeLoadEvent('https://multivox.pages.dev');
+		const result = (await load(event)) as { providers: Array<{ id: string; url: string }> };
+		const cookies = event.cookies as ReturnType<typeof makeCookies>;
+		const csrfState = cookies.store['csrf_state'];
+
+		const smartId = result.providers.find((p) => p.id === 'smart-id')!;
+		const parsed = new URL(smartId.url);
+		const next = decodeURIComponent(parsed.searchParams.get('next') ?? '');
+		expect(next).toBe(`https://multivox.pages.dev/auth/callback?state=${csrfState}&key=`);
 	});
 });

@@ -27,7 +27,7 @@ export const load: ServerLoad = async ({ cookies, url }) => {
 	const providers = PROVIDERS.map(({ id, label }) => ({
 		id,
 		label,
-		url: `${baseUrl}auth/${id}?next=${encodeURIComponent(callbackBase)}&state=${csrfState}`,
+		url: `${baseUrl}auth/${id}?next=${encodeURIComponent(callbackBase)}`,
 	}));
 
 	return { providers };
