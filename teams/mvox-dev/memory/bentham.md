@@ -7,6 +7,22 @@ metadata:
 
 # Bentham scratchpad
 
+## 2026-05-22 — Session 13: #35 Frontend scaffolding review (branch tip `98eaa33`)
+
+[DECISION] **#35 verdict: GREEN with 4 follow-up YELLOWs.** Reviewed at `git show 98eaa33:<path>`. 25 RED tests (`c727f2f`) → 7 Vitest GREEN + 17 Playwright GREEN + 1 documented `.skip()` (`e77c280`, references CHORE-36). Security-critical: no client→Entu call, no server import in client, no XSS surface (Svelte auto-escape everywhere; no `{@html}`), JWT not leaked in nav (decorative bullet only). Svelte 5 runes throughout; no legacy syntax. YELLOWs: 35.1 hardcoded `members/section` in `+page.svelte:95`; 35.2 `OrgEntity` declared in 3 files (lift to `src/lib/types.ts`); 35.3 `$app/stores` legacy form on the first such import in the codebase; 35.4 session derivation fragility (architectural — lift to `+layout.server.ts`).
+
+[PATTERN] **Session derivation in `+layout.svelte` from `$page.data?.session` is fragile — should live in `+layout.server.ts`.** When session-aware nav reads from `$page.data?.session`, it only sees session on routes whose `+page.server.ts` returns `session`. Today only `/` provides it → `/auth/login` shows "Sign in" even when signed-in (wrong nav state). The architectural fix is to populate `session` in `src/routes/+layout.server.ts` so every route inherits it. **RED trigger for the next-but-one authenticated route**: if a route requires auth but doesn't supply `{ session }` in its own page.server.ts AND `+layout.server.ts` doesn't yet exist, the nav is broken. YELLOW today (only `/auth/login` affected); turns RED when the second authenticated route lands. Encode for review of any future `+page.server.ts` returning auth-gated data: ensure session lives in `+layout.server.ts` before merging that route.
+
+[PATTERN] **`$app/stores` is legacy on SvelteKit 2 + Svelte 5; `$app/state` is the forward-looking convention.** `import { page } from '$app/stores'` works (it's the runtime-store API, not a runes violation) but `import { page } from '$app/state'` is the rune-compatible equivalent in SvelteKit 2. Common-prompt's "Runes ONLY" rule doesn't explicitly call this out — but on the first `$app/*` import in mvox setting the convention, prefer `$app/state`. YELLOW for legacy usage; not RED unless an entire feature ships with stale legacy patterns.
+
+[PATTERN] **Transient duplication during CSR-shim phases is acceptable.** When an architectural decision creates a temporary CSR-over-SSR accommodation (e.g., #35's `+page.svelte` `$effect` re-fetches what `+page.server.ts` already fetched), the duplication between server-load and client-effect is deliberate, time-bounded, and disappears at the CHORE that completes the migration (here: CHORE-36). Don't YELLOW transient duplication tied to a documented future CHORE — only YELLOW persistent duplication (types, helpers, route-shared logic). Distinguishing test: "would un-duplicating this require reverting the CSR shim?" If yes → transient, accept. If no → factor.
+
+[PATTERN] **Type-as-source-of-truth lives in `src/lib/types.ts`.** When a payload-shape type (e.g., `OrgEntity`) is declared in N>1 files, the canonical home is `src/lib/types.ts` (Byrd's scope per common-prompt §TDD-Workflow). When N=3 and each declaration is byte-identical, YELLOW for lift-to-types. Pair with the BFF helper-extraction YELLOWs — same shape, different scope (types for shared shapes; `src/lib/server/bff/` for shared logic).
+
+[GOTCHA] **Hardcoded English can slip past i18n review when it's a suffix to a data value.** `#35` had `{org.member_count_per_section} members/section` — the English `members/section` is a suffix to a templated number, which doesn't visually look like a "string" the way `<h1>Sign in</h1>` does. Comenius's review pass missed it because the line opens with `{...}`. **For future i18n review:** scan for English words anywhere on a line containing `{...}`, not just lines that are pure text. Canonical i18n YELLOW (Comenius is the natural owner), not RED.
+
+---
+
 ## 2026-05-22 — Session 13: #32 BFF MVP review (commit `49ee037`, merged as `8fd3ed0`)
 
 [DECISION] **#32 verdict: GREEN with 2 follow-up YELLOWs.** 27/27 RED tests at `9087a1f` mapped exactly to AC §§5.1+5.2; impl at `49ee037` satisfies them. 328/328 tests pass; `pnpm check` 0. TDD ordering monotonic. Schema-mutation trailers present (depends on `82727ca` Layer 1 + `entu/research@f52adc4`). Security-critical surface (two new `+server.ts` + `client.ts` throw addition) reviewed line-by-line.
