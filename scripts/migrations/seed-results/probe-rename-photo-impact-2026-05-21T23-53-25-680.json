@@ -1,0 +1,32 @@
+{
+  "runAt": "2026-05-21T23:53:25.680Z",
+  "db": "polyphony",
+  "personAvatar": {
+    "propDef": {
+      "propDefEntityId": "6a0d709890c8df7a1cc7e12e",
+      "parentTypeName": "person",
+      "parentTypeEntityId": "69bcfd8e9c031ab8e6ce805f",
+      "nameValueId": "6a0d709890c8df7a1cc7e131",
+      "currentName": "avatar"
+    },
+    "instanceCount": 0,
+    "instances": []
+  },
+  "orgLogo": {
+    "propDef": {
+      "propDefEntityId": "6a0d2e8790c8df7a1cc7dfad",
+      "parentTypeName": "organization",
+      "parentTypeEntityId": "69c7ea478489bfcb0e819e3d",
+      "nameValueId": "6a0d2e8790c8df7a1cc7dfb0",
+      "currentName": "logo"
+    },
+    "instanceCount": 0,
+    "instances": []
+  },
+  "formulaReferences": [],
+  "menuReferences": [],
+  "openQuestions": [
+    "person.avatar: 0 instances with values. May be already renamed or never set. Verify."
+  ],
+  "errors": []
+}

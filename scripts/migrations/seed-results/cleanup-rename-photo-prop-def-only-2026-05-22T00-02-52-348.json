@@ -1,0 +1,52 @@
+{
+  "script": "cleanup-rename-photo-prop-def-only-2026-05-21",
+  "layer": "Layer 1 — prop-def renames only",
+  "dryRun": true,
+  "startedAt": "2026-05-22T00:02:52.348Z",
+  "completedAt": "2026-05-22T00:02:52.578Z",
+  "manifest": [
+    {
+      "kind": "rename_prop_def",
+      "typeName": "person",
+      "oldName": "avatar",
+      "newName": "photo",
+      "propDefEntityId": "6a0d709890c8df7a1cc7e12e",
+      "nameValueId": "6a0d709890c8df7a1cc7e131"
+    },
+    {
+      "kind": "rename_prop_def",
+      "typeName": "organization",
+      "oldName": "logo",
+      "newName": "photo",
+      "propDefEntityId": "6a0d2e8790c8df7a1cc7dfad",
+      "nameValueId": "6a0d2e8790c8df7a1cc7dfb0"
+    }
+  ],
+  "results": [
+    {
+      "kind": "rename_prop_def",
+      "typeName": "person",
+      "oldName": "avatar",
+      "newName": "photo",
+      "propDefEntityId": "6a0d709890c8df7a1cc7e12e",
+      "nameValueId": "6a0d709890c8df7a1cc7e131",
+      "outcome": "would-rename"
+    },
+    {
+      "kind": "rename_prop_def",
+      "typeName": "organization",
+      "oldName": "logo",
+      "newName": "photo",
+      "propDefEntityId": "6a0d2e8790c8df7a1cc7dfad",
+      "nameValueId": "6a0d2e8790c8df7a1cc7dfb0",
+      "outcome": "would-rename"
+    }
+  ],
+  "summary": {
+    "renames": 2,
+    "skipped": 0,
+    "failed": 0
+  },
+  "errors": [],
+  "exitCode": 0
+}

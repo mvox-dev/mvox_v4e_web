@@ -353,6 +353,78 @@ Commits (in order):
   seed-collectives.ts     — org/section/person/member instances (120p, 235m, 6o, 16s), last live: session 8
   seed-menu-items-per-entity-type-2026-05-21.ts — menu entity rationalization, idempotent by query, last live: 2026-05-21
 
+## Session 11 — avatar+logo → photo rename pre-stage (2026-05-21)
+
+[CHECKPOINT] Branch chore/perotin-rename-photo-prestage-2026-05-21 pushed (commit 05eb5df).
+  Discovery probe: probe-rename-photo-impact-2026-05-21.ts → probe-rename-photo-impact-2026-05-21T23-53-25-680.json
+  Migration script: cleanup-rename-avatar-logo-to-photo-2026-05-21.ts
+  Dry-run artifact: cleanup-rename-avatar-logo-to-photo-2026-05-21T23-55-07-306.json
+
+[PROBE-RESULT] Rename impact (2026-05-21T23:53Z):
+  person.avatar prop-def: _id=6a0d709890c8df7a1cc7e12e nameValueId=6a0d709890c8df7a1cc7e131
+    parent type entity: 69bcfd8e9c031ab8e6ce805f
+  organization.logo prop-def: _id=6a0d2e8790c8df7a1cc7dfad nameValueId=6a0d2e8790c8df7a1cc7dfb0
+    parent type entity: 69c7ea478489bfcb0e819e3d
+  person instances with avatar: 0 (Layer 2 is a no-op)
+  org instances with logo: 0 (Layer 2 is a no-op)
+  formula refs to avatar/logo: 0
+  menu refs to avatar/logo: 0
+
+[DECISION] Rename is prop-def-only (2 DELETE-then-POST ops). No instance value migration needed today.
+  If avatars/logos are uploaded before session 13 executes, the instance enumeration in Phase 2
+  of the migration script will catch them dynamically at runtime (manifest-first pattern).
+
+[DEFERRED] Live execution of cleanup-rename-avatar-logo-to-photo-2026-05-21.ts pending:
+  (a) entu/research PR "rename avatar+logo to photo" merging upstream (PO submits)
+  (b) Explicit "I authorize this run" SendMessage from team-lead
+  --live flag blocked at startup until both gates cleared.
+
+## Session 12 — RED-1 split + Bentham GREEN (2026-05-22)
+
+[LEARNED] Layer 1 / Layer 2 split discipline (Bentham RED-1, session 12):
+  When a migration has two distinct layers with different risk profiles, do NOT bundle them
+  in one script. Prop-def renames (Layer 1) are low-risk; instance value migrations
+  involving file properties (Layer 2) require empirical probe first.
+  Bundling allows Layer 2's unverified assumptions to block an otherwise GREEN Layer 1.
+  Rule: separate scripts for separate risk tiers.
+
+[LEARNED] File-property POST semantics are unverified (RED-1 root cause):
+  The original script assumed {type:'photo'} is sufficient to re-attach an S3 file after
+  DELETE-then-POST. Not confirmed. Entu file properties carry md5, content-type, S3 key.
+  Unknown whether POSTing only {type:'photo'} re-links the same file or creates a broken
+  orphan. Task #14 (deferred): empirical probe of Entu file POST wire shape before
+  Layer 2 is written.
+
+[GOTCHA] YELLOW-12.3 (findPropDef dead query): probe had a dead first listEntities call
+  querying instances (not the type entity), immediately superseded by the correct
+  META_TYPE_ENTITY_ID query. Fixed in ea1a2b1. Pattern: dead unreachable results in
+  multi-strategy functions are readability traps — remove or use.
+
+[CHECKPOINT] Session 12 shutdown state:
+  Branch chore/perotin-rename-photo-prestage-2026-05-21 at ea1a2b1 (Bentham GREEN).
+  Script: cleanup-rename-photo-prop-def-only-2026-05-21.ts (Layer 1 only)
+  Dry-run: cleanup-rename-photo-prop-def-only-2026-05-22T00-02-52-348.json (2 renames, 0 errors)
+  Parked awaiting: (a) entu/research PR merge upstream, (b) "I authorize this run" from team-lead.
+  Task #14 (Layer 2 file-payload probe + instance migration) deferred to future session.
+
+## Session 13 — Layer 1 live execution (2026-05-22)
+
+[CHECKPOINT] Layer 1 live execution complete (commit 8cc4556, branch chore/perotin-rename-photo-prestage-2026-05-21):
+  Script: cleanup-rename-photo-prop-def-only-2026-05-21.ts --live
+  Result artifact: cleanup-rename-photo-prop-def-only-2026-05-22T13-31-58-658.json
+  Outcome: 2/2 renames, 0 skipped, 0 failed, exit 0
+  Post-exec verification: person prop-def name="photo" OK, organization prop-def name="photo" OK — PASS
+  _thumbnail smoke: Eesti Kammerkooride Liit — _thumbnail absent (expected; no photo file uploaded yet)
+  entu/research gate: PR #49 merged at f52adc4
+  Authorization gate: team-lead "I authorize this run" 2026-05-22 13:30
+  Branch is now ready for squash-merge to main (team-lead handles merge ritual).
+
+[DATA STATE] Polyphony Entu db after session 13 Layer 1:
+  person.avatar prop-def: RENAMED to "photo" (propDefEntityId 6a0d709890c8df7a1cc7e12e)
+  organization.logo prop-def: RENAMED to "photo" (propDefEntityId 6a0d2e8790c8df7a1cc7dfad)
+  Instance values: 0 avatar / 0 logo values existed — Layer 2 remains a no-op today
+  _thumbnail: functional on both entity types once any photo file is uploaded
+
 ## Permanent role note
 
 Promoted from temporary specialist to permanent data-manager (session 7 end). Future seeding work:
