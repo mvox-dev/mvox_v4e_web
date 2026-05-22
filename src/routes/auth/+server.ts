@@ -1,6 +1,6 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import { json } from '@sveltejs/kit';
-import { DEFAULT_BASE_URL } from '../../lib/server/entu/client.ts';
+import { ENTU_API_BASE } from '../../lib/entu-config.ts';
 
 export const POST: RequestHandler = async ({ request, cookies, url }) => {
 	const authHeader = request.headers.get('Authorization');
@@ -9,7 +9,7 @@ export const POST: RequestHandler = async ({ request, cookies, url }) => {
 	}
 
 	const db = url.searchParams.get('db') ?? '';
-	const baseUrl = process.env.ENTU_BASE_URL ?? DEFAULT_BASE_URL;
+	const baseUrl = process.env.ENTU_BASE_URL ?? ENTU_API_BASE;
 	const entuAuthUrl = `${baseUrl}${db}/auth`;
 
 	const res = await fetch(entuAuthUrl, {

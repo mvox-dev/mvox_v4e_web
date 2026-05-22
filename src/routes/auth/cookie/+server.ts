@@ -13,6 +13,13 @@ function decodeJwtPayload(token: string): { exp?: unknown } | null {
 }
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
+	const csrfState = cookies.get('csrf_state');
+	if (!csrfState) {
+		return json({ error: 'csrf_missing' }, { status: 403 });
+	}
+
+	cookies.delete('csrf_state', { path: '/auth' });
+
 	let body: { token?: unknown };
 	try {
 		body = await request.json() as { token?: unknown };

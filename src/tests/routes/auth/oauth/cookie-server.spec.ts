@@ -3,10 +3,16 @@
  *
  * Receives { token: <JWT> } from client JS after Entu exchange.
  * Validates JWT shape (3 parts, non-expired `exp` claim).
+ * Validates CSRF state: reads csrf_state cookie, rejects if missing.
  * Sets entu_jwt httpOnly cookie.
+ * Deletes csrf_state cookie after processing (single-use, delete-always).
  *
  * Does NOT verify JWT signature — trust boundary is the Entu exchange itself.
  * Signature verification deferred until Entu public key is available.
+ *
+ * CHORE-41.1: CSRF binding added. csrf_state cookie (path /auth, set by
+ * /auth/login server load) must be present; POST /auth/cookie verifies and
+ * deletes it. Callback page server load no longer deletes it.
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { Cookies, RequestEvent } from '@sveltejs/kit';
@@ -37,8 +43,14 @@ function makeCookies(): Cookies & { store: Record<string, string>; opts: Record<
 	} as unknown as Cookies & { store: Record<string, string>; opts: Record<string, unknown> };
 }
 
-function makeCookiePostEvent(body: unknown): RequestEvent {
+const CSRF_STATE = 'csrf-test-state-abc';
+
+function makeCookiePostEvent(body: unknown, csrfState: string | null = CSRF_STATE): RequestEvent {
 	const cookies = makeCookies();
+	// Pre-seed csrf_state cookie (as set by /auth/login +page.server.ts)
+	if (csrfState !== null) {
+		(cookies as ReturnType<typeof makeCookies>).store['csrf_state'] = csrfState;
+	}
 	return {
 		cookies,
 		locals: { entuJwt: null } as App.Locals,
@@ -167,5 +179,61 @@ describe('POST /auth/cookie', () => {
 
 		const cookies = event.cookies as ReturnType<typeof makeCookies>;
 		expect(cookies.set).not.toHaveBeenCalled();
+	});
+
+	// -------------------------------------------------------------------------
+	// CSRF binding (CHORE-41.1)
+	// -------------------------------------------------------------------------
+
+	it('returns 403 when csrf_state cookie is missing', async () => {
+		const { POST } = await import('../../../../routes/auth/cookie/+server.ts');
+		const jwt = makeJwt(PAYLOAD_VALID);
+		const event = makeCookiePostEvent({ token: jwt }, null);
+		const response = await POST(event);
+
+		expect(response.status).toBe(403);
+	});
+
+	it('does not set entu_jwt cookie when csrf_state is missing', async () => {
+		const { POST } = await import('../../../../routes/auth/cookie/+server.ts');
+		const jwt = makeJwt(PAYLOAD_VALID);
+		const event = makeCookiePostEvent({ token: jwt }, null);
+		await POST(event);
+
+		const cookies = event.cookies as ReturnType<typeof makeCookies>;
+		const jwtCall = (cookies.set as ReturnType<typeof vi.fn>).mock.calls.find(
+			(c: unknown[]) => c[0] === 'entu_jwt'
+		);
+		expect(jwtCall).toBeUndefined();
+	});
+
+	// -------------------------------------------------------------------------
+	// csrf_state deletion — delete-always (CHORE-41.1)
+	// -------------------------------------------------------------------------
+
+	it('deletes csrf_state cookie on successful JWT validation', async () => {
+		const { POST } = await import('../../../../routes/auth/cookie/+server.ts');
+		const jwt = makeJwt(PAYLOAD_VALID);
+		const event = makeCookiePostEvent({ token: jwt });
+		await POST(event);
+
+		expect(event.cookies.delete).toHaveBeenCalledWith('csrf_state', expect.objectContaining({ path: '/auth' }));
+	});
+
+	it('deletes csrf_state cookie even when JWT is malformed (delete-always)', async () => {
+		const { POST } = await import('../../../../routes/auth/cookie/+server.ts');
+		const event = makeCookiePostEvent({ token: 'bad' });
+		await POST(event);
+
+		expect(event.cookies.delete).toHaveBeenCalledWith('csrf_state', expect.objectContaining({ path: '/auth' }));
+	});
+
+	it('deletes csrf_state cookie even when JWT is expired (delete-always)', async () => {
+		const { POST } = await import('../../../../routes/auth/cookie/+server.ts');
+		const jwt = makeJwt(PAYLOAD_EXPIRED);
+		const event = makeCookiePostEvent({ token: jwt });
+		await POST(event);
+
+		expect(event.cookies.delete).toHaveBeenCalledWith('csrf_state', expect.objectContaining({ path: '/auth' }));
 	});
 });

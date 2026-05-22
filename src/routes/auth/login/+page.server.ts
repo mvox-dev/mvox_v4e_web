@@ -1,5 +1,5 @@
 import type { ServerLoad } from '@sveltejs/kit';
-import { DEFAULT_BASE_URL } from '../../../lib/server/entu/client.ts';
+import { ENTU_API_BASE } from '../../../lib/entu-config.ts';
 
 const PROVIDERS: ReadonlyArray<{ id: string; label: string }> = [
 	{ id: 'smart-id', label: 'Smart-ID' },
@@ -20,7 +20,7 @@ export const load: ServerLoad = async ({ cookies, url }) => {
 		path: '/auth',
 	});
 
-	const baseUrl = process.env.ENTU_BASE_URL ?? DEFAULT_BASE_URL;
+	const baseUrl = process.env.ENTU_BASE_URL ?? ENTU_API_BASE;
 	const callbackBase = `${url.origin}/auth/callback?state=${csrfState}&key=`;
 
 	const providers = PROVIDERS.map(({ id, label }) => ({

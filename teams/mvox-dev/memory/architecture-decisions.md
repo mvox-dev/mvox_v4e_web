@@ -194,6 +194,68 @@ Polyphony's analogous list, for reference (NOT auto-inherited by mvox): cron cle
 
 ---
 
+## Client-side Entu carve-out for IP-bound OAuth exchange (2026-05-22, session 13)
+
+**Decision**: A single, narrow carve-out to the BFF user-rights default above and to the canonical "no client→Entu" RED trigger. The OAuth session-token-to-JWT exchange step — and ONLY that step — runs in the user's browser, calling Entu directly. All other Entu API traffic continues through the BFF on the user's JWT.
+
+### Where the carve-out lives
+
+- **File**: `src/lib/auth/exchange.ts` (function `exchangeSession`).
+- **Wire shape**: `GET ${ENTU_API_BASE}{db}/auth` with `Authorization: Bearer {sessionToken}` from the browser. `ENTU_API_BASE` is the single canonical Entu base URL constant from `src/lib/entu-config.ts`; whatever value it carries (currently `https://entu.app/api/`) IS the wire-shape literal — citing the constant rather than a hardcoded URL keeps this section drift-free across future base-URL unifications. Entu has historically served both subdomain (`https://api.entu.app/...`) and path (`https://entu.app/api/...`) forms; the canonical form is whatever `ENTU_API_BASE` resolves to today.
+- **What flows back through the BFF**: the resulting 48h JWT is POSTed by the same client to `POST /auth/cookie`, where the server validates shape + `exp` and sets the `entu_jwt` httpOnly cookie. From that point onward, all Entu calls are BFF-proxied with the user's JWT, per the BFF user-rights default.
+
+### Why this exchange must be client-side
+
+Entu's session token is **IP-bound**: the resulting JWT's `aud` claim encodes the client IP at mint time, and Entu verifies `aud` on every subsequent API call (see `docs/migration/findings/entu-api-key-expiry-2026-05-20.md` §3). If the IP between session-token mint and JWT mint changes, the exchange silently produces an unusable JWT.
+
+mvox deploys to Cloudflare Pages + Workers (see "Stack" decision above). CF Workers do not preserve the originating browser IP on outbound `fetch` — the call appears to Entu as coming from CF's edge network, not the user. Doing the exchange server-side would mint a JWT bound to a CF edge IP that the user's browser cannot use. Hence: the exchange must happen in the browser, where the IP matches what Entu expects.
+
+This is a property of Entu's auth implementation, not a mvox design choice. Until Entu either drops `aud` IP-binding or publishes a JWKS endpoint that would let us verify Entu-issued JWTs server-side (and route the exchange through a trusted server context), the carve-out stays.
+
+### Carve-out scope (what's allowed)
+
+- Exactly one call path: the OAuth session-token-to-JWT exchange in `src/lib/auth/exchange.ts`.
+- The Entu call uses ONLY the session token in `Authorization: Bearer` — no rights elevation, no service-account JWT, no API key.
+- The resulting JWT MUST be handed off to `POST /auth/cookie` (server-controlled cookie set) before any further use. The browser does NOT cache or re-use the JWT directly.
+
+### What stays disallowed (Bentham REDs)
+
+- Any other client-side `fetch` to `entu.app` (any subdomain, any path) — outside `src/lib/auth/exchange.ts`. Reads, writes, file uploads, signed-URL retrieval, ALL Entu data traffic continues to flow through the BFF.
+- Exposing the `entu_jwt` cookie value to JS (must stay `httpOnly`).
+- Removing the `POST /auth/cookie` handoff step — the JWT must travel to the cookie via a server-controlled write, not via JS reading and setting `document.cookie`.
+
+### What would trigger expansion or retirement
+
+The carve-out narrows or disappears if any of the following lands:
+
+1. **Entu publishes a JWKS endpoint.** Then the BFF can verify Entu-issued JWTs server-side, and we have an alternative path: keep the exchange client-side but additionally have the BFF cryptographically verify the JWT before setting the cookie. The carve-out itself doesn't change, but YELLOW-41.3 (JWT signature verification in `/auth/cookie`) closes.
+2. **Entu retires `aud` IP-binding** (e.g., switches to a non-IP-bound mint that proves session-token validity by a different mechanism). Then the entire exchange can move server-side and the carve-out is removed — `src/lib/auth/exchange.ts` is deleted; `POST /auth/cookie` either disappears or becomes a strict redirect.
+3. **A second IP-bound Entu operation appears.** Treat as a request to widen the carve-out: requires team-lead approval, scratchpad rationale, and an architecture-decisions update. Default posture is to refuse — find a non-IP-bound alternative first.
+
+### Review enforcement (Bentham)
+
+For any PR touching client-side Entu access:
+
+- **GREEN** when the only client→Entu call is the exchange in `src/lib/auth/exchange.ts` and the JWT round-trips through `POST /auth/cookie`.
+- **RED** for any other client-side `fetch` whose URL matches `entu.app` (any subdomain) — regardless of the verb, the data, or the operator's intent. Refactor to BFF-route first.
+- **RED** for any change to `src/lib/auth/exchange.ts` that broadens the carve-out (additional Entu endpoints, additional verbs, additional credentials carried).
+
+### Cross-links
+
+- Entu base URL constant: `src/lib/entu-config.ts` (`ENTU_API_BASE`). Single source of truth for both server (`src/lib/server/entu/client.ts`) and client (`src/lib/auth/exchange.ts`).
+- Finn research artifact: `docs/migration/findings/entu-api-key-expiry-2026-05-20.md` (JWT IP-binding mechanic, §3).
+- Finn scratchpad: `teams/mvox-dev/memory/finn.md:70` (IP-binding summary line).
+- Bentham #41 review: `teams/mvox-dev/memory/bentham.md` (session-13 #41 entry — pattern entries + 3 YELLOW carryforwards).
+- CHORE-41 merge: commit `a506266` (`feat(#41): real OAuth wiring — client-side exchange flow`).
+- CHORE-45 hardening (CSRF binding + Entu base URL unify): branch `feat/oauth-hardening`. Introduced `ENTU_API_BASE`; this section's wire-shape line was generalized to cite the constant at the same time (YELLOW-45.1).
+- Related decision above: "BFF user-rights default (2026-05-18, session 2)" — this carve-out modifies the "all BFF route handlers default to user-rights" rule by adding a single client-side exchange step *upstream* of the BFF. The user-rights default itself is unchanged for the BFF surface.
+
+**Source**: Bentham #41 review (session 13, 2026-05-22), lifted to settled patterns at team-lead direction the same session. Wire-shape generalization to constant: CHORE-45 / YELLOW-45.1, session 13.
+
+(*MVOX:Bentham*)
+
+---
+
 ## Formula rule — single-hop, aggregates-only across rights boundaries (2026-05-18, session 2)
 
 **Decision**:

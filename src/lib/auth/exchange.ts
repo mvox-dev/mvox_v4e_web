@@ -1,4 +1,4 @@
-const ENTU_BASE_URL = 'https://api.entu.app';
+import { ENTU_API_BASE } from '../entu-config.ts';
 
 export async function exchangeSession({
 	sessionToken,
@@ -13,7 +13,7 @@ export async function exchangeSession({
 
 	let jwt: string;
 	try {
-		const entuRes = await fetch(`${ENTU_BASE_URL}/${db}/auth`, {
+		const entuRes = await fetch(`${ENTU_API_BASE}${db}/auth`, {
 			headers: {
 				Authorization: `Bearer ${sessionToken}`,
 				Accept: 'application/json',

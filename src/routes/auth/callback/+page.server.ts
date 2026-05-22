@@ -14,8 +14,6 @@ export const load: ServerLoad = async ({ url, cookies }) => {
 		throw redirect(303, '/auth/login?error=missing_session_token');
 	}
 
-	cookies.delete('csrf_state', { path: '/auth' });
-
 	return {
 		sessionToken: key,
 		db: process.env.ENTU_DB ?? 'polyphony',

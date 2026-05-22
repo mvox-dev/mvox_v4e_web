@@ -1,4 +1,4 @@
-export const DEFAULT_BASE_URL = 'https://entu.app/api/';
+import { ENTU_API_BASE } from '../../entu-config.ts';
 
 export interface EntuEntity {
 	_id: string;
@@ -17,7 +17,7 @@ export class EntuClient {
 
 	constructor(jwt: string) {
 		this.jwt = jwt;
-		this.baseUrl = process.env.ENTU_BASE_URL ?? DEFAULT_BASE_URL;
+		this.baseUrl = process.env.ENTU_BASE_URL ?? ENTU_API_BASE;
 		this.db = process.env.ENTU_DB ?? '';
 	}
 
