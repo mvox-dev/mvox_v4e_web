@@ -13,7 +13,7 @@ export async function exchangeSession({
 
 	let jwt: string;
 	try {
-		const entuRes = await fetch(`${ENTU_API_BASE}${db}/auth`, {
+		const entuRes = await fetch(`${ENTU_API_BASE}auth?db=${encodeURIComponent(db)}`, {
 			headers: {
 				Authorization: `Bearer ${sessionToken}`,
 				Accept: 'application/json',

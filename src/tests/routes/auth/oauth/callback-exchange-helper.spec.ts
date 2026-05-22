@@ -64,7 +64,8 @@ describe('exchangeSession()', () => {
 
 		const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
 		expect(url).toContain('entu.app');
-		expect(url).toContain(`/${DB}/auth`);
+		expect(url).toContain('/auth?');
+		expect(new URL(url).searchParams.get('db')).toBe(DB);
 		const headers = new Headers(init?.headers);
 		expect(headers.get('Authorization')).toBe(`Bearer ${SESSION_TOKEN}`);
 	});
@@ -172,5 +173,94 @@ describe('exchangeSession()', () => {
 		const result = await exchangeSession({ sessionToken: SESSION_TOKEN, db: DB });
 
 		expect(result).toEqual({ ok: false, error: 'cookie_set_failed' });
+	});
+});
+
+// ---------------------------------------------------------------------------
+// #51 — Corrected Entu auth URL shape: /auth?db={db} query-form
+// These tests pin the FIXED shape and FAIL against the current buggy code.
+// exchange.ts imports ENTU_API_BASE directly (no env override here) so
+// GREEN only needs to fix the URL construction in exchange.ts.
+// ---------------------------------------------------------------------------
+describe('exchangeSession() — #51 corrected Entu auth URL shape', () => {
+	beforeEach(() => {
+		vi.resetModules();
+	});
+
+	afterEach(() => {
+		vi.restoreAllMocks();
+	});
+
+	it('Entu auth URL contains /auth? (query-form, not path-form)', async () => {
+		const fetchMock = vi
+			.fn()
+			.mockResolvedValueOnce(new Response(JSON.stringify({ token: JWT }), { status: 200 }))
+			.mockResolvedValueOnce(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+		vi.stubGlobal('fetch', fetchMock);
+
+		const { exchangeSession } = await import('../../../../lib/auth/exchange.ts');
+		await exchangeSession({ sessionToken: SESSION_TOKEN, db: DB });
+
+		const [url] = fetchMock.mock.calls[0] as [string, RequestInit];
+		expect(url).toContain('/auth?');
+	});
+
+	it('Entu auth URL has db as a query parameter', async () => {
+		const fetchMock = vi
+			.fn()
+			.mockResolvedValueOnce(new Response(JSON.stringify({ token: JWT }), { status: 200 }))
+			.mockResolvedValueOnce(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+		vi.stubGlobal('fetch', fetchMock);
+
+		const { exchangeSession } = await import('../../../../lib/auth/exchange.ts');
+		await exchangeSession({ sessionToken: SESSION_TOKEN, db: DB });
+
+		const [url] = fetchMock.mock.calls[0] as [string, RequestInit];
+		const parsed = new URL(url);
+		expect(parsed.searchParams.get('db')).toBe(DB);
+	});
+
+	it('Entu auth URL does NOT contain /{db}/auth path-form', async () => {
+		const fetchMock = vi
+			.fn()
+			.mockResolvedValueOnce(new Response(JSON.stringify({ token: JWT }), { status: 200 }))
+			.mockResolvedValueOnce(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+		vi.stubGlobal('fetch', fetchMock);
+
+		const { exchangeSession } = await import('../../../../lib/auth/exchange.ts');
+		await exchangeSession({ sessionToken: SESSION_TOKEN, db: DB });
+
+		const [url] = fetchMock.mock.calls[0] as [string, RequestInit];
+		expect(url).not.toContain(`/${DB}/auth`);
+	});
+
+	it('Entu auth URL host is api.entu.app', async () => {
+		const fetchMock = vi
+			.fn()
+			.mockResolvedValueOnce(new Response(JSON.stringify({ token: JWT }), { status: 200 }))
+			.mockResolvedValueOnce(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+		vi.stubGlobal('fetch', fetchMock);
+
+		const { exchangeSession } = await import('../../../../lib/auth/exchange.ts');
+		await exchangeSession({ sessionToken: SESSION_TOKEN, db: DB });
+
+		const [url] = fetchMock.mock.calls[0] as [string, RequestInit];
+		expect(new URL(url).host).toBe('api.entu.app');
+	});
+
+	it('db with spaces is URL-encoded in query parameter', async () => {
+		const fetchMock = vi
+			.fn()
+			.mockResolvedValueOnce(new Response(JSON.stringify({ token: JWT }), { status: 200 }))
+			.mockResolvedValueOnce(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+		vi.stubGlobal('fetch', fetchMock);
+
+		const { exchangeSession } = await import('../../../../lib/auth/exchange.ts');
+		await exchangeSession({ sessionToken: SESSION_TOKEN, db: 'my db' });
+
+		const [url] = fetchMock.mock.calls[0] as [string, RequestInit];
+		const parsed = new URL(url);
+		expect(parsed.searchParams.get('db')).toBe('my db');
+		expect(url).not.toContain('my db');
 	});
 });

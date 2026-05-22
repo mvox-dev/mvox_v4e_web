@@ -164,3 +164,77 @@ describe('POST /auth', () => {
 		expect(fetchMock).not.toHaveBeenCalled();
 	});
 });
+
+// ---------------------------------------------------------------------------
+// #51 — Corrected Entu auth URL shape: /auth?db={db} query-form
+// Unset ENTU_BASE_URL so code falls through to ENTU_API_BASE constant.
+// These tests FAIL against current buggy /{db}/auth path-form construction.
+// ---------------------------------------------------------------------------
+describe('POST /auth — #51 corrected Entu auth URL shape', () => {
+	beforeEach(() => {
+		// Force code to use ENTU_API_BASE (not env override) — GREEN fixes the constant
+		mockEnv.ENTU_BASE_URL = undefined as unknown as string;
+		vi.resetModules();
+	});
+
+	afterEach(() => {
+		vi.restoreAllMocks();
+	});
+
+	it('Entu auth URL contains /auth? (query-form, not path-form)', async () => {
+		const fetchMock = vi
+			.fn()
+			.mockResolvedValue(new Response(JSON.stringify({ token: 'tok' }), { status: 200 }));
+		vi.stubGlobal('fetch', fetchMock);
+
+		const { POST } = await import('../../../routes/auth/+server.ts');
+		const event = makeAuthEvent('api-key', 'testdb');
+		await POST(event);
+
+		const [url] = fetchMock.mock.calls[0] as [string, RequestInit];
+		expect(url).toContain('/auth?');
+	});
+
+	it('Entu auth URL has db as a query parameter', async () => {
+		const fetchMock = vi
+			.fn()
+			.mockResolvedValue(new Response(JSON.stringify({ token: 'tok' }), { status: 200 }));
+		vi.stubGlobal('fetch', fetchMock);
+
+		const { POST } = await import('../../../routes/auth/+server.ts');
+		const event = makeAuthEvent('api-key', 'mychoir');
+		await POST(event);
+
+		const [url] = fetchMock.mock.calls[0] as [string, RequestInit];
+		const parsed = new URL(url);
+		expect(parsed.searchParams.get('db')).toBe('mychoir');
+	});
+
+	it('Entu auth URL does NOT contain /{db}/auth path-form', async () => {
+		const fetchMock = vi
+			.fn()
+			.mockResolvedValue(new Response(JSON.stringify({ token: 'tok' }), { status: 200 }));
+		vi.stubGlobal('fetch', fetchMock);
+
+		const { POST } = await import('../../../routes/auth/+server.ts');
+		const event = makeAuthEvent('api-key', 'testdb');
+		await POST(event);
+
+		const [url] = fetchMock.mock.calls[0] as [string, RequestInit];
+		expect(url).not.toContain('/testdb/auth');
+	});
+
+	it('Entu auth URL host is api.entu.app', async () => {
+		const fetchMock = vi
+			.fn()
+			.mockResolvedValue(new Response(JSON.stringify({ token: 'tok' }), { status: 200 }));
+		vi.stubGlobal('fetch', fetchMock);
+
+		const { POST } = await import('../../../routes/auth/+server.ts');
+		const event = makeAuthEvent('api-key', 'testdb');
+		await POST(event);
+
+		const [url] = fetchMock.mock.calls[0] as [string, RequestInit];
+		expect(new URL(url).host).toBe('api.entu.app');
+	});
+});

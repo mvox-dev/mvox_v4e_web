@@ -11,7 +11,7 @@ export const POST: RequestHandler = async ({ request, cookies, url }) => {
 
 	const db = url.searchParams.get('db') ?? '';
 	const baseUrl = env.ENTU_BASE_URL ?? ENTU_API_BASE;
-	const entuAuthUrl = `${baseUrl}${db}/auth`;
+	const entuAuthUrl = `${baseUrl}auth?db=${encodeURIComponent(db)}`;
 
 	const res = await fetch(entuAuthUrl, {
 		method: 'GET',
