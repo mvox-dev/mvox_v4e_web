@@ -18,4 +18,10 @@ Format: `[GAP] <area> — <what's missing> — <risk level: low/med/high> — <d
 
 [GAP] Cloudflare adapter output shape — smoke test only checks that `.svelte-kit/cloudflare/` exists; doesn't verify `_worker.js` or `_routes.json` are present. LOW. 2026-05-18.
 
+[GAP] CHORE-32 — Section-of-section recursion not tested end-to-end. Current tests verify `parent_section` field is exposed in the flat response, but the recursive traversal path (GET /api/organizations/[id]/sections?parent=<sectionId>) is deferred to phase 2. MED. 2026-05-22.
+
+[GAP] CHORE-32 — No test for Entu upstream 5xx/502 handling in org or sections endpoints. Both endpoints currently only gate on 401 and org-not-found (404). Upstream unavailability → 502 behavior untested. LOW. 2026-05-22.
+
+[GAP] CHORE-32 — Anonymous /public/orgs endpoint not tested (deferred entirely to future scope). LOW. 2026-05-22.
+
 (*MVOX:Tallis*)

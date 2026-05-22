@@ -85,4 +85,29 @@
 
 [DECISION] YELLOW-3.1 committed directly to main (6e8c0f4), Bentham post-write GREEN, pushed to origin/main. Closed.
 
+## [CHECKPOINT] 2026-05-22 — Session 13: CHORE-32 RED phase
+
+[DECISION] 27 tests written. 2 spec files:
+- `src/tests/routes/api/organizations/server.spec.ts` (15 tests) — GET /api/organizations
+- `src/tests/routes/api/organizations/id/sections/server.spec.ts` (12 tests) — GET /api/organizations/[id]/sections
+
+Both RED on "Cannot find module" (route files don't exist yet). Total test count: 328 (27 RED, 301 pass).
+
+[PATTERN] Route handler specs: mirror same directory path under `src/tests/routes/api/` (NOT colocated in `src/routes/` — see existing GOTCHA re: `+server.spec.ts` crash). Import route by relative path with `[id]` literal in the path (e.g., `../../../../../../routes/api/organizations/[id]/sections/+server.ts`).
+
+[PATTERN] Route handler test approach: `vi.stubGlobal('fetch', ...)` mocks Entu at the network level (consistent with existing client.spec.ts and auth spec patterns). `vi.resetModules()` in afterEach ensures fresh module load per test (needed because route modules import EntuClient at module scope). `vi.stubGlobal` must be set BEFORE the dynamic `await import(...)`.
+
+[PATTERN] Sections endpoint: two sequential fetch calls — first `GET /entity/{id}` (org pre-check), then `GET /entity?...` (search). Use `mockResolvedValueOnce` chaining: `fetchMock.mockResolvedValueOnce(orgResponse).mockResolvedValueOnce(sectionSearchResponse)`.
+
+[GOTCHA] `vi.mock('$lib/...')` with `vi.resetModules()` in afterEach is broken: `resetModules` clears the module registry, so the next dynamic import gets a fresh module but `vi.mocked(EntuClient)` returns undefined (the mock factory ran at parse time, not re-run after reset). Use `vi.stubGlobal('fetch', ...)` instead — it intercepts at the fetch level, survives module resets, and doesn't require alias resolution.
+
+[DECISION] Pagination behavior encoded in tests: negative or non-numeric → default 50; over 200 → clamp to 200 (not reject). Josquin must implement this clamp logic in both route handlers.
+
+[DECISION] Empty response shape: both endpoints return `200 { entities: [] }` on zero results — never 404. Photo extraction: `o._thumbnail` directly (top-level field on EntuEntity, not nested in a property array). Sparse optional fields: `extractStringProp`/`extractTextProp`/`extractNumberProp` return `undefined` when the field's array is absent or empty.
+
+[OPEN] CHORE-32 GREEN — Josquin implements:
+- `src/routes/api/organizations/+server.ts`
+- `src/routes/api/organizations/[id]/sections/+server.ts`
+- Property extractor helpers (`extractStringProp`, `extractTextProp`, `extractNumberProp`, pagination clamp)
+
 (*MVOX:Tallis*)
