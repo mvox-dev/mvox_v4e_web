@@ -48,19 +48,21 @@ Open. None of the remaining follow-ups is a forced priority. Reasonable picks in
 
 **Carry-forward queue for session 15 (priority order):**
 
-1. The session-15 headline (one of the 5 above; PO picks at start).
-2. **#36** — Entu mock harness + SSR flip on landing page (and now login page). Still ~1 day single-PR scope.
-3. **#39 (YELLOW-35.4)** — lift session population to `+layout.server.ts`. Becomes RED for next authenticated route.
-4. **Loose YELLOWs fold-opportunistically:**
+1. **Audit GH backlog** (PO add 2026-05-22). `gh issue list --state open` currently shows ~24 items (mix of YELLOWs, user-story backlog, and follow-up CHOREs). Go through each, confirm fire-trigger still applies, close stale/satisfied items, promote any aging-but-still-valid YELLOWs to CHORE-N status. May discover items satisfied by recent merges that weren't named in `Closes #N` (backfill-close pattern from L47). Worth ~30-60 min as a session-start activity before picking the next CHORE.
+2. **Choose + implement linting** (PO add 2026-05-22). Currently `pnpm check` runs svelte-check (type-only). No code-style/lint pass. Options: ESLint with `@typescript-eslint` + `eslint-plugin-svelte` (community standard, mature plugin ecosystem) vs Biome (newer, faster, less Svelte support). Likely ESLint. Single-PR scope: install + config + `pnpm lint` script (and maybe `pnpm lint:fix`) + auto-fix the existing violations + a `no-process-env`-style meta-spec extension if it covers what we want. Bentham + Josquin should weigh in on tool choice. Full TDD-lite chain (Tallis spec for config presence + lint script; Josquin install + GREEN; Bentham review).
+3. The session-15 headline (one of the 5 below; PO picks at start once 1+2 are scoped).
+4. **#36** — Entu mock harness + SSR flip on landing page (and now login page). Still ~1 day single-PR scope.
+5. **#39 (YELLOW-35.4)** — lift session population to `+layout.server.ts`. Becomes RED for next authenticated route.
+6. **Loose YELLOWs fold-opportunistically:**
    - #31 — Tailwind OKLCH regex (fires on next Tailwind upgrade)
    - #33 (YELLOW-32.1) — BFF helper factor-out (`src/lib/server/bff/{pagination,props}.ts`) on next BFF route
    - #34 (YELLOW-32.2) — `EntuClient.get()` 403/404 throws tests in `client.spec.ts` (~10 lines)
    - #37 (YELLOW-35.1) — Comenius i18n on residual hardcoded "members/section" string in landing
    - #38 (YELLOW-35.2 + 35.3) — Byrd cleanup (OrgEntity to types.ts + `$app/state` flip)
-5. **Task #3 (formerly #14) — Layer 2 photo file-payload probe + impl** — still deferred. Fires when actual photo files uploaded or BFF needs `_thumbnail` on real data.
-6. **CHORE-6 Email (#6)** — still blocked on PO SPF + DKIM DNS records.
-7. **YELLOW-41.3** — JWT signature verification on /auth/cookie. Defer until Entu publishes JWKS endpoint.
-8. **CONTRIBUTING.md follow-ups (#29)** — low priority.
+7. **Task #3 (formerly #14) — Layer 2 photo file-payload probe + impl** — still deferred. Fires when actual photo files uploaded or BFF needs `_thumbnail` on real data.
+8. **CHORE-6 Email (#6)** — still blocked on PO SPF + DKIM DNS records.
+9. **YELLOW-41.3** — JWT signature verification on /auth/cookie. Defer until Entu publishes JWKS endpoint.
+10. **CONTRIBUTING.md follow-ups (#29)** — low priority.
 
 **Expected first action session 15:**
 1. Verify statusline on launch (`cd ~/workspace && claude`).
