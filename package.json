@@ -13,6 +13,7 @@
 		"test": "vitest run && playwright test",
 		"test:unit": "vitest run",
 		"test:e2e": "playwright test",
+		"deploy": "pnpm build && wrangler pages deploy .svelte-kit/cloudflare --project-name multivox",
 		"migrate:phase-a": "tsx scripts/migrations/2026-05-19-phase-a.ts",
 		"migrate:phase-a:dry": "tsx scripts/migrations/2026-05-19-phase-a.ts --dry-run"
 	},
