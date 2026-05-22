@@ -1,6 +1,93 @@
 # Palestrina — Team Lead Scratchpad
 
-### [NEXT SESSION] 2026-05-21 — session-11 → session-12
+### [NEXT SESSION] 2026-05-22 — session-12 → session-13
+
+**Session 12 outcome:** Clean carryforward sweep + BFF design review end-to-end + photo-rename pre-stage GREEN-ready. No production source code touched (per scope). All work either merged to main or parked on a clearly-gated branch.
+
+**Session 12 commit chain on main:**
+1. `e42cb1e` docs(bff): rights-aware contract design + entu/research rename PR draft (squashes branch `docs/bff-rights-design`; design doc APPROVED + entu/research PR draft as paste-ready finding doc)
+
+**Plus, parked on side branch `chore/perotin-rename-photo-prestage-2026-05-21`** (NOT merged; awaiting upstream + auth):
+- 4 commits ending at `ea1a2b1` — Layer 1 photo-rename pre-stage, Bentham GREEN
+
+**GH issues filed this session:**
+- mvox: #30 (CSRF gate, fires on first cookie-authed BFF mutation route), #31 (Tailwind OKLCH regex relax, fires on next Tailwind upgrade)
+- mvox: #29 extended with YELLOW-3.2 commit-body convention AC bullet (comment, not edit)
+- upstream: [anthropics/claude-code#61315](https://github.com/anthropics/claude-code/issues/61315) — sub-agent permission-gate silent-block report, cross-linked to #47339, #32402, #38859, #51288, #56686, #57037
+
+**Live polyphony Entu state at end of session 12:** UNCHANGED from session 11.
+- 122 persons, 6 orgs, 16 sections, 5 voices, all retired types still at 0 instances
+- 24 menus (5 Entu meta + 18 v4E domain)
+- `person.avatar` + `organization.logo` prop-defs still present (rename pre-staged, not executed)
+
+**Carry-forward queue for session 13 (priority order):**
+
+1. **entu/research PR status check + downstream execution** (THE headline session-13 item):
+   - **First action:** Check whether PO submitted + merged the entu/research PR draft from `docs/migration/findings/v4e-rename-avatar-logo-to-photo-2026-05-21.md`.
+   - **If merged:** Capture the merge SHA. Route Pérotin to execute Layer 1 live on `chore/perotin-rename-photo-prestage-2026-05-21`:
+     1. PO must SendMessage `"I authorize this run"` (this is the gate — see [authorization-gate-discipline]).
+     2. Pérotin flips `--live`, executes `cleanup-rename-photo-prop-def-only-2026-05-21.ts`, captures result artifact.
+     3. Post-execution probe verifies `currentName === 'photo'` on both prop-defs + 0 stale instance values.
+     4. Manual squash-merge Pérotin's branch to main per local merge ritual.
+     5. Confirm `_thumbnail` works on a real org (post-rename smoke).
+   - **If NOT merged:** defer Pérotin live work; assess alternative session-13 priorities.
+
+2. **First BFF impl PR** (gated on item 1 completing — rename must land BOTH upstream AND on polyphony db before this consumes the new shape):
+   - Tallis RED for `GET /api/organizations` + `GET /api/organizations/[id]/sections` (the 2-GET MVP from design §5)
+   - Josquin GREEN against Entu using `?props=_thumbnail` + pagination defaults (limit=50, max=200, offset)
+   - Bentham review
+   - Josquin merge
+   - **PR MUST carry `Schema-Change: entu/research@<sha>` + `PO-Approved: 2026-05-21 verbal in session` trailers** — Bentham REDs without both
+
+3. **Byrd frontend scaffolding** (also unblocked; could run parallel to item 2):
+   - Route shells, shared layout, auth-aware nav skeleton
+   - Mocked BFF endpoints until item 2 lands
+   - Decoupled from rename chain entirely
+
+4. **Task #14 — Layer 2 file-payload probe + impl** (deferred until needed):
+   - Fires only if `avatar`/`logo` instance values appear before Layer 2 lands
+   - OR fires when BFF needs `_thumbnail` working on real data with uploaded files
+   - Empirical probe of Entu's file-property POST re-link semantics is the gate
+
+5. **CHORE-6 Email** (#6) — still blocked on PO SPF + DKIM DNS records on chosen sender domain. Re-check at session 13 start.
+
+6. **Loose process notes:**
+   - GH #29 — CONTRIBUTING.md follow-ups (PR submission + code style sections; low priority; YELLOW-3.2 folded in as a sub-bullet comment)
+   - GH #30 — CSRF gate (fires on first cookie-authed mutation route in item 2's NEXT phase)
+   - GH #31 — Tailwind OKLCH regex (fires on next Tailwind upgrade)
+
+**Expected first action session 13:**
+1. Verify statusline on launch (`cd ~/workspace && claude`).
+2. Read this seed + recent commits since `e42cb1e`.
+3. Spawn finn + bentham + perotin per Phase 5 (always-on).
+4. Ask PO: did the entu/research PR get submitted + merged? If yes — capture SHA + route Pérotin for live execution. If no — pivot to Byrd frontend scaffolding or other priority.
+
+**Process lessons from session 12 (worth carrying forward):**
+
+- **L34 — Sub-agent perm-gate trap is upstream-known; the class is accumulating reports with no fix momentum.** Filed [anthropics/claude-code#61315](https://github.com/anthropics/claude-code/issues/61315) with cross-links to 6 related open issues (most recent #47339, #32402, #38859, #51288, #56686, #57037). **Until the harness changes, our mitigation stays:** keep sub-agent work to non-gated tools (Bash/Read/Grep/etc.) OR have team-lead do restricted-tool work directly. Memory: `feedback_agent_spawn_prompt.md` updated with the upstream link. Workaround included in spawn prompts ("if any tool hangs/prompts for permission >30 seconds, send a status SendMessage immediately") — this didn't trigger in session 12 because Josquin's + Pérotin's tasks stayed within Read/Edit/Write/Bash.
+
+- **L35 — "Split-by-blast-radius" pattern for bundled migrations (Bentham's calibration).** When a script bundle has Layer-1-always-on + Layer-2-dead-code-today, RED on the dead path is correct because runtime enumeration IS the safety net AND the safety net only works if the dead path is correct. Bentham wrote: "for any runtime-enumerating migration, code-review the dead path AS IF it will fire — empty-probe-today does not equal safe-to-defer." Carry: when a migration script has multiple layers with different blast radii, split into separate scripts with separate live-gates rather than fixing the dead path in place. Worth a `Patterns/split-by-blast-radius` entry in Brilliant KB.
+
+- **L36 — Manifest-first dry-run discipline keeps paying.** Pérotin's photo-rename pre-stage executed clean dry-run on first attempt + caught the RED-1 design flaw (Bentham review) BEFORE any live mutation. The discipline is now well-grooved across menu rationalization (session 11), Phase D (session 9), and now this rename. Settled pattern.
+
+- **L37 — Gated YELLOWs belong in GH issues with explicit fire-when triggers, not in seed carryforwards.** PO directive this session: convert CSRF gate (was YELLOW-1 carryforward) + OKLCH brittleness (was YELLOW carryforward) into discoverable GH issues. Result: seed is cleaner; the issue tracker is the source of truth for gated items. **Carry-forward rule:** when a YELLOW has an external trigger (next upgrade, next mutation route, next infra change), file a GH issue with the trigger language in the body; don't carry across seeds.
+
+- **L38 — Schema design pacing (re-confirmed).** Walked Q1-Q5 of the BFF design one at a time per `feedback_schema_design_pacing.md`. Q5 needed a follow-up because PO's first answer was ambiguous ("entu has a native solution"); the follow-up question pattern (clarifying with three concrete options) worked cleanly. Carry: when PO's answer is short or open to interpretation, ask a follow-up with 2-3 concrete options rather than assuming intent.
+
+- **L39 — Tool-call concatenation slip.** Mid-session I accidentally fused a TaskCreate and SendMessage into one tool call (the closing `</invoke>` got dropped). Got an InputValidationError on the TaskCreate. Quick recovery (re-issue both). **Carry:** when chaining tool calls in one response, double-check each `</invoke>` is closed before the next `<invoke>` opens. Particularly when copy-pasting prompt content between tool calls.
+
+**Brilliant KB updates (deferred — session 13 or whenever PO has bandwidth):**
+- New: `Patterns/split-by-blast-radius` — L35 codified
+- New: `Patterns/gated-yellows-as-gh-issues` — L37 codified
+- Update: `Patterns/sub-agent-permission-gate-trap` — point to anthropics/claude-code#61315
+- Update: `Projects/polyphony` — note photo-rename pre-stage parked on branch, awaiting upstream
+- New: `Decisions/mvox/v4e-rename-avatar-logo-to-photo` — capture the Q5 outcome + the `_thumbnail` mechanism rationale
+
+(*MVOX:Palestrina*)
+
+---
+
+### [PROCESSED 2026-05-22 end-of-session-12] session-11 → session-12
 
 **Session 11 outcome:** Productive day. CHORE-3 Paraglide closed end-to-end. Comenius spawn structural failure investigated and root-caused (PO-identified — sub-agent permission gates don't surface to parent UI). PO-directed type-name-string sweep + menu rationalization on live polyphony (18 mutations clean). YELLOW-3.1 closed inline. BFF rights-aware contracts design proposal landed on a branch awaiting PO review. ~4h elapsed.
 

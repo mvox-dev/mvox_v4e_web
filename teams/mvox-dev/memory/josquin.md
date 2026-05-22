@@ -4,19 +4,36 @@ Personal notes. Only Josquin writes here.
 
 ---
 
-## [DECISION] 2026-05-21 session 11 — BFF rights-aware design committed (awaiting PO)
+## [DECISION] 2026-05-22 session 12 — BFF rights-aware design APPROVED, merged to main at `e42cb1e`
 
-Doc lives at `docs/architecture/bff-rights-aware-contracts.md` on branch `docs/bff-rights-design` (pushed, NOT merged — commit `78193e3`). PO reviews next session and decides implementation scope. The 5 open questions (Section 7) are the gating decisions before any `src/` work begins.
+PO walked Q1-Q5 in session 12. All five answered, design doc finalized + `docs/migration/findings/v4e-rename-avatar-logo-to-photo-2026-05-21.md` written as a paste-ready entu/research PR draft. Both files merged to main at `e42cb1e` (team-lead per the shutdown note). Implementation now gated on the upstream rename PR landing + Pérotin migrating polyphony db; mvox impl PR (first to consume `organization.photo` + `_thumbnail`) must carry the `Schema-Change:` + `PO-Approved:` trailers per session-2 convention.
 
-Self-calibration on the design pass:
-- **Empty elevated-ops list was the right call**, not a punt. Pre-seeding capabilities (cron, federation reports, self-link) that have no callers yet would invite shortcut use later. Each gets added on demand, with the trailer convention.
-- **Empty-result = empty-state across the board** (Section 4). The temptation to distinguish "0 because no rights" from "0 because no data" is real and I flagged it (Q2). Resisting it stays inside user-rights principle 1; distinguishing requires elevation, which contradicts the whole design.
-- **Narrow typed shapes over Entu passthrough** (Section 5, Q4). My instinct was passthrough-for-velocity but writing it out, the BFF-as-contract posture demands shaping. Each endpoint's response is a deliberate UI contract, not a leaky bag of multi-valued arrays. PO can override.
+**Locked answers** (full table in design doc §0; one-liner each here for fast recall):
+- Q1 orgs-list scope: **rights-driven** (trust Entu's filter; orphan cascade = cleanup task)
+- Q2 empty-state: **generic** (no `rights_state` hint; would require elevation → violates §1)
+- Q3 pagination: **`limit=50` default, `200` max, offset `?limit=N&skip=M`** 1:1 with Entu
+- Q4 shape: **narrow / typed per-endpoint**
+- Q5 file URLs: **rename `avatar`+`logo` → `photo`** to unlock Entu's hardcoded `_thumbnail` → `photo` resolver (one-hop signed S3, anonymous-capable for `sharing: 'public'`)
 
-Implementation-phase blockers I'm tracking, in order:
-1. **PO call on Q1-Q5** — gates everything
-2. **#19 CSRF gate** — before the first MUTATION route, not the first read. MVP surface is GET-only so first impl PR doesn't need it; second impl PR does. Recommended path in Section 6: rely on SvelteKit's built-in `csrf.checkOrigin` (default-on).
-3. **base URL split** (see GOTCHA below from earlier today) — out of scope until a real BFF caller exists; first impl PR is that caller, so flag at that PR.
+**Finn's `_thumbnail` finding worth keeping** (won't re-derive): `entu/api/utils/entity.js` `cleanupEntity` does the resolution; it looks for a property literally named `photo`. `picture` is NOT special (zero refs across `entu/api` + `entu/app`). `?props=_thumbnail` on entity/search populates `_thumbnail` inline as a 60s pre-signed URL — no second property fetch. Only resolves a single property, so `list: true` file collections (e.g. `edition.file`) don't benefit and were excluded from the rename.
+
+**Implementation-phase blockers (refreshed)** — in dependency order:
+1. **entu/research rename PR lands** — PO submits using the paste-ready findings doc; capture merge SHA for the mvox impl trailer.
+2. **Pérotin polyphony data migration** — type-def name update + ~2 person + ~6 org instance value re-attaches under new property name. Manifest-first pattern.
+3. **#19 CSRF gate** — still pending; required before the FIRST mutation route, not the first read. MVP surface is GET-only so the first impl PR doesn't need it; second impl PR does. Recommended path (design doc §6): SvelteKit's built-in `csrf.checkOrigin` (default-on).
+4. **base URL split** (`entu.app/api/` path-form vs `api.entu.app/{db}/` subdomain-form) — still out of scope until a real BFF caller exists; first impl PR is that caller, so flag + probe at that PR. See 2026-05-21 GOTCHA below.
+
+## [PATTERN] 2026-05-22 session 12 — surface "regen ripple" in cross-repo schema PR drafts
+
+The entu/research rename PR draft mostly wrote itself, but one non-blocking question surfaced at report time: should the PR include the regenerated `schema.json` (via `pnpm build-schema` per the header comment of `schema.ts`) in the same commit, or as a follow-up? I flagged it to team-lead rather than guessing.
+
+**Generalizable:** any time a v4E schema change is being drafted for entu/research, check `schema.ts` header comment for build-artefact regen instructions. If there's one, mention it in the report-out — PO can decide single-commit (schema + regenerated artefact, keeps upstream CI green) vs two-commit (schema then regen). My default recommendation in the report was single-commit. Either is fine; the cost of NOT mentioning it is upstream catching it at PR review and bouncing.
+
+Small pattern but easy to forget when most of the work is the diff itself — the "what gets regenerated by this change" question is invisible from inside `schema.ts` unless you scroll up to the header. Worth a 30-second sweep at draft time.
+
+## [LEARNED] 2026-05-22 session 12 — self-calibration carried forward, all three calls held
+
+The three calibration points from session 11 (empty elevated-ops list, generic empty-state, narrow typed shapes) all survived PO review without revision — Q2 Q4 Q5 all came back resolved as recommended. The one I half-expected to bounce was Q4 (narrow vs passthrough); writing it out as "BFF-as-contract posture demands shaping" was apparently load-bearing for the call. Lesson: when an instinct disagrees with what writes well, follow the writing — the post-hoc justification IS the actual reason. Will lean on this when next torn between velocity-shape and contract-shape.
 
 ## [LEARNED] 2026-05-21 session 11 — docs-only branch flow
 
