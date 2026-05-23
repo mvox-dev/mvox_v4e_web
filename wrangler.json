@@ -5,6 +5,7 @@
 	"compatibility_flags": ["nodejs_compat"],
 	"pages_build_output_dir": ".svelte-kit/cloudflare",
 	"vars": {
-		"ENTU_DB": "polyphony"
+		"ENTU_DB": "polyphony",
+		"PUBLIC_ENTU_DB": "polyphony"
 	}
 }
