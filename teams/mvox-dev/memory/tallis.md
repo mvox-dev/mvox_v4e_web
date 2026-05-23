@@ -203,4 +203,20 @@ Updated: `src/tests/routes/auth/oauth/cookie-server.spec.ts` (5 new tests — as
 
 [DEFERRED] test-gaps.md additions for session 15 — no new gaps discovered beyond what's already logged.
 
+## [CHECKPOINT] 2026-05-23 — Session 16: CHORE-A RED phase (4 specs)
+
+[DECISION] 30 tests written across 4 RED spec files on `feat/chore-53a-foundation`. All RED on module-not-found. Branch HEAD at session end: `3febec1`.
+- `src/lib/auth/storage.spec.ts` (9 tests) — `f04b0ad`
+- `src/lib/auth/state.spec.ts` (8 tests) — `3301859`
+- `src/lib/api/wrapper.spec.ts` (5 tests) — `dcc5971`
+- `src/lib/entu/client.spec.ts` (8 tests) — `3febec1`
+
+[GOTCHA] `happy-dom` was not installed at session start; installed as devDep (`pnpm add -D happy-dom`) alongside A1 commit. Required for localStorage/sessionStorage in `storage.spec.ts`, `state.spec.ts`, and `wrapper.spec.ts` (all use `// @vitest-environment happy-dom` on line 1). `client.spec.ts` uses default node env (no DOM needed).
+
+[PATTERN] wrapper.spec.ts: `new Response(...)` in happy-dom does NOT auto-set `content-type`. Mock responses that expect JSON parsing must include `headers: { 'content-type': 'application/json' }` explicitly in the fixture. Plan's original A3 spec lacked these; brief corrected them (Byrd observation from his prior pass). Final committed spec includes the fix.
+
+[PROCESS] Chain-discipline redo at session midpoint: Byrd had pre-implemented A3/A4 before RED was committed. PO called a reset to `b8e7dea` to restore TDD chain. Lesson reinforced: RED must land before GREEN regardless of plan's simultaneous spec+impl blocks. Going forward, always confirm branch HEAD SHA before writing RED — if impl is already present, surface to team-lead immediately before proceeding.
+
+[DECISION] `src/lib/entu/` dir created for new client location. `src/lib/api/` dir created for wrapper. Neither existed at session start. Old `src/lib/server/entu/client.spec.ts` intentionally left untouched — deletion is Josquin's job during A4 GREEN (atomic move).
+
 (*MVOX:Tallis*)
