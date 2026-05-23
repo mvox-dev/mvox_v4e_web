@@ -1,5 +1,6 @@
+import { env } from '$env/dynamic/private';
 import { json, type RequestHandler } from '@sveltejs/kit';
-import { EntuClient, type EntuEntity } from '../../../lib/server/entu/client.ts';
+import { EntuClient, type EntuEntity } from '../../../lib/entu/client.ts';
 
 const DEFAULT_LIMIT = 50;
 const MAX_LIMIT = 200;
@@ -45,7 +46,11 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 	const limit = parseLimit(url.searchParams.get('limit'));
 	const skip = parseSkip(url.searchParams.get('skip'));
 
-	const client = new EntuClient(locals.entuJwt);
+	const client = new EntuClient({
+		jwt: locals.entuJwt,
+		db: env.ENTU_DB ?? '',
+		baseUrl: env.ENTU_BASE_URL,
+	});
 	const entities = await client.search({
 		'_type.string': 'organization',
 		props: '_id,name,description,location,_thumbnail,member_count_per_section',
