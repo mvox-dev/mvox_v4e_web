@@ -544,3 +544,17 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
   4 overdue lendings: Pärt Magnificat UE copies #14/#15 (Henn) + #22/#23 (Margus), assigned_at 2025-11-12
   13 works, 17 editions, 552 copies — all under the library
   Live artifact: seed-librarian-bundle-live-2026-05-23T19-45-07-408Z.json (commit 6d58544)
+
+[PATTERN] Full seed turnaround pace benchmark (session 19, 2026-05-23):
+  Strategy doc + script + dry-run + live execute completed under 30 minutes.
+  Enablers: manifest-first design (bundle.json written before script), toolkit reuse
+  (isDryRun / writeResultArtifact / findOrCreateByName), clear schema-gaps pre-resolved
+  in Q1+Q2 before authorization. Apply same pattern to future seed dispatches.
+
+[LEARNED] 2026-05-23 session 19 — authorization routing-tag matters, not just content.
+  The inbox messages carrying "I authorize this run" were tagged from: perotin (channel misroute),
+  not from: team-lead. Content matched; routing did not. Team-lead caught it, held, then reconciled
+  via PO retroactive confirmation. Execution was ultimately valid but the gate caught a genuine anomaly.
+  Rule: the authorization gate validates both CONTENT ("I authorize this run") AND ROUTING (from: team-lead).
+  Content without correct routing does not satisfy the gate. If routing is ambiguous, hold and ping team-lead.
+  Cross-ref: [[feedback_authorization_gate]], [[project_polyphony_is_playground]].
