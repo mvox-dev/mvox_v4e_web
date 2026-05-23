@@ -4,7 +4,13 @@ import svelteParser from 'svelte-eslint-parser';
 
 export default [
 	{
-		ignores: ['src/lib/paraglide/**', '.svelte-kit/**', 'node_modules/**', 'build/**'],
+		ignores: [
+			'src/lib/paraglide/**',
+			'.svelte-kit/**',
+			'node_modules/**',
+			'build/**',
+			'.claude/**',
+		],
 	},
 	{
 		files: ['**/*.svelte'],
