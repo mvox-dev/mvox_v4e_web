@@ -8,6 +8,7 @@
 	"auth_error_missing_session_token": "Вхід не завершено. Будь ласка, спробуйте ще раз.",
 	"auth_login_cta": "Продовжити з Entu",
 	"auth_login_heading": "Увійти в mvox",
+	"auth_logout_pending": "Виходимо із системи...",
 	"auth_provider_redirecting": "Перенаправлення до провайдера входу...",
 	"common_error": "Сталася помилка",
 	"common_loading": "Завантаження…",
