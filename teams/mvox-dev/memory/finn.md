@@ -121,3 +121,53 @@ When citing a GitHub issue as load-bearing evidence in a report:
 4. **When docs/default and an issue disagree**, default to the docs/default UNLESS the issue is open AND specifically applicable to the target deployment in its current state.
 
 (*MVOX:Finn*)
+
+---
+
+## 2026-05-22/23 — Session 15 research findings
+
+### [LEARNED] Entu URL shape: two distinct patterns, not one
+
+From tonight's OAuth 404 + URL audit:
+
+- **Data ops** (`entity`, `property`, `billing`, `history`, etc.): `https://api.entu.app/{db}/...` — `db` in path
+- **Auth exchange** (`GET /auth`): `https://api.entu.app/auth?db={db}` — `db` in query param
+- **OAuth init** (`GET /auth/{provider}`): `https://api.entu.app/auth/{provider}` — no `db` at all
+
+`ENTU_API_BASE = 'https://api.entu.app/'` is the correct server root. Appending `{db}/auth` to it produces a 404. Correct form: `${ENTU_API_BASE}auth?db=${db}`.
+
+Bugs fixed/filed: CHORE-50 (OAuth init path), CHORE-51 (`exchange.ts:16` + `auth/+server.ts:14` both use `/{db}/auth`).
+
+### [LEARNED] Entu IP-binding is documented, intentional, no escape hatch
+
+From `entu.ee/api/authentication` (live docs, 2026-05-23):
+
+> "The session token is short-lived (5 minutes) and bound to the user's browser IP. Your app's frontend must exchange it for a full JWT by calling GET /api/auth **directly from the browser** — server-side exchange will fail because the IP will not match."
+
+- No `?bind_ip=false`, no audience flag, no `/auth/backend` alternate endpoint in the OpenAPI spec or docs.
+- The IP-binding is enforced via `aud` claim; mismatch → `401 Invalid JWT audience`.
+- Documented workaround: **service entity with `entu_api_key`** for server-to-server integration — but this uses service rights, not user rights.
+- CHORE-53 Argo ask filed: request IP-unbound JWT variant for trusted server callers.
+
+### [LEARNED] Linting: Biome 2.x + ESLint 10 dual-tool verified versions (2026-05-22)
+
+- `@biomejs/biome@2.4.15`, `eslint@10.4.0`, `eslint-plugin-svelte@3.17.1`, `svelte-eslint-parser@1.6.1`, `@typescript-eslint/parser@8.59.4`
+- ESLint 10 requires Node ≥20.19/≥22.13/≥24 — Node 22.22.2 installed ✓
+- `@typescript-eslint` peer says TS `<6.1.0` — TS 6.0.3 installed, in range ✓
+- `eslint-plugin-svelte` peer explicitly includes `svelte@^5.0.0` — Svelte 5 Runes supported ✓
+- Biome does NOT lint `.svelte` files (roadmap, not shipped as of 2026-05)
+
+### [DEFERRED] CHORE-53: BFF proxy incompatible with Entu IP-bound JWT
+
+No Entu-side escape hatch exists today. Awaiting Argo response on Path B (IP-unbound JWT for trusted callers). Until resolved, data API calls from BFF will 401. Service entity API key (Path A) is a workaround but loses per-user rights granularity.
+
+### [WARNING] Stale `'https://entu.app/api/'` fixtures in 6 spec files
+
+These were NOT updated when CHORE-50 fixed `entu-config.ts`. They still pass (stubs bypass the real constant) but are misleading drift. Part of CHORE-51 GREEN scope:
+- `src/tests/routes/auth/server.spec.ts:5,49`
+- `src/tests/routes/auth/oauth/login-page-server.spec.ts:29,72`
+- `src/lib/server/entu/client.spec.ts:5,11`
+- `src/tests/routes/landing/page.server.spec.ts:56`
+- `src/tests/routes/api/organizations/server.spec.ts:45`
+- `src/tests/routes/api/organizations/id/sections/server.spec.ts:66`
+- Also: `callback-exchange-helper.spec.ts:67` asserts `/${DB}/auth` — needs updating to `?db=${DB}` pattern

@@ -4,6 +4,50 @@ Personal notes. Only Josquin writes here.
 
 ---
 
+## [CHECKPOINT] 2026-05-22→23 session 15 — 6 merges + 2 deploys + OAuth live success + /api/orgs 500 diagnosed
+
+Session shipped 6 squash-merges (`8861bfe` #34, `edacaa6` #37, `8b76af8` #48 (Closes #25), `5b7a741` #24+#29, `bc1d1a7` #50, `63a4ce3` #51) and 2 production deploys (`9a4971ae` post-slate, `2fca359a` post-CHORE-51). PO completed Smart-ID full OAuth round-trip end-to-end on the post-CHORE-51 deploy (sign-in worked: JWT cookie set, signed-in landing rendered). Then `/api/organizations` 500'd on the first authenticated BFF call — surfacing the IP-binding architectural blocker described below.
+
+### Durables worth keeping
+
+[CONTRACT] **Entu's `{error: true, url, ...}` response shape on data-API auth failure.** Confirmed via direct probe of `https://api.entu.app/polyphony/entity?...` with invalid Bearer → HTTP 401 + body `{"error":true,"url":"...",...}`. Crucially, the body does NOT have an `entities` key. Any consumer that types the body as `{entities: EntuEntity[]}` and does `.entities` without `!res.ok` check will get `undefined` and explode downstream on `.map()`/`.length`/`.filter()`. Live captured stack 2026-05-23T00:18Z via `wrangler pages deployment tail`: `TypeError: Cannot read properties of undefined (reading 'map') at GET (bundledWorker-...mjs:7614:11)` in the `/api/organizations` route after `EntuClient.search` returned `undefined`. CHORE-52 will fix.
+
+[GOTCHA] **`EntuClient.search` is missing the `!res.ok`-throw that `get` got in CHORE-34.** `src/lib/server/entu/client.ts:50-52` — direct asymmetry with `get` at L33-42 (which we explicitly pinned a spec for in CHORE-34 / commit `8861bfe`). Fix: mirror the same `if (!res.ok) throw new Error('Entu search ${this.db} failed: ${res.status}')`. The `setProperty` helper (L55+) likely has the same gap — audit when CHORE-52 GREEN starts. Pattern broader: any `EntuClient` method that calls fetch + casts JSON body needs the same `!res.ok` defense, or factor a shared `private async parseEntuJson<T>(res): Promise<T>` helper.
+
+[GOTCHA] **IP-bound JWT (`aud=<user-IP>`) breaks BFF server-side proxying entirely.** Confirmed via captured PO JWT: `"aud": "82.131.122.238"` (PO's home IP). The session-14 [CONTRACT] (L40-41) already flagged this for session-token exchange — the client-side `exchange.ts` carve-out exists because Entu's session-token is IP-bound. But the SAME constraint applies to the 48h JWT that exchange returns: PO's browser sends cookie, CF Worker forwards to Entu from FRA colo IP ≠ PO's IP, Entu sees `aud` mismatch, returns 401 with `{error:true}` shape. **The entire BFF rights-aware data path is architecturally broken for IP-bound JWTs.** This is the root cause of /api/organizations 500 — not the missing `!res.ok` check (which is a proximate symptom-amplifier). Three architectural options to resolve (CHORE-53 territory):
+1. **Entu issues non-IP-bound JWT for BFF use case** — service-token grant or OAuth client_id flow; needs Entu-side change; preserves user-rights-default arch.
+2. **Client-side direct data calls** — browser fetches Entu directly with JWT; violates BFF-as-single-surface stance + exposes Entu API to client.
+3. **BFF holds shared API key + impersonates user** — needs `_owner=true` impersonation feature in Entu OR a per-user API-key issuance flow; violates user-rights-default + drift toward open-platform stance.
+
+Recommendation when CHORE-53 lands: get Finn to research Entu's options; Victoria drafts impact on the existing BFF rights design in `architecture-decisions.md`; PO chooses.
+
+[PATTERN] **Live CF Worker diagnostic via `wrangler pages deployment tail` foreground-timeout.** Use `timeout 30 pnpm wrangler pages deployment tail <deployment-uuid> --project-name multivox --format json > /tmp/cf-tail.log` and have PO retry the failing action while the tail is running. Captures full stack + logs + headers in JSON. **Do NOT use `nohup ... & disown`** — backgrounded processes across Bash calls get killed (the harness doesn't preserve fully-detached processes between tool calls; my first attempt logged 0 events). Foreground with `timeout` is the reliable pattern. The JSON output has `event.request.url`, `event.response.status`, `exceptions[].name/message/stack`, `logs[].message` — sufficient to pin a SvelteKit `bundledWorker-*.mjs` exception to a specific source line by matching the bundled line number to the route's GET handler.
+
+[GOTCHA] **`pnpm wrangler login` requires xdg-utils.** Without `xdg-open` binary, wrangler crashes at 42ms with `FileNotFoundError: spawn xdg-open ENOENT` BEFORE starting the local OAuth callback server. Even if PO manually opens the browser and completes auth, the callback (`localhost:8976/oauth/callback`) has nowhere to land → token never persisted. Detected via metrics line `"errorType":"FileNotFoundError"` + `"isInteractive":false`. Fix: `sudo apt-get install -y xdg-utils` OR use API-token path (`CLOUDFLARE_API_TOKEN` env). The credentials-source pattern documented in Pérotin's prompt (`set -a; . ~/.config/mvox/credentials.env; set +a`) covers this elegantly — `~/.config/mvox/credentials.env` already contains both `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` from a prior session. Use this pattern for all deploys; don't fight the OAuth flow.
+
+[DECISION] **ENTU_API_BASE unified at `https://api.entu.app/` (CHORE-50).** Subdomain form serves all three Entu surfaces:
+- OAuth init: `${base}auth/{provider}` → `https://api.entu.app/auth/smart-id`
+- Session-token exchange (CHORE-51 wire shape): `${base}auth?db={db}` → `https://api.entu.app/auth?db=polyphony`
+- Data API: `${base}{db}/entity?...` → `https://api.entu.app/polyphony/entity?...`
+
+One constant covers all three. The old path-form `https://entu.app/api/` was incorrect for ALL surfaces — only OAuth init surfaced the bug because data API never fired live until post-sign-in tonight. The migration scripts always used the subdomain form (against live polyphony), which was the prior production-side evidence. Source: `src/lib/entu-config.ts`.
+
+[CONTRACT] **Test fixture vs source-default discipline (CHORE-50 + CHORE-51 confirmed).** When a spec pins the SOURCE default value as a literal, and the source default is itself wrong/changing, the spec moves with the fix. When a spec mocks an `ENTU_BASE_URL='https://entu.app/api/'` env override, that's pinning env-override BEHAVIOR (not the source default) — leave those alone even when source default changes. CHORE-50 updated `entu-config.spec.ts:18` (source pin) but NOT the 6 spec files mocking the env-override. CHORE-51 updated `callback-exchange-helper.spec.ts:67` (assertion pinning old path-form, contradicted by RED's "does not contain /${DB}/auth"). Bentham endorsed both calls. The principle: ask "is this assertion about the SOURCE DEFAULT or about ENV OVERRIDE BEHAVIOR" before touching.
+
+[PATTERN] **Stash dance for scratchpad-dirty squash-merges scales to 4+ files.** The session-14 L29 pattern (`git stash push -- teams/mvox-dev/memory/`) handled 3-4 dirty scratchpads cleanly across 6 squash-merges this session. Variant observation: if `git stash push` reports "No local changes to save" at chain start (harness flipped to clean main), the trailing `git stash pop` still restores anything queued from an EARLIER stash. End state after each merge: scratchpads back in dirty/unstaged state per usual. No special handling needed.
+
+[PATTERN] **OAuth callback shape (CHORE-50 + CHORE-51 combined).** After CHORE-50: provider URL is `https://api.entu.app/auth/{provider}?next=<encoded-callback>` with state ONLY inside the encoded `next` (no top-level `&state=`). The callback URL inside `next` decodes to `https://multivox.pages.dev/auth/callback?state=<csrf>&key=` — Entu appends the session token after `&key=`. After CHORE-51: client-side `exchange.ts` POSTs `https://api.entu.app/auth?db=polyphony` with `Authorization: Bearer <session-token>` + `Accept: application/json`. The 48h JWT comes back, gets POSTed to mvox `/auth/cookie` via the BFF, then stored as `entu_jwt` httpOnly cookie. **Sign-in completes successfully at this point.** The IP-binding bug only surfaces on the FIRST subsequent server-side BFF call to `/api/organizations` (and presumably any other data-API route).
+
+### Deferred / open items at session-15 close
+
+- **CHORE-52** — defensive `!res.ok` throw in `EntuClient.search` (+ likely `setProperty` audit) + route handler error mapping. Mirrors CHORE-34 pattern. ~15 min GREEN; tonight-or-next-session.
+- **CHORE-53** — BFF + IP-bound JWT architecture. Needs Finn research, Victoria draft, PO decision between the 3 options above. May require an entu/research PR to add non-IP-bound JWT issuance for BFF use cases. **This blocks ALL post-signin data flow** — until resolved, mvox is "signs in but doesn't show data".
+- **YELLOW-50.1 + YELLOW-51.1** — `architecture-decisions.md` L204 stale wire-shape literal needs update; Bentham folds in his next stewardship pass.
+- **GitHub issue closure** — #50 and #51 are still open (`Refs` not `Closes`); team-lead closes after CHORE-52/53 resolution context lands.
+- **5-min nohup tail attempt** — `/tmp/cf-tail-orgs-long.log` empty because backgrounded process died across Bash calls. Use foreground+timeout pattern in future diagnostics.
+
+---
+
 ## [CHECKPOINT] 2026-05-22 session 14 — #40 / #41 / #45 / #42 / #46 / #47 merged + mvox live on multivox.pages.dev
 
 Session shipped six PRs to main and got mvox publicly reachable for the first time. Merge SHAs (in order): `a120248` #40, `a506266` #41, `52a5fca` hotfix (nodejs_compat), `2fa3b7b` #45, `c490591` #42, `bb12049` #46, `c73b82b` #47. Tests landed at 403/403; `multivox.pages.dev` HTTP 200; OAuth flow live with CSRF binding + JWT cookie session.

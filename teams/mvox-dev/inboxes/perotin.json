@@ -1,8 +1,32 @@
 [
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779481442832@perotin\",\"from\":\"team-lead\",\"reason\":\"End of session 14\",\"timestamp\":\"2026-05-22T20:24:02.832Z\"}",
-    "timestamp": "2026-05-22T20:24:02.832Z",
+    "text": "[2026-05-22 20:37] Welcome back. Standing-concerns scan acknowledged — three of the four flags are clean.\n\nOn flag #4 (the `chore/perotin-rename-photo-prestage-2026-05-21` branch): closed loop. Layer 1 landed on main at `82727ca` (session 13). Branch was deleted post-merge — confirmed: no local branch, no `origin/chore/perotin-rename-photo-prestage-*`. Safe to update your scratchpad and drop the loose-end flag.\n\nNo dispatch right now. PO is deciding session-15 priorities (likely starts with GH backlog audit + linting choice + a headline pick). Stay idle; I'll route if/when data-manager work surfaces.",
+    "summary": "Photo-prestage branch closed — clean to drop the flag",
+    "timestamp": "2026-05-22T20:37:22.179Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-05-22 22:55] Quick read-only check — credentials.env probe.\n\nPO is trying to recover the existing `mvox-dev` Cloudflare API token (already issued per CF dashboard, status Active, scope `Account: Cloudflare Pages: Edit`). The dashboard only shows token values at creation — can't view it later. Hoping it was stashed in your credentials file.\n\n### What to do\n\nInspect `~/.config/mvox/credentials.env` for a `CLOUDFLARE_API_TOKEN` entry. Report **presence/absence + key-name + length** only — DO NOT echo the value. Same discipline as the ENTU_API_KEY handling.\n\nExample output shape (one line, value-masked):\n```\nCLOUDFLARE_API_TOKEN: present (length=40)\n```\nor\n```\nCLOUDFLARE_API_TOKEN: absent\nOther CF-related keys in file: CLOUDFLARE_ACCOUNT_ID (present), CLOUDFLARE_ZONE_ID (absent)\n```\n\nIf absent, list any OTHER credentials in the file (names only, no values) — PO may have used a different env-var name.\n\nSuggested command:\n```bash\ngrep -E '^[A-Z_]+=' ~/.config/mvox/credentials.env 2>/dev/null | awk -F= '{ printf \"%s: present (length=%d)\\n\", $1, length($2) }'\n```\nThat outputs key names + lengths without exposing values.\n\n### When done\nSendMessage with the probe result. No further action needed from you — PO will use the info to either export the recovered value or roll a fresh token.\n\n### Tool-restriction reminder\nSingle quick read. If anything is unexpected (file missing, permission denied, malformed entries) — report instead of guessing.",
+    "summary": "Quick check: is CLOUDFLARE_API_TOKEN in credentials.env?",
+    "timestamp": "2026-05-22T22:58:07.397Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-05-22 22:58] Thanks — probe confirms my direct read. Already actioned: Josquin is retrying `pnpm run deploy` with the inline `set -a; . ~/.config/mvox/credentials.env; set +a` pattern (same shape as your ENTU_API_KEY usage).\n\nIn hindsight I shouldn't have dispatched you for a single-grep credentials check — team-lead can do that directly with no spawn overhead. PO flagged the same. Will internalize for future quick filesystem probes. Stay idle, you're clear.",
+    "summary": "Probe acknowledged — already actioned, Josquin retrying with source-credentials pattern",
+    "timestamp": "2026-05-22T22:59:41.079Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779496104040@perotin\",\"from\":\"team-lead\",\"reason\":\"Session 15 shutdown. Standing-concerns scan was clean at start; one credentials-probe dispatch could have been team-lead direct (lesson L58, no fault). Save any scratchpad updates before responding.\",\"timestamp\":\"2026-05-23T00:28:24.040Z\"}",
+    "timestamp": "2026-05-23T00:28:24.040Z",
     "type": "message",
     "read": true
   }

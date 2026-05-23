@@ -7,6 +7,32 @@ metadata:
 
 # Bentham scratchpad
 
+## 2026-05-23 — Session 15: five clean reviews + two stewardship YELLOWs
+
+[CHECKPOINT] **Session-15 review log (all GREEN, no RED dispatched):**
+- **#34** (`d551a5d`): Tallis test-after-implementation pin of EntuClient.get() throws-on-!ok. YELLOW-32.2 close. GREEN clean.
+- **#37** (`69f6ee6`): Comenius i18n landing — `m.landing_members_per_section({count})`. YELLOW-35.1 close. GREEN clean.
+- **CHORE-48** (`b9b3499`): ESLint + Biome install-only scaffolding. Endorsed both Josquin judgment calls (assist disabled alongside linter; flat/recommended NOT spread). 79-file formatter sweep verified cosmetic-only on security-critical surface. YELLOW-37.1 + #25 folded.
+- **Docs bundle #24+#29** (`dc3c8a5`): README replace + CONTRIBUTING extend. All 3 Tallis flags endorsed. SHA-anchor for CHORE-3 example endorsed (`7bf0d8f`).
+- **CHORE-50** (`81589aa`): OAuth URL hotfix (wrong host + doubled state). Security-critical. CSRF gate verified intact end-to-end. All 3 Josquin calls endorsed (unified rebase; wrangler.json untouched; env-override mocks discipline).
+- **CHORE-51** (`b52272f`): Sibling Entu auth URL fix (path-form → query-form, 2 call sites). `encodeURIComponent` defensive call endorsed as correctness-not-over-engineering. Same env-override discipline consistency reaffirmed.
+
+[DEFERRED] **YELLOW-50.1 + YELLOW-51.1 — stewardship sweep on `architecture-decisions.md` L204 (carve-out section).** Combined updates needed in a single pass:
+- Wire-shape line currently: `GET ${ENTU_API_BASE}{db}/auth` → should be `GET ${ENTU_API_BASE}auth?db=${encodeURIComponent(db)}`.
+- Parenthetical literal "currently `https://entu.app/api/`" → should be `https://api.entu.app/`.
+- Lesson and surrounding text remain correct; only the example value + URL template need updating.
+- Same pattern as YELLOW-45.1 (which #46 closed via forward-pointer at L295). Consider whether to inline-update or add a forward-pointer for audit-trail fidelity. **Lean inline-update**: the carve-out section is the actively-consulted reference, not an audit-trail anchor (unlike L275-298 which IS anchored to the historical #20 incident).
+
+[PATTERN] **"Production-side value is itself wrong" vs. "fixture-pins-default" distinction — codified across CHORE-50 + CHORE-51.** Session-10 `[PATTERN]` (architecture-decisions.md L275-298) protects fixtures from becoming tautologies when production-side defaults are STABLE. Distinct case: when the production-side default value is itself a BUG, the spec that pins that default MOVES with the fix (e.g., `entu-config.spec.ts:18` in CHORE-50; `callback-exchange-helper.spec.ts:67` in CHORE-51). Both cases preserve test INTENT; the SHAPE attested to changes. Env-override mocks (which pin override behavior, not default behavior) stay unchanged in both cases — they use the historical literal as a stable distinct-from-default fixture to make the override-flow assertion meaningful. Reaffirmed twice this session; future me should recognize this pattern without re-deriving it.
+
+[PATTERN] **Defensive `encodeURIComponent` on URL-building primitives is correctness, not over-engineering.** CLAUDE.md "trust internal code" applies to logic flow + invariants enforced upstream — NOT to URL-construction primitives where the cost of safe-input encoding is zero (single primitive call) and the benefit is regression-proofing against future input drift (db renames, dev envs, test inputs, adversarial scenarios). Endorsed in CHORE-51 review without YELLOW. Over-engineering line: custom encoders, input-format validation upstream, type-narrowing — those would be premature. Calling the standard primitive at the call site is the minimum-correct shape.
+
+[PATTERN] **Bundled-config exclusions audit method.** For PRs that exclude paths from a tool's scope (Biome `files.includes` negations; ESLint `ignores`; similar): verify each exclusion against `git ls-tree` of the actual path. Categorize each: (a) intentional bad-shape fixtures (formatting would corrupt — e.g., `schema-malformed.txt`), (b) frozen output artifacts (audit logs, reports), (c) sibling data dirs (the `.ts` source is included, the `.json` data is excluded), (d) generated artifacts (overwritten on regen), (e) standard exclude set (`node_modules`, `build`, `.svelte-kit`). If none of those categories fit, the exclusion deserves scrutiny. CHORE-48 review used this. Encode for future tool-config review.
+
+[GOTCHA] **`assist.enabled: false` in biome.json freezes organizeImports state but the GREEN-pass output may already be organized.** When CHORE-48 ran `biome check --write` to produce the GREEN state, assist was likely briefly enabled (or organizeImports ran as part of the formatter sweep) — visible because the meta-spec's own imports got reordered RED→GREEN. Then assist was disabled for pnpm-lint stability. Future-CHORE turning assist back on may surface a one-time format-only commit (already-organized state may differ slightly from the new assist default). Pre-flagged so I don't RED that follow-up CHORE for unexpected churn — the churn would be expected.
+
+---
+
 ## 2026-05-22 — Session 13: #45 OAuth hardening review (branch `feat/oauth-hardening` final tip `5f2f9cb`)
 
 [DECISION] **#45 final verdict: GREEN.** Bundle: CHORE-41.1 (CSRF binding) + CHORE-41.2 (Entu base URL unify) + YELLOW-45.1 (carve-out doc generalize) + YELLOW-45.2 (alias drop) — all folded in this session. Final bundle = 5 commits: `06acb25` (carve-out lift, mine) → `736f252` (RED) → `768ba44` (GREEN unify) → `ed85d1c` (45.1 doc, mine) → `5f2f9cb` (45.2 alias drop). All co-author trailers present. 399/399 unit tests stable across the 45.1/45.2 folds; `pnpm check` 0 errors.

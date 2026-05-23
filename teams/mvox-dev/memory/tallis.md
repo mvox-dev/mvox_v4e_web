@@ -181,4 +181,26 @@ Updated: `src/tests/routes/auth/oauth/cookie-server.spec.ts` (5 new tests — as
 
 [OPEN] tests/oauth-flow.spec.ts (Playwright): all tests .skip() pending issue #36 mock harness.
 
+## [CHECKPOINT] 2026-05-22 — Session 15: post-audit RED slate + docs bundle
+
+[DECISION] #34 (YELLOW-32.2): 2 tests added to `src/lib/server/entu/client.spec.ts` pinning `EntuClient.get()` throw-on-403/404. Throw message: `Entu get ${entityId} failed: ${res.status}`. Tests assert `.toThrow('403')` / `.toThrow('404')` against the embedded status string. Branch `chore/34-client-get-throws-spec`, SHA `d551a5d`, merged.
+
+[DECISION] #48 (CHORE-48 RED): 7 tests in `src/tests/linting-setup.spec.ts` (Camp B pattern — filesystem + package.json, no subprocess). Asserts: biome.json exists, @biomejs/biome in devDeps, eslint.config.js exists, eslint-plugin-svelte in devDeps, svelte-eslint-parser in devDeps, lint + lint:fix scripts. Branch `chore/48-eslint-biome-linting`, SHA `76c86c0`.
+
+[DECISION] #24+#29 (docs bundle): README replaced (40 lines, pnpm-only commands, multivox.pages.dev, teams/mvox-dev/ pointer, v4E schema pointer). CONTRIBUTING.md extended with PR submission + Code style sections (+62 lines). Branch `chore/24-29-docs-bundle`, SHA `dc3c8a5`, merged.
+
+[DECISION] #50 (CHORE-50 RED): 8 tests appended to `src/tests/routes/auth/oauth/login-page-server.spec.ts`. 6 fail RED (host `entu.app`→`api.entu.app`, path `/api/auth/`→`/auth/`, top-level `state=` present when must be absent). 2 pass as forward guards (state in `next`, next shape). Branch `chore/50-oauth-url-hotfix`, SHA `eb467e9`, merged.
+
+[DECISION] #51 (CHORE-51 RED): 9 tests across 2 files. `callback-exchange-helper.spec.ts` +5 (exchange.ts call site) + `server.spec.ts` +4 (+server.ts call site). Both pin `/auth?db=` query-form vs buggy `/{db}/auth` path-form. 7 fail RED, 2 forward guards. Branch `chore/51-entu-auth-url-shape`, SHA `b763d6f`.
+
+[PATTERN] Synthetic-violation discipline (session-14 L52): for each RED cycle, unset `mockEnv.ENTU_BASE_URL` (set to `undefined`) in new describe blocks so the code falls through to `ENTU_API_BASE` constant. This ensures the test targets the constant's value, not the env-override mock. All 5 RED cycles verified this way.
+
+[PATTERN] Forward-guard tests: when a previous fix (e.g. CHORE-50 host fix) has already corrected part of the contract, write those assertions anyway and let them pass. They guard against future regression, and their passing is noted explicitly in the report to Bentham.
+
+[GOTCHA] `searchParams.getAll('state')` only sees top-level URL params. State embedded inside a URL-encoded `next` value is NOT visible via searchParams. For the doubled-state bug (#50), the correct assertion is `searchParams.has('state') === false` (top-level must be absent), not `getAll('state').length === 1`.
+
+[GOTCHA] `callback-exchange-helper.spec.ts:67` pins the buggy `/${DB}/auth` path-form. After CHORE-51 GREEN, Josquin must update that assertion. It was NOT updated in RED phase per brief instruction.
+
+[DEFERRED] test-gaps.md additions for session 15 — no new gaps discovered beyond what's already logged.
+
 (*MVOX:Tallis*)

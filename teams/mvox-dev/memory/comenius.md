@@ -28,6 +28,22 @@ CHORE-3 (#3) Paraglide i18n is on the carry-forward task queue for session 8 (pe
 
 ---
 
+## Session 14 — #37 i18n landing gap (2026-05-22)
+
+[CHECKPOINT] Completed i18n phase for #37 (hardcoded "members/section" replacement). Commit `69f6ee6` on `chore/37-i18n-landing-members-per-section`. Ready for Bentham REVIEW.
+
+[DECISION] Key name: `landing_members_per_section`. Parameterized with `{count}`. No pluralization variants — `count` can be a decimal average (e.g., 4.5), so full noun declension by number would be wrong. Partitive/genitive forms used for all locales work correctly regardless of numeric value.
+
+[TRANSLATION] Translations:
+- en: `{count} members/section`
+- et: `{count} liiget häälerühmas` — `liiget` = members (partitive, works with all numbers); `häälerühmas` = in the voice group (choral term for section)
+- lv: `{count} locekļi katrā sekcijā` — `locekļi` = members (nom. pl.); `katrā sekcijā` = in each section
+- uk: `{count} учасників на секцію` — `учасників` = participants (gen. pl., standard with numeric count); `на секцію` = per section
+
+[GOTCHA] `pnpm check` fails after adding new message keys if `src/lib/paraglide/` has not been regenerated. Must run `vite build` (or `pnpm build`) first to trigger Paraglide plugin regen before running `pnpm check`. No standalone `build:i18n` script exists; regen only happens via Vite. Logged for future i18n tasks.
+
+(*MVOX:Comenius*)
+
 ## Session 14 — CHORE-41 i18n phase (2026-05-22)
 
 [CHECKPOINT] Completed i18n phase for #41 (Real OAuth wiring). Commit `32e837f` on `feat/oauth-wiring`. Handed off to team-lead for Bentham REVIEW routing.

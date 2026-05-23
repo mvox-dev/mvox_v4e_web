@@ -1,6 +1,80 @@
 # Palestrina — Team Lead Scratchpad
 
-### [NEXT SESSION] 2026-05-22 — session-14 → session-15
+### [NEXT SESSION] 2026-05-23 — session-15 → session-16
+
+**Headline: session 15 surfaced an architectural blocker that's now the only thing that matters.** PO live OAuth click-through worked all the way through sign-in (Smart-ID → JWT in cookie → landing page renders), then 500'd on `/api/organizations`. The root cause traces to a fundamental incompatibility: **Entu's 48h JWTs are IP-bound (documented design property), and mvox's BFF-proxies-user-JWT pattern can't survive the CF Worker egress IP shift.** CHORE-53 documents the architectural fork (Path A rejected, Path B vs Path C to be decided). **No implementation work should happen until that decision lands.**
+
+**Session 15 outcome — 6 squash merges, 5 issues closed, 4 new issues filed.**
+
+| Slate | Issue | Squash SHA | What landed |
+|---|---|---|---|
+| 1/4 (audit) | #34 | `8861bfe` | EntuClient.get() 403/404 throws-spec pin |
+| 2/4 (audit) | #37 | `edacaa6` | i18n landing-page "members/section" gap closed |
+| 3/4 (audit) | #48 / #25 | `8b76af8` | Biome + ESLint dual-tool linting installed, install-only scope (Closes #25; Refs #48 — parent stays open for CHORE-49 rule enablement) |
+| 4/4 (audit) | #24 + #29 | `5b7a741` | README replace + CONTRIBUTING.md PR submission + Code style sections |
+| hotfix-1 | #50 | `bc1d1a7` | OAuth init URL fix (`entu.app/api/auth` → `api.entu.app/auth`) + doubled state removed. Live OAuth click-through verified. Closed. |
+| hotfix-2 | #51 | `63a4ce3` | Entu auth URL shape fix (`/{db}/auth` → `/auth?db={db}`). PO completed Smart-ID auth + got valid JWT. Closed. |
+
+main HEAD: `63a4ce3`. Vitest 429/429. `pnpm check` 0. `pnpm lint` 0.
+
+**Deployments tonight:** `9a4971ae` (post-#50), `92a8a624` (post-#51 first attempt — deploy unblocked once `CLOUDFLARE_API_TOKEN` env path was discovered in credentials.env), `2fca359a` (post-#51 production). Production alias `multivox.pages.dev` currently on `2fca359a`.
+
+**New issues filed (in priority order for session 16):**
+
+- **#53 CHORE-53 — BFF + IP-bound JWT architectural decision.** THE headline. PO must pick Path B (Argo ask) vs Path C (mvox rewrite to browser-direct). PO rejected Path A (service entity → mvox owns rights enforcement) explicitly: "if we have to own rights management, why use Entu at all." A `brainstorming` skill session is the right tool. Full diagnostic + 3-path tradeoff in the issue body.
+- **#52 CHORE-52 — EntuClient.search defensive !res.ok throw.** Mirrors CHORE-34's `get()` pattern; small fix that doesn't solve the architectural problem but stops the misleading 500 TypeError. Independent of #53; could land either before or after the arch decision. Standard TDD chain.
+- **#49 CHORE-49 — Incremental Biome lint rule enablement.** 5 sub-rule-enable cycles. Filed but no urgency.
+
+**Carry-forward queue for session 16 (priority order):**
+
+1. **Brainstorming session on CHORE-53.** PO + team-lead, use the `brainstorming` skill. Decide Path B vs Path C. Until that lands, OAuth flow is broken end-to-end for users (you can sign in; nothing past that loads).
+2. **CHORE-52 defensive fix** (if PO wants — independent of #53). ~15 min full TDD chain.
+3. **Long-session question** — PO raised this during the wrap-up. Maps cleanly onto the same Path B vs Path C fork (Path B: ask Argo for longer JWT bundled with IP-binding ask; Path C: mvox manages session lifetime via its own cookie + re-auth UX). Discuss alongside CHORE-53.
+4. **#36 mock harness + SSR flip** — still open from session-14 carryforward. Lower priority until arch settles.
+5. **#39 lift session to +layout.server.ts** — same; fires on next auth-aware route once arch is settled.
+6. **#38 Byrd cleanup** (OrgEntity to types.ts + `$app/state` flip) — relevant after arch decision; some may become moot if Path C lands (BFF code shrinks dramatically).
+7. **#33 BFF helper factor-out** — relevant only if Path B lands (preserves BFF). Skip if Path C lands.
+8. **#6 CHORE-6 Email** — still blocked on PO DNS records. Re-check.
+9. **CONTRIBUTING.md docs follow-up** — Bentham flagged the "Linting" section will need a one-line update once CHORE-49 lands. Cheap.
+10. **Bentham stewardship sweep** — YELLOW-50.1 + YELLOW-51.1 (stale literal + stale wire-shape in `architecture-decisions.md` L204). Folds into next stewardship pass.
+
+**Live state at session-15 close:**
+- main: `63a4ce3`
+- deployment: `2fca359a.multivox.pages.dev` (production alias)
+- OAuth flow: Smart-ID sign-in works end-to-end; `/api/organizations` 500s downstream (CHORE-52/53 territory)
+- Tests: vitest 429/429, pnpm check 0, pnpm lint 0
+- Agents registered: finn, bentham, perotin, tallis, josquin, comenius (all idle at shutdown)
+- Agents not spawned this session: byrd, victoria
+- PO has signed-in `entu_jwt` cookie in browser, valid 48h from ~23:25 — IP-bound to PO's home IP; only useful for direct-to-Entu testing, not for the BFF proxy
+
+**Expected first action session 16:**
+1. Read this seed + `git log --oneline main ^63a4ce3` (any new commits since shutdown)
+2. Verify production health: `curl -sI https://multivox.pages.dev/` and `/auth/login` — expect 200
+3. **Brainstorm CHORE-53 with PO.** Use the `brainstorming` skill. Decision is Path B vs Path C with meaningful cost/value tradeoffs.
+4. Spawn finn + bentham + perotin per Phase 5 (always-on). They're still in config.json from session 15, so State A reconnect — no re-spawn needed; just verify intros.
+
+**Process lessons from session 15 (worth carrying forward):**
+
+- **L54 — Entu's IP-binding is documented design property, not a bug.** Finn's research surfaced this in `entu.ee/api/authentication`. Service-entity API key is Entu's recommended backend pattern. The "BFF user-rights default" pattern in `architecture-decisions.md` was incompatible with Entu from the start; we just hadn't read carefully enough. Memory: `project_entu_jwt_ip_bound`.
+- **L55 — Audit-driven backlog sweep works as a single slate.** GH audit + 4 sequential items landed in ~1h45m. The no-parallel-branches directive (PO 2026-05-22) is the discipline that made it manageable. Memory: `feedback_no_parallel_branches`.
+- **L56 — Doc-only PRs via single-author lite-path scale fine when scope is tight.** #24+#29 bundle was Tallis-direct + Bentham GREEN + Josquin merge — no Comenius, no full TDD chain. ~15 min. Lite-path works for trivial cosmetic-or-doc work.
+- **L57 — `pnpm wrangler login` needs `xdg-utils`; `CLOUDFLARE_API_TOKEN` env path is cleaner.** Wrangler crashes at process start without xdg-utils, before setting up the OAuth callback listener. The env-var path (sourced from `~/.config/mvox/credentials.env`) works without ceremony. Memory: `project_wrangler_deploy_auth`.
+- **L58 — For single-shot filesystem/curl probes, team-lead runs directly.** PO flagged 2026-05-23: "you are much more capable in finding things on filesystem than i am" after I dispatched Pérotin for a credentials.env single-grep. Spawn cost exceeds the work for simple lookups. Memory: `feedback_team_lead_direct_probes`.
+- **L59 — The defensive pattern catches its own gaps but only on demand.** CHORE-34 (session 15 first item) pinned `client.get()` throws-on-!ok behavior. The exact same anti-pattern lived in `client.search()` and surfaced as the 500 TypeError 4 hours later. Lesson: when a defensive pattern lands, sweep the neighbors for the same vulnerability. CHORE-52 is the sibling sweep — being filed separately is the discipline, but the cost of the gap (4 hours of debugging + an architectural realization) was real.
+- **L60 — Architectural discoveries during live testing are gold.** CHORE-50/51 URL fixes were one-liners. CHORE-53 (BFF + IP-binding incompatibility) only surfaced because PO live-tested the actual flow. No unit test would have caught this — the IP shift is a runtime/production-only property. Live UX testing on the deployed surface is more valuable than I'd weighted it.
+
+**Brilliant KB updates (deferred — when PO has bandwidth):**
+- New: `Decisions/mvox/bff-vs-jwt-architecture` — codify L54/L60 architectural realization once Path B vs C is settled
+- New: `Patterns/entu-ip-binding-documented-property` — cross-reference `project_entu_jwt_ip_bound`
+- New: `Patterns/sweep-neighbors-when-pinning-defensive-pattern` — codify L59
+- New: `Patterns/live-test-on-deployed-surface` — codify L60
+- Update: `Projects/mvox` — sign-in flow live; data-API blocked on CHORE-53 arch decision
+
+(*MVOX:Palestrina*)
+
+---
+
+### [PROCESSED 2026-05-23 end-of-session-15] session-14 → session-15
 
 **Session 14 outcome:** Huge productive session. 7 squash merges to main: deploy pipeline (#40), real OAuth wiring (#41), CSRF binding + URL unify + carve-out lift (#45), nodejs_compat hotfix (52a5fca), TLS-lag runbook note (#42), arch-decisions forward-pointer (#46), process.env → $env/dynamic/private migration (#47). First public deployed surface live at **https://multivox.pages.dev/auth/login** with 6 provider buttons rendered. CSRF + env-access hardened. Six memory notes captured + multiple architecture-decisions lifts.
 

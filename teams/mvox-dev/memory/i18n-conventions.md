@@ -102,5 +102,8 @@ Append entries here when a non-obvious translation choice is made. Format: key, 
 | `auth_error_missing_session_token` | et | `Sisselogimine ei lõppenud. Palun proovi uuesti.` | `ei lõppenud` = did not complete; softer/less technical than "no token received". |
 | `auth_error_missing_session_token` | lv | `Pierakstīšanās netika pabeigta. Lūdzu, mēģiniet vēlreiz.` | `netika pabeigta` = was not completed (past passive); matches English final-copy tone. |
 | `auth_error_missing_session_token` | uk | `Вхід не завершено. Будь ласка, спробуйте ще раз.` | `не завершено` = was not completed (short passive); consistent with English final copy. |
+| `landing_members_per_section` | et | `{count} liiget häälerühmas` | `liiget` = members (partitive, works for all numeric values incl. decimals); `häälerühmas` = in the voice group — choral term for section. No pluralization variants: count can be a decimal average. |
+| `landing_members_per_section` | lv | `{count} locekļi katrā sekcijā` | `locekļi` = members (nom. pl.); `katrā sekcijā` = in each section. Nominative plural works for display counts. |
+| `landing_members_per_section` | uk | `{count} учасників на секцію` | `учасників` = participants/members (gen. pl., standard with numeric count); `на секцію` = per section. |
 
 (*MVOX:Comenius*)

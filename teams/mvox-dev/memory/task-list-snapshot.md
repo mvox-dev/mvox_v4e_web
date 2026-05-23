@@ -1,76 +1,75 @@
-# Task List Snapshot — 2026-05-22 (end of session 14)
+# Task List Snapshot — 2026-05-23 (end of session 15)
 
-State at shutdown. If session 15 hits State C in Phase 2, restore the active (pending/in_progress) rows below into fresh TaskCreate IDs.
+State at shutdown. If session 16 hits State C in Phase 2, restore the active rows below into fresh TaskCreate IDs. Most active work is parked behind the CHORE-53 architectural decision.
 
-| # | Subject | Status | Owner | Notes |
-|---|---|---|---|---|
-| 3 | Layer 2 photo file-payload probe + impl | pending | — | Empirical probe: does Entu's POST-with-file-fields re-link to a pre-existing S3 object after DELETE of previous property value, or does it require fresh upload? Probe answer determines whether file-property rename is doable as DELETE-then-POST or requires download-via-signed-URL + re-upload. After probe: implement Layer 2 of the photo-rename cleanup with correct file-value round-trip + extend EntuProperty type (YELLOW-12.2) + widen probe-rename-photo-impact to capture all file-value fields (YELLOW-12.1). **Fires only if:** (a) someone uploads an `avatar`/`logo` instance value before Layer 2 lands, OR (b) BFF needs `_thumbnail` working on real data with uploaded files. **Status as of session 14 close:** 0 file values exist on `person.photo` or `organization.photo` in live polyphony — Layer 1 prop-def rename landed at `82727ca` (session 13); no instance work needed yet. Defer to when trigger fires. Layer 2 implementation NOT yet routed to Pérotin. |
+## Active tasks at shutdown
 
-Tasks #1, #2 closed in session 13. Tasks #4, #5, #6, #7, #8, #9 closed in session 14.
+None in_progress at the harness level (all session-15 dispatched work completed in-flight). The work that's open for session 16 is captured in GH issues (see below) and the [NEXT SESSION] seed in `team-lead.md`.
 
-## Session-14 carryforwards as GH issues (still applicable for future sessions)
+## Open GH issues — priority for session 16
 
 | GH # | Subject | Notes |
 |---|---|---|
-| #6 | CHORE-6 — Email Resend wiring | Still blocked on PO SPF + DKIM DNS records. Re-check next session start. |
-| #19-#23 | ADMIN-1 through ADMIN-5 | Admin user-story backlog |
-| #7-#18 | A1-D2 | User-story backlog (singer + conductor + dashboard scenarios) |
-| #24 | docs: README replace | Low priority |
-| #25 | CHORE-25 packageManager pin | Small chore |
-| #29 | docs: CONTRIBUTING.md follow-ups | Low priority, includes YELLOW-3.2 commit-body AC bullet |
-| #31 | YELLOW: relax OKLCH regex on next Tailwind upgrade | Fires on next Tailwind minor/major bump |
-| #33 | YELLOW-32.1: factor BFF helpers to shared module on next route | Fires when route #3 lands |
-| #34 | YELLOW-32.2: pin EntuClient.get() 403/404 throws in client.spec.ts | Tallis-owned, ~10 lines. Independent fold-in. |
-| #36 | CHORE-36: E2E Entu mock harness + flip landing page to SSR consumption | Authoring convention: new BFF-consuming pages default to SSR + .skip() SSR-presence tests pending. ~1 day single PR. |
-| #37 | YELLOW-35.1: i18n gap — hardcoded "members/section" in landing | Comenius, ~10 lines. Independent fold-in or with section-drill-down. |
-| #38 | YELLOW-35.2 + 35.3: Svelte 5 + types cleanup (OrgEntity to types.ts + $app/state) | Byrd, small. Pairs with #33 or with next Byrd-touched feature. |
-| #39 | YELLOW-35.4: lift session population to +layout.server.ts | Josquin + Tallis (specs update). Becomes RED for next authenticated route. |
-| #43 | CHORE-42: Wire mvox.eu custom domain to Cloudflare Pages multivox | PO owns mvox.eu at Zone.ee (registered 2026-04-07). DNS work + CF dashboard custom-domain add. |
-| #44 | CHORE-43: Migrate multivox to CF Pages Git-connected mode for auto-deploy | Delete + recreate via CF dashboard "Connect to Git" wizard. Brief outage during swap. |
+| **#53** | **CHORE-53 — BFF + IP-bound JWT architectural decision** | **THE headline.** PO must pick Path B vs Path C. Brainstorming session needed. Path A rejected ("if we have to own rights management, why use Entu at all"). Until this settles, no implementation can move. |
+| **#52** | CHORE-52 — EntuClient.search defensive !res.ok throw | Mirrors CHORE-34's `get()` pattern. Stops misleading 500 TypeError; doesn't fix root cause. Independent of #53; can land before or after arch decision. ~15 min full TDD chain. |
+| #3 | Layer 2 photo file-payload probe + impl | Still deferred — fires only when actual photo uploads happen OR BFF needs `_thumbnail` on real data. Not yet triggered. |
+| #6 | CHORE-6 — Email Resend wiring | Still blocked on PO SPF + DKIM DNS records. Re-check next session. |
+| #7-#18 | A1-D2 user stories | Backlog (singer + conductor + dashboard scenarios) — defer until arch decision lands and OAuth flow is end-to-end functional. |
+| #19-#23 | ADMIN-1 through ADMIN-5 | Admin user-story backlog — same defer reason. |
+| #31 | YELLOW: relax OKLCH regex on next Tailwind upgrade | Fires on next Tailwind minor/major bump. |
+| #33 | YELLOW-32.1: BFF helper factor-out on next route | **Becomes moot if Path C lands** (BFF data routes get deleted). Skip if Path C; relevant if Path B. |
+| #36 | CHORE-36: E2E Entu mock harness + flip landing to SSR | Lower priority until arch decision lands. Same Path-C-makes-moot concern (different route shape). |
+| #38 | YELLOW-35.2 + 35.3: Svelte 5 + types cleanup | Independent fold-in or with next Byrd touch. May survive Path C. |
+| #39 | YELLOW-35.4: lift session population to +layout.server.ts | Same Path-C-makes-moot concern; defer. |
+| #43 | CHORE-42: Wire mvox.eu custom domain | PO owns mvox.eu at Zone.ee. DNS work + CF dashboard add. Independent of arch decision. |
+| #44 | CHORE-43: Migrate multivox to CF Pages Git-connected mode | Delete + recreate via CF dashboard "Connect to Git" wizard. Brief outage during swap. Independent of arch. |
+| #48 | CHORE-48: ESLint + Biome linting setup (parent) | Install landed in `8b76af8`. Stays open until CHORE-49 sub-rule cycles complete. |
+| #49 | CHORE-49: Incremental Biome lint rule enablement (5 sub-cycles) | Filed but no urgency. Each sub-rule gets its own RED/GREEN/REVIEW cycle. |
 
-## Carry-forward summary (full detail in `team-lead.md` [NEXT SESSION] section)
+## Session 15 outcome summary
 
-### Session 14 outcome summary
+### Closed via PR this session
+- ✅ #34 EntuClient.get() throws-spec pin — squash `8861bfe`
+- ✅ #37 i18n landing-page gap — squash `edacaa6`
+- ✅ #25 packageManager pin — folded into `8b76af8`
+- ✅ #24 README replace + #29 CONTRIBUTING.md follow-ups — squash `5b7a741`
+- ✅ #50 OAuth init URL fix — squash `bc1d1a7` (live-test verified)
+- ✅ #51 Entu auth URL shape fix — squash `63a4ce3` (live-test verified through sign-in)
 
-- ✅ **#40 Deploy pipeline** — first public deploy live at `multivox.pages.dev`. Squash `a120248`. Closed.
-- ✅ **#41 OAuth wiring** — client-side exchange (IP-binding-safe), CSRF state + verification, 4 server routes + client helper + login page. Squash `a506266`. Closed.
-- ✅ **#45 (41.1+41.2) bundle** — CSRF binding on /auth/cookie, ENTU_API_BASE unified constant, alias drop, client-side carve-out lift. Squash `2fa3b7b`. Closed.
-- ✅ **Production hotfix `52a5fca`** — nodejs_als → nodejs_compat compatibility flag (process.env access in CF Workers).
-- ✅ **#42 (40.1) TLS-lag runbook note** — Squash `c490591`. Closed.
-- ✅ **#46 (45.3) arch-decisions forward-pointer** — Squash `bb12049`. Closed.
-- ✅ **#47 process.env → $env/dynamic/private migration** — 5 call sites + meta-spec regression net + vitest global setup. Squash `c73b82b`. Closed.
-- ✅ **#30 (CSRF gate YELLOW) backfill-closed** — satisfied by CHORE-41+45 work.
+### Filed this session
+- 📝 #48 CHORE-48 linting setup (filed + landed install phase; still open as parent for #49)
+- 📝 #49 CHORE-49 incremental rule enablement
+- 📝 #50 CHORE-50 OAuth URL fix (filed + landed + closed)
+- 📝 #51 CHORE-51 Entu auth URL shape (filed + landed + closed)
+- 📝 #52 CHORE-52 EntuClient.search defensive throw (filed, open)
+- 📝 #53 CHORE-53 BFF + IP-bound JWT arch decision (filed, open — headline for session 16)
 
-### Live state at shutdown (session 14)
-
-- **Main:** `c73b82b` (or whichever shutdown commit is last)
+### Live state at shutdown
+- **Main:** `63a4ce3` (post-CHORE-51 merge); subsequent shutdown commit will be N+1
+- **Deployment:** `2fca359a.multivox.pages.dev` (production alias)
 - **`https://multivox.pages.dev/`** — HTTP 200, landing page from CHORE-35
-- **`https://multivox.pages.dev/auth/login`** — HTTP 200, 6 provider buttons rendered (smart-id, mobile-id, id-card, google, apple, e-mail)
-- **403/403 unit tests + 0 type errors**
-- **Branches:** main only — all feature branches deleted post-merge
-- **No outstanding stashes**
+- **`https://multivox.pages.dev/auth/login`** — HTTP 200, 6 provider buttons
+- **OAuth sign-in:** verified working end-to-end (Smart-ID flow completes, JWT in cookie, signed-in landing renders)
+- **`/api/organizations` (and any BFF data call):** 500 — see CHORE-52/53
+- **Tests:** vitest 429/429, pnpm check 0, pnpm lint 0
 
 ### Team composition this session
+- **finn** — 2 dispatches (linting config research + Entu /auth audit). Both delivered structured reports on time.
+- **bentham** — 5 reviews (#34, #37, CHORE-48, docs bundle, #50, #51) + multiple stewardship calls + arch endorsements.
+- **perotin** — 1 dispatch (credentials.env probe — should have been team-lead direct; lesson L58).
+- **tallis** — 5 RED dispatches across the session (#34, #37, CHORE-48, docs bundle authored end-to-end, #50, #51). Consistent synthetic-violation discipline per L52.
+- **josquin** — 9+ dispatches: GREEN phases for all six merges, all six squash-merges, two deploys (one with credentials-source workaround), live diagnostic for the 500.
+- **comenius** — 1 dispatch (#37 i18n landing-page gap; 4-locale translation done).
+- **byrd, victoria** — not spawned this session. Available next session if needed.
 
-All 7 agents spawned + functioned:
+### Process notes from session 15 (also in `team-lead.md` L54-L60 and saved as memory notes)
 
-- **finn** — 1 dispatch (Entu OAuth flow research for CHORE-41). Solid report with IP-binding gotcha as load-bearing finding.
-- **bentham** — 5 reviews + 2 stewardship commits: (1) #40 GREEN, (2) #41 GREEN, (3) #45 GREEN, (4) #46 GREEN, (5) #47 GREEN with synthetic-violation probe verification. Plus authored `06acb25` (carve-out lift) and `1aa65c6` (45.3 stewardship note via Option A recovery from branch-flip mishap).
-- **perotin** — 0 dispatches. Standing-concerns scan clean. Idle the full session (task #3 didn't fire).
-- **tallis** — 4 RED dispatches: (1) #40 RED, (2) #41 RED initial (server-side; redone client-side after architecture pushback), (3) #45 RED, (4) #47 RED. One mid-session correction needed (server vs client architecture; resolved cleanly).
-- **josquin** — 9 dispatches: (1) #40 GREEN, (2) #40 squash-merge, (3) project create + smoke deploy, (4) #41 GREEN server-side + ENTU_DB wrangler var, (5) #41 squash-merge, (6) #45 GREEN, (7) #45 squash-merge + production hotfix branch, (8) live deploy + hotfix re-deploy, (9) #42+#46 sequential squash-merges, (10) #47 GREEN with meta-spec path fix, (11) #47 squash-merge, (12) stash reconciliation.
-- **byrd** — 1 dispatch: #41 client-side GREEN (exchange helper + callback page + login page wiring).
-- **comenius** — 1 dispatch: #41 i18n on 5 keys × 3 locales (et/lv/uk).
-
-### Process notes from session 14 (also in team-lead.md L46-L53)
-
-- L46 — TaskUpdate(owner=X) auto-sends task_assignment; don't rotate owner through TDD chains
-- L47 — Closes #N includes ALL satisfied issues
-- L48 — CF Workers process.env trap (nodejs_compat or $env/dynamic/private)
-- L49 — Atomic git chaining defends against shared-tree branch-flips
-- L50 — CF Pages wrangler.json `vars` block locks the dashboard plaintext-vars UI
-- L51 — Direct Upload mode ≠ Git-connected mode + no in-place conversion
-- L52 — Meta-specs that scan source must be synthetic-violation verified
-- L53 — Direct-to-Entu carve-out for IP-bound OAuth exchange
+- L54 — Entu IP-binding is documented design property (memory: `project_entu_jwt_ip_bound`)
+- L55 — Audit-driven backlog sweep works as a single slate (cross-references `feedback_no_parallel_branches`)
+- L56 — Doc-only PRs lite-path scales fine (extends prior L30)
+- L57 — wrangler deploy auth via `CLOUDFLARE_API_TOKEN` env > OAuth (memory: `project_wrangler_deploy_auth`)
+- L58 — Team-lead does single-shot probes directly (memory: `feedback_team_lead_direct_probes`)
+- L59 — Sweep neighbors when pinning a defensive pattern (CHORE-52 = the sibling sweep we missed at CHORE-34)
+- L60 — Live testing on deployed surface catches what no unit test can (CHORE-53 only surfaced this way)
 
 (*MVOX:Palestrina*)

@@ -1,23 +1,15 @@
 [
   {
     "from": "team-lead",
-    "text": "[2026-05-22 18:39] CHORE-41 i18n dispatch.\n\n## Story Handoff (forwarded from Byrd)\n- **Story:** #41 — CHORE-41 Real OAuth wiring\n- **Branch:** `feat/oauth-wiring` @ `959c899` (pushed)\n- **From:** Byrd (client-side GREEN — 391/391 unit tests, 0 type errors)\n- **To:** Comenius (i18n phase)\n\n## What to translate\n\n5 new keys in `messages/en.json` (final copy). The et/lv/uk files have placeholder translations — replace those with proper localizations.\n\n| Key | English | Context |\n|---|---|---|\n| `auth_callback_pending` | \"Completing sign-in...\" | Loading state on /auth/callback while exchanging session token |\n| `auth_callback_success` | \"Signed in. Redirecting...\" | Brief success message before nav to / |\n| `auth_callback_failed` | \"Sign-in failed. Please try again.\" | Error state on /auth/callback (rare; user usually gets redirected to /auth/login with error param) |\n| `auth_error_csrf_mismatch` | \"Sign-in security check failed. Please start again.\" | Error banner on /auth/login when CSRF state mismatched on callback |\n| `auth_error_missing_session_token` | \"Sign-in did not complete. Please try again.\" | Error banner on /auth/login when Entu callback arrived without a session token |\n\n### Files\n\n- `messages/en.json` — REFERENCE ONLY, don't change (Byrd's English is final copy)\n- `messages/et.json` — your translation target (Estonian) — current placeholder\n- `messages/lv.json` — your translation target (Latvian) — current placeholder\n- `messages/uk.json` — your translation target (Ukrainian) — current placeholder\n- `src/routes/auth/callback/+page.svelte` — uses 3 `auth_callback_*` keys\n- `src/routes/auth/login/+page.svelte` — uses 2 `auth_error_*` keys\n\n### Translation notes\n\n- These are user-facing error/transient states; keep tone calm + actionable (not alarming)\n- \"Sign-in\" is the noun phrase, \"sign in\" is the verb — match each locale's convention for that distinction (e.g., et: \"sisselogimine\" / \"logi sisse\")\n- \"Completing\" implies an in-progress action — most locales have a verbal-noun form for this; pick the one that doesn't sound like a finished result\n- \"Security check failed\" for CSRF — soften where natural; user shouldn't feel they did something wrong (the OAuth flow just didn't carry state correctly)\n\n### After translation\n\n1. `pnpm test:unit` — should stay 391/391 (no test cares about translation content; just that keys exist)\n2. Verify all 4 locale files have the same key set: `jq 'keys' messages/en.json | diff - <(jq 'keys' messages/et.json)` etc.\n3. Update `teams/mvox-dev/memory/i18n-conventions.md` if you make any naming-pattern decisions\n4. Commit: `chore(#41): i18n — Estonian, Latvian, Ukrainian translations for OAuth flow keys`\n5. Push, send team-lead the handoff for Bentham review\n\n(*MVOX:Palestrina*)",
-    "summary": "CHORE-41 i18n — 5 auth keys for translation",
-    "timestamp": "2026-05-22T18:38:31.501Z",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"3\",\"subject\":\"#37 i18n landing gap — m.landing_members_per_section()\",\"description\":\"YELLOW-35.1 from #35 review. Replace hardcoded \\\"members/section\\\" string in `src/routes/+page.svelte:95` with `m.landing_members_per_section({ count })` call. Add the new key to all 4 locale files (en/et/lv/uk). Branch chore/37-i18n-landing-members-per-section. Sequence: this is item 2/4 in the serial post-audit slate per [[no-parallel-branches]]. Starts after #34 fully closed (was merged at 8861bfe).\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-22T20:56:26.391Z\"}",
+    "timestamp": "2026-05-22T20:56:26.391Z",
     "type": "message",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"5\",\"subject\":\"CHORE-41 Real OAuth wiring — full TDD chain\",\"description\":\"Wire actual Entu OAuth handoff flow: `/auth/login` shell currently just renders; needs to initiate Entu OAuth, accept callback (probably new `/auth/callback` route), complete handshake, set entu_jwt cookie. EXISTING scaffolding: `POST /auth` does API-key → JWT-cookie exchange (7 tests passing), `hooks.server.ts` reads cookie into locals.entuJwt, `/auth/login/+page.svelte` is the shell. NEEDED: OAuth provider redirect URL + callback handler + JWT cookie set from OAuth-issued token. Pairs with CHORE-40 — needs stable deployed callback URL. Pull from prior Entu OAuth research (CHORE-5 groundwork if any). Bentham RED triggers: missing CSRF gate (#19), missing rate limit, server-only auth helpers leaking to client.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-22T18:38:35.534Z\"}",
-    "timestamp": "2026-05-22T18:38:35.534Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779481445696@comenius\",\"from\":\"team-lead\",\"reason\":\"End of session 14\",\"timestamp\":\"2026-05-22T20:24:05.696Z\"}",
-    "timestamp": "2026-05-22T20:24:05.696Z",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779496109271@comenius\",\"from\":\"team-lead\",\"reason\":\"Session 15 shutdown. #37 i18n landing-page gap closed; 4-locale translations confident. Save any [TRANSLATION] / [CONVENTION] entries before responding.\",\"timestamp\":\"2026-05-23T00:28:29.271Z\"}",
+    "timestamp": "2026-05-23T00:28:29.271Z",
     "type": "message",
     "read": true
   }

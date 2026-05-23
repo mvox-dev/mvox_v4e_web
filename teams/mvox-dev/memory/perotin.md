@@ -374,10 +374,7 @@ Commits (in order):
   If avatars/logos are uploaded before session 13 executes, the instance enumeration in Phase 2
   of the migration script will catch them dynamically at runtime (manifest-first pattern).
 
-[DEFERRED] Live execution of cleanup-rename-avatar-logo-to-photo-2026-05-21.ts pending:
-  (a) entu/research PR "rename avatar+logo to photo" merging upstream (PO submits)
-  (b) Explicit "I authorize this run" SendMessage from team-lead
-  --live flag blocked at startup until both gates cleared.
+[RESOLVED 2026-05-22] Layer 1 live execution complete (session 13, main at 82727ca). Branch `chore/perotin-rename-photo-prestage-2026-05-21` squash-merged + deleted. Both gates cleared: entu/research PR #49 merged + team-lead "I authorize" 13:30.
 
 ## Session 12 — RED-1 split + Bentham GREEN (2026-05-22)
 
