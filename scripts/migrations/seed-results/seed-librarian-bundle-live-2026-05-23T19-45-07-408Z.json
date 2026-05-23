@@ -1,0 +1,292 @@
+{
+  "run_at": "2026-05-23T19:43:39.932Z",
+  "dry_run": false,
+  "teardown": false,
+  "library": {
+    "action": "CREATE",
+    "id": "6a12036c4ff8277cd4306b26",
+    "label": "EPCC Library"
+  },
+  "persons": [
+    {
+      "action": "CREATE",
+      "id": "6a12036c4ff8277cd4306b2d",
+      "label": "Maris Tamm"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a12036c4ff8277cd4306b3e",
+      "label": "Liina Saar"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a12036c4ff8277cd4306b4f",
+      "label": "Ave Lepp"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a12036d4ff8277cd4306b60",
+      "label": "Kärt Põld"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a12036d4ff8277cd4306b71",
+      "label": "Toomas Mägi"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a12036d4ff8277cd4306b82",
+      "label": "Andres Vahar"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a12036d4ff8277cd4306b93",
+      "label": "Margus Roos"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a12036e4ff8277cd4306ba4",
+      "label": "Henn Kuusik"
+    }
+  ],
+  "members": [
+    {
+      "action": "CREATE",
+      "id": "6a12036c4ff8277cd4306b34",
+      "label": "member for Maris Tamm"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a12036c4ff8277cd4306b45",
+      "label": "member for Liina Saar"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a12036d4ff8277cd4306b56",
+      "label": "member for Ave Lepp"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a12036d4ff8277cd4306b67",
+      "label": "member for Kärt Põld"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a12036d4ff8277cd4306b78",
+      "label": "member for Toomas Mägi"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a12036d4ff8277cd4306b89",
+      "label": "member for Andres Vahar"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a12036e4ff8277cd4306b9a",
+      "label": "member for Margus Roos"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a12036e4ff8277cd4306bab",
+      "label": "member for Henn Kuusik"
+    }
+  ],
+  "works": [
+    {
+      "action": "CREATE",
+      "id": "6a12036e4ff8277cd4306bb5",
+      "label": "Spem in alium"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a1203714ff8277cd4306c66",
+      "label": "Magnificat"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a12037a4ff8277cd4306e45",
+      "label": "Raua needmine"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a1203864ff8277cd43070cb",
+      "label": "Õnnis on inimene"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a12038d4ff8277cd430725c",
+      "label": "Stars"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a1203954ff8277cd4307435",
+      "label": "The Beatitudes"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a1203994ff8277cd430754c",
+      "label": "Only in Sleep"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a1203a04ff8277cd43076e1",
+      "label": "Ave verum corpus"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a1203a94ff8277cd43078d7",
+      "label": "Mass for Five Voices"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a1203ad4ff8277cd43079ae",
+      "label": "O Pastor Animarum"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a1203ad4ff8277cd43079c5",
+      "label": "Sleep"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a1203b54ff8277cd4307b9a",
+      "label": "Immortal Bach"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a1203bc4ff8277cd4307d3f",
+      "label": "O Magnum Mysterium"
+    }
+  ],
+  "editions": [
+    {
+      "action": "CREATE",
+      "id": "6a12036e4ff8277cd4306bc0",
+      "label": "Spem in alium — 40-part original"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a1203704ff8277cd4306c2b",
+      "label": "Spem in alium — 8-part reduction (Cooke)"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a1203714ff8277cd4306c72",
+      "label": "Magnificat — Universal Edition · original"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a1203764ff8277cd4306d6e",
+      "label": "Magnificat — Hyperion · reduced (Layton ed.)"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a12037a4ff8277cd4306e39",
+      "label": "Magnificat — UE · with organ"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a12037b4ff8277cd4306e50",
+      "label": "Raua needmine — Fennica Gehrman · SATB + shaman drum"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a1203834ff8277cd4307030",
+      "label": "Raua needmine — Pelle Pyy · a cappella reduction"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a1203864ff8277cd43070d7",
+      "label": "Õnnis on inimene — SP Muusikaprojekt"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a12038d4ff8277cd4307267",
+      "label": "Stars — Musica Baltica · SATB + glasses"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a1203954ff8277cd4307441",
+      "label": "The Beatitudes — Universal Edition"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a1203994ff8277cd4307556",
+      "label": "Only in Sleep — Musica Baltica"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a1203a04ff8277cd43076ec",
+      "label": "Ave verum corpus — Stainer & Bell"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a1203a94ff8277cd43078e3",
+      "label": "Mass for Five Voices — Chester · ed. Fellowes"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a1203ad4ff8277cd43079b9",
+      "label": "O Pastor Animarum — A-R Editions · transcription"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a1203ad4ff8277cd43079cf",
+      "label": "Sleep — Walton Music"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a1203b54ff8277cd4307ba4",
+      "label": "Immortal Bach — Norsk Musikforlag"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a1203bc4ff8277cd4307d4a",
+      "label": "O Magnum Mysterium — Peer Music"
+    }
+  ],
+  "copies": {
+    "total": 552,
+    "created": 552,
+    "skipped": 0
+  },
+  "lendings": [
+    {
+      "action": "CREATE",
+      "id": "6a1203c24ff8277cd4307ed5",
+      "label": "lending copy #14 of \"Universal Edition · original\" → hk"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a1203c34ff8277cd4307ede",
+      "label": "lending copy #15 of \"Universal Edition · original\" → hk"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a1203c34ff8277cd4307ee7",
+      "label": "lending copy #22 of \"Universal Edition · original\" → mr"
+    },
+    {
+      "action": "CREATE",
+      "id": "6a1203c34ff8277cd4307ef0",
+      "label": "lending copy #23 of \"Universal Edition · original\" → mr"
+    }
+  ],
+  "errors": [],
+  "summary": {
+    "library_created": 1,
+    "persons_created": 8,
+    "persons_skipped": 0,
+    "members_created": 8,
+    "members_skipped": 0,
+    "works_created": 13,
+    "works_skipped": 0,
+    "editions_created": 17,
+    "editions_skipped": 0,
+    "copies_created": 552,
+    "copies_skipped": 0,
+    "lendings_created": 4,
+    "lendings_skipped": 0,
+    "errors": 0
+  }
+}
