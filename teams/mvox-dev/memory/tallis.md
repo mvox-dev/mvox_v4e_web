@@ -219,4 +219,27 @@ Updated: `src/tests/routes/auth/oauth/cookie-server.spec.ts` (5 new tests — as
 
 [DECISION] `src/lib/entu/` dir created for new client location. `src/lib/api/` dir created for wrapper. Neither existed at session start. Old `src/lib/server/entu/client.spec.ts` intentionally left untouched — deletion is Josquin's job during A4 GREEN (atomic move).
 
+## [CHECKPOINT] 2026-05-23 — Session 17: CHORE-B RED phases (B2/B3/B5/B7/B10/B11/B12/B13a/B15)
+
+[DECISION] All CHORE-B RED phases completed this session. Summary of specs written/rewritten:
+- `src/tests/routes/auth/oauth/callback-exchange-helper.spec.ts` — B2: 6 cases (rewrote; dropped old 11-test suite)
+- `src/routes/auth/[provider]/page.spec.ts` — B3: 4 cases (new colocated spec)
+- `src/tests/routes/auth/oauth/login-page-server.spec.ts` — B5: 3 cases (rewrote; dropped 22-test suite)
+- `src/tests/routes/auth/oauth/callback-page-server.spec.ts` — B7: 3 cases (rewrote; dropped 9-test suite)
+- `src/routes/auth/logout/page.spec.ts` — B10: 1 case (new colocated spec)
+- `src/hooks.server.spec.ts` — B11: 2 cases (rewrote; dropped 4-test suite)
+- `src/tests/routes/landing/page.server.spec.ts` — B12: 1 case (rewrote; dropped 7-test suite)
+- `src/lib/api/wrapper.spec.ts` — B13a: 3 cases appended (CHORE-A 5 cases kept)
+- B15: both URL sweeps clean — no stale `entu.app/api/` or `/{db}/auth` fixtures; no commit needed
+
+[PATTERN] $lib alias not resolved in vitest (vitest.config.ts standalone, no SvelteKit plugin). All spec imports use relative paths. From `src/tests/routes/auth/oauth/` use `../../../../lib/...`; from `src/routes/auth/[provider]/` use `../../../lib/...`; from `src/routes/auth/logout/` use `../../../lib/...`.
+
+[PATTERN] Colocated specs under `src/routes/` need `// @vitest-environment happy-dom` when testing helpers that touch localStorage/sessionStorage. Static top-level imports work fine (no need for dynamic `await import()` pattern used in older specs).
+
+[PATTERN] For rewrite-style specs (B2/B5/B7/B11/B12): use static import at top level, pass bare minimal event objects `{}` or `{ url }` — the RED signal is that the old impl crashes or returns the wrong shape when given these minimal inputs.
+
+[GOTCHA] Playwright E2E tests (`tests/frontend-scaffolding.spec.ts`) still mock old BFF `/api/organizations` route deleted in B14. These fail at `pnpm test` (Playwright stage). Expected — pre-existing gap documented in test-gaps.md. Vitest unit suite (37 files) passes clean.
+
+[GAP] tests/frontend-scaffolding.spec.ts — 10 Playwright tests mock `/api/organizations` BFF route (now deleted in B14). Need update to mock browser-direct Entu fetch or remove BFF route mock. HIGH. 2026-05-23.
+
 (*MVOX:Tallis*)

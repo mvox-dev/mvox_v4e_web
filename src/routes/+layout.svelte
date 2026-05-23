@@ -7,6 +7,7 @@
 
 	let { children } = $props();
 
+	let mounted = $state(false);
 	let signedIn = $state(false);
 
 	function refreshSignedIn() {
@@ -15,6 +16,7 @@
 
 	onMount(() => {
 		refreshSignedIn();
+		mounted = true;
 
 		// React to storage changes from other tabs (logout in one tab clears all)
 		const onStorage = (e: StorageEvent) => {
@@ -36,14 +38,16 @@
 	<nav class="max-w-5xl mx-auto flex items-center justify-between">
 		<a href="/" class="text-xl font-bold text-gray-900">mvox</a>
 		<div class="flex items-center gap-4">
-			{#if signedIn}
-				<a href="/auth/logout" data-testid="nav-sign-out" class="text-sm text-gray-700 hover:text-gray-900">
-					{m.nav_sign_out()}
-				</a>
-			{:else}
-				<a href="/auth/login" data-testid="nav-sign-in" class="text-sm text-gray-700 hover:text-gray-900">
-					{m.nav_sign_in()}
-				</a>
+			{#if mounted}
+				{#if signedIn}
+					<a href="/auth/logout" data-testid="nav-sign-out" class="text-sm text-gray-700 hover:text-gray-900">
+						{m.nav_sign_out()}
+					</a>
+				{:else}
+					<a href="/auth/login" data-testid="nav-sign-in" class="text-sm text-gray-700 hover:text-gray-900">
+						{m.nav_sign_in()}
+					</a>
+				{/if}
 			{/if}
 		</div>
 	</nav>
