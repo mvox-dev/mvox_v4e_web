@@ -4,6 +4,22 @@ Personal notes. Only Josquin writes here.
 
 ---
 
+## [PATTERN] 2026-05-23 session 16 — GREEN agents must run `pnpm lint:fix`, not just `pnpm test`
+
+CHORE-A's A5 verification gate (post-Byrd/Tallis GREEN reports for A1-A4) failed `pnpm lint` on 4 files: 3 from prior A1-A3 cycles (Byrd's `wrapper.ts`, Tallis's `wrapper.spec.ts` + `state.spec.ts`) + 1 from A4's Tallis RED (`client.spec.ts`). All 4 were Biome formatter complaints — line-break style on chained `vi.fn().mockResolvedValue(...)` calls — pure cosmetic, no semantic impact. `pnpm lint:fix` auto-resolved all 4 in one sweep.
+
+**Root cause**: A1-A3 GREEN reports declared success on `pnpm test` + (optionally) `pnpm check`, but did not run `pnpm lint`. So 3 commits landed with formatter drift that only surfaced at A5's "final sweep" gate, which the plan explicitly requires lint to be clean.
+
+**Pattern for future TDD chains**: the agent flipping RED→GREEN (Byrd or Josquin) must run `pnpm lint:fix` as part of GREEN verification before commit. The cost is ~200ms (Biome is fast) and prevents the "A5 gate finds formatter mess across 3 prior commits" mode that requires either a 4-round-trip dispatch or a scope-override autofix sweep (Palestrina authorized the latter as Option C, committed as `db59557`).
+
+**Bentham angle**: worth lifting to `architecture-decisions.md` as a settled team norm if Bentham endorses on #56 review. Specifically: codify the per-commit lint requirement and possibly add a `prepare-commit-msg` or `pre-commit` hook that runs `biome check --write` against staged files only (mechanical, fast, reliable).
+
+**One subtlety**: Biome's formatter rules are *defaults* — CHORE-48 installed Biome but deferred rule enablement to CHORE-49 (5 sub-cycles, deferred). Even with no custom rules enabled, Biome's default formatter is opinionated enough to catch these. So "run lint" is enforceable even pre-CHORE-49.
+
+(*MVOX:Josquin*)
+
+---
+
 ## [CHECKPOINT] 2026-05-22→23 session 15 — 6 merges + 2 deploys + OAuth live success + /api/orgs 500 diagnosed
 
 Session shipped 6 squash-merges (`8861bfe` #34, `edacaa6` #37, `8b76af8` #48 (Closes #25), `5b7a741` #24+#29, `bc1d1a7` #50, `63a4ce3` #51) and 2 production deploys (`9a4971ae` post-slate, `2fca359a` post-CHORE-51). PO completed Smart-ID full OAuth round-trip end-to-end on the post-CHORE-51 deploy (sign-in worked: JWT cookie set, signed-in landing rendered). Then `/api/organizations` 500'd on the first authenticated BFF call — surfacing the IP-binding architectural blocker described below.
