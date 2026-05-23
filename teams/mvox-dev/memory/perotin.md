@@ -534,4 +534,13 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
   seed-collectives.ts               — org/section/person/member (120p, 235m, 6o, 16s), last live: session 8
   seed-menu-items-per-entity-type-2026-05-21.ts — menu entity rationalization, last live: 2026-05-21
   cleanup-menu-usability-2026-05-23.ts          — menu usability pass (17 UPDATE ops), last live: 2026-05-23
-  seed-librarian-bundle-data.ts     — CHORE-60 EPCC library subtree (1 lib, 8p, 8m, 13w, 17e, 552c, 4l), dry-run 2026-05-23; AWAITING LIVE AUTH
+  seed-librarian-bundle-data.ts     — CHORE-60 EPCC library subtree (1 lib, 8p, 8m, 13w, 17e, 552c, 4l), last live: 2026-05-23
+
+[DATA STATE] Polyphony after CHORE-60 seed (2026-05-23T19:45Z):
+  Library: 6a12036c4ff8277cd4306b26 ("EPCC Library") under EFK
+  8 bundle persons/members created: Maris Tamm, Liina Saar, Ave Lepp, Kärt Põld,
+    Toomas Mägi, Andres Vahar, Margus Roos (member 6a12036e4ff8277cd4306b9a),
+    Henn Kuusik (member 6a12036e4ff8277cd4306bab)
+  4 overdue lendings: Pärt Magnificat UE copies #14/#15 (Henn) + #22/#23 (Margus), assigned_at 2025-11-12
+  13 works, 17 editions, 552 copies — all under the library
+  Live artifact: seed-librarian-bundle-live-2026-05-23T19-45-07-408Z.json (commit 6d58544)
