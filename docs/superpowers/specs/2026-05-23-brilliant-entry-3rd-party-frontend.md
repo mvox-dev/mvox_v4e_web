@@ -124,7 +124,7 @@ The mvox CHORE-B branch landed Path C across 16 atomic commits, then hit four ho
 
 Other production surprises worth knowing upfront:
 
-- **`DELETE /property/<id>` does NOT remove the S3 object** despite what Entu's OpenAPI description says. The route handler only soft-deletes the property in MongoDB. Every file-typed property DELETE leaves a Spaces orphan. Argo-side fix needed; mvox filed an upstream ask.
+- **To clear a file property, POST with an empty list — don't reach for `DELETE /property/<id>`.** Entu's user-facing model is overwrite-with-empty: `POST /<db>/entity/<id>` with body `{ photo: [] }` clears all values for that property. The DELETE endpoint exists, but it's an admin / teardown primitive (migrations, test fixtures), not the canonical pattern for application code. Multi-valued semantics drive this: POST appends, POST-empty-list clears. If you're modeling Entu like a relational DB and reaching for DELETE on a property, you're at the wrong layer.
 - **CF Workers + `process.env`.** If you deploy on Cloudflare with `compatibility_flags: ["nodejs_als"]`, `process.env` is undefined at runtime (vitest passes on Node; production 500s). Use `nodejs_compat` (superset) or move to `$env/static/private` / `$env/dynamic/private`.
 - **CF Pages rejects non-ASCII commit messages** with cryptic error `8000111`. Em-dash (U+2014) in a commit subject = failed deploy. Use `--` not `—` in commit messages that will ride a CF Pages deploy.
 - **CORS for browser-direct S3 PUT.** Entu/webapp uploads work from arbitrary origins, so DigitalOcean Spaces CORS should already allow it. If you hit CORS, it's an Argo-side allowlist fix.
@@ -143,10 +143,7 @@ Other production surprises worth knowing upfront:
 
 ## What to ask the Entu platform for
 
-Two long-standing 3rd-party-frontend asks worth filing if you hit them:
-
-1. **`login_hint` / `prompt=none` passthrough on OAuth init.** Entu's auth proxy through oauth.ee uses a fixed 5-param set. Allowing the caller to add `login_hint` (or `prompt=none` for silent re-auth) would unlock the "remember provider AND account" UX without weakening anything. Forward-compat in the caller is cheap (`?login_hint=<email>` in the OAuth init URL is silently dropped today; the day Argo accepts it, the feature lights up with zero client code change).
-2. **`DELETE /property/<id>` actually deletes the S3 object.** Or, fix the OpenAPI description to say "the property is removed from MongoDB; the file persists in object storage." Either is honest; the current state isn't.
+One long-standing 3rd-party-frontend ask worth filing if you hit it: **`login_hint` / `prompt=none` passthrough on OAuth init.** Entu's auth proxy through oauth.ee uses a fixed 5-param set. Allowing the caller to add `login_hint` (or `prompt=none` for silent re-auth) would unlock the "remember provider AND account" UX without weakening anything. Forward-compat in the caller is cheap (`?login_hint=<email>` in the OAuth init URL is silently dropped today; the day Argo accepts it, the feature lights up with zero client code change).
 
 ## Related
 
