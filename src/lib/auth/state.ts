@@ -8,6 +8,7 @@ export interface OAuthState {
 	nonce: string;
 	return_to: string;
 	intent: 'login' | 'reauth';
+	provider: string;
 }
 
 export function createNonce(): string {

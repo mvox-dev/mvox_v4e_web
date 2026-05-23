@@ -1,26 +1,53 @@
 <script lang="ts">
 	import '../app.css';
 	import { page } from '$app/stores';
+	import { onMount } from 'svelte';
+	import { getToken } from '$lib/auth/storage';
 	import * as m from '$lib/paraglide/messages.js';
 
 	let { children } = $props();
 
-	const session = $derived($page.data?.session ?? null);
+	let mounted = $state(false);
+	let signedIn = $state(false);
+
+	function refreshSignedIn() {
+		signedIn = getToken() !== null;
+	}
+
+	onMount(() => {
+		refreshSignedIn();
+		mounted = true;
+
+		// React to storage changes from other tabs (logout in one tab clears all)
+		const onStorage = (e: StorageEvent) => {
+			if (e.key === 'token' || e.key === null) refreshSignedIn();
+		};
+		window.addEventListener('storage', onStorage);
+		return () => window.removeEventListener('storage', onStorage);
+	});
+
+	// Re-read on navigation (sign-in/out via internal goto won't fire storage event)
+	$effect(() => {
+		// Touch $page.url to make this $effect reactive to URL changes
+		$page.url;
+		refreshSignedIn();
+	});
 </script>
 
 <header class="bg-white border-b border-gray-200 px-4 py-3">
 	<nav class="max-w-5xl mx-auto flex items-center justify-between">
 		<a href="/" class="text-xl font-bold text-gray-900">mvox</a>
 		<div class="flex items-center gap-4">
-			{#if session}
-				<span class="text-sm text-gray-600">{session.jwt ? '●' : ''}</span>
-				<a href="/auth/logout" data-testid="nav-sign-out" class="text-sm text-gray-700 hover:text-gray-900">
-					{m.nav_sign_out()}
-				</a>
-			{:else}
-				<a href="/auth/login" data-testid="nav-sign-in" class="text-sm text-gray-700 hover:text-gray-900">
-					{m.nav_sign_in()}
-				</a>
+			{#if mounted}
+				{#if signedIn}
+					<a href="/auth/logout" data-testid="nav-sign-out" class="text-sm text-gray-700 hover:text-gray-900">
+						{m.nav_sign_out()}
+					</a>
+				{:else}
+					<a href="/auth/login" data-testid="nav-sign-in" class="text-sm text-gray-700 hover:text-gray-900">
+						{m.nav_sign_in()}
+					</a>
+				{/if}
 			{/if}
 		</div>
 	</nav>

@@ -20,7 +20,12 @@ describe('OAuth state', () => {
 	});
 
 	it('encodes + decodes a state payload round-trip', () => {
-		const payload = { nonce: 'abc', return_to: '/orgs?q=foo', intent: 'login' as const };
+		const payload = {
+			nonce: 'abc',
+			return_to: '/orgs?q=foo',
+			intent: 'login' as const,
+			provider: 'google',
+		};
 		const encoded = encodeState(payload);
 		expect(decodeState(encoded)).toEqual(payload);
 	});
@@ -30,6 +35,7 @@ describe('OAuth state', () => {
 			nonce: '?+/=&',
 			return_to: '/path?with&special=chars',
 			intent: 'reauth' as const,
+			provider: 'smart-id',
 		};
 		const encoded = encodeState(payload);
 		expect(encoded).not.toMatch(/[+/=]/);

@@ -1,10 +1,26 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
+	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
+	import { getLastProvider } from '$lib/auth/storage';
 	import * as m from '$lib/paraglide/messages.js';
 
-	const { data } = $props<{ data: { providers: Array<{ id: string; label: string; url: string }> } }>();
+	const { data } = $props<{ data: { providers: Array<{ id: string; label: string }> } }>();
 
-	const error = $derived($page.url.searchParams.get('error'));
+	const error = $derived(page.url.searchParams.get('error'));
+
+	// On mount: if we have a remembered provider AND there's no explicit ?picker=1
+	// override AND no error to surface, redirect to that provider's init route.
+	onMount(() => {
+		if (error) return;
+		if (page.url.searchParams.get('picker') === '1') return;
+
+		const remembered = getLastProvider();
+		if (remembered) {
+			const returnTo = page.url.searchParams.get('return_to') ?? '/';
+			goto(`/auth/${remembered}?return_to=${encodeURIComponent(returnTo)}&intent=reauth`);
+		}
+	});
 </script>
 
 <div class="max-w-md mx-auto py-16 text-center">
@@ -25,7 +41,7 @@
 	<div class="flex flex-col gap-3">
 		{#each data.providers as provider (provider.id)}
 			<a
-				href={provider.url}
+				href={`/auth/${provider.id}?return_to=${encodeURIComponent(page.url.searchParams.get('return_to') ?? '/')}&intent=login`}
 				data-testid="provider-{provider.id}"
 				class="inline-block w-full rounded-lg border border-gray-300 bg-white px-6 py-3 font-medium text-gray-700 hover:bg-gray-50"
 			>

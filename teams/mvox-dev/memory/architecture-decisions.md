@@ -201,23 +201,140 @@ What stays unchanged:
 
 ---
 
-## BFF user-rights default (2026-05-18, session 2)
+## Data path — browser-direct to Entu (2026-05-23, session 17, CHORE-53/Path C)
 
-**Decision**: All BFF route handlers default to running in the authenticated user's Entu rights — SvelteKit server forwards the user's JWT on every outbound Entu call. Elevated operations (where the BFF acts with more rights than the user has) live on a small explicit enumerated list. Adding to that list requires team-lead approval and a documented rationale.
+**Decision**: mvox does NOT proxy Entu data calls. The frontend authenticates via Entu's OAuth flow client-side and then talks to `api.entu.app` browser-direct, exactly the way Entu's reference frontend (`entu/webapp`) does. The Entu JWT lives in `localStorage` and is sent as `Authorization: Bearer` on every API call. The BFF (CF Worker) is reserved for OAuth coordination + a currently-empty list of genuinely-elevated future operations (transactional email, cron cleanup, federation reports). All data flows browser ↔ `api.entu.app` directly, with no SvelteKit server-side hop.
 
-**Current elevated-ops list** (seeded; grows by explicit decision only):
+### Forcing function
 
-- *(none yet — list seeded empty; populate as real ops emerge)*
+After CHORE-50 + CHORE-51 unblocked live OAuth sign-in in session 15, every subsequent BFF-proxied data call 500'd. Root cause: Entu JWTs encode the issuing browser's IP in the `aud` claim; the BFF on Cloudflare Workers proxies from CF Frankfurt egress IPs, so every BFF call returns `401 Invalid JWT audience`. This is not a code bug — it is a foundational incompatibility between mvox's prior "httpOnly cookie + BFF proxy" pattern and Entu's IP-bound JWT design. Three paths considered (Path A: service-entity API key with mvox owning rights enforcement — rejected by PO 2026-05-23 ("if we have to own rights management, why use Entu at all"); Path B: ask Argo to relax IP-binding — rejected as it would weaken Entu's threat model; Path C: mirror `entu/webapp`). Path C selected. Full design at `docs/superpowers/specs/2026-05-23-chore-53-path-c-design.md`.
 
-Polyphony's analogous list, for reference (NOT auto-inherited by mvox): cron cleanup (orphan persons, expired invitations/applications, series past `end_date`); BFF curated federation reports; self-link of additional verified emails. These may or may not apply to mvox — evaluate per op.
+### Why this is structurally sound, not a downgrade
 
-**Rationale**: Case study Section B4. The rights model is the authoritative API contract; if the BFF has magic capabilities beyond user rights, alternative clients become second-class. Heuristic: if a frequent user operation needs elevation, the role model is probably wrong.
+1. **It mirrors Entu's reference implementation.** `entu/webapp` (Entu's own open-source production frontend) uses localStorage + Bearer + browser-direct. If Entu ships future best-practice updates, mvox adopts them mechanically.
+2. **It accepts Entu's threat model honestly.** IP-binding is the JWT-theft mitigation — a stolen token from a different IP is useless. The prior httpOnly-cookie wrapper *looked* more secure than localStorage, but the BFF proxy made the JWT unusable; the apparent security was theater because data flow could not happen at all.
+3. **It realizes the open-platform stance.** Multiple Entu frontends (`entu/webapp`, mvox, future federation peers, third-party UIs) all run the same browser-direct pattern. "Open-platform stance for 3rd-party frontends" stops being aspirational doc text and becomes structurally enforced.
+4. **Failure modes shrink.** Auth-cookie state machine vanishes (no "cookie expired but JWT valid" / "cookie present but JWT expired" / "cookie on wrong domain"). The CF-Workers-environment-differs-from-Node trap (CHORE-47 `process.env`) is structurally impossible because there is no CF Worker code in the data path.
+5. **Test layer becomes honest.** Tests intercept `api.entu.app` at the network layer (MSW under CHORE-C); every layer runs the same code in tests as in production.
 
-**Source**: Case study `$ENTU_RESEARCH/docs/case-studies/2026-05-polyphony-on-entu.md` Section B4.
+The honest non-win: XSS in mvox now grants the attacker the full Entu API surface as the user for the JWT's remaining lifetime, instead of only the routes the BFF explicitly exposed. The mitigation is IP-binding (stolen token used from a different IP = useless) — the same deal `entu/webapp` accepts. Defensive hygiene under Path C: strict CSP, no third-party scripts in the auth/data flow, careful review of any component that handles untrusted input. See spec §7.1.
+
+### Architecture
+
+```
+Browser ──► api.entu.app          (data calls, Bearer from localStorage)
+Browser ──► mvox BFF (CF Worker)   (OAuth coordination + future elevated ops only)
+```
+
+The BFF retains:
+
+- `/auth/login` — server-renders the provider picker page (i18n stays).
+- `/auth/[provider]/+page.svelte` — **client-side** OAuth init: constructs the init URL with state nonce + forward-compat `login_hint` from localStorage, then `window.location` redirects to `api.entu.app/auth/<provider>?next=...`. Mirrors `entu/webapp:app/pages/auth/[provider].vue`. No `+server.ts` here.
+- `/auth/callback` — server-renders the spinner shell; client-side JS runs the JWT exchange (browser-direct to `api.entu.app/auth?db=...`) + writes `token` / `accounts` / `user` to localStorage.
+- `/auth/logout` — `+page.svelte` that clears localStorage on mount; no server-side state to clear.
+
+Deleted under CHORE-B: `/auth/+server.ts`, `/auth/cookie/+server.ts`, `/auth/logout/+server.ts`, `/api/organizations/+server.ts` + `[id]/sections/+server.ts` + all corresponding `.spec.ts` files. `hooks.server.ts` becomes a no-op (no cookie session under Path C).
+
+### Storage and CSRF model
+
+Browser storage layout:
+
+| Key | Storage | Lifetime | Purpose | Cleared by |
+|---|---|---|---|---|
+| `token` | localStorage | until expiry / 401 / logout | Entu JWT (`Authorization: Bearer`) | logout, 401 |
+| `accounts` | localStorage | until logout | Entu account list (multi-tenant) | logout, 401 |
+| `user` | localStorage | until logout | Entu user metadata | logout, 401 |
+| `mvox.last_provider` | localStorage | persistent | Last successful OAuth provider id | **logout only** (NOT 401) |
+| `mvox.token_version` | localStorage | until version bump | Cache-bust sentinel on JWT shape changes | written by `setToken` only |
+| OAuth `state` nonce | sessionStorage | single OAuth round-trip | CSRF protection for OAuth callback | callback verifies + deletes |
+
+Naming rules:
+- The first three keys (`token`, `accounts`, `user`) match `entu/webapp` exactly — same names, same shapes. Future devs reading `entu/webapp` source can apply that knowledge directly.
+- mvox-specific keys are prefixed `mvox.` — clear namespace boundary, clear devtools signal.
+- Return URL never lives in localStorage / sessionStorage independently; it rides inside the OAuth `state` payload (base64url JSON: `{ nonce, return_to, intent }`). Stale return URLs cannot outlive a single OAuth attempt — state is verified-then-consumed atomically on callback.
+
+`/auth/logout` clears all five localStorage keys + sessionStorage; the next sign-in starts at the provider picker (no `login_hint`, no `prompt=none`, no carried account identifier) — load-bearing for users with multiple Google/Apple accounts mapped to different memberships. Involuntary re-auth on 401 (handled by `src/lib/api/wrapper.ts`) clears the same keys EXCEPT `mvox.last_provider`, then redirects to `/auth/<saved-provider>` with `intent=reauth`.
+
+### Wire shapes (canonical)
+
+The two browser-direct call shapes mvox uses today:
+
+- **OAuth init redirect**: `window.location → ${ENTU_API_BASE}auth/${provider}?next=<callback-with-state>[&login_hint=<email>]`. Implementation: `src/routes/auth/[provider]/+page.svelte` → `src/routes/auth/[provider]/build-oauth-init-url.ts`.
+- **Session-to-JWT exchange**: `GET ${ENTU_API_BASE}auth?db=${encodeURIComponent(db)}` with `Authorization: Bearer <session-token>`. Implementation: `src/lib/auth/exchange.ts`. Query-form (`?db=...`) is canonical — closes the path-form (`/{db}/auth`) drift that CHORE-50/51 surfaced.
+
+`ENTU_API_BASE` is the single canonical Entu base URL constant from `src/lib/entu-config.ts` (today: `https://api.entu.app/`). The constant must be readable from client code — server-only access (`$env/dynamic/private`) is incompatible with the browser-direct call shape. The per-deployment tenant database is supplied at the call site via `PUBLIC_ENTU_DB` (`$env/static/public`); CF Pages sets it via `wrangler.json` `vars`.
+
+### Carve-out vs default — terminology shift
+
+Sessions 13 / 14 called the OAuth session-token-to-JWT exchange a "carve-out" — a narrow exception to a BFF-default rule. Under Path C the framing inverts: **browser-direct IS the default**, and the OAuth exchange is no longer special. The whole data path now runs the pattern that was previously labeled an exception. What stays narrow is the elevated-ops list (see "BFF elevated-ops list" decision below) — those genuinely cannot live client-side because their secrets / privilege cannot ship to the browser.
+
+### Review enforcement (Bentham)
+
+For any PR touching the auth or data path:
+
+- **GREEN** when client-side calls go to `${ENTU_API_BASE}` directly via `src/lib/entu/client.ts` (or its consumers) and the resulting JWT is read from localStorage via `src/lib/auth/storage.ts`.
+- **RED** for any NEW `+server.ts` under `src/routes/api/` that proxies Entu data calls. The data path is browser-direct by decision; new BFF data routes require team-lead approval + an entry on the elevated-ops list with rationale.
+- **RED** for any client-side code that reads/writes the Entu JWT outside the `src/lib/auth/storage.ts` helpers (single source of truth for key names + version sentinel).
+- **RED** for any code path that writes `user` / `accounts` AFTER `setToken` — see the token-version invariant in `storage.ts`. The contract is: callers MUST sequence `setUser` + `setAccounts` BEFORE `setToken`; `setToken` is the gate that publishes the new auth state with the current version. Reversing the order across a version bump leaves stale data without triggering the wipe.
+- **RED** for any `apiRequest` consumer that handles 401 itself instead of letting the wrapper's interceptor fire. The 401 → clear-with-preserve-provider → redirect is centralized.
+
+### What would trigger revision
+
+The decision narrows or expands if any of the following lands:
+
+1. **Entu retires `aud` IP-binding.** Then the data path could optionally move back through a BFF without breakage. The browser-direct default would still stand on the architectural-coherence grounds (Section "Why this is structurally sound" above), but the IP-binding necessity argument vanishes.
+2. **Entu publishes a JWKS endpoint.** The BFF could cryptographically verify Entu-issued JWTs server-side, enabling stronger server-side guards on the elevated-ops list. Does not change the browser-direct data default.
+3. **A second BFF-resident credential or capability emerges.** Treat as a request to expand the elevated-ops list (next section); requires team-lead approval + rationale.
+
+### Cross-links
+
+- GitHub issue: [mvox-dev/mvox_v4e_web#53](https://github.com/mvox-dev/mvox_v4e_web/issues/53).
+- Full design spec: `docs/superpowers/specs/2026-05-23-chore-53-path-c-design.md`.
+- Implementation plan: `docs/superpowers/plans/2026-05-23-chore-53-b-rewrite.md`.
+- Entu base URL constant: `src/lib/entu-config.ts` (`ENTU_API_BASE`).
+- Browser-side auth + API trio: `src/lib/auth/storage.ts` (localStorage helpers + version sentinel), `src/lib/auth/state.ts` (OAuth state payload + CSRF nonce), `src/lib/api/wrapper.ts` (Bearer injection + 401 interceptor).
+- Reference frontend (mvox mirrors this): [entu/webapp](https://github.com/entu/webapp) — `app/utils/user.js`, `app/utils/api.js`, `app/pages/auth/[provider].vue`, `app/pages/auth/callback.vue`.
+- Finn research: `docs/migration/findings/entu-api-key-expiry-2026-05-20.md` (JWT IP-binding mechanic, §3).
+- CHORE-A merge: PR #56 — foundation libraries (`src/lib/auth/{storage,state}.ts`, `src/lib/api/wrapper.ts` skeleton, `EntuClient` move).
+- CHORE-B branch: `feat/chore-53b-rewrite` — this decision's implementation.
+
+**Source**: PO direction 2026-05-23, session 17. Brainstorm + spec authored same day. Supersedes the session-2 "BFF user-rights default" decision (the BFF-as-data-proxy default becomes moot — those routes do not exist under Path C) and the session-13 "Client-side Entu carve-out for IP-bound OAuth exchange" decision (today's default is no longer an exception). Closes YELLOW-50.1 + YELLOW-51.1 from session 15 (the wire-shape literal + parenthetical drift in the prior carve-out section is moot — the section is replaced; the canonical wire shapes are stated above).
+
+(*MVOX:Bentham*)
 
 ---
 
-## Client-side Entu carve-out for IP-bound OAuth exchange (2026-05-22, session 13)
+## BFF elevated-ops list (2026-05-23, session 17, CHORE-53/Path C)
+
+**Decision**: The BFF (SvelteKit server + CF Worker) hosts a single explicit enumerated list of operations that genuinely cannot run in the user's browser, because their secrets or privilege cannot ship to the client. Every other operation runs browser-direct against `api.entu.app` with the user's JWT (see "Data path — browser-direct to Entu" decision above).
+
+**Current elevated-ops list** (seeded empty under Path C):
+
+- *(none yet — list seeded empty; populate as real ops emerge)*
+
+Anticipated future entries (no implementation today, no commitment to add):
+
+- **Transactional email** (CHORE-6 Resend) — Resend API key cannot ship to the browser.
+- **Cron cleanup** — orphan persons, expired invitations/applications, series past `end_date`. Service-account credentials; no human user context.
+- **Federation reports** — curated cross-org aggregates. May require service-account read across rights islands.
+
+Adding to the list requires:
+
+1. A written rationale (in the PR description or scratchpad) for why the op cannot run browser-direct under the user's JWT.
+2. Team-lead approval.
+3. An update to this section listing the new op + the rationale summary.
+
+**Rationale**: The rights model (Entu `_owner` / `_editor` / `_viewer` per entity) is the authoritative API contract. If the BFF has magic capabilities beyond user rights, alternative frontends (`entu/webapp`, mvox-mobile, federation peers, third-party UIs) become second-class. Heuristic: if a frequent user operation needs elevation, the role model is probably wrong. Per case study `$ENTU_RESEARCH/docs/case-studies/2026-05-polyphony-on-entu.md` §B4.
+
+**Review enforcement (Bentham)**: New `+server.ts` under `src/routes/api/` that performs Entu writes/reads with anything other than the caller's JWT → RED unless the op is on this list. New BFF data routes that only proxy user-JWT calls (i.e., would have been browser-direct trivially) → RED for re-introducing the proxy pattern Path C deletes.
+
+**Source**: PO direction 2026-05-23, session 17. Splits out from the prior "BFF user-rights default" decision (session 2) — that decision's BFF-data-proxy default is moot under Path C; what survives is this narrow elevated-ops list.
+
+(*MVOX:Bentham*)
+
+---
+
+## Historical — Client-side Entu carve-out for IP-bound OAuth exchange (2026-05-22, session 13) (SUPERSEDED 2026-05-23 by "Data path — browser-direct to Entu")
 
 **Decision**: A single, narrow carve-out to the BFF user-rights default above and to the canonical "no client→Entu" RED trigger. The OAuth session-token-to-JWT exchange step — and ONLY that step — runs in the user's browser, calling Entu directly. All other Entu API traffic continues through the BFF on the user's JWT.
 

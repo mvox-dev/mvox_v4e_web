@@ -8,7 +8,7 @@
 // Throws on !res.ok in all methods. The thrown Error includes the status code
 // so the apiRequest wrapper layer (or the route handler) can react appropriately.
 
-import { ENTU_API_BASE } from '../entu-config.ts';
+import { ENTU_API_BASE } from '../entu-config';
 
 export interface EntuEntity {
 	_id: string;

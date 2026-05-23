@@ -8,6 +8,8 @@
 	"auth_error_missing_session_token": "Pierakstīšanās netika pabeigta. Lūdzu, mēģiniet vēlreiz.",
 	"auth_login_cta": "Turpināt ar Entu",
 	"auth_login_heading": "Pierakstīties mvox",
+	"auth_logout_pending": "Notiek atteikšanās...",
+	"auth_provider_redirecting": "Tiek pārsūtīts uz pieteikšanās pakalpojumu sniedzēju...",
 	"common_error": "Radās kļūda",
 	"common_loading": "Ielādē…",
 	"landing_empty_state": "Jūs vēl neesat neviena kora loceklis.",

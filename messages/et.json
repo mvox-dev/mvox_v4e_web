@@ -8,6 +8,8 @@
 	"auth_error_missing_session_token": "Sisselogimine ei lõppenud. Palun proovi uuesti.",
 	"auth_login_cta": "Jätka Entuga",
 	"auth_login_heading": "Logi mvox-i sisse",
+	"auth_logout_pending": "Sind logitakse välja...",
+	"auth_provider_redirecting": "Suuname sind sisselogimise pakkuja juurde...",
 	"common_error": "Tekkis viga",
 	"common_loading": "Laadimine…",
 	"landing_empty_state": "Sa ei ole veel ühegi koori liige.",
