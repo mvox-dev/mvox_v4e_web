@@ -20,6 +20,20 @@ CHORE-A's A5 verification gate (post-Byrd/Tallis GREEN reports for A1-A4) failed
 
 ---
 
+## [CONTRACT] 2026-05-23 session 16 — BFF route specs survive constructor-shape changes via `vi.stubEnv` indirection
+
+CHORE-A A4 moved `EntuClient`'s constructor from `new EntuClient(jwt)` (reading `$env/dynamic/private` internally) to `new EntuClient({jwt, db, baseUrl})` (caller passes env). The two BFF route consumers (`/api/organizations/+server.ts` + `[id]/sections/+server.ts`) were updated. **The pre-existing route specs at `src/tests/routes/api/organizations/{server,id/sections/server}.spec.ts` continued to pass without ANY modification** — including the mock setup.
+
+**Why**: those specs do `vi.stubEnv('ENTU_BASE_URL', '...')` + `vi.stubEnv('ENTU_DB', 'testdb')` + `vi.stubGlobal('fetch', mockFn)`. They never imported or mocked `EntuClient` directly. The route now reads `env.ENTU_DB` + `env.ENTU_BASE_URL` from `$env/dynamic/private` and passes them to the constructor, so `vi.stubEnv` transparently feeds the new code path. The new defensive `!res.ok` throw on `search()` doesn't fire in these specs because they all return `200` status on the mocked fetch.
+
+**For CHORE-B**: when you rewrite the routes (or delete them under Path C), this pattern of "specs that test routes end-to-end via env-stub + fetch-stub, NOT via mocking internal modules" is the resilient pattern. As long as the env contract stays (`ENTU_BASE_URL` + `ENTU_DB`), the specs adapt automatically. If CHORE-B shifts the route to use a different env var or removes the env read entirely, the specs WILL need a sweep — but the breakage will be obvious (stub-then-nothing-reads-it).
+
+**Cross-reference**: this is the same DI pattern Bentham would call "test boundary at the edge, not the seam" — mock at the network boundary (fetch + env), not at the SDK seam (EntuClient module).
+
+(*MVOX:Josquin*)
+
+---
+
 ## [CHECKPOINT] 2026-05-22→23 session 15 — 6 merges + 2 deploys + OAuth live success + /api/orgs 500 diagnosed
 
 Session shipped 6 squash-merges (`8861bfe` #34, `edacaa6` #37, `8b76af8` #48 (Closes #25), `5b7a741` #24+#29, `bc1d1a7` #50, `63a4ce3` #51) and 2 production deploys (`9a4971ae` post-slate, `2fca359a` post-CHORE-51). PO completed Smart-ID full OAuth round-trip end-to-end on the post-CHORE-51 deploy (sign-in worked: JWT cookie set, signed-in landing rendered). Then `/api/organizations` 500'd on the first authenticated BFF call — surfacing the IP-binding architectural blocker described below.
