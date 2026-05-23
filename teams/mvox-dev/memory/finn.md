@@ -157,9 +157,33 @@ From `entu.ee/api/authentication` (live docs, 2026-05-23):
 - `eslint-plugin-svelte` peer explicitly includes `svelte@^5.0.0` — Svelte 5 Runes supported ✓
 - Biome does NOT lint `.svelte` files (roadmap, not shipped as of 2026-05)
 
-### [DEFERRED] CHORE-53: BFF proxy incompatible with Entu IP-bound JWT
+### [DECISION] CHORE-53 resolved: browser-direct pattern (Path C), cookie dropped
 
-No Entu-side escape hatch exists today. Awaiting Argo response on Path B (IP-unbound JWT for trusted callers). Until resolved, data API calls from BFF will 401. Service entity API key (Path A) is a workaround but loses per-user rights granularity.
+Architectural decision landed session 16. mvox adopts Entu's native pattern: JWT in localStorage, all data calls browser-direct to `api.entu.app`. The BFF httpOnly cookie is retired for data calls. Rationale: Entu's IP-binding was designed FOR browser-direct; BFF proxy is architecturally incompatible. Source: `entu/webapp` code audit + CHORE-A merge.
+
+### [LEARNED] entu/webapp: Nuxt 3 SPA, localStorage, browser-direct
+
+Confirmed via `entu/webapp` source (open, github.com/entu/webapp):
+- JWT: `useLocalStorage('token')` — plain JS-readable localStorage, no httpOnly
+- All API calls: browser→`api.entu.app` directly via `apiRequest()` in `app/utils/api.js`
+- Framework: Nuxt 3, pure SPA (`data-ssr="false"`), no server routes / proxy layer
+- OAuth exchange: `app/pages/auth/callback.vue` runs in browser, stores result to localStorage
+- IP shift: auto-logout on 401, no refresh flow
+- `accounts` and `user` also in localStorage
+
+This confirms IP-binding is Entu's XSS mitigation substitute (stolen token + different IP = useless), not an implementation accident.
+
+### [LEARNED] Entu OAuth proxies through oauth.ee, not Google/Apple directly
+
+`entu/api:routes/auth/[provider].get.js` — Entu redirects to `https://oauth.ee/auth/{provider}` with exactly 5 hardcoded params: `client_id`, `redirect_uri`, `response_type`, `scope`, `state`. No caller query params pass through.
+
+- `login_hint`: **not forwarded** (not in URLSearchParams construction)
+- `prompt=none`: **not forwarded** (same)
+- `?email=` prefill for e-mail provider: **not forwarded**
+- `state` JWT carries only `{ next: <url> }` — no channel for extra params
+- All providers share the same code path (no Apple/Google-specific handling)
+
+Silent re-auth / account-hint flows via `login_hint`/`prompt=none` are impossible through Entu's current auth proxy. Would require oauth.ee changes (outside mvox control).
 
 ### [WARNING] Stale `'https://entu.app/api/'` fixtures in 6 spec files
 

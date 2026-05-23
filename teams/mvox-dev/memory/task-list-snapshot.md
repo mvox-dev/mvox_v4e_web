@@ -1,75 +1,74 @@
-# Task List Snapshot — 2026-05-23 (end of session 15)
+# Task List Snapshot — 2026-05-23 (end of session 16)
 
-State at shutdown. If session 16 hits State C in Phase 2, restore the active rows below into fresh TaskCreate IDs. Most active work is parked behind the CHORE-53 architectural decision.
+State at shutdown. If session 17 hits State C in Phase 2, restore the active rows below into fresh TaskCreate IDs.
 
 ## Active tasks at shutdown
 
-None in_progress at the harness level (all session-15 dispatched work completed in-flight). The work that's open for session 16 is captured in GH issues (see below) and the [NEXT SESSION] seed in `team-lead.md`.
+None in_progress at the harness level. All session-16 work either completed (CHORE-A end-to-end) or carry-forward via GH issues.
 
-## Open GH issues — priority for session 16
+## Open GH issues — priority for session 17
 
 | GH # | Subject | Notes |
 |---|---|---|
-| **#53** | **CHORE-53 — BFF + IP-bound JWT architectural decision** | **THE headline.** PO must pick Path B vs Path C. Brainstorming session needed. Path A rejected ("if we have to own rights management, why use Entu at all"). Until this settles, no implementation can move. |
-| **#52** | CHORE-52 — EntuClient.search defensive !res.ok throw | Mirrors CHORE-34's `get()` pattern. Stops misleading 500 TypeError; doesn't fix root cause. Independent of #53; can land before or after arch decision. ~15 min full TDD chain. |
-| #3 | Layer 2 photo file-payload probe + impl | Still deferred — fires only when actual photo uploads happen OR BFF needs `_thumbnail` on real data. Not yet triggered. |
+| **#53** | **CHORE-53 — Path C architectural rewrite** | **Spec + plans approved; CHORE-A merged.** CHORE-B (the rewrite) is the session-17 headline. |
+| **#54** | CHORE-54 — Client-side runtime error capture (deferred) | Filed session 16. Fires after Path C stabilizes + before mvox opens to real users. Tool choice (Sentry / OSS GlitchTip / homegrown) is its own brainstorm. |
+| #3 | Layer 2 photo file-payload probe + impl | Still deferred — fires when actual photo uploads OR BFF needs `_thumbnail` on real data. |
 | #6 | CHORE-6 — Email Resend wiring | Still blocked on PO SPF + DKIM DNS records. Re-check next session. |
-| #7-#18 | A1-D2 user stories | Backlog (singer + conductor + dashboard scenarios) — defer until arch decision lands and OAuth flow is end-to-end functional. |
-| #19-#23 | ADMIN-1 through ADMIN-5 | Admin user-story backlog — same defer reason. |
+| #7-#23 | A1-D2 user stories + ADMIN-1-5 | Backlog — defer until Path C ships + OAuth flow end-to-end functional. |
 | #31 | YELLOW: relax OKLCH regex on next Tailwind upgrade | Fires on next Tailwind minor/major bump. |
-| #33 | YELLOW-32.1: BFF helper factor-out on next route | **Becomes moot if Path C lands** (BFF data routes get deleted). Skip if Path C; relevant if Path B. |
-| #36 | CHORE-36: E2E Entu mock harness + flip landing to SSR | Lower priority until arch decision lands. Same Path-C-makes-moot concern (different route shape). |
+| #33 | YELLOW-32.1: BFF helper factor-out on next route | **Closes in CHORE-C** (moot under Path C). |
+| #36 | CHORE-36: E2E Entu mock harness + flip landing to SSR | **Closes in CHORE-C** (realized as MSW + Playwright bootstrap). |
 | #38 | YELLOW-35.2 + 35.3: Svelte 5 + types cleanup | Independent fold-in or with next Byrd touch. May survive Path C. |
-| #39 | YELLOW-35.4: lift session population to +layout.server.ts | Same Path-C-makes-moot concern; defer. |
-| #43 | CHORE-42: Wire mvox.eu custom domain | PO owns mvox.eu at Zone.ee. DNS work + CF dashboard add. Independent of arch decision. |
-| #44 | CHORE-43: Migrate multivox to CF Pages Git-connected mode | Delete + recreate via CF dashboard "Connect to Git" wizard. Brief outage during swap. Independent of arch. |
-| #48 | CHORE-48: ESLint + Biome linting setup (parent) | Install landed in `8b76af8`. Stays open until CHORE-49 sub-rule cycles complete. |
-| #49 | CHORE-49: Incremental Biome lint rule enablement (5 sub-cycles) | Filed but no urgency. Each sub-rule gets its own RED/GREEN/REVIEW cycle. |
+| #39 | YELLOW-35.4: lift session population to +layout.server.ts | **Closes in CHORE-C** (no server-side session under Path C). |
+| #43 | CHORE-42: Wire mvox.eu custom domain | Independent of CHORE-53. PO DNS work. |
+| #44 | CHORE-43: Migrate multivox to CF Pages Git-connected | Independent. Brief outage during swap. |
+| #48 | CHORE-48: ESLint + Biome linting setup (parent) | Install landed session 15. Stays open until CHORE-49 sub-rule cycles complete. |
+| #49 | CHORE-49: Incremental Biome lint rule enablement (5 sub-cycles) | Filed but no urgency. |
 
-## Session 15 outcome summary
+## Session 16 outcome summary
 
 ### Closed via PR this session
-- ✅ #34 EntuClient.get() throws-spec pin — squash `8861bfe`
-- ✅ #37 i18n landing-page gap — squash `edacaa6`
-- ✅ #25 packageManager pin — folded into `8b76af8`
-- ✅ #24 README replace + #29 CONTRIBUTING.md follow-ups — squash `5b7a741`
-- ✅ #50 OAuth init URL fix — squash `bc1d1a7` (live-test verified)
-- ✅ #51 Entu auth URL shape fix — squash `63a4ce3` (live-test verified through sign-in)
+- ✅ **CHORE-A merged** — squash `773a057`, foundation libraries (storage, state, wrapper skeleton, EntuClient move). Closes #52 (defensive search throw subsumed).
 
 ### Filed this session
-- 📝 #48 CHORE-48 linting setup (filed + landed install phase; still open as parent for #49)
-- 📝 #49 CHORE-49 incremental rule enablement
-- 📝 #50 CHORE-50 OAuth URL fix (filed + landed + closed)
-- 📝 #51 CHORE-51 Entu auth URL shape (filed + landed + closed)
-- 📝 #52 CHORE-52 EntuClient.search defensive throw (filed, open)
-- 📝 #53 CHORE-53 BFF + IP-bound JWT arch decision (filed, open — headline for session 16)
+- 📝 #54 CHORE-54 — Client-side runtime error capture (deferred)
+
+### Major artifacts produced
+- 📄 `docs/superpowers/specs/2026-05-23-chore-53-path-c-design.md` — 482-line design spec (Path C decision, full architecture)
+- 📄 `docs/superpowers/plans/2026-05-23-chore-53-a-foundation.md` — 968 lines, 5 tasks (CHORE-A, merged)
+- 📄 `docs/superpowers/plans/2026-05-23-chore-53-b-rewrite.md` — 1819 lines, 17 tasks (CHORE-B, ready for execution)
+- 📄 `docs/superpowers/plans/2026-05-23-chore-53-c-test-infra.md` — 791 lines, 9 tasks (CHORE-C, ready for execution)
+
+### Stewardship pending (carry into session 17)
+- YELLOW-50.1 + YELLOW-51.1 in `architecture-decisions.md` L204 (planned fold-in for CHORE-B)
+- YELLOW-A.3 import-extension consistency (6 one-char edits, fold into CHORE-B)
+- YELLOW-A.4 token-version invariant code comment (fold into CHORE-B)
+- Bentham's [PATTERN] lift to architecture-decisions (lint:fix in GREEN) — check his shutdown commit
 
 ### Live state at shutdown
-- **Main:** `63a4ce3` (post-CHORE-51 merge); subsequent shutdown commit will be N+1
-- **Deployment:** `2fca359a.multivox.pages.dev` (production alias)
-- **`https://multivox.pages.dev/`** — HTTP 200, landing page from CHORE-35
-- **`https://multivox.pages.dev/auth/login`** — HTTP 200, 6 provider buttons
-- **OAuth sign-in:** verified working end-to-end (Smart-ID flow completes, JWT in cookie, signed-in landing renders)
-- **`/api/organizations` (and any BFF data call):** 500 — see CHORE-52/53
-- **Tests:** vitest 429/429, pnpm check 0, pnpm lint 0
+- **Main:** `ef09aef` (post-CHORE-A squash + Josquin scratchpad commit; teammate shutdown commits may land before final push)
+- **Deployment:** `a44a1c88.multivox.pages.dev` (production alias `multivox.pages.dev` same build)
+- **`https://multivox.pages.dev/`** — HTTP 200
+- **`https://multivox.pages.dev/auth/login`** — HTTP 200
+- **OAuth sign-in:** unchanged from session 15 (Smart-ID flow works; data calls still 500 until CHORE-B lands)
+- **Tests:** vitest 449/449 unit, pnpm check 0, pnpm lint 0, pnpm build clean. Playwright has 2 pre-existing failures (YELLOW-A.1, YELLOW-A.2 — CHORE-C scope).
 
 ### Team composition this session
-- **finn** — 2 dispatches (linting config research + Entu /auth audit). Both delivered structured reports on time.
-- **bentham** — 5 reviews (#34, #37, CHORE-48, docs bundle, #50, #51) + multiple stewardship calls + arch endorsements.
-- **perotin** — 1 dispatch (credentials.env probe — should have been team-lead direct; lesson L58).
-- **tallis** — 5 RED dispatches across the session (#34, #37, CHORE-48, docs bundle authored end-to-end, #50, #51). Consistent synthetic-violation discipline per L52.
-- **josquin** — 9+ dispatches: GREEN phases for all six merges, all six squash-merges, two deploys (one with credentials-source workaround), live diagnostic for the 500.
-- **comenius** — 1 dispatch (#37 i18n landing-page gap; 4-locale translation done).
-- **byrd, victoria** — not spawned this session. Available next session if needed.
+- **finn** — 2 dispatches (entu/webapp source read + OAuth parameter passthrough probe). Both delivered conclusive structured reports.
+- **bentham** — 1 review (PR #56). GREEN with 4 well-scoped YELLOWs + stewardship endorsement.
+- **perotin** — 0 dispatches (architecture session + foundation; no Entu data work).
+- **tallis** — 4 RED dispatches (storage, state, wrapper, client move). Clean execution.
+- **byrd** — pre-emptively shipped A1-A5 in one pass (chain-discipline reset; redid through chain after PO call). Final 3 GREEN dispatches (storage, state, wrapper) clean.
+- **josquin** — 1 GREEN dispatch (A4 client move), A5 verify+PR, merge ritual. Surfaced the lint:fix in GREEN [PATTERN].
+- **comenius, victoria** — not spawned this session.
 
-### Process notes from session 15 (also in `team-lead.md` L54-L60 and saved as memory notes)
-
-- L54 — Entu IP-binding is documented design property (memory: `project_entu_jwt_ip_bound`)
-- L55 — Audit-driven backlog sweep works as a single slate (cross-references `feedback_no_parallel_branches`)
-- L56 — Doc-only PRs lite-path scales fine (extends prior L30)
-- L57 — wrangler deploy auth via `CLOUDFLARE_API_TOKEN` env > OAuth (memory: `project_wrangler_deploy_auth`)
-- L58 — Team-lead does single-shot probes directly (memory: `feedback_team_lead_direct_probes`)
-- L59 — Sweep neighbors when pinning a defensive pattern (CHORE-52 = the sibling sweep we missed at CHORE-34)
-- L60 — Live testing on deployed surface catches what no unit test can (CHORE-53 only surfaced this way)
+### Process notes from session 16
+- L61 — brainstorming skill is the right tool for architectural forks
+- L62 — Mirror the reference implementation when one exists (entu.app is the Entu frontend reference)
+- L63 — Forward-compat code is cheap insurance for blocked external asks (login_hint pre-included)
+- L64 — Chain discipline matters even when work is correct (the L30 precedent is for trivial refactor, not architectural foundations)
+- L65 — GREEN-phase agents must run `pnpm lint:fix` as part of done-criteria
+- L66 — superpowers:writing-plans's "complete code in every step" mandate produces hefty plans but pays off in dispatch quality
+- L67 — `--force-with-lease` on a feature branch is the bounded exception to git safety; main is still protected
 
 (*MVOX:Palestrina*)

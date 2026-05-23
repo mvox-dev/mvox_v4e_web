@@ -1,6 +1,79 @@
 # Palestrina — Team Lead Scratchpad
 
-### [NEXT SESSION] 2026-05-23 — session-15 → session-16
+### [NEXT SESSION] 2026-05-23 — session-16 → session-17
+
+**Headline: CHORE-53 went from "architectural fork" to "spec + plans approved + CHORE-A merged + deployed" in one session.** The Path C decision is the call (mirror entu/webapp: localStorage JWT + browser-direct api.entu.app + IP-binding-as-security-model). Spec at `docs/superpowers/specs/2026-05-23-chore-53-path-c-design.md`. Implementation plans (A/B/C) at `docs/superpowers/plans/2026-05-23-chore-53-*.md`. **CHORE-A is merged + deployed; CHORE-B is the big rewrite + the headline for session 17.**
+
+**Session 16 outcome — 1 squash merge (CHORE-A), 1 issue closed (#52), 1 new issue filed (#54), 2 new docs (spec + 3-plan-bundle).**
+
+| Slate | Issue / Artifact | SHA | What landed |
+|---|---|---|---|
+| 1 | CHORE-53 design spec | `ba5120a` + `910e09f` | Path B/C brainstorm via superpowers:brainstorming skill; full 482-line spec; Section 13 added for deferred concerns post-commit |
+| 2 | CHORE-53 plans (A/B/C) | `2e96ebb` | superpowers:writing-plans skill output; 3 files, 3578 lines total |
+| 3 | CHORE-A squash | `773a057` | Path C foundation libraries — storage.ts, state.ts, wrapper.ts skeleton, EntuClient move out of server/. Subsumes #52 |
+| 4 | Josquin scratchpad [PATTERN] | `ef09aef` | "GREEN agents must run pnpm lint:fix, not just pnpm test:unit"; Bentham endorsed lifting to architecture-decisions (may have landed in his shutdown commit — verify) |
+
+main HEAD at session-close: `4719311` (final teammate shutdown commit was Byrd's scratchpad). Teammate shutdown commit chain: `98d904c` (tallis) → `ad4a189` (bentham — incl. [PATTERN] lift) → `0d4a457` (josquin) → `4719311` (byrd). My own scratchpad + inbox-persist commit lands on top of this.
+
+**New issue filed:**
+- **#54 CHORE-54 — Client-side runtime error capture (deferred).** Surfaced during spec review; PO flagged that Path C moves all data-flow errors to the user's device, blind to mvox-dev without explicit capture. Fires after Path C stabilizes + before mvox opens to real users. Tool choice (Sentry / OSS GlitchTip / homegrown) is its own brainstorm.
+
+**Stewardship items (status at shutdown):**
+- ✅ **Bentham's [PATTERN] lift to architecture-decisions** (lint:fix in GREEN) — landed in his shutdown commit `ad4a189`. Includes a clarifying RED/YELLOW enforcement rule: "autofix commits touching only whitespace/import-order are YELLOW from CHORE-B forward; autofix touching function bodies is RED."
+- **YELLOW-50.1 + YELLOW-51.1** in `architecture-decisions.md` L204 (wire-shape literals from session-15 audit) — spec §References explicitly schedules these as free fold-in during CHORE-B's arch-decisions revision. Bentham confirmed in his shutdown report: if CHORE-B doesn't fold them, he'll dispatch a standalone stewardship pass next session.
+- **YELLOW-A.3** — import-extension consistency drift (6 one-character edits) from PR #56 Bentham review — fold into CHORE-B (cheap).
+- **YELLOW-A.4** — token-version invariant comment in `storage.ts` (load-bearing subtlety; one-line code comment) — fold into CHORE-B.
+- **Pre-commit hook for `biome check --write`** (Josquin's deferred suggestion from his shutdown report) — small (~10 lines in `.githooks/`); structural fix for the lint-drift-across-commits failure mode that produced the autofix commit on CHORE-A. Schedule under CHORE-49 (Biome rule enablement) since it lives in the same scope.
+
+**Carry-forward queue for session 17 (priority order):**
+
+1. **CHORE-B — the Path C rewrite (the headline).** Plan at `docs/superpowers/plans/2026-05-23-chore-53-b-rewrite.md`. ~17 tasks, 1819 lines of plan. **Mandatory PO live-test on deployed preview URL before merging** — all 6 OAuth providers + logout + 401 re-auth + multi-tab. Folds in YELLOW-50.1, YELLOW-51.1, YELLOW-A.3, YELLOW-A.4 as part of the natural scope.
+2. **CHORE-C — Path C test infrastructure.** Plan at `docs/superpowers/plans/2026-05-23-chore-53-c-test-infra.md`. MSW + Playwright wiring + E2E coverage. Closes #36, #39, #33 + the two pre-existing Playwright failures (YELLOW-A.1, YELLOW-A.2).
+3. **Argo ask (#19) — file the GH issue.** Appendix A of the spec has the paste-ready body. File after CHORE-B lands so the entu-research case study + Brilliant entry exist as cross-references. Forward-compat `login_hint` is already in CHORE-B's `/auth/[provider]/+page.svelte`, so this is purely about activation timing.
+4. **Brilliant entry (#17) — Patterns/entu/3rd-party-frontend-browser-direct.** Canonical source for the Section 7 pros content. Schedule after CHORE-B + CHORE-C merge.
+5. **entu-research case study (#16).** $ENTU_RESEARCH/docs/case-studies/2026-05-3rd-party-frontend-on-entu.md. Lifts from Brilliant; for 3rd-party Entu frontend devs.
+6. **#43 mvox.eu custom domain** — independent of CHORE-53; can land any time PO has DNS bandwidth.
+7. **#44 CF Pages Git-connected migration** — independent; brief outage during the swap.
+8. **#49 Biome lint rule enablement** (5 sub-cycles) — incremental, no urgency.
+
+**Live state at session-16 close:**
+- main: `ef09aef` (+ teammate shutdown commits)
+- deployment: `a44a1c88.multivox.pages.dev` (production alias `multivox.pages.dev` serving the same build), 200 on `/` and `/auth/login`
+- OAuth flow: same as session-15 — Smart-ID sign-in works end-to-end; `/api/organizations` still 500s (the broken-on-purpose state, fixed in CHORE-B)
+- Tests: vitest 449/449 unit, pnpm check 0, pnpm lint 0, pnpm build clean. Playwright has 2 pre-existing failures (CHORE-C territory).
+- Agents at shutdown: finn, bentham, perotin, tallis, byrd, josquin all dispatched and processed shutdown
+- Foundations in place for CHORE-B: src/lib/auth/{storage,state}.ts, src/lib/api/wrapper.ts (skeleton, 401 deferred), src/lib/entu/client.ts (moved + revised, subsumes #52)
+- PO still has signed-in entu_jwt cookie from session 15; that cookie becomes a no-op in CHORE-B (hooks.server.ts stops reading it)
+
+**Expected first action session 17:**
+1. Read this seed + `git log --oneline ef09aef..HEAD` (any teammate shutdown commits since)
+2. Verify production health: `curl -sI https://multivox.pages.dev/` and `/auth/login` — expect 200
+3. **Check if Bentham landed the [PATTERN] lift** to architecture-decisions during shutdown. If yes, downgrade the stewardship-pending bullet above. If no, dispatch as the first stewardship action of session 17 (before CHORE-B kicks off).
+4. Spawn finn + bentham + perotin (always-on). Hold byrd/josquin/tallis/comenius until needed (CHORE-B's first task brief is ~A1-style — Tallis RED → Byrd or Josquin GREEN per file ownership).
+5. **Confirm with PO: kick off CHORE-B now, or pivot first?** CHORE-B is the long-haul work (~17 tasks, ~3-4 hours of dispatches + a PO live-test gate that requires PO awake-and-focused). Reasonable to schedule for a specific block rather than start cold.
+
+**Process lessons from session 16 (worth carrying forward — also in memory notes if I have time before push):**
+
+- **L61 — `brainstorming` skill is the right tool for architectural forks.** The Path A/B/C tradeoff would have been muddled in free-form text; the skill's "one question at a time, then propose 2-3 approaches, then design sections" structure produced a clean spec. Particularly useful: the Visual Companion offer is a NOT-EVERY-QUESTION-IS-VISUAL reminder.
+- **L62 — Mirror the reference implementation when one exists.** "How does entu.app do it?" collapsed Path C complexity from "invent something" to "do what they do." Argo's threat-model is already documented + battle-tested. We stopped swimming upstream. Codify as a heuristic.
+- **L63 — Forward-compat code is cheap insurance for blocked external asks.** The `login_hint` parameter is included in CHORE-B's outgoing OAuth URLs even though Entu strips it today; once Argo accepts the passthrough ask, mvox auto-benefits with zero code change. Same pattern can apply to any feature gated on external cooperation.
+- **L64 — Chain discipline matters even when work is correct.** Byrd shipped A1-A5 in one pass (correct code, all tests passing) without the per-task Tallis-RED → Byrd-GREEN ordering. PO chose to reset and redo (not the L30 "accept-with-coaching" precedent, which was for a trivial refactor). Calibration: chain discipline scales with stakes. Foundation-of-architectural-rewrite is high-stakes enough to enforce strictly.
+- **L65 — Process improvement: GREEN-phase agents must run `pnpm lint:fix`.** Caught by Josquin at A5 verification gate; required a Palestrina-authorized scope override + a separate biome-autofix commit. Worth codifying in `architecture-decisions.md` so future GREEN dispatches include this in their done-criteria. (Bentham endorsed; may already be lifted in his shutdown commit.)
+- **L66 — superpowers:writing-plans's "complete code in every step" mandate produces hefty plans but pays off in dispatch quality.** CHORE-A's 968-line plan let me write tight dispatch briefs that just copy-paste the test code + impl code. Sub-agents don't have to interpret the plan — they execute it. Worth the upfront cost.
+- **L67 — `--force-with-lease` on a feature branch is fine; on main it's not.** After resetting `feat/chore-53a-foundation` post-coaching, force-pushed cleanly. PO authorized via the "reset and redo" option. Per Git Safety Protocol, this is the bounded exception — main is still protected.
+
+**Brilliant KB updates (deferred — when PO has bandwidth):**
+- New: `Patterns/mirror-reference-implementation` — codify L62 (Entu's frontend = reference)
+- New: `Patterns/forward-compat-blocked-asks` — codify L63 (login_hint as illustration)
+- New: `Patterns/chain-discipline-scales-with-stakes` — codify L64 (when L30 applies vs doesn't)
+- Update: `Patterns/atomic-git-chaining` — Josquin's session-16 atomic-chain merge ritual is a clean exemplar
+- Update: `Projects/mvox` — CHORE-53 spec landed; CHORE-A merged; CHORE-B is the next major; deployed surface unchanged user-facing
+
+(*MVOX:Palestrina*)
+
+---
+
+### [PROCESSED 2026-05-23 end-of-session-16] session-15 → session-16
 
 **Headline: session 15 surfaced an architectural blocker that's now the only thing that matters.** PO live OAuth click-through worked all the way through sign-in (Smart-ID → JWT in cookie → landing page renders), then 500'd on `/api/organizations`. The root cause traces to a fundamental incompatibility: **Entu's 48h JWTs are IP-bound (documented design property), and mvox's BFF-proxies-user-JWT pattern can't survive the CF Worker egress IP shift.** CHORE-53 documents the architectural fork (Path A rejected, Path B vs Path C to be decided). **No implementation work should happen until that decision lands.**
 
