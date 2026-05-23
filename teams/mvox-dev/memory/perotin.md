@@ -352,6 +352,7 @@ Commits (in order):
   seed-voices.ts          — voice instances (5 voices), idempotent by name, last live: 2026-05-20
   seed-collectives.ts     — org/section/person/member instances (120p, 235m, 6o, 16s), last live: session 8
   seed-menu-items-per-entity-type-2026-05-21.ts — menu entity rationalization, idempotent by query, last live: 2026-05-21
+  cleanup-menu-usability-2026-05-23.ts — menu usability pass (17 UPDATE ops: ordinals, labels, sort), idempotent by current-value drift-check, last live: 2026-05-23 (commit 9297df7)
 
 ## Session 11 — avatar+logo → photo rename pre-stage (2026-05-21)
 
@@ -428,3 +429,33 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
 - Live seed-collectives.ts execution (PR E merged 1d8b562 — COMPLETE per session-8 note, retiring DEFERRED)
 - Phase C seeding needs (rsvp, attendance once those entities exist)
 - Dev/staging fresh-deploy seed choreography
+
+## Session 17 — 2026-05-23
+
+### Menu usability pass (commit 9297df7)
+
+[CHECKPOINT] 17 UPDATE ops executed live on polyphony. 4/4 post-exec checks PASS.
+  Script: scripts/migrations/cleanup-menu-usability-2026-05-23.ts
+  Proposal: docs/migration/proposals/menu-usability-pre-launch-2026-05-23.md
+  Dry-run artifact: cleanup-menu-usability-dry-run-2026-05-23T09-11-25-311.json
+  Live artifact: cleanup-menu-usability-live-2026-05-23T09-15-53-634.json
+
+[DATA STATE] Polyphony menu set after session 17 usability pass:
+  18 Polyphony-group menus in ordinal order:
+  110 Organisations, 115 Voices, 130 Sections, 140 Members
+  200 Works, 210 Editions, 220 Copies, 230 Loans, 240 Libraries
+  300 Invitations, 310 Applications
+  400 Events (sort=start_date.date), 410 Seasons (sort=start_date.date),
+  420 Repertoire, 430 Programme, 440 Event Series
+  500 Attendance, 510 RSVPs
+
+[DECISION] Entu date sort syntax: sort=<property>.date for type:date properties.
+  Confirmed via v3 schema docs (event.md uses sort=date.date, season.md uses sort=-start_date.date).
+  Mirrors the .string suffix convention for type:string properties.
+
+[PROBE-RESULT] probe-phase-c-affiliation-deep-2026-05-21.ts — read-only pre-flight for Phase C.
+  No findings doc needed. Purpose satisfied by Phase C execution and AC verification. Closed.
+
+[DECISION] Branch discipline for data commits: always commit on main, not on active feature branches.
+  Session 17: working tree was on feat/chore-53b-rewrite; switched to main for commit, then restored.
+  Apply stash pattern if working tree is dirty when switching.
