@@ -1,6 +1,11 @@
+<!-- src/routes/+page.svelte -->
 <script lang="ts">
+	import { onMount } from 'svelte';
+	import { PUBLIC_ENTU_DB } from '$env/static/public';
+	import { ENTU_API_BASE } from '$lib/entu-config';
+	import { apiRequest } from '$lib/api/wrapper';
+	import { getToken } from '$lib/auth/storage';
 	import * as m from '$lib/paraglide/messages.js';
-	import type { PageData } from './$types';
 
 	type OrgEntity = {
 		_id: string;
@@ -11,24 +16,54 @@
 		member_count_per_section?: number;
 	};
 
-	let { data }: { data: PageData } = $props();
+	type EntuOrgRaw = {
+		_id: string;
+		name?: Array<{ string?: string }>;
+		description?: Array<{ string?: string }>;
+		location?: Array<{ string?: string }>;
+		_thumbnail?: string;
+		member_count_per_section?: Array<{ number?: number }>;
+	};
 
+	let signedIn = $state(false);
 	let orgs = $state<OrgEntity[] | null>(null);
 	let loadError = $state(false);
 	let loaded = $state(false);
 
+	function pickString(arr: Array<{ string?: string }> | undefined): string | undefined {
+		if (!Array.isArray(arr) || arr.length === 0) return undefined;
+		return arr[0]?.string;
+	}
+
+	function pickNumber(arr: Array<{ number?: number }> | undefined): number | undefined {
+		if (!Array.isArray(arr) || arr.length === 0) return undefined;
+		return arr[0]?.number;
+	}
+
+	function mapOrg(o: EntuOrgRaw): OrgEntity {
+		return {
+			_id: o._id,
+			name: pickString(o.name) ?? '',
+			description: pickString(o.description),
+			location: pickString(o.location),
+			photo: o._thumbnail,
+			member_count_per_section: pickNumber(o.member_count_per_section),
+		};
+	}
+
 	async function fetchOrgs() {
 		loaded = false;
 		try {
-			const res = await fetch('/api/organizations');
-			if (!res.ok) {
-				orgs = null;
-				loadError = true;
-			} else {
-				const body = (await res.json()) as { entities: OrgEntity[] };
-				orgs = body.entities;
-				loadError = false;
-			}
+			const params = new URLSearchParams({
+				'_type.string': 'organization',
+				props: '_id,name,description,location,_thumbnail,member_count_per_section',
+				limit: '50',
+				skip: '0',
+			});
+			const url = `${ENTU_API_BASE}${PUBLIC_ENTU_DB}/entity?${params.toString()}`;
+			const body = await apiRequest<{ entities: EntuOrgRaw[] }>(url);
+			orgs = body.entities.map(mapOrg);
+			loadError = false;
 		} catch {
 			orgs = null;
 			loadError = true;
@@ -37,8 +72,9 @@
 		}
 	}
 
-	$effect(() => {
-		if (data.session) {
+	onMount(() => {
+		signedIn = getToken() !== null;
+		if (signedIn) {
 			fetchOrgs();
 		}
 	});
@@ -48,7 +84,7 @@
 	}
 </script>
 
-{#if data.session === null}
+{#if !signedIn}
 	<section class="py-16 text-center">
 		<h1 class="text-3xl font-bold text-gray-900 mb-6">{m.landing_signed_out_headline()}</h1>
 		<a href="/auth/login" data-testid="signed-out-cta" class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700">
