@@ -430,6 +430,40 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
 - Phase C seeding needs (rsvp, attendance once those entities exist)
 - Dev/staging fresh-deploy seed choreography
 
+## Session 18 — 2026-05-23
+
+### File-property wire-shape probe (task #14 — deferred Layer 2 / session-12)
+
+[PROBE-RESULT] Entu file upload flow: two-step — POST to Entu (announce), PUT to S3 (upload).
+  S3 provider: DigitalOcean Spaces fra1 (entu-files.fra1.digitaloceanspaces.com), NOT AWS S3.
+  S3-compatible API (AWS4 signatures, same presigned URL mechanics).
+  Probe entity: _probe_file_wire_shape (person). All 6 phases PASS. Teardown complete.
+  Commit: ac1dcc5. Finding doc: docs/migration/findings/file-property-wire-shape-2026-05-23.md
+
+[DECISION] File property POST shape: [{ type:'photo', filename, filesize, filetype }]
+  All three fields required. Missing any → 400. Missing ALL three → silent empty-shell property (no upload field).
+
+[DECISION] S3 PUT required headers: ACL + Content-Disposition + Content-Type.
+  Content-Length: in upload.headers but must NOT be set explicitly — runtime sets from body.
+  Content-Disposition is in X-Amz-SignedHeaders — omitting it → signature mismatch (403 from Spaces).
+
+[DECISION] Upload URL TTL: 60 seconds. No retry with same URL. On failure: DELETE old property + restart Step 1.
+
+[DECISION] _thumbnail = signed download URL for photo[0]. No resize pipeline. 60s TTL. Same URL as GET /property/{id}.url.
+
+[GOTCHA] upload object NOT stored in DB — generated at POST response time only. Not available on subsequent GET /entity/.
+  If upload URL expires before PUT, must DELETE the stale property and POST again for a new signed URL.
+
+[DECISION] EntuProperty type in src/lib/ needs extension for file uploads — route to Josquin when photo feature is ready.
+  EntuFilePropertyInput: { type, filename, filesize, filetype }
+  EntuUploadShape: { url, method:'PUT', headers: { ACL, Content-Disposition, Content-Length, Content-Type } }
+
+[DECISION] Task #14 (Layer 2 file-property migrate) disposition: zero instances today (person.avatar/org.logo = 0).
+  Layer 2 remains a code-safe no-op. The probe closes "unverified" flag.
+  Architecture decision "file-property mutations must round-trip full file payload" CONFIRMED empirically.
+
+[SEED CATALOG UPDATE] No new seed scripts this session. Catalog unchanged.
+
 ## Session 17 — 2026-05-23
 
 ### Menu usability pass (commit 9297df7)
