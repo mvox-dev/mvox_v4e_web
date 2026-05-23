@@ -227,3 +227,169 @@ Our CHORE-B bug: `next` URL had `?state=<base64>` already in it; Entu concatenat
 - **mvox fit**: PO iterates visuals in Claude Design → exports bundle → Byrd converts to Svelte via Claude Code. Two-step, not direct. Best for full-page designs; accessibility/headless logic remains Byrd's domain.
 
 (*MVOX:Finn*)
+
+---
+
+## [CHECKPOINT] 2026-05-23 17:59 — research-org pass for case study #16 + Brilliant #17
+
+*Source pull: team-lead.md [PROCESSED] sessions 14-18; spec `2026-05-23-chore-53-path-c-design.md`; memory notes; Pérotin's finding doc; git log; production curl.*
+
+---
+
+### §1 — Architectural arc (sessions 14-18), chronological
+
+| Session | Headline | Key architectural realization | Anchor SHA(s) |
+|---|---|---|---|
+| 14 | First public deploy live. OAuth wiring + deploy pipeline. | BFF pattern assumed: all Entu calls via CF Worker proxy using httpOnly cookie JWT. process.env trap surfaced + fixed with nodejs_compat. | `a120248` (deploy), `a506266` (OAuth), `52a5fca` (nodejs_compat hotfix), `c73b82b` (process.env → $env/dynamic) |
+| 15 | OAuth sign-in works end-to-end; first data API call 500s. | Root cause: Entu's 48h JWT is IP-bound (`aud=browser IP`); CF Worker egress IP ≠ browser IP → every BFF-proxied data call returns `401 Invalid JWT audience`. CHORE-53 filed. Path A rejected by PO. | `bc1d1a7` (#50 OAuth URL fix), `63a4ce3` (#51 auth URL shape fix) |
+| 16 | CHORE-53 design spec approved + CHORE-A merged + deployed. | Path C chosen: mirror entu/webapp exactly. localStorage JWT + browser-direct api.entu.app + IP-binding-as-security-model. Path B rejected (weakening Entu's security model). | `ba5120a` + `910e09f` (spec), `773a057` (CHORE-A squash) |
+| 17 | CHORE-B (Path C rewrite) shipped to production, 4 hotfix iterations during PO live-test. | Three of four hotfixes traced to "should have mirrored entu/webapp exactly the first time." PO live-tested all 3 active providers (Smart-ID, Google, email) end-to-end. | `fc99291` (CHORE-B squash, −1580 lines net) |
+| 18 | Pérotin Layer-2 file-property probe: two-step upload pattern fully verified. New finding: property-DELETE leaves S3 orphans. | No production code change. S3 provider is DigitalOcean Spaces (not AWS). OpenAPI description for DELETE is incorrect. | `ac1dcc5` + `6517b47` + `f6704f6` (probe + finding) |
+
+---
+
+### §2 — Path A/B/C analysis (verbatim from spec `docs/superpowers/specs/2026-05-23-chore-53-path-c-design.md`)
+
+**Path A — Service entity + mvox owns rights enforcement:** Rejected by PO: *"if we have to own rights management, why use Entu at all."* mvox keeps Entu's `_owner`/`_editor`/`_viewer` rights as the authoritative access model.
+
+**Path B — Ask Argo to relax IP-binding:** Abandoned. Finn's research established IP-binding is a deliberate security primitive — stolen token + different IP = useless. Entu's own reference frontend (entu/webapp) stores JWT in localStorage and calls api.entu.app browser-direct; IP-binding is the load-bearing mitigation that compensates for JS-readable tokens. Asking Argo to relax it = asking them to weaken their threat model.
+
+**Path C — Mirror entu/webapp (chosen):** Same storage keys (`token`, `accounts`, `user`), same Bearer-auth pattern, same browser-direct calls, same expiry/IP-shift handling. Battle-tested in Entu's own production frontend. mvox stops swimming upstream of Entu's design.
+
+**Architecture before/after:**
+```
+Before (broken):
+  Browser → mvox BFF (CF Worker) → api.entu.app
+            └─ adds Authorization from httpOnly cookie
+            └─ IP-binding rejects: CF egress IP ≠ browser IP
+
+After Path C:
+  Browser → api.entu.app          (data calls, Bearer from localStorage)
+  Browser → mvox BFF (CF Worker)  (login redirect + future elevated ops only)
+```
+
+**Tradeoff table** (from spec §7 / §7.1):
+- Testability collapses to honest network mocks (MSW intercepts api.entu.app)
+- Modularity: EntuClient becomes a portable, framework-agnostic lib
+- Fewer hops (3→2), fewer failure modes (no cookie state machine)
+- CF Pages cost/quota footprint shrinks dramatically
+- Architecture mirrors the reference implementation (entu/webapp)
+- Security model becomes coherent (IP-binding IS the mitigation; cookie was theater)
+- Smaller surface for new contributors (no BFF abstraction layer to learn)
+- Federation-ready by construction
+- [non-win] XSS grants full Entu API surface as user — same trade-off entu/webapp accepted; mitigation: strict CSP + IP-binding
+
+---
+
+### §3 — IP-binding discovery
+
+**Memory note:** `~/.claude/projects/-home-michelek-workspace/memory/project_entu_jwt_ip_bound.md`
+
+**Surfaced:** Session 15 when PO live-tested Smart-ID OAuth flow. Sign-in succeeded; first BFF data call to `/api/organizations` 500'd. Finn researched `entu.ee/api/authentication` docs.
+
+**Verbatim from Entu docs (verified by Finn, session 15):**
+> "The session token is short-lived (5 minutes) and bound to the user's browser IP. Your app's frontend must exchange it for a full JWT by calling GET /api/auth **directly from the browser** — server-side exchange will fail because the IP will not match."
+
+**Mechanics:** JWT has `aud: <callerIP>`; mismatch → `401 Invalid JWT audience`. Documented, intentional, no `?bind_ip=false` escape hatch. Entu's documented pattern for server-to-server: **service-entity API key** (but those use service rights, not user rights — = rejected Path A).
+
+**CHORE-53 filed** as the architectural fork. PO rejected Path A same session.
+
+---
+
+### §4 — The 4-hotfix sequence (session 17)
+
+All hotfixes subsumed into the `fc99291` CHORE-B squash. Individual interim SHAs from the session-17 [PROCESSED] section:
+
+| # | What broke | Root cause | Fix | Interim SHA | Lesson |
+|---|---|---|---|---|---|
+| HOTFIX-1 | OAuth state param corrupted on callback | `next=` URL had `?state=<base64>` already in it; Entu appended JWT after base64 → no `?key=` param landed; callback got `null`. | Mirror entu/webapp exactly: `next` URL ends in `?key=` with no value; state goes to localStorage (not URL); callback reads `route.query.key`. | `477f27f` | L69: mirror the reference implementation first; don't infer the wire shape. |
+| HOTFIX-2 | After sign-in, OAuth provider was lost; last-provider redirect broke | Provider ID wasn't encoded in OAuth state payload; callback couldn't recover which provider was used. | Encode `provider` in the OAuth `state` JSON object. | `5f2dcf4` | L69 again: entu/webapp stores return path in localStorage, not state — we inferred wrong. |
+| HOTFIX-3 | Email OAuth flow broken (Smart-ID + Google worked) | Callback verified sessionStorage nonce; email auth is tab-jump based (new tab). sessionStorage is per-tab; nonce lost on tab jump. | Drop sessionStorage nonce verification from callback. | `4df0dea` | L70: PO live-test on deployed surface is irreplaceable; no unit test covers tab-jump semantics. |
+| HOTFIX-4 | Layout nav didn't update after login/logout | Nav bound to SSR-rendered session variable, not reactive to localStorage. Under Path C no server-side session; client-side state update didn't trigger nav re-render. | Gate auth-state-dependent nav rendering on `mounted` flag set in `onMount`; read localStorage on mount. | `2f771b8` | L71: no FOIC — never show auth-state-dependent UI before hydration. |
+
+**Bonus L72 (deploy friction):** Em-dash (U+2014) in commit messages rejected by CF Pages deploy with error 8000111. Use `--` not `—`.
+
+---
+
+### §5 — The "mirror entu/webapp" pattern
+
+**L62 (session 16) + L69 (session 17):** When mirroring a reference implementation, READ the reference's exact wire shape; don't infer.
+
+**Three things mvox copied verbatim from entu/webapp source:**
+
+1. **localStorage key names:** `token`, `accounts`, `user` — exact same as `entu/webapp:app/utils/user.js`. Future devs reading entu/webapp can apply knowledge directly.
+
+2. **`next=` URL shape for OAuth init:** `next` param ends in `?key=` with no value; Entu appends session-token JWT by string concatenation. Source `entu/webapp:app/pages/auth/[provider].vue`:
+   ```js
+   const callbackUrl = `${window.location.origin}/auth/callback?key=`
+   await navigateTo(`${apiUrl}/auth/${provider}?next=${encodeURIComponent(callbackUrl)}`, { external: true })
+   ```
+   Param name is `key` (not `token` or `jwt`). Callback reads `route.query.key`.
+
+3. **Browser-direct `apiRequest` wrapper:** All data calls go to `api.entu.app` via `Bearer <localStorage.token>`. Source: `entu/webapp:app/utils/api.js`. On 401: auto-logout + redirect to last-provider or `/auth/login`.
+
+**mvox additions (not in entu/webapp):** State nonce in sessionStorage (CSRF); `intent` field in state payload; `mvox.last_provider` persistence; `mounted` guard for auth-state UI; `login_hint` forward-compat (no-op until Argo accepts passthrough ask, task #19).
+
+---
+
+### §6 — Pérotin's wire-shape probe + S3 orphan finding (session 18)
+
+**Source:** `docs/migration/findings/file-property-wire-shape-2026-05-23.md` (commits `ac1dcc5` + `f6704f6`)
+
+**Two-step upload pattern:**
+
+| Step | Endpoint | Auth | Key fields |
+|---|---|---|---|
+| 1. Announce | `POST /{db}/entity/{id}` | Bearer JWT | `filename`, `filesize`, `filetype` in body (all 3 required) |
+| 1. Response | — | — | `upload.url`, `upload.method=PUT`, `upload.headers` (ACL, Content-Disposition, Content-Length, Content-Type) |
+| 2. Upload | `PUT <upload.url>` | None (pre-signed) | Send ACL, Content-Disposition, Content-Type; skip Content-Length (browser/fetch sets from body) |
+| 3. Download | `GET /{db}/property/{id}` | Bearer JWT | Returns `url` (60s TTL signed download) |
+| 4. Thumbnail | `GET /{db}/entity/{id}?props=_thumbnail` | Bearer JWT | Returns `_thumbnail` (60s TTL; IS the full photo, no resize pipeline) |
+
+**Key findings:**
+- S3 provider: **DigitalOcean Spaces** (Frankfurt, `fra1`, `entu-files.fra1.digitaloceanspaces.com`), not AWS S3. S3-compatible API.
+- `Content-Disposition` is in `X-Amz-SignedHeaders` — omitting it from PUT → `SignatureDoesNotMatch` 403.
+- `Content-Length` must NOT be set explicitly — browser/fetch sets from body. `entu/webapp` skips it explicitly.
+- Upload URL TTL: 60s; download URL TTL: 60s (both generated fresh per call; not stored in DB).
+- `_thumbnail` = `getSignedDownloadUrl(entity.photo[0])` — IS the full photo, no resize. Absent if no `photo` property values.
+- S3 object key: `{db}/{entityId}/{propertyId}` — property `_id` IS the S3 key segment.
+
+**NEW FINDING: `DELETE /property/{id}` does NOT delete the S3 object.** OpenAPI description says "Files are removed from S3" — incorrect. Route handler only soft-deletes property in MongoDB + triggers re-aggregation. No S3 delete call in route or `utils/aggregate.js`. Every DELETE on a file-typed property leaves a Spaces orphan. Probe orphan: `polyphony/6a11dc804ff8277cd4306b1e/6a11dc804ff8277cd4306b24` (70 bytes, harmless). Argo ask pending (task #60).
+
+**CORS note:** Under Path C, S3 PUT is browser-direct. Entu/webapp does this from arbitrary origins, so the Spaces CORS policy should already allow browser PUT. If mvox hits CORS errors, fix is Argo-side (add multivox.pages.dev to Spaces CORS allowlist).
+
+---
+
+### §7 — Cross-cutting memory notes summary
+
+| Memory | Key content for artifact |
+|---|---|
+| `project_entu_jwt_ip_bound` | JWT IP-binding: `aud=callerIP`; 48h lifetime; BFF-proxy incompatible; service-entity API key is Entu's backend pattern; CHORE-53 established Path C. See §3. |
+| `project_entu_api_key_mechanics` | API key = property of type `entu_api_key` on person entity. SHA-256 hashed at storage. No auto-expiry. Raw key returned once at creation. Auth: SHA-256 → index lookup → 48h IP-bound JWT. Rotation: overwrite property → old key auth returns `accounts: []`. Client must validate `accounts.length > 0` post-auth. |
+| `project_cf_workers_process_env` | `nodejs_als` does NOT expose `process` global. `process.env.X` 500s in CF Workers runtime; Vitest passes on Node → "passes tests, fails production." Use `nodejs_compat` (superset) OR `$env/static/private` / `$env/dynamic/private`. mvox CHORE-47 migrated to `$env/dynamic/private`; `nodejs_compat` retained as safety net. |
+| `project_cf_pages_wrangler_vars` | When `wrangler.json` has a `vars` block, CF dashboard Variables UI is LOCKED. Only secrets (encrypted) can be managed via dashboard. Wrangler is source of truth for plaintext vars. |
+| `project_wrangler_deploy_auth` | `pnpm wrangler login` fails without `xdg-utils`. Use `set -a; . ~/.config/mvox/credentials.env; set +a && pnpm run deploy` — picks up `CLOUDFLARE_API_TOKEN`. Credentials at `~/.config/mvox/credentials.env`. |
+| `project_entu_post_appends_multi_value` | POST to an existing non-formula string property APPENDS a new value (multi-valued at wire level). To replace: DELETE existing property value(s) by `_id` first, then POST. Affects any "update a field" UX. `list: true` is a UI hint only. |
+| `project_entu_wire_shape_entity_vs_property` | Two distinct `_id` kinds: entity `_id` → `DELETE /entity/{id}`; property-value `_id` → `DELETE /property/{id}`. Cannot be interchanged (404 if conflated). UPDATE pattern: DELETE value via `/property/{id}`, POST new via `/entity/{id}`. |
+| `project_entu_formula_mechanics` | Formula values MATERIALIZED on instances (not virtual reads). Survive source-property deletion. Direct POST to formula property silently dropped (re-evaluates). Pre-delete verify: check `/\S/`, not just non-empty — formula can materialize as single space. |
+
+---
+
+### §8 — Production state + verification
+
+**curl -sIL https://multivox.pages.dev/ (2026-05-23 17:59):** HTTP/2 200. CF-Ray: a005f3f6d9cf243e-FRA. Production is healthy.
+
+**Latest deploy SHA:** `a9c9ad88.multivox.pages.dev` (alias `multivox.pages.dev`) — CHORE-B build from `fc99291`. Unchanged since session 17.
+
+**4-hotfix-cycle commit chain** (all subsumed into `fc99291` CHORE-B squash on main):
+- `477f27f` — bare next= + state-to-localStorage (HOTFIX-1)
+- `5f2dcf4` — provider-in-state closes #57 (HOTFIX-2)
+- `4df0dea` — drop sessionStorage nonce verify (HOTFIX-3)
+- `2f771b8` — layout nav reactive (HOTFIX-4)
+- `f4f7a0a` — pre-merge cleanup: gate auth UI on hydration + drop dev scaffold
+
+**Tests at session-18 close:** Vitest 361/361 unit, pnpm check 0, pnpm lint 0, pnpm build clean. Playwright: 11 pre-existing failures (CHORE-C scope).
+
+**S3 orphan:** `polyphony/6a11dc804ff8277cd4306b1e/6a11dc804ff8277cd4306b24` (70 bytes, harmless, pending Argo ask task #60).
+
+(*MVOX:Finn*)

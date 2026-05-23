@@ -1,6 +1,60 @@
 # Palestrina — Team Lead Scratchpad
 
-### [NEXT SESSION] 2026-05-23 — session-18 → session-19
+### [NEXT SESSION] 2026-05-23 (recovery shutdown) — session-19 (incomplete) → session-20
+
+**Headline: /clear-induced recovery shutdown. The substantive work that landed in commits `7fb0420` → `aaac286` → `f94f37e` → `2a8c08f` (post-session-18-bundle, before /clear) closed two of the three top session-18 carry-forwards. Bundle in place. CHORE-60 is the natural session-20 headline.**
+
+**What landed in the post-session-18-bundle window (no conversation context survived):**
+- `7fb0420` — Updated session-18 seed to elevate Brilliant + case study (#16/#17) to priority-0.
+- `aaac286` — Bentham's per-commit-GREEN lift to settled architecture-decisions (carry-forward item 2 from session-18 seed). **DONE.**
+- `f94f37e` + `2a8c08f` — Brilliant entry trail `Patterns/entu/3rd-party-frontend-browser-direct` (KB id `06e6196e-21e1-4ed4-b77e-9ebff4740875`), v2 with empty-list-POST correction per PO clarification. Tasks #16 + #17 now completed in the harness task list. **DONE.**
+- Sibling artifact (mentioned in commit `f94f37e` body): entu/research PR #50, 454-line case study lifting from the Brilliant entry. Drafted same window from Finn's research-org pass. NOT in this repo — verify state in `~/projects/entu-research/` at session-20 open.
+- `teams/mvox-dev/memory/finn.md` Finn's research-org [CHECKPOINT] for the case study (was uncommitted at recovery; committed in recovery shutdown bundle).
+
+**Live state at recovery shutdown (2026-05-23 evening):**
+- main: `2a8c08f` + the recovery shutdown bundle commit
+- Production: `multivox.pages.dev` 200/200 on `/` + `/auth/login` (unchanged from session 17)
+- Tests: not re-run this window; carry session-17 numbers (vitest 361/361 unit, check 0, lint 0, build clean; Playwright 11 pre-existing failures)
+- Bundle in place: `docs/design/inbox/2026-05-23-librarian/bundle/mvox.eu-handoff.zip` (225KB)
+- Polyphony Entu db: 1 orphan S3 object remains in DigitalOcean Spaces from session-18 probe (70 bytes, 1×1 PNG, no impact)
+- Scheduled routine: `trig_014xDo7ZTuzNLpBUuWdtEs32` next_run_at 2026-05-30T09:00:00Z (unchanged)
+- Agents in config.json: `finn`, `bentham`. **STALE — the /clear killed in-process agents but config entries persist.** Do NOT SendMessage them blindly at session-20 open; verify aliveness first or spawn fresh per Phase 5.
+- Pérotin not registered. Spawn on demand if data-manager work surfaces.
+
+**Recovery-shutdown caveats:**
+- No conversation context bridged session-18-bundle → recovery /clear. The 4 interim commits + Brilliant entry diff are the only artifacts. Commit bodies are the source of truth for what happened in the cleared window.
+- entu/research PR #50 referenced in commit body but its merge state not verified at recovery. Confirm at session-20 open.
+- Recovery shutdown skipped step 4 (send shutdown_requests) — no live agents to drain.
+
+**Carry-forward queue for session 20 (priority order; refreshed from session-18 seed):**
+
+1. **CHORE-60 — Convert Claude Design librarian bundle to Svelte 5.** Bundle at `docs/design/inbox/2026-05-23-librarian/bundle/mvox.eu-handoff.zip`. Inbox README pre-stages context for a fresh Claude Code session. New session per the README pattern; writing-plans → TDD chain. Probable session-20 headline.
+2. **CHORE-C test infra.** Plan at `docs/superpowers/plans/2026-05-23-chore-53-c-test-infra.md` (791 lines, 9 tasks). MSW + Playwright bootstrap + E2E coverage. Closes #36, #39, #33 + 11 pre-existing Playwright failures. Tallis-heavy. Could run in parallel with CHORE-60 (different file scope).
+3. **Argo ask — S3 orphan from photo DELETE** (#60 local task ID; not yet a GH issue). Pérotin's finding doc + cross-reference are file-ready content.
+4. **Argo ask — login_hint passthrough** (#19, GH). Forward-compat already shipped in CHORE-B.
+5. **#54 client-side error capture (deferred).** Path C is stable; fires before mvox opens to real users.
+6. **Routine fires 2026-05-30T09:00:00Z** (`trig_014xDo7ZTuzNLpBUuWdtEs32`) → emails PO with #59 deferred-providers checklist.
+7. **#43 mvox.eu custom domain** — PO DNS work.
+8. **#44 CF Pages Git-connected migration.**
+9. **#49 Biome lint rule enablement** (5 sub-cycles).
+10. **#6 CHORE-6 Email Resend** — blocked on PO SPF + DKIM DNS.
+
+**Expected first action session 20:**
+1. Read this seed + `git log --oneline <recovery-shutdown-sha>..HEAD`
+2. Verify production health: 200 on `/` + `/auth/login`
+3. Check `~/projects/entu-research/` git log for PR #50 merge state
+4. Per Phase 5: **spawn finn + bentham fresh** (config entries are stale from this recovery). Spawn pérotin if data-manager work surfaces.
+5. Confirm with PO: kick off CHORE-60 (probable; bundle has been waiting since 2026-05-23 17:52Z).
+
+**Process lesson from this recovery (worth carrying forward):**
+
+- **L82 — /clear instead of full shutdown ceremony is a recoverable failure mode.** Disk state survives (`config.json`, repo files, task list, recent commits); in-process agents are killed; conversation context is gone. Recovery procedure: refresh the [NEXT SESSION] seed from disk (commit log + scratchpad audit + Brilliant trail), refresh task-list-snapshot to match live task list, commit any uncommitted scratchpad work, push. Skip step 4 (shutdown_requests) — no live agents. Document the gap so next-session knows the conversation history is missing for the cleared window. Worth a Brilliant entry: `Patterns/recovery-shutdown-after-clear`.
+
+(*MVOX:Palestrina*)
+
+---
+
+### [PROCESSED 2026-05-23 recovery-shutdown] session-18 → session-19 (incomplete)
 
 **Headline: UI/design lane opened — Claude Design prompt drafted + committed + pushed; PO will run the design session out-of-band and drop the bundle into a pre-staged inbox.** No production code change this session. GH issue **CHORE-60** filed as the conversion target (blocked on bundle return). Pérotin Layer-2 file-property probe complete with an authorization-gate breach corrective; new finding: Entu's property-DELETE doesn't purge S3 objects.
 
