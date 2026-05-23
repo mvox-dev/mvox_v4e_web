@@ -13,20 +13,28 @@
 | 3 | Clean bundle/ subdir | `68231ca` | `docs/design/inbox/2026-05-23-librarian/bundle/.gitkeep` — PO's drop zone for bundle files, isolated from the README |
 | 4 | Pérotin file-property probe | `ac1dcc5` + `6517b47` + `f6704f6` | Empirical wire-shape verification for Entu photo uploads. Two-step upload, DigitalOcean Spaces (not AWS), Content-Disposition in signed headers, 60s TTL on upload + download URLs, `_thumbnail = signed photo[0]`. **New finding: property-DELETE leaves S3 orphans, contradicting OpenAPI description.** Plus authorization-gate breach + corrective + LEARNED |
 
+**Debt acknowledgment (PO-flagged at session-18 close):**
+
+The team owes the Brilliant article + entu/research case study on **how mvox built for Entu**. This debt has accumulated across sessions 14-18 and is now overdue. Tasks #16 + #17 have been in the queue since session 13 (case study) / session 17 (Brilliant entry). With Path C live in production + four-hotfix-cycle production-test data + Pérotin's S3-orphan finding + the entu/webapp source-comparison work + the IP-binding/JWT story + the BFF→browser-direct architectural arc, the material is now thoroughly there. **Treat as priority-0 for session 19**, before opening any new lanes. CHORE-60 conversion + CHORE-C test infra both remain queued but should not preempt this write.
+
+Suggested ordering for session 19:
+1. **First action after Phase 6 ready:** confirm with PO whether to begin the case study + Brilliant entry, or whether bundling them as a single first-action dispatch (Finn does a research-organization pass; team-lead drafts the case study at `$ENTU_RESEARCH/docs/case-studies/2026-05-3rd-party-frontend-on-entu.md`; team-lead drafts the Brilliant entry as `Patterns/entu/3rd-party-frontend-browser-direct`; PO reviews both). Both artifacts share material so writing them in tandem is efficient.
+2. Material to organize: Path C arch-decisions section (settled), the 4-hotfix sequence + lessons (L68-L75 in this scratchpad), entu/webapp source audits (Finn's research), the IP-binding discovery (memory: `project_entu_jwt_ip_bound`), the API-key-mechanics finding (memory: `project_entu_api_key_mechanics`), Pérotin's wire-shape probe + S3-orphan finding, the architectural-pre-emption-as-followup-chore pattern, the mirror-reference-implementation pattern (L62/L69).
+
 **Carry-forward queue for session 19 (priority order):**
 
-1. **Wait on PO's Claude Design session.** When the bundle returns, PO drops files into `docs/design/inbox/2026-05-23-librarian/bundle/` and reboots Claude Code with the new session. The new session reads the inbox README cold, invokes writing-plans, and dispatches the TDD chain. Closes CHORE-60.
+0. **Brilliant article + entu/research case study (#16 + #17)** — see Debt section above. Priority 0.
+1. **Wait on PO's Claude Design session — bundle has landed.** PO uploaded `mvox.eu-handoff.zip` (225KB) directly via GitHub web UI at session-18 close (`1db5ac2`); rebased through. Bundle is at `docs/design/inbox/2026-05-23-librarian/bundle/`. Unzip + consume in a new Claude Code session per the inbox README. CHORE-60 is unblocked the moment the next session opens.
 2. **Bentham's stewardship offer (parked from session 18 intro):** lift "every-commit-GREEN on a feature branch" to settled architecture-decisions entry, sibling to the lint:fix-in-GREEN entry (session 16). CHORE-B is the canonical exemplar. ~5 min doc-only edit; cheap stewardship pass for whenever next session opens.
 3. **CHORE-C test infra (still queued).** Plan at `docs/superpowers/plans/2026-05-23-chore-53-c-test-infra.md` (791 lines, 9 tasks). MSW + Playwright bootstrap + E2E coverage. Closes #36, #39, #33 + 11 pre-existing Playwright failures. Tallis-heavy. Could run in parallel with CHORE-60 conversion (different file scope).
 4. **Argo ask — S3 orphan from photo DELETE.** Task #60 local; file as GH issue against entu/research or as direct Argo ask, sibling to existing #19 login_hint ask. Pérotin's finding doc + cross-reference are the file-ready content.
 5. **Argo ask — login_hint passthrough (#19).** Forward-compat already shipped in CHORE-B. File when bandwidth.
 6. **#54 client-side error capture (deferred).** Path C is now stable in production; fires before mvox opens to real users.
 7. **Routine fires 2026-05-30T09:00:00Z** (`trig_014xDo7ZTuzNLpBUuWdtEs32`) → emails PO with #59 deferred-providers checklist. May land mid-session-19 or later.
-8. **#16/#17 case study + Brilliant entry** (Path C live, 4-hotfix-cycle data, S3 orphan finding adds material).
-9. **#43 mvox.eu custom domain** — PO DNS work.
-10. **#44 CF Pages Git-connected migration.**
-11. **#49 Biome lint rule enablement** (5 sub-cycles).
-12. **#6 CHORE-6 Email Resend** — blocked on PO SPF + DKIM DNS.
+8. **#43 mvox.eu custom domain** — PO DNS work.
+9. **#44 CF Pages Git-connected migration.**
+10. **#49 Biome lint rule enablement** (5 sub-cycles).
+11. **#6 CHORE-6 Email Resend** — blocked on PO SPF + DKIM DNS.
 
 **Live state at session-18 close:**
 - main: `68231ca` (pushed); origin/main matches
