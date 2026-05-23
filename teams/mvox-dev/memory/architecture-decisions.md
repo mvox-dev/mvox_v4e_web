@@ -6,6 +6,29 @@ Format per entry: short title, decision, rationale, date. Most recent at the top
 
 ---
 
+## GREEN-phase quality gate — `pnpm lint:fix` is part of GREEN, not optional (2026-05-23, session 16)
+
+**Decision**: GREEN-phase agents (Byrd + Josquin) MUST run `pnpm lint:fix` before handing off to the next phase. Test-passing alone is not GREEN. The full GREEN gate is:
+
+```
+pnpm check     # 0 type errors
+pnpm test:unit # all tests pass
+pnpm lint:fix  # zero lint findings after autofix
+pnpm build     # builds clean
+```
+
+Then hand off. The lint:fix step catches the divergence between "tests pass" and "code matches house style after Biome's view of it." Skipping lint:fix manufactures a downstream autofix commit that pollutes the PR history with whitespace + import-order changes that should have been in the GREEN impl commit.
+
+**Rationale**: CHORE-A (PR #56) was the first GREEN cycle to exercise the lint scaffolding from CHORE-48 (`b9b3499`). `pnpm test` passed; `pnpm lint` did not. The result was a separate `db59557` autofix commit at the tip of the branch — palatable as a one-time scope-override on the first lint-cycle, but a smell that becomes noise if it repeats. Lift to a settled norm BEFORE CHORE-B GREEN so it doesn't compound.
+
+**Review enforcement (Bentham)**: From CHORE-B forward, any GREEN handoff whose subsequent autofix commit changes more than the implementer's claimed scope is YELLOW. An autofix commit that ONLY changes whitespace/import-order is a smell but not a blocker; an autofix that touches function bodies, conditionals, or semantic structure is RED — the GREEN commit was misattributed work.
+
+**Source**: Josquin's session-16 [PATTERN] entry on `bentham.md` review thread; lift endorsed by Bentham, ratified by team-lead. First exercised: CHORE-B onward.
+
+(*MVOX:Bentham*)
+
+---
+
 ## Bundled-migration RED → split-by-blast-radius (2026-05-22, session 13)
 
 **Decision**: When a bundled migration script has a clean Layer N and a problematic Layer N+1, the recommended fix path is **split the script into two** — one ships now (the clean layer), one defers behind its own task (the problematic layer). This wins over fix-in-place when:

@@ -7,6 +7,24 @@ metadata:
 
 # Bentham scratchpad
 
+## 2026-05-23 — Session 16: PR #56 GREEN (CHORE-A Path C foundation)
+
+[CHECKPOINT] **PR #56 verdict: GREEN.** HEAD `db59557`, 9 commits, strict TDD ordering (RED→GREEN×4 + autofix). Spec compliance verified against `docs/superpowers/specs/2026-05-23-chore-53-path-c-design.md` §6 + §9.1. New foundation libraries: `src/lib/auth/{storage,state}.ts` + `src/lib/api/wrapper.ts` skeleton + EntuClient moved out of `server/`. Defensive `!res.ok` throw extended to all 3 client methods (`get`/`search`/`setProperty`) — `search` + `setProperty` are bonus over the plan, which only specified `search`. Subsumes #52.
+
+[PATTERN] **token_version cache-busting — version sentinel written only by setToken.** `setUser`/`setAccounts` deliberately don't bump `mvox.token_version`. The contract: at callback time, callers MUST sequence `setUser` + `setAccounts` BEFORE `setToken`. The `setToken` call is the gate that publishes the new auth state with the current version. If a future writer reverses this order across a version bump, get* will read stale data without triggering the wipe. Surfaced in PR #56 review (YELLOW-A.4 — proposed one-line invariant comment in storage.ts). Encode for CHORE-B review: any code path that writes user/accounts AFTER token is RED unless documented as intentional.
+
+[PATTERN] **GREEN-cycle lint-divergence is real, not theoretical.** PR #56's `db59557` autofix commit exists because `pnpm test` GREEN'd before `pnpm lint:fix` ran. CHORE-A is the first GREEN cycle exercising the lint scaffolding from CHORE-48. Josquin's draft addition for `architecture-decisions.md`: "GREEN agents must run `pnpm lint:fix`, not just `pnpm test`." Endorsed lifting; pending team-lead concurrence. Encode for review of any future GREEN handoff: spec mock-shape or impl that passes tests but isn't linted = potential rework cycle.
+
+[DEFERRED] **Two YELLOWs carry into CHORE-B (NOT blockers for #56 merge):**
+- **YELLOW-A.3**: Import-extension drift. 6 new relative imports in CHORE-A are extensionless (`./storage`, `./state`, `./client`, `./wrapper`, `../auth/storage` ×2); 1 keeps `.ts` (`../entu-config.ts`). `rewriteRelativeImportExtensions: true` is on; convention per CHORE-32 GOTCHA + existing `+server.ts` files is to keep `.ts`. ~6 one-character edits, fold into CHORE-B.
+- **YELLOW-A.4**: token-version invariant comment in `storage.ts` (see PATTERN above). Fold into CHORE-B.
+
+[DEFERRED] **YELLOW-A.1 / YELLOW-A.2 — pre-existing Playwright failures**, verified pre-existing on `main` (Josquin checked against `3febec1`), NOT caused by CHORE-A. Routed to CHORE-C scope; the Tailwind one may need its own follow-up.
+
+[DEFERRED] **Stewardship carryforward — YELLOW-50.1 + YELLOW-51.1** (architecture-decisions.md L204 wire-shape literal + parenthetical) confirmed still present on session-16 startup. Spec §References explicitly lists these for CHORE-B fold-in alongside the BFF user-rights default rewrite. Holding pending CHORE-B dispatch — no separate stewardship pass this session unless CHORE-B doesn't fold them.
+
+---
+
 ## 2026-05-23 — Session 15: five clean reviews + two stewardship YELLOWs
 
 [CHECKPOINT] **Session-15 review log (all GREEN, no RED dispatched):**
