@@ -1,0 +1,337 @@
+{
+  "choir": {
+    "name": "Eesti Filharmoonia Kammerkoor",
+    "entu_id": "69c7f8718489bfcb0e81b065",
+    "library_name": "EPCC Library"
+  },
+  "voice_map": {
+    "S1": "soprano",
+    "S2": "soprano",
+    "A": "alto",
+    "T1": "tenor",
+    "T2": "tenor",
+    "B1": "bass",
+    "B2": "bass"
+  },
+  "section_map": {
+    "S1": "Soprano",
+    "S2": "Soprano",
+    "A": "Alto",
+    "T1": "Tenor",
+    "T2": "Tenor",
+    "B1": "Bass",
+    "B2": "Bass"
+  },
+  "members": [
+    { "id": "mt", "name": "Maris Tamm",    "voice": "S1" },
+    { "id": "ls", "name": "Liina Saar",    "voice": "S2" },
+    { "id": "al", "name": "Ave Lepp",      "voice": "A"  },
+    { "id": "kp", "name": "Kärt Põld",     "voice": "A"  },
+    { "id": "tm", "name": "Toomas Mägi",   "voice": "T1" },
+    { "id": "av", "name": "Andres Vahar",  "voice": "T2" },
+    { "id": "mr", "name": "Margus Roos",   "voice": "B1" },
+    { "id": "hk", "name": "Henn Kuusik",   "voice": "B2" }
+  ],
+  "works": [
+    {
+      "id": "tallis-spem",
+      "composer": "Thomas Tallis",
+      "title": "Spem in alium",
+      "original_language": "Latin",
+      "genre": ["sacred", "motet"],
+      "editions": [
+        {
+          "id": "tallis-40",
+          "name": "40-part original",
+          "edition_type": "vocal_score",
+          "voicing": "SSSSAAAATTTTBBBB ×5",
+          "publisher": "Chester Novello",
+          "year": 1928,
+          "total": 12,
+          "loans": []
+        },
+        {
+          "id": "tallis-8",
+          "name": "8-part reduction (Cooke)",
+          "edition_type": "vocal_score",
+          "voicing": "SSAATTBB",
+          "publisher": "OUP",
+          "year": 1989,
+          "total": 6,
+          "loans": []
+        }
+      ]
+    },
+    {
+      "id": "part-magnificat",
+      "composer": "Arvo Pärt",
+      "title": "Magnificat",
+      "original_language": "Latin",
+      "genre": ["sacred", "Estonian", "tintinnabuli"],
+      "editions": [
+        {
+          "id": "mag-ue",
+          "name": "Universal Edition · original",
+          "edition_type": "vocal_score",
+          "voicing": "SSSAATBB",
+          "publisher": "Universal Edition",
+          "year": 1989,
+          "catalogue": "UE-19400",
+          "total": 30,
+          "loans": [
+            { "copy_number": 14, "member_id": "hk", "assigned_at": "2025-11-12" },
+            { "copy_number": 15, "member_id": "hk", "assigned_at": "2025-11-12" },
+            { "copy_number": 22, "member_id": "mr", "assigned_at": "2025-11-12" },
+            { "copy_number": 23, "member_id": "mr", "assigned_at": "2025-11-12" }
+          ]
+        },
+        {
+          "id": "mag-rh",
+          "name": "Hyperion · reduced (Layton ed.)",
+          "edition_type": "vocal_score",
+          "voicing": "SATB div.",
+          "publisher": "Hyperion Eds.",
+          "year": 2001,
+          "total": 24,
+          "loans": []
+        },
+        {
+          "id": "mag-org",
+          "name": "UE · with organ",
+          "edition_type": "supplementary",
+          "voicing": "SATB + org.",
+          "publisher": "Universal Edition",
+          "year": 1996,
+          "total": 0,
+          "limitless": true,
+          "loans": []
+        }
+      ]
+    },
+    {
+      "id": "tormis-raua",
+      "composer": "Veljo Tormis",
+      "title": "Raua needmine",
+      "original_language": "Estonian",
+      "genre": ["Estonian", "runo"],
+      "editions": [
+        {
+          "id": "raua-fg",
+          "name": "Fennica Gehrman · SATB + shaman drum",
+          "edition_type": "vocal_score",
+          "voicing": "SATB · drum",
+          "publisher": "Fennica Gehrman",
+          "year": 1991,
+          "catalogue": "FG-552",
+          "total": 52,
+          "location": "Cabinet B · shelf 1",
+          "loans": []
+        },
+        {
+          "id": "raua-pl",
+          "name": "Pelle Pyy · a cappella reduction",
+          "edition_type": "vocal_score",
+          "voicing": "SATB",
+          "publisher": "Pyy",
+          "year": 2003,
+          "total": 18,
+          "loans": []
+        }
+      ]
+    },
+    {
+      "id": "kreek-onnis",
+      "composer": "Cyrillus Kreek",
+      "title": "Õnnis on inimene",
+      "original_language": "Estonian",
+      "genre": ["Estonian", "sacred", "psalm"],
+      "editions": [
+        {
+          "id": "onnis-sp",
+          "name": "SP Muusikaprojekt",
+          "edition_type": "vocal_score",
+          "voicing": "SATB",
+          "publisher": "SP Muusikaprojekt",
+          "year": 1998,
+          "total": 42,
+          "location": "Cabinet A · shelf 4",
+          "loans": []
+        }
+      ]
+    },
+    {
+      "id": "esenvalds-stars",
+      "composer": "Ēriks Ešenvalds",
+      "title": "Stars",
+      "original_language": "English",
+      "genre": ["Latvian", "contemporary"],
+      "editions": [
+        {
+          "id": "stars-mt",
+          "name": "Musica Baltica · SATB + glasses",
+          "edition_type": "vocal_score",
+          "voicing": "SSAATTBB",
+          "publisher": "Musica Baltica",
+          "year": 2011,
+          "catalogue": "MB-2089",
+          "total": 50,
+          "location": "Cabinet C · shelf 2",
+          "loans": []
+        }
+      ]
+    },
+    {
+      "id": "part-beatitudes",
+      "composer": "Arvo Pärt",
+      "title": "The Beatitudes",
+      "original_language": "English",
+      "genre": ["sacred", "Estonian", "tintinnabuli"],
+      "editions": [
+        {
+          "id": "beat-ue",
+          "name": "Universal Edition",
+          "edition_type": "vocal_score",
+          "voicing": "SATB + org.",
+          "publisher": "Universal Edition",
+          "year": 1990,
+          "total": 32,
+          "loans": []
+        }
+      ]
+    },
+    {
+      "id": "esenvalds-sleep",
+      "composer": "Ēriks Ešenvalds",
+      "title": "Only in Sleep",
+      "original_language": "English",
+      "genre": ["Latvian"],
+      "editions": [
+        {
+          "id": "sleep-mb",
+          "name": "Musica Baltica",
+          "edition_type": "vocal_score",
+          "voicing": "SSAATTBB + sop. solo",
+          "publisher": "Musica Baltica",
+          "year": 2010,
+          "total": 48,
+          "loans": []
+        }
+      ]
+    },
+    {
+      "id": "byrd-ave",
+      "composer": "William Byrd",
+      "title": "Ave verum corpus",
+      "original_language": "Latin",
+      "genre": ["sacred", "English"],
+      "editions": [
+        {
+          "id": "ave-st",
+          "name": "Stainer & Bell",
+          "edition_type": "vocal_score",
+          "voicing": "SATB",
+          "publisher": "Stainer & Bell",
+          "year": 1923,
+          "total": 60,
+          "loans": []
+        }
+      ]
+    },
+    {
+      "id": "byrd-mass5",
+      "composer": "William Byrd",
+      "title": "Mass for Five Voices",
+      "original_language": "Latin",
+      "genre": ["sacred", "English", "mass"],
+      "editions": [
+        {
+          "id": "mass5-cs",
+          "name": "Chester · ed. Fellowes",
+          "edition_type": "vocal_score",
+          "voicing": "SSATB",
+          "publisher": "Chester",
+          "year": 1922,
+          "total": 24,
+          "loans": []
+        }
+      ]
+    },
+    {
+      "id": "hildegard-pastor",
+      "composer": "Hildegard von Bingen",
+      "title": "O Pastor Animarum",
+      "original_language": "Latin",
+      "genre": ["sacred", "plainchant"],
+      "editions": [
+        {
+          "id": "pastor-am",
+          "name": "A-R Editions · transcription",
+          "edition_type": "supplementary",
+          "voicing": "Unison + drone",
+          "publisher": "A-R Editions",
+          "year": 1998,
+          "total": 0,
+          "limitless": true,
+          "loans": []
+        }
+      ]
+    },
+    {
+      "id": "whitacre-sleep",
+      "composer": "Eric Whitacre",
+      "title": "Sleep",
+      "original_language": "English",
+      "genre": ["American"],
+      "editions": [
+        {
+          "id": "wh-sleep",
+          "name": "Walton Music",
+          "edition_type": "vocal_score",
+          "voicing": "SATB div.",
+          "publisher": "Walton Music",
+          "year": 2000,
+          "total": 56,
+          "loans": []
+        }
+      ]
+    },
+    {
+      "id": "nystedt-immortal",
+      "composer": "Knut Nystedt",
+      "title": "Immortal Bach",
+      "original_language": "German",
+      "genre": ["Norwegian"],
+      "editions": [
+        {
+          "id": "im-no",
+          "name": "Norsk Musikforlag",
+          "edition_type": "vocal_score",
+          "voicing": "SATB div.",
+          "publisher": "Norsk Musikforlag",
+          "year": 1988,
+          "total": 50,
+          "loans": []
+        }
+      ]
+    },
+    {
+      "id": "lauridsen-om",
+      "composer": "Morten Lauridsen",
+      "title": "O Magnum Mysterium",
+      "original_language": "Latin",
+      "genre": ["sacred", "American"],
+      "editions": [
+        {
+          "id": "om-pe",
+          "name": "Peer Music",
+          "edition_type": "vocal_score",
+          "voicing": "SATB",
+          "publisher": "Peer Music",
+          "year": 1994,
+          "total": 48,
+          "loans": []
+        }
+      ]
+    }
+  ]
+}

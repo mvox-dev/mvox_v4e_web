@@ -1,0 +1,241 @@
+{
+  "run_at": "2026-05-23T19:41:57.522Z",
+  "dry_run": true,
+  "teardown": false,
+  "library": {
+    "action": "WOULD_CREATE",
+    "label": "EPCC Library"
+  },
+  "persons": [
+    {
+      "action": "WOULD_CREATE",
+      "label": "Maris Tamm"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "Liina Saar"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "Ave Lepp"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "Kärt Põld"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "Toomas Mägi"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "Andres Vahar"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "Margus Roos"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "Henn Kuusik"
+    }
+  ],
+  "members": [
+    {
+      "action": "WOULD_CREATE",
+      "label": "member for Maris Tamm"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "member for Liina Saar"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "member for Ave Lepp"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "member for Kärt Põld"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "member for Toomas Mägi"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "member for Andres Vahar"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "member for Margus Roos"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "member for Henn Kuusik"
+    }
+  ],
+  "works": [
+    {
+      "action": "WOULD_CREATE",
+      "label": "Spem in alium"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "Magnificat"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "Raua needmine"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "Õnnis on inimene"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "Stars"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "The Beatitudes"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "Only in Sleep"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "Ave verum corpus"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "Mass for Five Voices"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "O Pastor Animarum"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "Sleep"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "Immortal Bach"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "O Magnum Mysterium"
+    }
+  ],
+  "editions": [
+    {
+      "action": "WOULD_CREATE",
+      "label": "Spem in alium — 40-part original"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "Spem in alium — 8-part reduction (Cooke)"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "Magnificat — Universal Edition · original"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "Magnificat — Hyperion · reduced (Layton ed.)"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "Magnificat — UE · with organ"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "Raua needmine — Fennica Gehrman · SATB + shaman drum"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "Raua needmine — Pelle Pyy · a cappella reduction"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "Õnnis on inimene — SP Muusikaprojekt"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "Stars — Musica Baltica · SATB + glasses"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "The Beatitudes — Universal Edition"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "Only in Sleep — Musica Baltica"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "Ave verum corpus — Stainer & Bell"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "Mass for Five Voices — Chester · ed. Fellowes"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "O Pastor Animarum — A-R Editions · transcription"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "Sleep — Walton Music"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "Immortal Bach — Norsk Musikforlag"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "O Magnum Mysterium — Peer Music"
+    }
+  ],
+  "copies": {
+    "total": 552,
+    "created": 552,
+    "skipped": 0
+  },
+  "lendings": [
+    {
+      "action": "WOULD_CREATE",
+      "label": "lending copy #14 of \"Universal Edition · original\" → hk"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "lending copy #15 of \"Universal Edition · original\" → hk"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "lending copy #22 of \"Universal Edition · original\" → mr"
+    },
+    {
+      "action": "WOULD_CREATE",
+      "label": "lending copy #23 of \"Universal Edition · original\" → mr"
+    }
+  ],
+  "errors": [],
+  "summary": {
+    "library_created": 1,
+    "persons_created": 8,
+    "persons_skipped": 0,
+    "members_created": 8,
+    "members_skipped": 0,
+    "works_created": 13,
+    "works_skipped": 0,
+    "editions_created": 17,
+    "editions_skipped": 0,
+    "copies_created": 552,
+    "copies_skipped": 0,
+    "lendings_created": 4,
+    "lendings_skipped": 0,
+    "errors": 0
+  }
+}
