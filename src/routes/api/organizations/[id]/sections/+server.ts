@@ -1,5 +1,6 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
-import { EntuClient, type EntuEntity } from '../../../../../lib/server/entu/client.ts';
+import { env } from '$env/dynamic/private';
+import { EntuClient, type EntuEntity } from '../../../../../lib/entu/client.ts';
 
 const DEFAULT_LIMIT = 50;
 const MAX_LIMIT = 200;
@@ -60,7 +61,7 @@ export const GET: RequestHandler = async ({ locals, params, url }) => {
 		return json({ error: 'not_found' }, { status: 404 });
 	}
 
-	const client = new EntuClient(locals.entuJwt);
+	const client = new EntuClient({ jwt: locals.entuJwt, db: env.ENTU_DB ?? '', baseUrl: env.ENTU_BASE_URL });
 
 	const org = await client.get(orgId).catch(() => null);
 	if (!org) {
