@@ -6,6 +6,36 @@ Format per entry: short title, decision, rationale, date. Most recent at the top
 
 ---
 
+## Per-commit GREEN on feature branches — every commit independently passes the full GREEN gate (2026-05-23, session 19)
+
+**Decision**: Every commit on a feature branch MUST independently pass the full GREEN gate — not just the branch tip. The gate is the same as the GREEN-phase quality gate below:
+
+```
+pnpm check     # 0 type errors
+pnpm test:unit # all tests pass
+pnpm lint:fix  # zero lint findings after autofix
+pnpm build     # builds clean
+```
+
+Intermediate broken states ("I'll fix it in the next commit") are not permitted. When a planned commit ordering would leave a transient broken intermediate, the GREEN-phase implementer surfaces-and-stops, proposes a re-sequence, and re-splits the work into atomic GREEN commits. The branch tip passing alone is not sufficient.
+
+**Rationale**: CHORE-B (the Path C rewrite, `feat/chore-53b-rewrite`) is the canonical exemplar. The plan's literal step ordering would have produced two broken intermediates:
+
+- **B11 (`hooks.server.ts` + `app.d.ts` strip)** — stripping cookie-reading before landing's `+page.server.ts` was updated would break landing's `PageData` typing mid-branch. Josquin surface-and-stop #1.
+- **B12 (landing `+page.server.ts` → `{}`)** — emptying the server load before the `+page.svelte` stopped reading `data.session` would strip data the component still consumed. Josquin surface-and-stop #2.
+
+The team adopted "Path 2: every commit GREEN" via re-sequence — B13a (wrapper extend) → B13b (svelte rewrite consuming the extended wrapper) → B12 (server-load strip, now safe because the consumer no longer reads it). Three atomic GREEN commits instead of one commit + two broken intermediates. Net branch: 15 implementer commits, zero broken intermediates, bisect-clean across both re-sequences.
+
+This is sibling to the lint:fix-in-GREEN rule below — both rules close gaps between "tests pass at the tip" and "the branch is actually a clean unit of history." Per-commit-GREEN closes the gap for bisect viability and prevents the "transient broken-state hand-off lands in main on squash" failure mode.
+
+**Review enforcement (Bentham)**: For any feature-branch review, spot-check `pnpm check` + `pnpm test:unit` on at least two non-tip commits (e.g., the first GREEN commit and a mid-branch commit). If any commit fails the gate, the branch is YELLOW pending re-sequence — not auto-RED, because the tip is what merges, but the audit trail loses bisect value and the re-sequence cost is owed back. Implementers who surface-and-stop on a plan-ordering bug instead of merging through a broken intermediate are doing the right thing; team-lead's role is to accept the re-sequence proposal, not push through the original ordering.
+
+**Source**: CHORE-B branch `feat/chore-53b-rewrite` (session 17, 2026-05-23). Bentham's session-17 review note: "bisect viability + prevents transient broken hand-off landing in main on squash." Lift proposed end of session 17, parked through session 18, ratified session 19.
+
+(*MVOX:Bentham*)
+
+---
+
 ## GREEN-phase quality gate — `pnpm lint:fix` is part of GREEN, not optional (2026-05-23, session 16)
 
 **Decision**: GREEN-phase agents (Byrd + Josquin) MUST run `pnpm lint:fix` before handing off to the next phase. Test-passing alone is not GREEN. The full GREEN gate is:
