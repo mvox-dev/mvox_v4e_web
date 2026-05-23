@@ -11,11 +11,21 @@ export interface OAuthInitArgs {
 	nonce: string;
 }
 
-export function buildOAuthInitUrl(args: OAuthInitArgs): string {
-	const state = encodeState({ nonce: args.nonce, return_to: args.returnTo, intent: args.intent });
-	const next = `${args.origin}/auth/callback?state=${encodeURIComponent(state)}`;
+export const OAUTH_STATE_KEY = 'mvox.oauth_state';
 
-	const params = new URLSearchParams({ next });
+export function buildOAuthInitUrl(args: OAuthInitArgs): string {
+	// Persist state to localStorage BEFORE redirect — Entu's redirect appends
+	// the JWT directly after the `key=` stub in next, with no separator and
+	// no new query param. State must NOT live in the URL.
+	const state = encodeState({
+		nonce: args.nonce,
+		return_to: args.returnTo,
+		intent: args.intent,
+	});
+	localStorage.setItem(OAUTH_STATE_KEY, state);
+
+	const callbackUrl = `${args.origin}/auth/callback?key=`;
+	const params = new URLSearchParams({ next: callbackUrl });
 
 	const user = getUser();
 	if (user?.email) {
