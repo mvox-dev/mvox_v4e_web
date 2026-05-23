@@ -1,5 +1,14 @@
-import { env } from '$env/dynamic/private';
-import { ENTU_API_BASE } from '../../entu-config.ts';
+// src/lib/entu/client.ts
+//
+// Entu API client. Constructor accepts config explicitly (jwt + db + optional
+// baseUrl) — no env reads here, the caller is responsible for sourcing config
+// (BFF routes read $env/dynamic/private; CHORE-B browser code will read
+// $env/dynamic/public + storage).
+//
+// Throws on !res.ok in all methods. The thrown Error includes the status code
+// so the apiRequest wrapper layer (or the route handler) can react appropriately.
+
+import { ENTU_API_BASE } from '../entu-config.ts';
 
 export interface EntuEntity {
 	_id: string;
@@ -7,8 +16,13 @@ export interface EntuEntity {
 }
 
 export interface EntuSearchQuery {
-	type?: string;
 	[key: string]: unknown;
+}
+
+export interface EntuClientConfig {
+	jwt: string;
+	db: string;
+	baseUrl?: string;
 }
 
 export class EntuClient {
@@ -16,10 +30,10 @@ export class EntuClient {
 	private readonly baseUrl: string;
 	private readonly db: string;
 
-	constructor(jwt: string) {
-		this.jwt = jwt;
-		this.baseUrl = env.ENTU_BASE_URL ?? ENTU_API_BASE;
-		this.db = env.ENTU_DB ?? '';
+	constructor(config: EntuClientConfig) {
+		this.jwt = config.jwt;
+		this.baseUrl = config.baseUrl ?? ENTU_API_BASE;
+		this.db = config.db;
 	}
 
 	private authHeaders(): HeadersInit {
@@ -48,6 +62,9 @@ export class EntuClient {
 		}
 		const url = `${this.baseUrl}${this.db}/entity?${params.toString()}`;
 		const res = await fetch(url, { headers: this.authHeaders() });
+		if (!res.ok) {
+			throw new Error(`Entu search failed: ${res.status}`);
+		}
 		const body = (await res.json()) as { entities: EntuEntity[] };
 		return body.entities;
 	}
@@ -62,6 +79,9 @@ export class EntuClient {
 			},
 			body: JSON.stringify({ entity: entityId, type: prop, string: value }),
 		});
+		if (!res.ok) {
+			throw new Error(`Entu setProperty failed: ${res.status}`);
+		}
 		return res.json() as Promise<{ _id: string }>;
 	}
 }
