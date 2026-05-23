@@ -147,6 +147,18 @@ There is **no separate thumbnail generation** — `_thumbnail` IS the full photo
 
 ---
 
+## S3 object lifecycle — orphan finding
+
+**`DELETE /property/{id}` does NOT delete the S3 object.**
+
+The OpenAPI description for the property DELETE endpoint states "Files are removed from S3." This is incorrect — the route handler (`routes/[db]/property/[_id]/index.delete.js`) only soft-deletes the property in MongoDB and triggers re-aggregation. There is no S3 delete call in the route or in `utils/aggregate.js`.
+
+**Implication:** Every `DELETE /property/{id}` on a file-typed property leaves a Spaces orphan at `{db}/{entityId}/{propertyId}`. This accumulates indefinitely unless Argo has a server-side cleanup job outside the public API source.
+
+**For the probe:** The probe teardown deleted property `6a11dc804ff8277cd4306b24` and entity `6a11dc804ff8277cd4306b1e` from Entu's DB. Both are confirmed 404. However, the 1×1 PNG at `polyphony/6a11dc804ff8277cd4306b1e/6a11dc804ff8277cd4306b24` on DigitalOcean Spaces is an orphan (70 bytes, no user-visible impact). Flag to Argo for cleanup if needed.
+
+**For mvox photo upload UX:** A "delete photo" button that calls `DELETE /property/{id}` removes the photo from Entu's data model but NOT from storage. Old photos accumulate in Spaces. This is acceptable for MVP (storage cost near zero at current scale) but should be noted for longer-term operations.
+
 ## Replacing an existing photo
 
 To replace a photo on an entity (e.g., user uploads a new org photo):
