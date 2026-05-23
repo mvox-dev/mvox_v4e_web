@@ -384,6 +384,30 @@ Each commit body lists relevant `Closes #N`.
 
 CHORE-B is the chunky one (~300-500 lines of diff, rough estimate). Default: keep as one PR (atomic, easier to deploy + revert). If review bandwidth becomes a concern during writing-plans, split into B1 (auth flow rewrite) + B2 (BFF deletion + landing rewrite) — but B1 alone leaves the landing page in a broken intermediate state, so B1 can't deploy without B2 anyway.
 
+## 13. Deferred concerns (out of MVP, tracked separately)
+
+### 13.1 Client-side runtime error capture — [CHORE-54](https://github.com/mvox-dev/mvox_v4e_web/issues/54)
+
+Under Path B (today's broken architecture), data-flow errors live server-side in Cloudflare Worker code, surfacing in CF logs. Under Path C, **all data-flow errors move to the user's device.** CF Workers logs no longer see a 500 from `api.entu.app`, a parse failure in the Entu client wrapper, an unexpected `null` in a Svelte component, or a network timeout in the involuntary-re-auth flow. Once mvox has real users, we'd be production-blind without explicit client-side instrumentation.
+
+**Fire-when triggers (sequenced AND):**
+- CHORE-A + CHORE-B + CHORE-C merged and deployed
+- ~1 week of production observation on Path C stability
+- Before mvox is opened to real users (first non-PO sign-in)
+
+**Scope when fired:** tool selection (Sentry / GlitchTip / homegrown), instrumentation pattern, PII filtering (strip token + email + `?key=` URL params), retention + alerting policy, performance budgets. Likely pairs with browser RUM and structured client-side telemetry as a single broader observability brainstorm.
+
+Deferred deliberately:
+- Architecture must stabilize first (no point instrumenting code we're about to delete)
+- Tool choice deserves separate brainstorm (cost / GDPR / source-map / replay trade-offs)
+- No users yet — filing keeps the concern visible without premature implementation
+
+### 13.2 Other deferred items (already tracked)
+
+- **Argo OAuth parameter passthrough ask** (task #19, Appendix A) — file post-spec-commit
+- **Brilliant entry + entu-research case study + entu docs RFC** (tasks #17, #16, #18) — propagation chain for the Section 7 pros content
+- **Long-session "remember me" beyond Entu's 48h** — discussed in brainstorm, accepted Entu's default. Revisit if 48h re-auth proves UX-unacceptable in user feedback.
+
 ---
 
 ## Appendix A — Argo / Entu feature request draft (to file post-spec-commit, task #19)
