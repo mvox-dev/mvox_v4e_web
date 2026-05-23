@@ -8,7 +8,10 @@
 git clone https://github.com/mvox-dev/mvox_v4e_web
 cd mvox_v4e_web
 pnpm install
+cp .env.example .env
 ```
+
+The `.env` file is required for `pnpm build` and `pnpm dev` — SvelteKit's `$env/static/public` reads it at build time. `.env.example` lists the public vars; copy and adjust if you need a non-default Entu database. Server-only vars (CF Pages runtime) live in `wrangler.json` `vars`.
 
 ```bash
 pnpm dev        # development server (localhost:5173)
