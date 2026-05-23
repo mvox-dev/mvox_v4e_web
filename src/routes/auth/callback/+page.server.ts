@@ -2,14 +2,9 @@ import type { ServerLoad } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
 
-export const load: ServerLoad = async ({ url, cookies }) => {
-	const stateInUrl = url.searchParams.get('state');
-	const stateInCookie = cookies.get('csrf_state');
+export const load: ServerLoad = async ({ url }) => {
 	const key = url.searchParams.get('key');
-
-	if (!stateInUrl || !stateInCookie || stateInUrl !== stateInCookie) {
-		throw redirect(303, '/auth/login?error=csrf_mismatch');
-	}
+	const state = url.searchParams.get('state');
 
 	if (!key) {
 		throw redirect(303, '/auth/login?error=missing_session_token');
@@ -17,6 +12,7 @@ export const load: ServerLoad = async ({ url, cookies }) => {
 
 	return {
 		sessionToken: key,
+		state: state ?? '',
 		db: env.ENTU_DB ?? 'polyphony',
 	};
 };
