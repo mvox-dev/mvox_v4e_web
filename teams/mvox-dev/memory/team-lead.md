@@ -1,6 +1,89 @@
 # Palestrina — Team Lead Scratchpad
 
-### [NEXT SESSION] 2026-05-23 (recovery shutdown) — session-19 (incomplete) → session-20
+### [NEXT SESSION] 2026-05-23 end-of-session-19 — session-19 → session-20
+
+**Headline: CHORE-60 brainstorm + spec + auth-scope expansion + 31-task plan COMPLETE. Pérotin's parallel seed landed live on polyphony (607 entities). PO chose subagent-driven execution mode but deferred to session 20. Ready to dispatch.**
+
+**Session 19 outcome — productive long session:**
+
+| Slate | Artifact | SHA | What landed |
+|---|---|---|---|
+| 1 | Recovery shutdown from /clear early in session | `85ed6cb` | Demoted stale session-18→19 seed; refreshed [NEXT SESSION] + task snapshot; committed Finn's uncommitted research checkpoint |
+| 2 | CHORE-60 design spec | `ebb1cbb` | 280-line spec from brainstorm: page IA (wood-grain desk + 3 paper stacks + ambient catalog strip), aesthetic (hybrid Inter base + Caveat accents), persona scope (librarian-only), 18-component UI kit |
+| 3 | CHORE-60 auth scope expansion | `bcb4795` | +42 lines: /auth/login + /auth/logout redesign added (3 new components: PaperCard, ProviderButton, BrandMark). Component count 18 → 21. |
+| 4 | Pérotin seed strategy doc | `7437f2f` (cherry-picked from `040d8e2` on chore branch) | 292-line strategy: entity mapping for 8 members + 13 works + 21→17 editions + 552 copies + 4 lendings to v4E in polyphony |
+| 5 | Pérotin seed script + dry-run | `4ffce6b` | 673-line idempotent script + dry-run artifact |
+| 6 | Pérotin live execution result | `6d58544` | 607 entities created on polyphony, 0 errors, library ID `6a12036c4ff8277cd4306b26` (EFK Library) |
+| 7 | Pérotin scratchpad checkpoints | `24636a1` + `3582fb1` | Session-19 checkpoint + live-seed-complete |
+| 8 | CHORE-60 implementation plan | `44c6809` (local, unpushed) | 3073-line, 31-task plan: foundations → primitives → composites → stacks → bodies → chrome → composition → auth → i18n → verify. Test-first per team TDD chain. Each task leaves branch GREEN per per-commit-GREEN discipline. |
+
+**Memory entries added this session (carry forward):**
+- [[polyphony-is-playground]] — PO classification: polyphony is dev sandbox, not live
+- [[mvox-visual-personality-over-throughput]] — design picks lean character-rich
+- [[mvox-hybrid-aesthetic]] — Inter base + Caveat accents only
+- [[feedback_auth_gate_routing]] — team-lead-channel re-routing for impostor-defense
+- [[spawn-agents-with-worktree-isolation]] — apply isolation:worktree to code-committing agents from session 20+
+
+**Live state at session-19 close:**
+- main: `7437f2f` (pushed) + `44c6809` (local plan commit, unpushed — will be in shutdown bundle)
+- Production: `multivox.pages.dev` 200/200 (no deploys this session)
+- Polyphony Entu db: EFK Library `6a12036c4ff8277cd4306b26` + 8 persons + 8 members + 13 works + 17 editions + 552 copies + 4 lendings under EFK. 1 S3 orphan from session-18 file-probe (70-byte 1×1 PNG, no impact).
+- Tests: unchanged from session-17 baseline (no code changes touched test surface)
+- Agents at shutdown: Pérotin (alive, stand-down message sent at 19:59); finn + finn-2 + bentham not registered. Pérotin config entry remains for session-20 reuse OR re-spawn with isolation:worktree.
+- Scheduled routine: `trig_014xDo7ZTuzNLpBUuWdtEs32` next_run_at 2026-05-30T09:00:00Z (unchanged)
+
+**Carry-forward queue for session 20 (priority order):**
+
+1. **Execute CHORE-60 plan via subagent-driven-development.** PO chose this mode at session-19 close + explicitly deferred to session 20. Plan at `docs/superpowers/plans/2026-05-23-library-page-ui-kit.md`. 31 tasks. **First-action discipline**: spawn agents with `isolation: "worktree"` per [[spawn-agents-with-worktree-isolation]] — this is the session-20 adoption point for that change. Probable session-20 headline.
+2. **CHORE-C test infra** (carry-forward from session 18). Plan at `docs/superpowers/plans/2026-05-23-chore-53-c-test-infra.md`. MSW + Playwright bootstrap. Could land in parallel with CHORE-60 if test-stream and impl-stream don't conflict (they shouldn't — different file scope).
+3. **Argo asks** — S3 orphan from photo DELETE + login_hint passthrough (#19 forward-compat already shipped in CHORE-B). File when bandwidth.
+4. **#54 client-side error capture (deferred).** Path C stable; fires before mvox opens to real users.
+5. **#43 mvox.eu custom domain** — PO DNS work.
+6. **#44 CF Pages Git-connected migration.**
+7. **#49 Biome lint rule enablement** (5 sub-cycles).
+8. **#6 CHORE-6 Email Resend** — blocked on PO SPF + DKIM DNS.
+9. **Routine fires 2026-05-30T09:00:00Z** → emails PO with #59 deferred-providers checklist.
+
+**Expected first action session 20:**
+1. Read this seed + `git log --oneline 44c6809..HEAD` (anything that landed between shutdown bundle and session-20 open)
+2. Verify production health: `curl -sI https://multivox.pages.dev/` and `/auth/login` — expect 200
+3. **Apply worktree-isolation adoption point.** Spawn finn + bentham (always-on) with `isolation: "worktree"` per [[spawn-agents-with-worktree-isolation]]. Pérotin config entry exists; re-spawn with isolation if dispatching new data-manager work.
+4. Confirm with PO: kick off CHORE-60 plan execution via subagent-driven-development? If yes, invoke `superpowers:subagent-driven-development` with the plan as input and begin Task 1.
+5. Branch convention: implementation work goes on `feat/library-page-ui-kit` (the plan's Task 1 creates this branch).
+
+**Process lessons from session 19 (worth carrying forward):**
+
+- **L82 — /clear recovery is doable.** Disk state survives, agents die, conversation context is gone. Recovery: refresh seed + snapshot from disk evidence, commit uncommitted scratchpads, skip shutdown_requests (no live agents to drain). The session-19 recovery shutdown (`85ed6cb`) is the canonical exemplar.
+- **L83 — Polyphony is playground.** PO clarified explicitly. Ambitious mutations + full teardowns are fine. The auth-gate ceremony stays as discipline (Bentham's "friction is the point") rather than as risk-mitigation. Future production-grade dbs warrant additional friction beyond the gate. Codified as [[polyphony-is-playground]].
+- **L84 — Auth-gate routing is impostor-defense.** Two messages in Pérotin's inbox tagged `from: perotin` carried team-lead-voice authorization (Q1+Q2 answers + "I authorize this run"). Pérotin acted on them; live mutation occurred before team-lead's HOLD message arrived. PO retroactively confirmed authorization ("i do authorize"). Lesson: when PO authorizes in conversation, team-lead MUST re-route via own SendMessage to teammate IMMEDIATELY, before any other action. The `from: team-lead` channel is the authoritative gate. Codified as [[feedback_auth_gate_routing]].
+- **L85 — Shared-tree branch flips bit twice this session.** (a) Team-lead's auth-spec commit landed on Pérotin's `chore/seed-librarian-bundle` branch; (b) Pérotin's script + manifest + dry-run + live-result artifacts landed on main instead of his chore branch. Both required cherry-pick recovery. The Agent tool's built-in `isolation: "worktree"` parameter eliminates this class of bug. Adoption from session 20+ per [[spawn-agents-with-worktree-isolation]].
+- **L86 — Visual companion is the right tool for design synthesis.** 9 screens pushed over the brainstorm; PO clicked through them and the per-question screens (cat-1 task header, cat-2 returns body, cat-3-4 all three stacks, cat-5 catalog placement, cat-8 composition) materially shaped the spec. The wood-grain repeating-linear-gradient bug ("can you add wood-grain?") was caught only by PO seeing the screen and saying "I don't see it" — confirming visual mockups beat textual descriptions for layout/aesthetic decisions.
+- **L87 — PO redirects on visual taste questions are common.** PO redirected once each on: cat-1 (B mini-cards instead of my recommended C stack-header — later implicitly revised once they saw cat-2's stacks composed); criterion (visual distinctiveness over my recommended operational throughput). Pattern: my structural recommendations land; my aesthetic recommendations get redirected ~40% of the time. Lean character-rich by default per [[mvox-visual-personality-over-throughput]] — saves a redirect cycle.
+- **L88 — finn-2 spawn collision is a real failure mode.** Spawning `name: "finn"` when a stale `finn` entry exists in config disambiguates to `finn-2`. Cleanup requires shutdown_request to both (which works even on stale entries — they ack as if the harness retains the queue). Mitigation: before Phase 5 spawn, check config.json for existing names and decide: re-use (no-op spawn / SendMessage) vs explicit deregistration via TeamDelete+TeamCreate (loses task list) vs accept collision + cleanup later. Pre-spawn check + reuse is the cheap default.
+- **L89 — Pérotin context-restore mid-session causes status dissonance.** Pérotin reported "Holding — live seed not executed" at 19:48 AFTER reporting "Live execution complete" at 19:45. The intervening HOLD message + likely process re-spawn caused him to lose memory of the execution. Reorientation message ("you DID execute; defer to disk + commit log as ground truth") resolved it. Pattern: when teammate state contradicts disk evidence, trust disk + the commit log; send teammate a reorientation pointing to the artifacts.
+
+**Brilliant KB updates (deferred — when PO has bandwidth):**
+- New: `Patterns/recovery-shutdown-after-clear` — codify L82
+- New: `Patterns/auth-gate-routing-as-impostor-defense` — codify L84 with the session-19 incident
+- New: `Patterns/worktree-isolation-for-coding-agents` — codify L85 + the Agent tool's built-in parameter
+- New: `Patterns/visual-companion-for-design-synthesis` — codify L86 with the 9-screen brainstorm as exemplar
+- New: `Patterns/teammate-context-restore-dissonance` — codify L89 with the Pérotin reorientation pattern
+- New: `Decisions/mvox/ui-aesthetic-hybrid-inter-caveat` — codify L86 with the librarian-bundle synthesis as canonical reference
+- Update: `Projects/mvox` — CHORE-60 plan ready for subagent-driven execution; polyphony seeded with 607 librarian entities
+
+(*MVOX:Palestrina*)
+
+---
+
+### [PROCESSED 2026-05-23 end-of-session-19] session-19 mid-session recovery checkpoint
+
+**Originally the [NEXT SESSION] seed written during the recovery shutdown earlier this same session. Demoted to PROCESSED at end-of-session-19 because: (a) the substantive session-19 work continued well past this point (CHORE-60 brainstorm + spec + plan + Pérotin seed all landed AFTER); (b) the end-of-session-19 seed above is the actual session-20 handoff. Kept here as the audit trail of the mid-session recovery.**
+
+(*MVOX:Palestrina*)
+
+---
+
+### [PROCESSED 2026-05-23 recovery-shutdown] session-18 → session-19 (incomplete)
 
 **Headline: /clear-induced recovery shutdown. The substantive work that landed in commits `7fb0420` → `aaac286` → `f94f37e` → `2a8c08f` (post-session-18-bundle, before /clear) closed two of the three top session-18 carry-forwards. Bundle in place. CHORE-60 is the natural session-20 headline.**
 

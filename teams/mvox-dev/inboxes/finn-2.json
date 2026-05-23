@@ -1,0 +1,9 @@
+[
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779566279261@finn-2\",\"from\":\"team-lead\",\"reason\":\"Duplicate of stale finn entry from recovery shutdown. Cleaning up — please approve shutdown so config consolidates. No work in flight on your side; you can shut down cleanly.\",\"timestamp\":\"2026-05-23T19:57:59.261Z\"}",
+    "timestamp": "2026-05-23T19:57:59.261Z",
+    "type": "message",
+    "read": true
+  }
+]
