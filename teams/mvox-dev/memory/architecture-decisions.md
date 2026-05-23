@@ -262,7 +262,7 @@ The two browser-direct call shapes mvox uses today:
 - **OAuth init redirect**: `window.location → ${ENTU_API_BASE}auth/${provider}?next=<callback-with-state>[&login_hint=<email>]`. Implementation: `src/routes/auth/[provider]/+page.svelte` → `src/routes/auth/[provider]/build-oauth-init-url.ts`.
 - **Session-to-JWT exchange**: `GET ${ENTU_API_BASE}auth?db=${encodeURIComponent(db)}` with `Authorization: Bearer <session-token>`. Implementation: `src/lib/auth/exchange.ts`. Query-form (`?db=...`) is canonical — closes the path-form (`/{db}/auth`) drift that CHORE-50/51 surfaced.
 
-`ENTU_API_BASE` is the single canonical Entu base URL constant from `src/lib/entu-config.ts`. The runtime value is sourced from `PUBLIC_ENTU_API_URL` (set on Cloudflare Pages); whatever it resolves to today IS the wire-shape literal. Public-prefixed env vars are intentional — the constant must be readable from client code.
+`ENTU_API_BASE` is the single canonical Entu base URL constant from `src/lib/entu-config.ts` (today: `https://api.entu.app/`). The constant must be readable from client code — server-only access (`$env/dynamic/private`) is incompatible with the browser-direct call shape. The per-deployment tenant database is supplied at the call site via `PUBLIC_ENTU_DB` (`$env/static/public`); CF Pages sets it via `wrangler.json` `vars`.
 
 ### Carve-out vs default — terminology shift
 
