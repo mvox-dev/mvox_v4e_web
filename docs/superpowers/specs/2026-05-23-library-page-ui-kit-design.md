@@ -21,12 +21,13 @@ The bundle shipped 3 directions (Catalog / Ledger / Desk). PO did not pick one w
 ### In scope (CHORE-60)
 
 - `/library` Svelte route — full page composing the kit modules
-- ~17 Svelte 5 components (the UI kit) listed in §5
+- 21 Svelte 5 components (the UI kit) listed in §5
 - Tailwind v4 `@theme` token block (paper/ink/state palette)
 - Font loading for Caveat, Inter, JetBrains Mono
 - Mock data fixtures matching the bundle's `Data.jsx` shape (TypeScript const exports for dev/test)
 - Component spec tests (Vitest, RED before GREEN per team TDD chain)
 - i18n keys for the user-visible UI labels (en/et/lv/uk per stack)
+- **Auth UI redesign** — `/auth/login` and `/auth/logout` revised to use the design system (wood-grain desk bg, paper-card with rotation, Caveat headings, sketch-chrome provider buttons, SIGNED OUT stamp). All CHORE-B auth logic (storage, OAuth flow, callback handling) preserved; only the visual layer changes.
 
 ### Out of scope (future CHOREs)
 
@@ -108,6 +109,34 @@ The current `src/routes/+layout.svelte` applies a `max-w-5xl mx-auto` content wr
 - Body: 6-column grid of `MiniWorkCard` — first 6 works (pinned / recent / today's relevant). Each card: composer (bold, truncate) + title (italic, truncate) + voicing/stats row with state-tone count.
 - Bg: `paper2` (one shade darker than the surrounding paper) to read as "the drawer under the desk."
 
+### 4.6 Auth screens (login + logout)
+
+The login + logout pages reuse the design system but with a simpler **PaperCard** primitive (single sheet, rotated, drop shadow — distinct from the 3-sheet PaperStack used for tasks). Both screens sit on the same wood-grain desk surface as `/library`, framing auth as part of the same product world.
+
+**`/auth/login`** — paper card (~380px wide), rotated -0.6°, centered on the desk surface. Layout:
+- Brand mark top-left (BrandMark component — m-tile + "mvox" wordmark, also used in MvoxNav)
+- Eyebrow: "Sign in" (uppercase Inter)
+- Caveat title: "Welcome back" (Caveat 38px)
+- Inter subtitle: "Pick how you'd like to identify yourself."
+- "Last used" section (Inter eyebrow): the most-recently-used provider button highlighted in `--color-highlight` (sticky-note yellow), with a `⏎` keyboard hint suggesting Enter triggers it.
+- "All providers" section: 5 remaining ProviderButtons (Smart-ID, Mobile-ID, ID-card, Apple, e-mail). Bundle's existing provider order/icons preserved.
+- Bottom note (dashed-top-border): "New here? Sign in with the provider your choir's secretary registered for you. The first time signs you up automatically."
+- Caveat marginalia below the card: deployment URL + version (`~ multivox.pages.dev · v0.4`).
+
+The "last used" provider comes from the `lastProvider` localStorage entry the CHORE-B flow already writes; if no value is present, all 6 providers render in "All providers" with no highlight.
+
+**`/auth/logout`** — paper card (~380px wide), rotated +0.4°. Layout:
+- BrandMark top-left
+- Big rotated `Stamp` (-3°): green SIGNED OUT (mirrors the Returns stack's ARRIVED stamp pattern — same component, same tone)
+- Caveat title: "See you soon" (Caveat 42px, centered)
+- Inter subtitle: "Your session has been cleared from this browser."
+- Featured `Sign back in` ProviderButton (full-width-centered)
+- "Return to home" text link below
+- JetBrains-Mono auto-redirect hint: "auto-redirect in 5s · press `Esc` to cancel"
+- Caveat marginalia below the card: "thanks for stopping by → ~ Maire (the librarian)" (signed by the persona who owns the librarian view — even on logout, the warmth carries)
+
+The auto-redirect-to-home behavior is preserved from CHORE-B; this redesign just adds a UI surface around it (currently the page is mostly logic with minimal markup).
+
 ## 5. Component inventory (the UI kit)
 
 All components live in `src/lib/components/`. Tested via colocated `*.spec.ts` (RED → GREEN per chain). Typed props with Svelte 5 Runes (`$props()`, no `export let`).
@@ -131,9 +160,12 @@ All components live in `src/lib/components/`. Tested via colocated `*.spec.ts` (
 | 15 | `BorrowerCard` | Overdue-borrower card: avatar initials circle + name + voice badge + Mono copy IDs + Caveat overdue-days + Nudge/Return buttons. Props: `member`, `loans[]`. | Overdue stack body |
 | 16 | `PullItemCard` | Per-work pull card: PencilCheckbox + WorkTitle + right big-tally + state-driven action set (Locate/Skip/Pull-N for todo; ✓-on-the-desk + Undo for done). Props: `work`, `edition`, `pulled`, `needed`. | Pull stack body |
 | 17 | `MiniWorkCard` | Bottom-strip work card: composer + title + voicing + state-toned available/total fraction. Props: `work`, `pinnedTone?`. | ambient catalog strip |
-| 18 | `Margin` | Caveat-cursive rotated marginalia block. Props: `rotate`, `color` (default red). | Overdue stack's "owe rental library" warning; future contextual notes |
+| 18 | `Margin` | Caveat-cursive rotated marginalia block. Props: `rotate`, `color` (default red). | Overdue stack's "owe rental library" warning; future contextual notes; auth screens' below-card signatures |
+| 19 | `PaperCard` | Single-sheet paper card with rotation + drop shadow. Distinct from PaperStack (which has 3-sheet shadow). **Stretches to fit content**, same invariant as PaperStack. Props: `rotate`, `width`, `tone` (default ink border, optional). | `/auth/login`, `/auth/logout`; future single-card surfaces |
+| 20 | `ProviderButton` | OAuth provider button: icon (left, brand-colored) + name (Inter, flex-1) + sub-label (mono small, right). Featured variant uses `--color-highlight` bg + heavier shadow. Props: `provider` (smart-id/mobile-id/id-card/google/apple/email), `featured?`, `onClick`. Includes the existing CHORE-B handler shape (writes `lastProvider` to localStorage, navigates to `/auth/[provider]`). | `/auth/login` (all 6), `/auth/logout` (Sign back in variant) |
+| 21 | `BrandMark` | The mvox brand mark: dark `m`-tile + "mvox" wordmark. Props: `size` (default m; s/m/l variants). Extracted from MvoxNav (component #1) so it's reusable. | `MvoxNav`, `/auth/login` card, `/auth/logout` card |
 
-Total: 18 components. (One above the 17 in the composition note — `Margin` was implicit there; explicit here.)
+Total: 21 components. (3 added from the auth-screens scope addition: `PaperCard`, `ProviderButton`, `BrandMark`. `MvoxNav` now composes `BrandMark` rather than rendering the brand inline.)
 
 Plus support modules (no separate components):
 - `$lib/types/library.ts` — TypeScript types for `Work`, `Edition`, `Copy`, `Loan`, `Member`, `Choir`, `Task` matching v4E entity shapes (slimmed for the page's needs).
@@ -213,6 +245,8 @@ Mark every user-visible string for Paraglide:
 - Empty/derived strings ("Singers tonight", "Catalog · 13 works", "Open full catalog ↗")
 - Top strip ("Library · librarian's desk", "On the desk today", "Rehearsal 16:00 · in 1h 28m")
 - Marginalia ("owe rental library if not back by 31 May")
+- Auth login ("Sign in", "Welcome back", "Pick how you'd like to identify yourself.", "Last used", "All providers", "New here? Sign in with the provider your choir's secretary registered for you. The first time signs you up automatically.", "Continue with Google" / "Smart-ID" / "Mobile-ID" / "ID-card" / "Apple" / "E-mail", provider sub-labels "EE/LV/LT" / "EE" / "magic link")
+- Auth logout ("Signed out", "See you soon", "Your session has been cleared from this browser.", "Sign back in", "Return to home", "auto-redirect in 5s · press Esc to cancel", marginalia "thanks for stopping by → ~ Maire (the librarian)")
 
 en/et/lv/uk per locale. Note: "Caveat" handwriting font may render Estonian/Latvian/Ukrainian diacritics imperfectly; Comenius to verify per locale at i18n step.
 
@@ -248,9 +282,11 @@ The writing-plans skill takes this spec and produces a tasked plan. Sketched out
 6. **Stack bodies** as components: `BorrowerCard`, `PullItemCard`, `MiniWorkCard`. T-RED → B-GREEN.
 7. **Page chrome**: `MvoxNav` (or update existing if already present), `DeskSurface`. T-RED → B-GREEN.
 8. **`/library +page.svelte` composition** — wire the kit together, render mock fixtures, hand-verify against the approved composition mockup at `.superpowers/brainstorm/.../08-composition.html`. T-RED for the route loads + smoke-renders without crashing; B-GREEN.
-9. **i18n keys** — Comenius pass: extract all user-visible strings to `messages/en.json` + propagate to et/lv/uk.
-10. **Bentham review** — full architectural review of the kit + page composition. Verdict.
-11. **Josquin merge** — squash-merge to main, deploy preview, hand-verify on the deployed URL.
+9. **Auth components**: `PaperCard`, `BrandMark`, `ProviderButton`. T-RED → B-GREEN. `MvoxNav` refactored to compose `BrandMark`.
+10. **Auth page revisions**: `/auth/login/+page.svelte` and `/auth/logout/+page.svelte` swapped to the new design system. All CHORE-B auth logic preserved (storage, OAuth flow, callback, redirect timers). T-RED for the visual surface (renders the right provider count, last-used highlighted when present, SIGNED OUT stamp on logout); B-GREEN.
+11. **i18n keys** — Comenius pass: extract all user-visible strings (librarian view + auth screens) to `messages/en.json` + propagate to et/lv/uk.
+12. **Bentham review** — full architectural review of the kit + page composition + auth redesign. Verdict.
+13. **Josquin merge** — squash-merge to main, deploy preview, hand-verify on the deployed URL (/library + /auth/login + /auth/logout).
 
 Estimated: similar scale to CHORE-B (~15-17 tasks; mostly atomic components). Tallis-heavy at the test-writing stages; Byrd-heavy at GREEN; minimal Josquin (no backend changes since fixtures are in-source).
 
