@@ -180,7 +180,15 @@ async function runTeardown(client: EntuClient, manifest: Manifest): Promise<Resu
 	const libraryId = await findExisting(client, 'library', { '_parent.reference': ekfId });
 	if (!libraryId) {
 		console.log('  Library not found — nothing to tear down.');
-		result.summary = { libraries: 0, lendings: 0, copies: 0, editions: 0, works: 0, members: 0, persons: 0 };
+		result.summary = {
+			libraries: 0,
+			lendings: 0,
+			copies: 0,
+			editions: 0,
+			works: 0,
+			members: 0,
+			persons: 0,
+		};
 		return result;
 	}
 	console.log(`  Found library: ${libraryId}`);
@@ -336,7 +344,9 @@ async function runSeed(client: EntuClient, manifest: Manifest): Promise<ResultPa
 			sectionNameToId[nameVals[0].string] = e._id;
 		}
 	}
-	console.log(`  Resolved ${Object.keys(sectionNameToId).length} EFK sections: ${Object.keys(sectionNameToId).join(', ')}`);
+	console.log(
+		`  Resolved ${Object.keys(sectionNameToId).length} EFK sections: ${Object.keys(sectionNameToId).join(', ')}`,
+	);
 
 	// ------------------------------------------------------------------
 	// Phase 3 — Persons + Members
@@ -429,9 +439,7 @@ async function runSeed(client: EntuClient, manifest: Manifest): Promise<ResultPa
 		const workFilters: Record<string, string> = { 'name.string': work.title };
 		if (libraryId) workFilters['_parent.reference'] = libraryId;
 
-		let workId: string | null = libraryId
-			? await findExisting(client, 'work', workFilters)
-			: null;
+		let workId: string | null = libraryId ? await findExisting(client, 'work', workFilters) : null;
 
 		if (workId) {
 			console.log(`  Work SKIP: "${work.title}" → ${workId}`);
@@ -470,7 +478,11 @@ async function runSeed(client: EntuClient, manifest: Manifest): Promise<ResultPa
 
 			if (editionId) {
 				console.log(`    Edition SKIP: "${ed.name}" → ${editionId}`);
-				result.editions.push({ action: 'SKIP', id: editionId, label: `${work.title} — ${ed.name}` });
+				result.editions.push({
+					action: 'SKIP',
+					id: editionId,
+					label: `${work.title} — ${ed.name}`,
+				});
 			} else {
 				console.log(`    Edition ${DRY_RUN ? 'WOULD CREATE' : 'CREATE'}: "${ed.name}"`);
 				if (!DRY_RUN && workId) {
@@ -488,11 +500,18 @@ async function runSeed(client: EntuClient, manifest: Manifest): Promise<ResultPa
 						props.push({ type: 'license_note', string: `Catalogue: ${ed.catalogue}` });
 					}
 					if (ed.limitless) {
-						props.push({ type: 'license_note', string: 'Unlimited — no physical copies (digital/score)' });
+						props.push({
+							type: 'license_note',
+							string: 'Unlimited — no physical copies (digital/score)',
+						});
 					}
 					const r = await createEntity(client, props);
 					editionId = r._id;
-					result.editions.push({ action: 'CREATE', id: editionId, label: `${work.title} — ${ed.name}` });
+					result.editions.push({
+						action: 'CREATE',
+						id: editionId,
+						label: `${work.title} — ${ed.name}`,
+					});
 					console.log(`      → edition created: ${editionId}`);
 				} else {
 					result.editions.push({ action: 'WOULD_CREATE', label: `${work.title} — ${ed.name}` });
@@ -506,9 +525,7 @@ async function runSeed(client: EntuClient, manifest: Manifest): Promise<ResultPa
 					const copyFilters: Record<string, string> = { 'copy_number.number': String(n) };
 					if (editionId) copyFilters['_parent.reference'] = editionId;
 
-					const existingCopyId = editionId
-						? await findExisting(client, 'copy', copyFilters)
-						: null;
+					const existingCopyId = editionId ? await findExisting(client, 'copy', copyFilters) : null;
 
 					if (existingCopyId) {
 						result.copies.skipped++;
@@ -533,7 +550,9 @@ async function runSeed(client: EntuClient, manifest: Manifest): Promise<ResultPa
 					}
 				}
 				if (!DRY_RUN) {
-					console.log(`      Copies for "${ed.name}": ${ed.total} (created ${result.copies.created} so far, skipped ${result.copies.skipped})`);
+					console.log(
+						`      Copies for "${ed.name}": ${ed.total} (created ${result.copies.created} so far, skipped ${result.copies.skipped})`,
+					);
 				} else {
 					console.log(`      Copies WOULD CREATE: ${ed.total} for "${ed.name}"`);
 				}
@@ -608,7 +627,8 @@ async function runSeed(client: EntuClient, manifest: Manifest): Promise<ResultPa
 		ops.filter((o) => o.action === action || o.action === `WOULD_${action}`).length;
 
 	result.summary = {
-		library_created: result.library.action === 'CREATE' || result.library.action === 'WOULD_CREATE' ? 1 : 0,
+		library_created:
+			result.library.action === 'CREATE' || result.library.action === 'WOULD_CREATE' ? 1 : 0,
 		persons_created: countOp(result.persons, 'CREATE'),
 		persons_skipped: countOp(result.persons, 'SKIP'),
 		members_created: countOp(result.members, 'CREATE'),

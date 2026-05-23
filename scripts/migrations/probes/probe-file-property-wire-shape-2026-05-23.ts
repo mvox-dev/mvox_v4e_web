@@ -28,7 +28,14 @@
  *   pnpm exec tsx scripts/migrations/probes/probe-file-property-wire-shape-2026-05-23.ts
  */
 
-import { getJwt, createEntity, fetchEntity, deletePropertyValue, deleteEntity, type EntuClient } from '../lib/entu-client.js';
+import {
+	getJwt,
+	createEntity,
+	fetchEntity,
+	deletePropertyValue,
+	deleteEntity,
+	type EntuClient,
+} from '../lib/entu-client.js';
 import { isDryRun, writeResultArtifact } from '../perotin-toolkit.js';
 
 const API_BASE = process.env.ENTU_API_BASE ?? 'https://api.entu.app';
@@ -108,7 +115,10 @@ if (!API_KEY) {
 
 const DRY_RUN = isDryRun();
 
-async function fetchPropertyRecord(client: EntuClient, propertyId: string): Promise<PropertyRecord> {
+async function fetchPropertyRecord(
+	client: EntuClient,
+	propertyId: string,
+): Promise<PropertyRecord> {
 	const url = `${client.apiBase}/${client.db}/property/${propertyId}`;
 	const res = await fetch(url, {
 		method: 'GET',
@@ -147,7 +157,9 @@ async function postPhotoProperty(
 	const json = (await res.json()) as { _id: string; properties: PropertyRecord[] };
 	const photoProp = json.properties?.find((p) => p.type === 'photo');
 	if (!photoProp) {
-		throw new Error(`POST succeeded but no 'photo' in returned properties: ${JSON.stringify(json)}`);
+		throw new Error(
+			`POST succeeded but no 'photo' in returned properties: ${JSON.stringify(json)}`,
+		);
 	}
 	return {
 		_id: photoProp._id,
@@ -156,7 +168,9 @@ async function postPhotoProperty(
 	};
 }
 
-async function s3Put(uploadShape: UploadShape): Promise<{ status: number; headersEchoed: string[] }> {
+async function s3Put(
+	uploadShape: UploadShape,
+): Promise<{ status: number; headersEchoed: string[] }> {
 	// Build headers — skip Content-Length (browsers can't set it; fetch ignores it).
 	// The real Content-Type and Content-Disposition must be sent or S3 rejects.
 	const headers: Record<string, string> = {};
@@ -228,11 +242,17 @@ async function main() {
 			console.log(`  WOULD: ${step}`);
 		}
 		console.log(`\n  Probe entity name  : _probe_file_wire_shape`);
-		console.log(`  File to upload     : ${PROBE_FILENAME} (${PROBE_FILESIZE} bytes, ${PROBE_FILETYPE})`);
+		console.log(
+			`  File to upload     : ${PROBE_FILENAME} (${PROBE_FILESIZE} bytes, ${PROBE_FILETYPE})`,
+		);
 		console.log(`  POST body shape    : [{ type:'photo', filename, filesize, filetype }]`);
-		console.log(`  S3 PUT headers     : Content-Type, Content-Disposition, ACL (no Content-Length)`);
+		console.log(
+			`  S3 PUT headers     : Content-Type, Content-Disposition, ACL (no Content-Length)`,
+		);
 		console.log(`  Download verify    : GET /property/{id} → expects { url, filename, filesize }`);
-		console.log(`  Thumbnail verify   : GET /entity/{id}?props=_thumbnail → expects _thumbnail: "<url>"`);
+		console.log(
+			`  Thumbnail verify   : GET /entity/{id}?props=_thumbnail → expects _thumbnail: "<url>"`,
+		);
 		console.log('\nDRY-RUN complete. Send "I authorize this run" to proceed live.');
 
 		artifact.conclusions.push('DRY-RUN only — no live data touched.');
@@ -285,13 +305,21 @@ async function main() {
 			console.log(`  upload.url   : ${upload.url.slice(0, 80)}...`);
 			console.log(`  upload.headers keys: ${Object.keys(upload.headers).join(', ')}`);
 		} else {
-			console.warn('  WARNING: no upload object in response — file property may not trigger upload URL');
-			artifact.conclusions.push('UNEXPECTED: no upload object returned by POST photo — investigate Entu version');
+			console.warn(
+				'  WARNING: no upload object in response — file property may not trigger upload URL',
+			);
+			artifact.conclusions.push(
+				'UNEXPECTED: no upload object returned by POST photo — investigate Entu version',
+			);
 		}
 	} catch (err) {
 		const msg = String(err);
 		artifact.phase2_postPhotoProperty = {
-			ok: false, propertyId: null, uploadShape: null, rawResponse: null, error: msg,
+			ok: false,
+			propertyId: null,
+			uploadShape: null,
+			rawResponse: null,
+			error: msg,
 		};
 		artifact.errors.push(`Phase 2: ${msg}`);
 		console.error('Phase 2 FAILED:', msg);
@@ -319,7 +347,12 @@ async function main() {
 		}
 	} else {
 		console.log('\nPhase 3: SKIPPED (no upload shape from Phase 2)');
-		artifact.phase3_s3Put = { ok: false, status: null, headersEchoed: [], error: 'skipped — no upload shape' };
+		artifact.phase3_s3Put = {
+			ok: false,
+			status: null,
+			headersEchoed: [],
+			error: 'skipped — no upload shape',
+		};
 	}
 
 	// ── Phase 4: Verify property via GET /property/{id} ──────────────────
@@ -332,7 +365,8 @@ async function main() {
 				ok: true,
 				propertyRecord: propRecord,
 				hasUrl,
-				urlTtlNote: 'Signed download URL TTL is 60s (GetObjectCommand expiresIn:60 in utils/file.js)',
+				urlTtlNote:
+					'Signed download URL TTL is 60s (GetObjectCommand expiresIn:60 in utils/file.js)',
 			};
 			console.log(`  filename     : ${propRecord.filename ?? '(absent)'}`);
 			console.log(`  filesize     : ${propRecord.filesize ?? '(absent)'}`);
@@ -344,7 +378,11 @@ async function main() {
 		} catch (err) {
 			const msg = String(err);
 			artifact.phase4_getProperty = {
-				ok: false, propertyRecord: null, hasUrl: false, urlTtlNote: '', error: msg,
+				ok: false,
+				propertyRecord: null,
+				hasUrl: false,
+				urlTtlNote: '',
+				error: msg,
 			};
 			artifact.errors.push(`Phase 4: ${msg}`);
 			console.error('Phase 4 FAILED:', msg);
@@ -362,12 +400,21 @@ async function main() {
 			console.log(`  _thumbnail present: ${present}`);
 			if (url) console.log(`  _thumbnail url    : ${url.slice(0, 80)}...`);
 			if (!present) {
-				console.warn('  _thumbnail absent after upload — may need aggregation trigger or S3 PUT failed');
-				artifact.conclusions.push('_thumbnail absent post-upload — see Entu aggregate pipeline or S3 PUT status');
+				console.warn(
+					'  _thumbnail absent after upload — may need aggregation trigger or S3 PUT failed',
+				);
+				artifact.conclusions.push(
+					'_thumbnail absent post-upload — see Entu aggregate pipeline or S3 PUT status',
+				);
 			}
 		} catch (err) {
 			const msg = String(err);
-			artifact.phase5_thumbnail = { ok: false, thumbnailPresent: false, thumbnailUrl: null, error: msg };
+			artifact.phase5_thumbnail = {
+				ok: false,
+				thumbnailPresent: false,
+				thumbnailUrl: null,
+				error: msg,
+			};
 			artifact.errors.push(`Phase 5: ${msg}`);
 			console.error('Phase 5 FAILED:', msg);
 		}
@@ -406,30 +453,55 @@ async function main() {
 
 	// ── Conclusions ───────────────────────────────────────────────────────
 	if (artifact.phase2_postPhotoProperty.uploadShape) {
-		artifact.conclusions.push('CONFIRMED: POST with { filename, filesize, filetype } returns upload { url, method, headers }');
-		artifact.conclusions.push(`upload.method: ${artifact.phase2_postPhotoProperty.uploadShape.method}`);
-		artifact.conclusions.push(`upload.headers keys: ${Object.keys(artifact.phase2_postPhotoProperty.uploadShape.headers).join(', ')}`);
+		artifact.conclusions.push(
+			'CONFIRMED: POST with { filename, filesize, filetype } returns upload { url, method, headers }',
+		);
+		artifact.conclusions.push(
+			`upload.method: ${artifact.phase2_postPhotoProperty.uploadShape.method}`,
+		);
+		artifact.conclusions.push(
+			`upload.headers keys: ${Object.keys(artifact.phase2_postPhotoProperty.uploadShape.headers).join(', ')}`,
+		);
 	}
 	if (artifact.phase3_s3Put.ok) {
 		artifact.conclusions.push('CONFIRMED: S3 PUT with signed URL succeeds (status 200)');
-		artifact.conclusions.push(`S3 PUT headers required (no Content-Length): ${artifact.phase3_s3Put.headersEchoed.join(', ')}`);
+		artifact.conclusions.push(
+			`S3 PUT headers required (no Content-Length): ${artifact.phase3_s3Put.headersEchoed.join(', ')}`,
+		);
 	}
 	if (artifact.phase4_getProperty.hasUrl) {
-		artifact.conclusions.push('CONFIRMED: GET /property/{id} returns { url, filename, filesize, filetype } post-upload');
-		artifact.conclusions.push('Download URL TTL: 60s (from utils/file.js getSignedDownloadUrl expiresIn:60)');
+		artifact.conclusions.push(
+			'CONFIRMED: GET /property/{id} returns { url, filename, filesize, filetype } post-upload',
+		);
+		artifact.conclusions.push(
+			'Download URL TTL: 60s (from utils/file.js getSignedDownloadUrl expiresIn:60)',
+		);
 	}
 
 	// ── Write artifact ────────────────────────────────────────────────────
-	const artifactPath = await writeResultArtifact('probe-file-property-wire-shape-2026-05-23', artifact);
+	const artifactPath = await writeResultArtifact(
+		'probe-file-property-wire-shape-2026-05-23',
+		artifact,
+	);
 	console.log(`\nArtifact: ${artifactPath}`);
 
 	console.log('\n=== SUMMARY ===');
 	console.log(`Phase 1 (create entity)  : ${artifact.phase1_createEntity.ok ? 'OK' : 'FAIL'}`);
-	console.log(`Phase 2 (post photo)     : ${artifact.phase2_postPhotoProperty.ok ? 'OK' : 'FAIL'} — upload shape: ${artifact.phase2_postPhotoProperty.uploadShape ? 'PRESENT' : 'ABSENT'}`);
-	console.log(`Phase 3 (S3 PUT)         : ${artifact.phase3_s3Put.ok ? 'OK' : 'FAIL'} — status: ${artifact.phase3_s3Put.status ?? 'N/A'}`);
-	console.log(`Phase 4 (verify property): ${artifact.phase4_getProperty.ok ? 'OK' : 'FAIL'} — has url: ${artifact.phase4_getProperty.hasUrl}`);
-	console.log(`Phase 5 (_thumbnail)     : ${artifact.phase5_thumbnail.ok ? 'OK' : 'FAIL'} — present: ${artifact.phase5_thumbnail.thumbnailPresent}`);
-	console.log(`Phase 6 (teardown)       : prop=${artifact.phase6_teardown.propertyDeleted} entity=${artifact.phase6_teardown.entityDeleted}`);
+	console.log(
+		`Phase 2 (post photo)     : ${artifact.phase2_postPhotoProperty.ok ? 'OK' : 'FAIL'} — upload shape: ${artifact.phase2_postPhotoProperty.uploadShape ? 'PRESENT' : 'ABSENT'}`,
+	);
+	console.log(
+		`Phase 3 (S3 PUT)         : ${artifact.phase3_s3Put.ok ? 'OK' : 'FAIL'} — status: ${artifact.phase3_s3Put.status ?? 'N/A'}`,
+	);
+	console.log(
+		`Phase 4 (verify property): ${artifact.phase4_getProperty.ok ? 'OK' : 'FAIL'} — has url: ${artifact.phase4_getProperty.hasUrl}`,
+	);
+	console.log(
+		`Phase 5 (_thumbnail)     : ${artifact.phase5_thumbnail.ok ? 'OK' : 'FAIL'} — present: ${artifact.phase5_thumbnail.thumbnailPresent}`,
+	);
+	console.log(
+		`Phase 6 (teardown)       : prop=${artifact.phase6_teardown.propertyDeleted} entity=${artifact.phase6_teardown.entityDeleted}`,
+	);
 	console.log(`Errors                   : ${artifact.errors.length}`);
 	if (artifact.conclusions.length > 0) {
 		console.log('\nConclusions:');
