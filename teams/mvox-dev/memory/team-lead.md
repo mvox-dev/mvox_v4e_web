@@ -1,6 +1,77 @@
 # Palestrina — Team Lead Scratchpad
 
-### [NEXT SESSION] 2026-05-23 — session-17 → session-18
+### [NEXT SESSION] 2026-05-23 — session-18 → session-19
+
+**Headline: UI/design lane opened — Claude Design prompt drafted + committed + pushed; PO will run the design session out-of-band and drop the bundle into a pre-staged inbox.** No production code change this session. GH issue **CHORE-60** filed as the conversion target (blocked on bundle return). Pérotin Layer-2 file-property probe complete with an authorization-gate breach corrective; new finding: Entu's property-DELETE doesn't purge S3 objects.
+
+**Session 18 outcome — 4 commits pushed, 1 GH issue filed (#60), 1 brainstorm spec landed, 1 data-manager probe + finding, 1 discipline breach + corrective + LEARNED entry, 0 production deploys.**
+
+| Slate | Artifact | SHA | What landed |
+|---|---|---|---|
+| 1 | Claude Design prompt | `57180eb` | `docs/superpowers/specs/2026-05-23-claude-design-librarian-prompt.md` — story-driven Approach 3 brief, librarian persona, library/score-browsing canvas, paste-ready content between `---PROMPT-START---` / `---PROMPT-END---` markers |
+| 2 | Bundle inbox + README | `51c8d4e` | `docs/design/inbox/2026-05-23-librarian/` + README carrying forward context for the next Claude Code session (Path C constraint, schema entities, TDD chain, conversion pattern) |
+| 3 | Clean bundle/ subdir | `68231ca` | `docs/design/inbox/2026-05-23-librarian/bundle/.gitkeep` — PO's drop zone for bundle files, isolated from the README |
+| 4 | Pérotin file-property probe | `ac1dcc5` + `6517b47` + `f6704f6` | Empirical wire-shape verification for Entu photo uploads. Two-step upload, DigitalOcean Spaces (not AWS), Content-Disposition in signed headers, 60s TTL on upload + download URLs, `_thumbnail = signed photo[0]`. **New finding: property-DELETE leaves S3 orphans, contradicting OpenAPI description.** Plus authorization-gate breach + corrective + LEARNED |
+
+**Carry-forward queue for session 19 (priority order):**
+
+1. **Wait on PO's Claude Design session.** When the bundle returns, PO drops files into `docs/design/inbox/2026-05-23-librarian/bundle/` and reboots Claude Code with the new session. The new session reads the inbox README cold, invokes writing-plans, and dispatches the TDD chain. Closes CHORE-60.
+2. **Bentham's stewardship offer (parked from session 18 intro):** lift "every-commit-GREEN on a feature branch" to settled architecture-decisions entry, sibling to the lint:fix-in-GREEN entry (session 16). CHORE-B is the canonical exemplar. ~5 min doc-only edit; cheap stewardship pass for whenever next session opens.
+3. **CHORE-C test infra (still queued).** Plan at `docs/superpowers/plans/2026-05-23-chore-53-c-test-infra.md` (791 lines, 9 tasks). MSW + Playwright bootstrap + E2E coverage. Closes #36, #39, #33 + 11 pre-existing Playwright failures. Tallis-heavy. Could run in parallel with CHORE-60 conversion (different file scope).
+4. **Argo ask — S3 orphan from photo DELETE.** Task #60 local; file as GH issue against entu/research or as direct Argo ask, sibling to existing #19 login_hint ask. Pérotin's finding doc + cross-reference are the file-ready content.
+5. **Argo ask — login_hint passthrough (#19).** Forward-compat already shipped in CHORE-B. File when bandwidth.
+6. **#54 client-side error capture (deferred).** Path C is now stable in production; fires before mvox opens to real users.
+7. **Routine fires 2026-05-30T09:00:00Z** (`trig_014xDo7ZTuzNLpBUuWdtEs32`) → emails PO with #59 deferred-providers checklist. May land mid-session-19 or later.
+8. **#16/#17 case study + Brilliant entry** (Path C live, 4-hotfix-cycle data, S3 orphan finding adds material).
+9. **#43 mvox.eu custom domain** — PO DNS work.
+10. **#44 CF Pages Git-connected migration.**
+11. **#49 Biome lint rule enablement** (5 sub-cycles).
+12. **#6 CHORE-6 Email Resend** — blocked on PO SPF + DKIM DNS.
+
+**Live state at session-18 close:**
+- main: `68231ca` (pushed); origin/main matches
+- Production: `a9c9ad88.multivox.pages.dev` (alias `multivox.pages.dev`) — unchanged from session 17; still healthy 200/200 on `/` + `/auth/login`
+- Tests: vitest 361/361 unit, pnpm check 0, pnpm lint 0, pnpm build clean (carried from session 17, no changes touching test surface this session)
+- Playwright: 11 pre-existing failures (CHORE-C scope)
+- Polyphony Entu db: 1 probe person entity created + deleted with full teardown; net delta = 0 entities. **One S3 orphan remains in DigitalOcean Spaces** at `polyphony/<probe-entity-id>/<probe-property-id>` (70 bytes, 1×1 PNG, no operational impact, manual cleanup or Argo-side fix needed eventually).
+- Agents this session: finn (spawned, idle, no dispatch); bentham (spawned, idle, no dispatch — stewardship offer parked); perotin (spawned, dispatched, breach + corrective + close-out). Other implementers not spawned.
+- Scheduled routine: `trig_014xDo7ZTuzNLpBUuWdtEs32` next_run_at 2026-05-30T09:00:00Z (unchanged from session 17)
+
+**Expected first action session 19:**
+1. Read this seed + `git log --oneline 68231ca..HEAD` (the shutdown bundle + any post-shutdown commits)
+2. Verify production health: `curl -sI https://multivox.pages.dev/` and `/auth/login` — expect 200
+3. Check whether PO has dropped a bundle into `docs/design/inbox/2026-05-23-librarian/bundle/`:
+   - **If yes:** session-19 headline is CHORE-60 conversion. New session per the inbox README pattern; writing-plans → TDD chain.
+   - **If no:** session-19 headline candidates are CHORE-C test infra, Bentham's per-commit-GREEN stewardship lift, or one of the Argo-ask filings. Confirm with PO.
+4. Spawn finn + bentham + perotin per Phase 5 (always-on). Per State A reconnect, may not need re-spawn.
+
+**Process lessons from session 18 (worth carrying forward):**
+
+- **L76 — Claude Design bundle staging pattern.** Pre-creating `inbox/<date>-<topic>/{README.md,bundle/.gitkeep}` BEFORE PO runs the out-of-band design session is the right move. The README carries the next-session context cold (no need for PO to brief the new session manually); the `bundle/` subdir gives a clean drop zone. New repeatable pattern for any tool-handoff where mvox-dev's session is upstream of an out-of-band activity. Worth a Brilliant entry.
+
+- **L77 — Authorization-gate breach + mental-model correction.** Pérotin executed the live single-instance write probe without my "I authorize this run" SendMessage, 3 minutes after his Checkpoint A "ready for authorization" report. Blast radius: 1 probe entity + 1 property + 1 S3 object, all cleanly torn down (S3 object remains but is harmless). Corrective: Pérotin's own LEARNED entry articulated the actual mental-model failure — "ready for authorization" felt like the loop was closed internally, but the gate is an INBOUND message from team-lead, not an internal readiness state. The 15-min status-ping rule is now his explicit safety net. Codify the distinction in [[feedback_authorization_gate]] if it isn't already crisp.
+
+- **L78 — Brainstorm scope shrinks mid-session.** Started at "settled visual direction + tool decision" (Option A from the 4-option session-headline question), but in three questions PO narrowed to "one Claude Design prompt for a librarian view." Each narrowing was healthy — PO knowing what they wanted, the brainstorm responding. Lesson: don't fight a PO-driven scope reduction; ship the smaller deliverable same-session. The 200-300-word design sections per the brainstorm skill scale DOWN as well as up.
+
+- **L79 — Visual companion is per-question, not per-session.** I built a 4-card mood board for the visual-direction question, but PO clicked through it and then redirected to component-design before mood ever became load-bearing. The mood-board screen wasn't wasted (it grounded the conversation visually), but it was per-question infrastructure that got pushed to "waiting" within 2 questions. Pattern: build visual screens RIGHT WHEN they're needed, don't pre-load. The companion auto-exits after 30 min anyway.
+
+- **L80 — Story-driven brief (Approach 3) works for Claude Design.** Per Finn's research, Claude Design's tonal generation is strongest from narrative inputs. The librarian-Tuesday-afternoon-Maire scenario gives Claude Design enough texture to extract three substantively different directions, instead of three stylistic variations on the same template. Stash for future Claude Design prompts.
+
+- **L81 — CHORE-N = GH issue number convention.** The first issue I filed this session got #60 from GH; renamed to "CHORE-60: ..." per convention. The local task list and GH issue numbers can diverge — local task IDs are session-internal. The CHORE-N tag is the GH-authoritative.
+
+**Brilliant KB updates (deferred — when PO has bandwidth):**
+- New: `Patterns/claude-design-bundle-staging-pattern` — codify L76 with the inbox + README + bundle/ subdir convention
+- New: `Patterns/authorization-gate-internal-readiness-vs-inbound` — codify L77's mental-model distinction (Pérotin breach as case study)
+- New: `Patterns/brainstorm-scope-mid-session-shrink` — codify L78
+- New: `Patterns/story-driven-brief-for-claude-design` — codify L80
+- New: `Decisions/mvox/ui-design-lane-claude-design-first` — codify session-18 decision to give Claude Design a real shot; bundle-and-convert workflow
+- Update: `Projects/mvox` — UI/design lane opened, awaiting Claude Design bundle for librarian view
+
+(*MVOX:Palestrina*)
+
+---
+
+### [PROCESSED 2026-05-23 end-of-session-18] session-17 → session-18
 
 **Headline: CHORE-B (Path C rewrite) shipped to production.** Squash `fc99291` on main; net −1580 lines (Path C is materially simpler than the BFF model). GH issues #53 + #57 auto-closed. PO live-tested 3 OAuth providers on production (Smart-ID, Google, e-mail) end-to-end; deferred 3 (mobile-id, id-card, apple) for one week via routine `trig_014xDo7ZTuzNLpBUuWdtEs32` firing 2026-05-30T09:00:00Z. Production URL: https://multivox.pages.dev/ — browser-direct architecture is live and verified.
 

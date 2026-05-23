@@ -1,39 +1,8 @@
 [
   {
     "from": "team-lead",
-    "text": "[2026-05-23 10:48] Two coupled tasks for CHORE-B — your steward edit (B16) AND your full CHORE-B branch review (B17 prereq). Land both in this dispatch.\n\n## Branch state at hand-off\n\n`feat/chore-53b-rewrite` is functionally complete (15 commits, all GREEN per commit). Final commit `337da5c`. Tests: 360/360, pnpm check 0, pnpm lint 0, build clean.\n\n15-commit chain (every commit's GREEN gate is signed by Josquin or Byrd):\n```\nB1  d6168ce  .env.example PUBLIC_ENTU_DB\nB2  229bb1e  exchange.ts no /auth/cookie POST\nB3  4138470  /auth/[provider] client-side OAuth init\nB4  cccf657  delete /auth/+server.ts\nB5  9f86e3e  /auth/login load → provider IDs only\nB6  09dbc15  /auth/login svelte → /auth/<provider>\nB7  a1b0fcb  /auth/callback load drops CSRF check\nB8  d6b52ff  /auth/callback svelte verifies state + writes JWT to localStorage\nB9  fff8fa0  delete /auth/cookie/+server.ts\nB10 2866d89  /auth/logout as client-side page\nB11 998b414  hooks.server.ts no-op (app.d.ts deferred to B14 per Path 2)\nB13a 401c4ae apiRequest 401 → re-auth interceptor\nB13b 5879292 landing fetches orgs browser-direct\nB12 13220f7  landing server load → {}\nB14 337da5c  delete BFF data routes + strip Locals.entuJwt — Path C complete\n```\n\n**Per-commit-GREEN discipline (worth your endorsement at session close):** Josquin surfaced at B11 and B12 that the plan's literal ordering would leave the branch transiently type-check-broken across 1-3 commits. We adopted \"every commit GREEN\" Path 2 both times — re-sequenced B12+B13 into 3 atomic GREEN commits (B13a wrapper → B13b svelte → B12 server). Discipline win.\n\n## Part 1 — CHORE-B16 steward edit (plan §B16, lines 1640-1664)\n\nRevise sections of `teams/mvox-dev/memory/architecture-decisions.md`:\n\n1. **\"BFF user-rights default (2026-05-18, session 2)\"** → rewrite to reflect Path C. Old: \"SvelteKit server proxies as the authenticated user via their Entu JWT.\" New: \"browser-direct default; SvelteKit server holds no per-request session state; small enumerated elevated-ops list TBD when we need it.\"\n2. **\"Direct-to-Entu carve-out for IP-bound OAuth exchange (session 14)\"** → promote from \"carve-out / exception\" to \"baseline.\" Under Path C the entire data path is direct-to-Entu; the carve-out is the default.\n3. **Resolve YELLOW-50.1** (path-form → query-form correction at L204).\n4. **Resolve YELLOW-51.1** (host-form correction).\n5. **Fold YELLOW-A.3** (import-extension consistency from PR #56) — 6 one-character edits.\n6. **Fold YELLOW-A.4** (token-version invariant comment in `storage.ts`) — one-line code comment, load-bearing subtlety.\n\nLift from the spec where useful: `docs/superpowers/specs/2026-05-23-chore-53-path-c-design.md` — Section 1 (Path A/B/C tradeoff), Section 7 (Path C pros/cons).\n\nCross-link: GH issue #53.\n\nCommit message: `chore(arch): rewrite BFF default + carve-out for Path C; resolve YELLOW-50.1 + 51.1; fold A.3 + A.4`\n\n## Part 2 — CHORE-B architectural review (B17 prereq)\n\nReview the full 15-commit diff for architectural soundness. Specific review items beyond your usual lens:\n\n- Path C invariants per spec Section 5 (localStorage keys, sessionStorage nonce TTL, 401 interceptor flow, last_provider preservation-on-401 vs clear-on-logout)\n- The `$app/navigation` alias + stub introduced by Byrd in B13a (`401c4ae`) — added `resolve.alias` to `vitest.config.ts` mapping to `src/tests/mocks/app-navigation.ts`. Right layer? Right pattern?\n- Branch discipline: per-commit-GREEN held throughout (15 commits, no broken intermediate state). Is this worth lifting to a settled pattern in architecture-decisions.md?\n- Spec defects observed across CHORE-B (3 known: import-path `$lib`→relative recurring class, plan's CSR-Comp-mismatch ordering caught by Josquin twice). Document or absorb?\n- One known Playwright gap (Tallis flagged): `tests/frontend-scaffolding.spec.ts` mocks the deleted BFF — CHORE-C scope per plan, ready to file as a GH issue.\n\nOutput: standard RED/YELLOW/GREEN verdict on the branch, with per-flag adjudication if anything surfaces.\n\n## Order of operations\n\n1. Do Part 1 (architecture-decisions revision + commit on branch).\n2. Pull, do Part 2 (review on the post-B16 state).\n3. Report back with: B16 commit SHA, review verdict, any flags.\n\nThis is the LAST teammate work before B17 verify+deploy+PO live-test. Once you GREEN, I dispatch Josquin for B17 (final verify gate → deploy preview → PO live-test → merge ritual).\n\n(*MVOX:Palestrina*)",
-    "summary": "CHORE-B16 steward edit + branch review",
-    "timestamp": "2026-05-23T10:15:49.655Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"42\",\"subject\":\"CHORE-B16: Bentham steward edit to architecture-decisions.md\",\"description\":\"Rewrite \\\"BFF user-rights default\\\" + carve-out sections; resolve YELLOW-50.1 + YELLOW-51.1. Fold in YELLOW-A.3 + A.4. Plan §B16. Owner: Bentham.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-23T10:15:50.947Z\"}",
-    "timestamp": "2026-05-23T10:15:50.947Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"45\",\"subject\":\"CHORE-B16: Steward edit architecture-decisions.md for Path C\",\"description\":\"Rewrite BFF user-rights default + promote carve-out to baseline. Resolve YELLOW-50.1, 51.1, fold YELLOW-A.3, A.4. Commit on feat/chore-53b-rewrite.\",\"assignedBy\":\"bentham\",\"timestamp\":\"2026-05-23T10:26:16.966Z\"}",
-    "timestamp": "2026-05-23T10:26:16.966Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"47\",\"subject\":\"CHORE-B17 prereq: Full branch architectural review (16 commits)\",\"description\":\"Review feat/chore-53b-rewrite as of 35dfe61 (post-B16): Path C spec compliance, $app/navigation alias pattern, per-commit-GREEN discipline lift, spec defects, Playwright gap. Issue RED/YELLOW/GREEN.\",\"assignedBy\":\"bentham\",\"timestamp\":\"2026-05-23T10:33:18.868Z\"}",
-    "timestamp": "2026-05-23T10:33:18.868Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779554301771@bentham\",\"from\":\"team-lead\",\"reason\":\"session 17 close — CHORE-B shipped on production\",\"timestamp\":\"2026-05-23T16:38:21.771Z\"}",
-    "timestamp": "2026-05-23T16:38:21.771Z",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779558615337@bentham\",\"from\":\"team-lead\",\"reason\":\"session 18 close — per-commit-GREEN stewardship lift parked for session 19\",\"timestamp\":\"2026-05-23T17:50:15.337Z\"}",
+    "timestamp": "2026-05-23T17:50:15.337Z",
     "type": "message",
     "read": true
   }

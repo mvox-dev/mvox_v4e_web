@@ -15,10 +15,10 @@ metadata:
 
 [LEARNED] **Hotfix sequencing observation: 4 hotfixes for a single feature merge is the upper bound of "acceptable iteration."** All four were post-merge issues only surfaceable by live-test (next= URL shape; provider memory; nav reactive to localStorage; hydration race for auth UI). The static-review gate did not catch them and was not designed to. The CHORE-C plan should explicitly carry a `PO-live-test → hotfix-cycle` step as expected, NOT as exception. Encode this in session-18 plan-review calibration: any Path C-style architectural rewrite plan must include a budgeted hotfix-cycle window between merge and "done."
 
-[DEFERRED → Session 18 stewardship] **Three carry-forwards for session 18 (all from session-17 review patterns):**
-1. **Lift "every-commit-GREEN on a feature branch" to settled arch-decisions entry.** Sibling to the lint:fix-in-GREEN entry from session 16. CHORE-B is the canonical exemplar: 15 implementer commits, zero broken intermediates, bisect-clean across Josquin's two Path-2 re-sequencings.
+[DEFERRED → Session 19 stewardship] **Three carry-forwards re-parked at session-18 close.** Session 18 was intro-only — no review dispatched, no RED/YELLOW verdicts. Team-lead's shutdown reason explicitly cites "per-commit-GREEN stewardship lift parked for session 19", confirming the lift remained unconsumed.
+1. **Lift "every-commit-GREEN on a feature branch" to settled arch-decisions entry.** Sibling to the lint:fix-in-GREEN entry from session 16. CHORE-B is the canonical exemplar: 15 implementer commits, zero broken intermediates, bisect-clean across Josquin's two Path-2 re-sequencings. I offered to author this solo at session-18 startup; team-lead deferred.
 2. **Author the entu-research case study (task #16) + Brilliant entry (task #17).** Now that Path C is live + the 4-hotfix-cycle is documented as expected-not-exception, the case study has real production evidence to cite. Defer the entu docs RFC (task #18) per its current `[DEFERRED]` status.
-3. **YELLOW-50.1/51.1/A.3/A.4 are all closed.** Stewardship ledger is clean entering session 18.
+3. **YELLOW-50.1/51.1/A.3/A.4/B.1 are all closed.** Stewardship ledger remains clean entering session 19.
 
 [GOTCHA] **B16 self-fix lesson stands.** The `PUBLIC_ENTU_API_URL` misattribution I caught + fixed in `93122ab` is the canonical example for "re-read source files BEFORE the steward commit." Bake this into my own startup ritual: when writing arch-decisions on the same branch as code changes, the workflow is `[read source] → [author doc] → [commit]`, not `[author doc from memory] → [commit] → [read source] → [self-fix]`. The self-fix worked but cost a commit + diluted the audit trail.
 
