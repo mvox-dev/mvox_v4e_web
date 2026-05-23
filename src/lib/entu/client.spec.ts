@@ -14,9 +14,9 @@ describe('EntuClient', () => {
 	});
 
 	it('defaults baseUrl to api.entu.app when not supplied', async () => {
-		const fetchMock = vi.fn().mockResolvedValue(
-			new Response(JSON.stringify({ entity: { _id: 'x' } }), { status: 200 }),
-		);
+		const fetchMock = vi
+			.fn()
+			.mockResolvedValue(new Response(JSON.stringify({ entity: { _id: 'x' } }), { status: 200 }));
 		vi.stubGlobal('fetch', fetchMock);
 
 		const c = new EntuClient(baseConfig);
@@ -29,9 +29,9 @@ describe('EntuClient', () => {
 	});
 
 	it('get() sends Authorization: Bearer header', async () => {
-		const fetchMock = vi.fn().mockResolvedValue(
-			new Response(JSON.stringify({ entity: { _id: 'x' } }), { status: 200 }),
-		);
+		const fetchMock = vi
+			.fn()
+			.mockResolvedValue(new Response(JSON.stringify({ entity: { _id: 'x' } }), { status: 200 }));
 		vi.stubGlobal('fetch', fetchMock);
 
 		const c = new EntuClient(baseConfig);
@@ -46,18 +46,16 @@ describe('EntuClient', () => {
 	});
 
 	it('get() throws with status code on !res.ok', async () => {
-		vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
-			new Response('forbidden', { status: 403 }),
-		));
+		vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('forbidden', { status: 403 })));
 
 		const c = new EntuClient(baseConfig);
 		await expect(c.get('x')).rejects.toThrow(/403/);
 	});
 
 	it('search() builds query string from query object', async () => {
-		const fetchMock = vi.fn().mockResolvedValue(
-			new Response(JSON.stringify({ entities: [] }), { status: 200 }),
-		);
+		const fetchMock = vi
+			.fn()
+			.mockResolvedValue(new Response(JSON.stringify({ entities: [] }), { status: 200 }));
 		vi.stubGlobal('fetch', fetchMock);
 
 		const c = new EntuClient(baseConfig);
@@ -70,18 +68,16 @@ describe('EntuClient', () => {
 	});
 
 	it('search() throws with status code on !res.ok (CHORE-52 defensive throw)', async () => {
-		vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
-			new Response('forbidden', { status: 403 }),
-		));
+		vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('forbidden', { status: 403 })));
 
 		const c = new EntuClient(baseConfig);
 		await expect(c.search({ '_type.string': 'organization' })).rejects.toThrow(/403/);
 	});
 
 	it('search() omits undefined values from the query string', async () => {
-		const fetchMock = vi.fn().mockResolvedValue(
-			new Response(JSON.stringify({ entities: [] }), { status: 200 }),
-		);
+		const fetchMock = vi
+			.fn()
+			.mockResolvedValue(new Response(JSON.stringify({ entities: [] }), { status: 200 }));
 		vi.stubGlobal('fetch', fetchMock);
 
 		const c = new EntuClient(baseConfig);
@@ -92,9 +88,9 @@ describe('EntuClient', () => {
 	});
 
 	it('setProperty() POSTs to /property with content-type and body', async () => {
-		const fetchMock = vi.fn().mockResolvedValue(
-			new Response(JSON.stringify({ _id: 'prop-1' }), { status: 200 }),
-		);
+		const fetchMock = vi
+			.fn()
+			.mockResolvedValue(new Response(JSON.stringify({ _id: 'prop-1' }), { status: 200 }));
 		vi.stubGlobal('fetch', fetchMock);
 
 		const c = new EntuClient(baseConfig);

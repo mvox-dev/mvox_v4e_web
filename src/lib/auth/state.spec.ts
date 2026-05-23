@@ -26,7 +26,11 @@ describe('OAuth state', () => {
 	});
 
 	it('encoded state is base64url-safe (no +, /, =)', () => {
-		const payload = { nonce: '?+/=&', return_to: '/path?with&special=chars', intent: 'reauth' as const };
+		const payload = {
+			nonce: '?+/=&',
+			return_to: '/path?with&special=chars',
+			intent: 'reauth' as const,
+		};
 		const encoded = encodeState(payload);
 		expect(encoded).not.toMatch(/[+/=]/);
 	});

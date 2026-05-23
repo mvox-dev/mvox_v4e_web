@@ -12,10 +12,7 @@ export interface ApiRequestInit extends RequestInit {
 	headers?: Record<string, string>;
 }
 
-export async function apiRequest<T = unknown>(
-	url: string,
-	init: ApiRequestInit = {},
-): Promise<T> {
+export async function apiRequest<T = unknown>(url: string, init: ApiRequestInit = {}): Promise<T> {
 	const token = getToken();
 	const headers: Record<string, string> = { ...(init.headers ?? {}) };
 	if (token) headers.Authorization = `Bearer ${token}`;
