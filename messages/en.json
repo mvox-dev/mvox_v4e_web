@@ -8,6 +8,7 @@
 	"auth_error_missing_session_token": "No session token received. Please try again.",
 	"auth_login_cta": "Continue with Entu",
 	"auth_login_heading": "Sign in to mvox",
+	"auth_provider_redirecting": "Redirecting to your sign-in provider...",
 	"common_error": "An error occurred",
 	"common_loading": "Loading…",
 	"landing_empty_state": "You are not a member of any choir yet.",
