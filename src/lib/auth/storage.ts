@@ -12,6 +12,13 @@ const KEYS = {
 
 const CURRENT_TOKEN_VERSION = '1';
 
+// Token-version cache-busting invariant: only `setToken` writes
+// `mvox.token_version`. Callers MUST sequence setUser + setAccounts BEFORE
+// setToken; setToken is the gate that publishes new auth state with the
+// current version. Writing user/accounts AFTER setToken across a version
+// bump leaves them stale (subsequent get* calls see a fresh version sentinel
+// and skip the wipe).
+
 export interface EntuUser {
 	_id: string;
 	email?: string;

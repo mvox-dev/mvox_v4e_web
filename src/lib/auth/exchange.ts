@@ -1,4 +1,4 @@
-import { ENTU_API_BASE } from '../entu-config.ts';
+import { ENTU_API_BASE } from '../entu-config';
 import type { EntuAccount, EntuUser } from './storage';
 
 export interface ExchangeSuccess {
