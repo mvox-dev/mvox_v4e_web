@@ -1,10 +1,11 @@
 // @vitest-environment happy-dom
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { setToken } from '../auth/storage';
+import { setLastProvider, setToken, setUser } from '../auth/storage';
 import { apiRequest } from './wrapper';
 
 beforeEach(() => {
 	localStorage.clear();
+	sessionStorage.clear();
 	vi.restoreAllMocks();
 });
 
@@ -83,5 +84,64 @@ describe('apiRequest', () => {
 		expect(callArgs?.body).toContain('"name"');
 		expect((callArgs?.headers as Record<string, string>)['Content-Type']).toBe('application/json');
 		expect((callArgs?.headers as Record<string, string>).Authorization).toBe('Bearer jwt');
+	});
+});
+
+describe('apiRequest 401 handling', () => {
+	it('clears token/user/accounts on 401 (preserves mvox.last_provider)', async () => {
+		setToken('expired-jwt');
+		setUser({ _id: 'u1', email: 'a@b.c' });
+		setLastProvider('google');
+		vi.stubGlobal(
+			'fetch',
+			vi.fn().mockResolvedValue(new Response('unauthorized', { status: 401 })),
+		);
+		const gotoMock = vi.fn();
+		vi.stubGlobal('__mvox_test_goto', gotoMock);
+
+		await apiRequest('https://api.entu.app/polyphony/entity').catch(() => undefined);
+
+		expect(localStorage.getItem('token')).toBeNull();
+		expect(localStorage.getItem('mvox.last_provider')).toBe('google');
+	});
+
+	it('navigates to /auth/<last_provider>?intent=reauth&return_to=<current> on 401', async () => {
+		setToken('expired-jwt');
+		setLastProvider('google');
+		Object.defineProperty(window, 'location', {
+			value: { pathname: '/orgs', search: '?q=foo', href: 'https://multivox.pages.dev/orgs?q=foo' },
+			writable: true,
+		});
+		vi.stubGlobal(
+			'fetch',
+			vi.fn().mockResolvedValue(new Response('unauthorized', { status: 401 })),
+		);
+		const gotoMock = vi.fn();
+		vi.stubGlobal('__mvox_test_goto', gotoMock);
+
+		await apiRequest('https://api.entu.app/polyphony/entity').catch(() => undefined);
+
+		expect(gotoMock).toHaveBeenCalledWith(expect.stringMatching(/^\/auth\/google\?/));
+		const calledUrl = gotoMock.mock.calls[0][0] as string;
+		expect(calledUrl).toContain('intent=reauth');
+		expect(calledUrl).toContain('return_to=%2Forgs%3Fq%3Dfoo');
+	});
+
+	it('navigates to /auth/login on 401 when no last_provider stored', async () => {
+		setToken('expired-jwt');
+		Object.defineProperty(window, 'location', {
+			value: { pathname: '/', search: '', href: 'https://multivox.pages.dev/' },
+			writable: true,
+		});
+		vi.stubGlobal(
+			'fetch',
+			vi.fn().mockResolvedValue(new Response('unauthorized', { status: 401 })),
+		);
+		const gotoMock = vi.fn();
+		vi.stubGlobal('__mvox_test_goto', gotoMock);
+
+		await apiRequest('https://api.entu.app/polyphony/entity').catch(() => undefined);
+
+		expect(gotoMock).toHaveBeenCalledWith(expect.stringMatching(/^\/auth\/login\?/));
 	});
 });
