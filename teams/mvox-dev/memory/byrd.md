@@ -32,4 +32,16 @@
 
 [GOTCHA] Paraglide does NOT regenerate `src/lib/paraglide/messages.js` during `pnpm check` (only svelte-kit sync runs). Must run `pnpm build` (or `pnpm dev`) to trigger Paraglide compilation after adding new message keys. Empty message files → "No messages found — Skipping compilation" → type errors in svelte files.
 
+## [CHECKPOINT] 2026-05-23 — CHORE-53 CHORE-A GREEN complete (session 16)
+
+[LEARNED] Vitest `environmentMatchGlobs` is deprecated in vitest v3. Use `@vitest-environment happy-dom` inline comment at the top of the spec file instead. Tallis's spec files for storage/state already had this comment — no vitest.config.ts change needed.
+
+[LEARNED] `$lib` alias does NOT resolve in the vitest runner (uses `vitest/config`, not SvelteKit's vite config). Route files must use relative imports (`'../../../lib/entu/client.ts'`) not `$lib/entu/client` — the relative form works in both vitest and SvelteKit production build. The `$env/dynamic/private` alias works because it's globally mocked in `src/tests/setup.ts`.
+
+[LEARNED] `new Response(JSON.stringify(...), { status: 200 })` in happy-dom does NOT automatically set `content-type: application/json`. Detecting JSON by `content-type` header fails in tests. Safer: try `JSON.parse(await res.text())` and fall back to raw string — works in tests and production.
+
+[GOTCHA] The old `src/lib/server/entu/` directory was the only thing in `src/lib/server/` — removing client.ts + client.spec.ts leaves the directory structure empty. Removed with `rmdir` to keep tree clean.
+
+[DECISION] CHORE-A wrapper.spec.ts authored by Byrd (Tallis only committed storage.spec.ts and state.spec.ts before session 16). Same for src/lib/entu/client.spec.ts.
+
 (*MVOX:Byrd*)
