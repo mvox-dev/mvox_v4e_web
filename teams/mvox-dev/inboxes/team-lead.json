@@ -1,15 +1,6 @@
 [
   {
     "from": "josquin",
-    "text": "[2026-05-23 09:49] B12 surface-and-stop.\n\nPer your dispatch note (\"if `pnpm check` warns, surface and stop\"), I probed the empty-load rewrite and got concrete RED:\n\n```\nERROR \"src/routes/+page.svelte\" 41:12 \"Property 'session' does not exist on type '{}'.\"\nERROR \"src/routes/+page.svelte\" 51:11 \"Property 'session' does not exist on type '{}'.\"\nCOMPLETED 977 FILES 2 ERRORS 0 WARNINGS\n```\n\n**Difference from B5/B7's no-warning surprise:** those .svelte files used `$props<{ data: {...} }>()` — a manual type annotation that svelte-check treats as a declaration, not a constraint to verify against the load return. This landing .svelte uses the proper SvelteKit pattern:\n\n```ts\nimport type { PageData } from './$types';\nlet { data }: { data: PageData } = $props();\n```\n\n`PageData` is auto-derived from the load's actual return shape. When load drops `{ session, orgs }`, `PageData` becomes `{}`, and `data.session` on lines 41 + 51 breaks compile.\n\nI've reverted my probe edit. Working tree is back to: only Tallis's RED spec staged in `src/tests/routes/landing/page.server.spec.ts`.\n\n**Three paths I see:**\n\n**Path 1 — Land B12 with branch type-check-RED.** Plan ordering says B13 follows next (Byrd rewrites +page.svelte to drop the session-driven branching, replace with localStorage-derived state + wrapper-based client fetch). B13 lands → check goes back to GREEN. Same blast radius as the rejected Path 1 from B11 — one commit on the branch with broken type-check.\n\n**Path 2 — Fold B12 + B13 into one dispatch.** Byrd rewrites +page.svelte alongside my +page.server.ts rewrite; we commit together; branch stays GREEN through every commit. Need team-lead to dispatch Byrd in this window or before mine to coordinate.\n\n**Path 3 — B12 with a transient type-shim:** add `type LoadResult = Record<string, never>;` to +page.server.ts AND update +page.svelte to `let { data }: { data: Record<string, unknown> } = $props();` (or drop the type entirely). Keeps GREEN this commit; B13 then rewrites both sides cleanly. Slightly ugly transient state for ~1 commit.\n\n**Recommendation:** **Path 2** — same reasoning as Path 2 of B11 (every commit GREEN beats plan-ordering fidelity). It does require dispatching me + Byrd as a coupled pair instead of sequential, OR rolling B13's .svelte work into me (out of my normal write scope, but I CAN write .svelte if the team-lead delegates — though \"no-`.svelte`-writes\" is my prompt's standing rule).\n\nRealistically: ask Byrd to do the .svelte rewrite NOW, commit it first (it'll RED test-wise but GREEN check-wise since `data.session` becomes opt-then-fallback-to-localStorage), then I land the server-load rewrite right after. Branch stays GREEN throughout because the .svelte stops depending on load-provided `data.session` before load drops it.\n\nWhich path? Holding work pending decision.\n\n(*MVOX:Josquin*)",
-    "summary": "B12 — surface-and-stop: landing .svelte type breaks",
-    "timestamp": "2026-05-23T09:49:08.579Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin",
     "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-23T09:49:12.020Z\",\"idleReason\":\"available\"}",
     "timestamp": "2026-05-23T09:49:12.020Z",
     "color": "orange",
@@ -834,6 +825,14 @@
     "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779575511505@perotin\",\"from\":\"perotin\",\"timestamp\":\"2026-05-23T22:32:01.299Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
     "timestamp": "2026-05-23T22:32:01.299Z",
     "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779575609555@bentham\",\"from\":\"bentham\",\"timestamp\":\"2026-05-23T22:33:39.429Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-23T22:33:39.429Z",
+    "color": "green",
     "type": "message",
     "read": true
   }

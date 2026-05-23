@@ -5,5 +5,12 @@
     "timestamp": "2026-05-23T17:50:15.337Z",
     "type": "message",
     "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779575609555@bentham\",\"from\":\"team-lead\",\"reason\":\"End of session 19. Stale config entry from prior session; never spawned in this session. If you are alive (unexpected): please approve shutdown. If you are a dead config artifact: this queues harmlessly until next session.\",\"timestamp\":\"2026-05-23T22:33:29.555Z\"}",
+    "timestamp": "2026-05-23T22:33:29.555Z",
+    "type": "message",
+    "read": true
   }
 ]
