@@ -1,0 +1,47 @@
+{
+  "runAt": "2026-05-23T16:56:48.249Z",
+  "db": "polyphony",
+  "dryRun": true,
+  "plan": [
+    "Phase 1: CREATE throwaway person entity (_probe_file_wire_shape)",
+    "Phase 2: POST photo property { filename, filesize, filetype } — capture upload shape",
+    "Phase 3: PUT 1×1 PNG to S3 signed URL from upload.url",
+    "Phase 4: GET /property/{id} — verify url (signed download), filename, filesize",
+    "Phase 5: GET /entity/{id}?props=_thumbnail — verify _thumbnail resolution",
+    "Phase 6: TEARDOWN — DELETE property value, DELETE entity"
+  ],
+  "phase1_createEntity": {
+    "entityId": null,
+    "ok": false
+  },
+  "phase2_postPhotoProperty": {
+    "ok": false,
+    "propertyId": null,
+    "uploadShape": null,
+    "rawResponse": null
+  },
+  "phase3_s3Put": {
+    "ok": false,
+    "status": null,
+    "headersEchoed": []
+  },
+  "phase4_getProperty": {
+    "ok": false,
+    "propertyRecord": null,
+    "hasUrl": false,
+    "urlTtlNote": ""
+  },
+  "phase5_thumbnail": {
+    "ok": false,
+    "thumbnailPresent": false,
+    "thumbnailUrl": null
+  },
+  "phase6_teardown": {
+    "propertyDeleted": false,
+    "entityDeleted": false
+  },
+  "conclusions": [
+    "DRY-RUN only — no live data touched."
+  ],
+  "errors": []
+}

@@ -1,0 +1,99 @@
+{
+  "runAt": "2026-05-23T16:57:36.579Z",
+  "db": "polyphony",
+  "dryRun": false,
+  "plan": [
+    "Phase 1: CREATE throwaway person entity (_probe_file_wire_shape)",
+    "Phase 2: POST photo property { filename, filesize, filetype } — capture upload shape",
+    "Phase 3: PUT 1×1 PNG to S3 signed URL from upload.url",
+    "Phase 4: GET /property/{id} — verify url (signed download), filename, filesize",
+    "Phase 5: GET /entity/{id}?props=_thumbnail — verify _thumbnail resolution",
+    "Phase 6: TEARDOWN — DELETE property value, DELETE entity"
+  ],
+  "phase1_createEntity": {
+    "entityId": "6a11dc804ff8277cd4306b1e",
+    "ok": true
+  },
+  "phase2_postPhotoProperty": {
+    "ok": true,
+    "propertyId": "6a11dc804ff8277cd4306b24",
+    "uploadShape": {
+      "url": "https://entu-files.fra1.digitaloceanspaces.com/polyphony/6a11dc804ff8277cd4306b1e/6a11dc804ff8277cd4306b24?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=DO801K7KGBJ4M3DXWW4X%2F20260523%2Ffra1%2Fs3%2Faws4_request&X-Amz-Date=20260523T165736Z&X-Amz-Expires=60&X-Amz-Signature=9de71569616bc4d70fbfcb8ba1b154f8d19b4fe6a1e6ee04f9c260ceecedd027&X-Amz-SignedHeaders=content-disposition%3Bhost&x-amz-acl=private&x-amz-checksum-crc32=AAAAAA%3D%3D&x-amz-sdk-checksum-algorithm=CRC32&x-id=PutObject",
+      "method": "PUT",
+      "headers": {
+        "ACL": "private",
+        "Content-Disposition": "inline;filename=\"_probe_file_wire_shape.png\"",
+        "Content-Length": 70,
+        "Content-Type": "image/png"
+      }
+    },
+    "rawResponse": {
+      "_id": "6a11dc804ff8277cd4306b1e",
+      "properties": [
+        {
+          "_id": "6a11dc804ff8277cd4306b24",
+          "type": "photo",
+          "filename": "_probe_file_wire_shape.png",
+          "filesize": 70,
+          "filetype": "image/png",
+          "upload": {
+            "url": "https://entu-files.fra1.digitaloceanspaces.com/polyphony/6a11dc804ff8277cd4306b1e/6a11dc804ff8277cd4306b24?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=DO801K7KGBJ4M3DXWW4X%2F20260523%2Ffra1%2Fs3%2Faws4_request&X-Amz-Date=20260523T165736Z&X-Amz-Expires=60&X-Amz-Signature=9de71569616bc4d70fbfcb8ba1b154f8d19b4fe6a1e6ee04f9c260ceecedd027&X-Amz-SignedHeaders=content-disposition%3Bhost&x-amz-acl=private&x-amz-checksum-crc32=AAAAAA%3D%3D&x-amz-sdk-checksum-algorithm=CRC32&x-id=PutObject",
+            "method": "PUT",
+            "headers": {
+              "ACL": "private",
+              "Content-Disposition": "inline;filename=\"_probe_file_wire_shape.png\"",
+              "Content-Length": 70,
+              "Content-Type": "image/png"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "phase3_s3Put": {
+    "ok": true,
+    "status": 200,
+    "headersEchoed": [
+      "ACL",
+      "Content-Disposition",
+      "Content-Type"
+    ]
+  },
+  "phase4_getProperty": {
+    "ok": true,
+    "propertyRecord": {
+      "_id": "6a11dc804ff8277cd4306b24",
+      "type": "photo",
+      "filename": "_probe_file_wire_shape.png",
+      "filesize": 70,
+      "filetype": "image/png",
+      "entity": "6a11dc804ff8277cd4306b1e",
+      "created": {
+        "at": "2026-05-23T16:57:36.795Z",
+        "by": "69bcfd8e9c031ab8e6ce8079"
+      },
+      "url": "https://entu-files.fra1.digitaloceanspaces.com/polyphony/6a11dc804ff8277cd4306b1e/6a11dc804ff8277cd4306b24?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=DO801K7KGBJ4M3DXWW4X%2F20260523%2Ffra1%2Fs3%2Faws4_request&X-Amz-Date=20260523T165737Z&X-Amz-Expires=60&X-Amz-Signature=375ceeedd9e5bdd4c1c669da9e1f968a6c8f4b355d77448ac4b9128f7efc22e3&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject"
+    },
+    "hasUrl": true,
+    "urlTtlNote": "Signed download URL TTL is 60s (GetObjectCommand expiresIn:60 in utils/file.js)"
+  },
+  "phase5_thumbnail": {
+    "ok": true,
+    "thumbnailPresent": true,
+    "thumbnailUrl": "https://entu-files.fra1.digitaloceanspaces.com/polyphony/6a11dc804ff8277cd4306b1e/6a11dc804ff8277cd4306b24?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=DO801K7KGBJ4M3DXWW4X%2F20260523%2Ffra1%2Fs3%2Faws4_request&X-Amz-Date=20260523T165737Z&X-Amz-Expires=60&X-Amz-Signature=375ceeedd9e5bdd4c1c669da9e1f968a6c8f4b355d77448ac4b9128f7efc22e3&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject"
+  },
+  "phase6_teardown": {
+    "propertyDeleted": true,
+    "entityDeleted": true
+  },
+  "conclusions": [
+    "CONFIRMED: POST with { filename, filesize, filetype } returns upload { url, method, headers }",
+    "upload.method: PUT",
+    "upload.headers keys: ACL, Content-Disposition, Content-Length, Content-Type",
+    "CONFIRMED: S3 PUT with signed URL succeeds (status 200)",
+    "S3 PUT headers required (no Content-Length): ACL, Content-Disposition, Content-Type",
+    "CONFIRMED: GET /property/{id} returns { url, filename, filesize, filetype } post-upload",
+    "Download URL TTL: 60s (from utils/file.js getSignedDownloadUrl expiresIn:60)"
+  ],
+  "errors": []
+}
