@@ -21,6 +21,7 @@ export function buildOAuthInitUrl(args: OAuthInitArgs): string {
 		nonce: args.nonce,
 		return_to: args.returnTo,
 		intent: args.intent,
+		provider: args.provider,
 	});
 	localStorage.setItem(OAUTH_STATE_KEY, state);
 

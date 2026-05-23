@@ -23,7 +23,7 @@
 			return;
 		}
 
-		let decoded: { nonce: string; return_to: string; intent: 'login' | 'reauth' };
+		let decoded: { nonce: string; return_to: string; intent: 'login' | 'reauth'; provider: string };
 		try {
 			decoded = decodeState(stateBlob);
 		} catch {
@@ -54,11 +54,7 @@
 
 		localStorage.removeItem(OAUTH_STATE_KEY);
 
-		// last-provider derivation from referrer (YELLOW-B.1 / GH #57 — separate fix path)
-		const refMatch = document.referrer.match(/\/auth\/([^/?]+)/);
-		if (refMatch && refMatch[1] && refMatch[1] !== 'callback' && refMatch[1] !== 'login') {
-			setLastProvider(refMatch[1]);
-		}
+		setLastProvider(decoded.provider);
 
 		exchangeState = 'success';
 		goto(decoded.return_to || '/');

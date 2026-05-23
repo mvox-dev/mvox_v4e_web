@@ -51,6 +51,7 @@ describe('buildOAuthInitUrl', () => {
 			nonce: 'nonce-123',
 			return_to: '/orgs?q=foo',
 			intent: 'reauth',
+			provider: 'smart-id',
 		});
 	});
 
