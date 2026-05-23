@@ -1,0 +1,181 @@
+{
+  "runAt": "2026-05-23T09:15:50.023Z",
+  "db": "polyphony",
+  "dryRun": false,
+  "totalOps": 17,
+  "updated": 17,
+  "skipped": 0,
+  "halted": 0,
+  "ops": [
+    {
+      "op": "U1  Voices ordinal 110 → 115",
+      "entityId": "6a0f6d304ff8277cd43069ab",
+      "field": "ordinal",
+      "action": "UPDATED",
+      "liveValue": 110,
+      "newValue": 115,
+      "propValueId": "6a0f6d304ff8277cd43069b1",
+      "dryRun": false
+    },
+    {
+      "op": "U2  Lending name → \"Loans\"",
+      "entityId": "6a0f6d314ff8277cd43069f8",
+      "field": "name",
+      "action": "UPDATED",
+      "liveValue": "Lending",
+      "newValue": "Loans",
+      "propValueId": "6a0f6d314ff8277cd43069fd",
+      "dryRun": false
+    },
+    {
+      "op": "U3  Loans ordinal 240 → 230",
+      "entityId": "6a0f6d314ff8277cd43069f8",
+      "field": "ordinal",
+      "action": "UPDATED",
+      "liveValue": 240,
+      "newValue": 230,
+      "propValueId": "6a0f6d314ff8277cd43069fe",
+      "dryRun": false
+    },
+    {
+      "op": "U4  Libraries ordinal 200 → 240",
+      "entityId": "6a0f6d314ff8277cd43069cc",
+      "field": "ordinal",
+      "action": "UPDATED",
+      "liveValue": 200,
+      "newValue": 240,
+      "propValueId": "6a0f6d314ff8277cd43069d2",
+      "dryRun": false
+    },
+    {
+      "op": "U5  Works ordinal 210 → 200",
+      "entityId": "6a0f6d314ff8277cd43069d7",
+      "field": "ordinal",
+      "action": "UPDATED",
+      "liveValue": 210,
+      "newValue": 200,
+      "propValueId": "6a0f6d314ff8277cd43069dd",
+      "dryRun": false
+    },
+    {
+      "op": "U6  Editions ordinal 220 → 210",
+      "entityId": "6a0f6d314ff8277cd43069e2",
+      "field": "ordinal",
+      "action": "UPDATED",
+      "liveValue": 220,
+      "newValue": 210,
+      "propValueId": "6a0f6d314ff8277cd43069e8",
+      "dryRun": false
+    },
+    {
+      "op": "U7  Copies ordinal 230 → 220",
+      "entityId": "6a0f6d314ff8277cd43069ed",
+      "field": "ordinal",
+      "action": "UPDATED",
+      "liveValue": 230,
+      "newValue": 220,
+      "propValueId": "6a0f6d314ff8277cd43069f3",
+      "dryRun": false
+    },
+    {
+      "op": "U8  Events ordinal 420 → 400",
+      "entityId": "6a0f6d314ff8277cd4306a2f",
+      "field": "ordinal",
+      "action": "UPDATED",
+      "liveValue": 420,
+      "newValue": 400,
+      "propValueId": "6a0f6d314ff8277cd4306a35",
+      "dryRun": false
+    },
+    {
+      "op": "U9  Events query sort name.string → start_date.date",
+      "entityId": "6a0f6d314ff8277cd4306a2f",
+      "field": "query",
+      "action": "UPDATED",
+      "liveValue": "_type.string=event&sort=name.string",
+      "newValue": "_type.string=event&sort=start_date.date",
+      "propValueId": "6a0f6d314ff8277cd4306a36",
+      "dryRun": false
+    },
+    {
+      "op": "U10 Seasons ordinal 400 → 410",
+      "entityId": "6a0f6d314ff8277cd4306a19",
+      "field": "ordinal",
+      "action": "UPDATED",
+      "liveValue": 400,
+      "newValue": 410,
+      "propValueId": "6a0f6d314ff8277cd4306a1f",
+      "dryRun": false
+    },
+    {
+      "op": "U11 Seasons query sort name.string → start_date.date",
+      "entityId": "6a0f6d314ff8277cd4306a19",
+      "field": "query",
+      "action": "UPDATED",
+      "liveValue": "_type.string=season&sort=name.string",
+      "newValue": "_type.string=season&sort=start_date.date",
+      "propValueId": "6a0f6d314ff8277cd4306a20",
+      "dryRun": false
+    },
+    {
+      "op": "U12 Repertoire ordinal 430 → 420",
+      "entityId": "6a0f6d324ff8277cd4306a3a",
+      "field": "ordinal",
+      "action": "UPDATED",
+      "liveValue": 430,
+      "newValue": 420,
+      "propValueId": "6a0f6d324ff8277cd4306a40",
+      "dryRun": false
+    },
+    {
+      "op": "U13 Programme Items ordinal 440 → 430",
+      "entityId": "6a0f6d324ff8277cd4306a45",
+      "field": "ordinal",
+      "action": "UPDATED",
+      "liveValue": 440,
+      "newValue": 430,
+      "propValueId": "6a0f6d324ff8277cd4306a4b",
+      "dryRun": false
+    },
+    {
+      "op": "U14 Programme Items name → \"Programme\"",
+      "entityId": "6a0f6d324ff8277cd4306a45",
+      "field": "name",
+      "action": "UPDATED",
+      "liveValue": "Programme Items",
+      "newValue": "Programme",
+      "propValueId": "6a0f6d324ff8277cd4306a4a",
+      "dryRun": false
+    },
+    {
+      "op": "U15 Event Series ordinal 410 → 440",
+      "entityId": "6a0f6d314ff8277cd4306a24",
+      "field": "ordinal",
+      "action": "UPDATED",
+      "liveValue": 410,
+      "newValue": 440,
+      "propValueId": "6a0f6d314ff8277cd4306a2a",
+      "dryRun": false
+    },
+    {
+      "op": "U16 Attendance ordinal 510 → 500",
+      "entityId": "6a0f6d324ff8277cd4306a5b",
+      "field": "ordinal",
+      "action": "UPDATED",
+      "liveValue": 510,
+      "newValue": 500,
+      "propValueId": "6a0f6d324ff8277cd4306a61",
+      "dryRun": false
+    },
+    {
+      "op": "U17 RSVPs ordinal 500 → 510",
+      "entityId": "6a0f6d324ff8277cd4306a50",
+      "field": "ordinal",
+      "action": "UPDATED",
+      "liveValue": 500,
+      "newValue": 510,
+      "propValueId": "6a0f6d324ff8277cd4306a56",
+      "dryRun": false
+    }
+  ]
+}

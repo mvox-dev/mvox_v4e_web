@@ -1,0 +1,164 @@
+{
+  "runAt": "2026-05-23T09:11:24.001Z",
+  "db": "polyphony",
+  "dryRun": true,
+  "totalOps": 17,
+  "updated": 0,
+  "skipped": 17,
+  "halted": 0,
+  "ops": [
+    {
+      "op": "U1  Voices ordinal 110 → 115",
+      "entityId": "6a0f6d304ff8277cd43069ab",
+      "field": "ordinal",
+      "action": "SKIPPED",
+      "liveValue": 110,
+      "newValue": 115,
+      "dryRun": true
+    },
+    {
+      "op": "U2  Lending name → \"Loans\"",
+      "entityId": "6a0f6d314ff8277cd43069f8",
+      "field": "name",
+      "action": "SKIPPED",
+      "liveValue": "Lending",
+      "newValue": "Loans",
+      "dryRun": true
+    },
+    {
+      "op": "U3  Loans ordinal 240 → 230",
+      "entityId": "6a0f6d314ff8277cd43069f8",
+      "field": "ordinal",
+      "action": "SKIPPED",
+      "liveValue": 240,
+      "newValue": 230,
+      "dryRun": true
+    },
+    {
+      "op": "U4  Libraries ordinal 200 → 240",
+      "entityId": "6a0f6d314ff8277cd43069cc",
+      "field": "ordinal",
+      "action": "SKIPPED",
+      "liveValue": 200,
+      "newValue": 240,
+      "dryRun": true
+    },
+    {
+      "op": "U5  Works ordinal 210 → 200",
+      "entityId": "6a0f6d314ff8277cd43069d7",
+      "field": "ordinal",
+      "action": "SKIPPED",
+      "liveValue": 210,
+      "newValue": 200,
+      "dryRun": true
+    },
+    {
+      "op": "U6  Editions ordinal 220 → 210",
+      "entityId": "6a0f6d314ff8277cd43069e2",
+      "field": "ordinal",
+      "action": "SKIPPED",
+      "liveValue": 220,
+      "newValue": 210,
+      "dryRun": true
+    },
+    {
+      "op": "U7  Copies ordinal 230 → 220",
+      "entityId": "6a0f6d314ff8277cd43069ed",
+      "field": "ordinal",
+      "action": "SKIPPED",
+      "liveValue": 230,
+      "newValue": 220,
+      "dryRun": true
+    },
+    {
+      "op": "U8  Events ordinal 420 → 400",
+      "entityId": "6a0f6d314ff8277cd4306a2f",
+      "field": "ordinal",
+      "action": "SKIPPED",
+      "liveValue": 420,
+      "newValue": 400,
+      "dryRun": true
+    },
+    {
+      "op": "U9  Events query sort name.string → start_date.date",
+      "entityId": "6a0f6d314ff8277cd4306a2f",
+      "field": "query",
+      "action": "SKIPPED",
+      "liveValue": "_type.string=event&sort=name.string",
+      "newValue": "_type.string=event&sort=start_date.date",
+      "dryRun": true
+    },
+    {
+      "op": "U10 Seasons ordinal 400 → 410",
+      "entityId": "6a0f6d314ff8277cd4306a19",
+      "field": "ordinal",
+      "action": "SKIPPED",
+      "liveValue": 400,
+      "newValue": 410,
+      "dryRun": true
+    },
+    {
+      "op": "U11 Seasons query sort name.string → start_date.date",
+      "entityId": "6a0f6d314ff8277cd4306a19",
+      "field": "query",
+      "action": "SKIPPED",
+      "liveValue": "_type.string=season&sort=name.string",
+      "newValue": "_type.string=season&sort=start_date.date",
+      "dryRun": true
+    },
+    {
+      "op": "U12 Repertoire ordinal 430 → 420",
+      "entityId": "6a0f6d324ff8277cd4306a3a",
+      "field": "ordinal",
+      "action": "SKIPPED",
+      "liveValue": 430,
+      "newValue": 420,
+      "dryRun": true
+    },
+    {
+      "op": "U13 Programme Items ordinal 440 → 430",
+      "entityId": "6a0f6d324ff8277cd4306a45",
+      "field": "ordinal",
+      "action": "SKIPPED",
+      "liveValue": 440,
+      "newValue": 430,
+      "dryRun": true
+    },
+    {
+      "op": "U14 Programme Items name → \"Programme\"",
+      "entityId": "6a0f6d324ff8277cd4306a45",
+      "field": "name",
+      "action": "SKIPPED",
+      "liveValue": "Programme Items",
+      "newValue": "Programme",
+      "dryRun": true
+    },
+    {
+      "op": "U15 Event Series ordinal 410 → 440",
+      "entityId": "6a0f6d314ff8277cd4306a24",
+      "field": "ordinal",
+      "action": "SKIPPED",
+      "liveValue": 410,
+      "newValue": 440,
+      "dryRun": true
+    },
+    {
+      "op": "U16 Attendance ordinal 510 → 500",
+      "entityId": "6a0f6d324ff8277cd4306a5b",
+      "field": "ordinal",
+      "action": "SKIPPED",
+      "liveValue": 510,
+      "newValue": 500,
+      "dryRun": true
+    },
+    {
+      "op": "U17 RSVPs ordinal 500 → 510",
+      "entityId": "6a0f6d324ff8277cd4306a50",
+      "field": "ordinal",
+      "action": "SKIPPED",
+      "liveValue": 500,
+      "newValue": 510,
+      "dryRun": true
+    }
+  ]
+}
