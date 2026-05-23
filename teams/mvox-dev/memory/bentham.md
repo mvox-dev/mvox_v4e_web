@@ -7,6 +7,23 @@ metadata:
 
 # Bentham scratchpad
 
+## 2026-05-23 — Session 17 CLOSE: CHORE-B shipped on production
+
+[CHECKPOINT] **Path C is live.** CHORE-B merged + deployed; 4 hotfixes landed in the same session (next= URL shape mirror, YELLOW-B.1 fold-in, layout-nav reactive to localStorage, pre-merge dev-scaffold drop + auth-UI hydration gate). My initial branch GREEN was correct on its scope but the integration cycle surfaced 4 follow-up issues that only PO live-test could find — appropriate split: my static review caught the YELLOW set; integration caught the dynamic cases.
+
+[LEARNED] **YELLOW-B.1 closed by HOTFIX-2 (task #49).** PO live-test confirmed the `document.referrer` derivation was empty post-OAuth round-trip (as predicted); fix landed by encoding `provider` in the OAuth state payload — the alternative the file's own author comment had named. **Calibration**: when a static-review YELLOW flags a fix path that the file's own comment endorses + the fix is small, lean toward "fold-in pre-merge" rather than "post-merge follow-up issue." The cost of the post-merge fold-in (HOTFIX-2 commit + branch dispatch + re-review) exceeded what the pre-merge fold-in would have cost. Future Bentham: if a YELLOW's fix is sub-10-line + the implementer's own comments already point to it, prefer fold-in before merge, not after.
+
+[LEARNED] **Hotfix sequencing observation: 4 hotfixes for a single feature merge is the upper bound of "acceptable iteration."** All four were post-merge issues only surfaceable by live-test (next= URL shape; provider memory; nav reactive to localStorage; hydration race for auth UI). The static-review gate did not catch them and was not designed to. The CHORE-C plan should explicitly carry a `PO-live-test → hotfix-cycle` step as expected, NOT as exception. Encode this in session-18 plan-review calibration: any Path C-style architectural rewrite plan must include a budgeted hotfix-cycle window between merge and "done."
+
+[DEFERRED → Session 18 stewardship] **Three carry-forwards for session 18 (all from session-17 review patterns):**
+1. **Lift "every-commit-GREEN on a feature branch" to settled arch-decisions entry.** Sibling to the lint:fix-in-GREEN entry from session 16. CHORE-B is the canonical exemplar: 15 implementer commits, zero broken intermediates, bisect-clean across Josquin's two Path-2 re-sequencings.
+2. **Author the entu-research case study (task #16) + Brilliant entry (task #17).** Now that Path C is live + the 4-hotfix-cycle is documented as expected-not-exception, the case study has real production evidence to cite. Defer the entu docs RFC (task #18) per its current `[DEFERRED]` status.
+3. **YELLOW-50.1/51.1/A.3/A.4 are all closed.** Stewardship ledger is clean entering session 18.
+
+[GOTCHA] **B16 self-fix lesson stands.** The `PUBLIC_ENTU_API_URL` misattribution I caught + fixed in `93122ab` is the canonical example for "re-read source files BEFORE the steward commit." Bake this into my own startup ritual: when writing arch-decisions on the same branch as code changes, the workflow is `[read source] → [author doc] → [commit]`, not `[author doc from memory] → [commit] → [read source] → [self-fix]`. The self-fix worked but cost a commit + diluted the audit trail.
+
+---
+
 ## 2026-05-23 — Session 17: CHORE-B GREEN (16 commits + B16 steward edit + self-fix)
 
 [CHECKPOINT] **Branch `feat/chore-53b-rewrite` verdict: GREEN with 2 YELLOWs.** HEAD `93122ab` (post-B16 + post-self-fix). 17 commits total: 15 implementer commits (B1→B14, all signed by Josquin/Byrd, per-commit GREEN held throughout) + B16 architecture-decisions rewrite + minor self-fix of an env-var inaccuracy I introduced in B16. Verification: pnpm check 0 errors, 360/360 unit tests, lint clean. The 11 Playwright failures pre-flagged as CHORE-C scope (`tests/frontend-scaffolding.spec.ts` mocks the deleted BFF) — confirmed NOT branch-introduced regressions; they're the explicit "BFF mocks now reference deleted routes" gap.

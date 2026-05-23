@@ -4,6 +4,92 @@ Personal notes. Only Josquin writes here.
 
 ---
 
+## [PATTERN] 2026-05-23 session 17 — Surface-and-stop when type-check would RED, propose Path 2 split
+
+CHORE-B11 + B12 both hit a transient "production code would type-check-RED if I land the planned commit alone" scenario. The plan ordering was opportunistic, not load-bearing — it assumed downstream commits would close the type gap. Team-lead's dispatch in BOTH cases said "if check warns, surface and stop." I did, and both times team-lead chose **Path 2**: split the commit so the load-bearing change lands alone (keeping branch GREEN), defer the cosmetic type-cleanup to a later commit that has zero consumers left.
+
+**Template for the surface-and-stop message** (worked twice cleanly):
+
+1. Quote the concrete error output verbatim (file:line + message).
+2. Diff-vs-other-cases — explain WHY this RED happened when prior similar work didn't. (For B12: `import type { PageData } from './$types'` vs `$props<{ data: {...} }>()` — the former cross-validates, the latter doesn't.)
+3. Enumerate options as **Path 1 / Path 2 / Path 3** with explicit tradeoffs (transient broken state vs cross-agent coupling vs in-band shim).
+4. Make a recommendation with a one-line reason.
+5. Surface the question — don't proceed.
+
+**When surface-and-stop is the right move**: any time the immediate next file write would (a) red `pnpm check` AND (b) the plan claims subsequent commits will close it. The "GREEN per commit on the feature branch" stance is worth a small dispatch round-trip; Bentham reviews atom by atom, not "branch end-state vs trunk."
+
+**When it's wrong**: when the type error IS the whole point of the commit (intentional API surface change with planned consumer updates in the same atom). Use judgement: is this a refactor where the type change AND consumer fixes belong in the same atom? Then don't split.
+
+CHORE-B17 squash commit message acknowledged this pattern obliquely: "Post-design hotfixes during live-test (folded in via squash)" — five hotfix commits made it past the formal TDD chain because live-test surfaced things tests couldn't. The atomic-per-commit-GREEN discipline kept those hotfixes reviewable.
+
+(*MVOX:Josquin*)
+
+---
+
+## [GOTCHA] 2026-05-23 session 17 — Stale task_assignment notifications arrive AFTER your completion report
+
+Roughly half of the CHORE-B dispatches arrived to me as `{type: "task_assignment", ...}` JSON from team-lead WITH timestamps that PREDATED my own GREEN-report timestamp on the SAME task. Pattern: team-lead sends the task_assignment + the dispatch message, but the task_assignment notification arrives in my inbox after I've already completed the task and reported back.
+
+Sequence observed (B1 → B14):
+- 08:58:14Z task_assignment for #27 arrived AFTER my 09:11 GREEN report
+- 09:16:10Z task_assignment for #30 arrived AFTER my 09:19 GREEN report
+- 09:22:09Z task_assignment for #31 arrived AFTER my 09:25 GREEN report
+- 09:29:22Z task_assignment for #33 arrived AFTER my 09:31 GREEN report
+- 09:34:18Z task_assignment for #35 arrived AFTER my 09:36 GREEN report
+- 09:42:51Z task_assignment for #37 arrived AFTER my own surface-and-stop msg (#37 in_progress, holding)
+- 09:47:59Z task_assignment for #38 arrived AFTER my B12 surface-and-stop msg (#38 in_progress, holding)
+- 10:06:25Z task_assignment for #40 arrived AFTER my 10:08 GREEN report
+- 10:38:50Z task_assignment for #43 arrived AFTER my 10:42 Steps 1-3 report
+
+Team-lead confirmed on the first one (09:15): "TaskUpdate-fires-notification artifact; ignore." Subsequent stale notifications get a one-line ack from me: "Stale task_assignment for #N — already completed at SHA (timestamp X)." Quiet but auditable.
+
+**Don't let stale assignments make you redo work** — always check the task list state + your own previous report before reacting. The pattern is that TaskUpdate(owner=josquin) triggers an in-process notification that lags behind the original SendMessage dispatch + my own SendMessage report.
+
+(*MVOX:Josquin*)
+
+---
+
+## [CHECKPOINT] 2026-05-23 session 17 — CHORE-B Path C shipped to production at `fc99291`
+
+Squash-merged 18 feature commits + 5 live-test hotfixes into `feat(#53): CHORE-B -- Path C rewrite -- browser-direct Entu`. Net `+910 / -2490` (−1580 lines). PR #58 closed; branch `feat/chore-53b-rewrite` deleted local + remote. Issues #53 + #57 auto-closed by squash commit body. Production deploy: `https://multivox.pages.dev` at hash `a9c9ad88`. Smoke 200/200.
+
+### What's on production after this merge
+
+Path C end-state — mvox now mirrors `entu/webapp`:
+- JWT in browser localStorage (not httpOnly cookie)
+- Browser-direct calls to api.entu.app on every data path
+- No BFF data routes (`/api/organizations/*` deleted)
+- OAuth init + callback + logout all client-side
+- 401 in any data call triggers involuntary re-auth via saved provider (state-encoded, not document.referrer)
+- `hooks.server.ts` is pure pass-through
+- `Locals.entuJwt` stripped from `src/app.d.ts`
+
+### Durables worth keeping (beyond the per-task [PATTERN] entries above)
+
+[CONTRACT] **The 5 live-test hotfixes captured architectural learnings worth preserving** — they're squash-folded but each was its own atomic commit on the branch:
+- **`5aacd1c`**: bare `next=` URL + state to localStorage (mirror entu/webapp; the plan's `?state=&key=` pattern was a Path A vestige).
+- **`0a2c7bd`**: provider encoded in OAuth state, closing #57 ("YELLOW-B.1 via document.referrer fragility"). State now `{provider, csrf}` not just CSRF — saves the saved-provider deterministically across cross-origin OAuth redirects where referrer is stripped (Google + Apple).
+- **`4df0dea`**: dropped sessionStorage nonce verify on /auth/callback because it broke email auth (email's callback comes from a different origin than the init, so sessionStorage on init-origin isn't available on callback-origin). Decided IP-binding is the CSRF defense; sessionStorage was belt-and-braces that broke a provider. Lesson: belt-and-braces stacking adds failure modes too.
+- **`2f771b8`**: layout nav reactive to localStorage state (signed-in/-out toggle didn't update on logout in another tab). storage-event listener pattern.
+- **`f4f7a0a`**: gate auth-state UI on hydration (no flash of incorrect content). `let hydrated = $state(false); $effect(() => { hydrated = true; });` — render-shell-first, then derive auth state after mount.
+
+[PATTERN] **Architectural rewrite gate sequence that worked**: full TDD chain (Tallis RED → Byrd/Josquin GREEN per atom) → Bentham review → squash-PR open → CF Pages **preview** deploy → PO live-test on preview (6 providers + edge cases) → only THEN squash-merge to main → production deploy → PO final-verify on production. The preview deploy was load-bearing — it surfaced 5 hotfixes that no test caught (auth-side bugs that only manifest with real Entu round-trip). Cannot architect-review your way to GREEN past a PO live-test for OAuth/architectural rewrites.
+
+[PATTERN] **ASCII-only commit titles on CF Pages deploys** — wrangler rejects non-ASCII. Team-lead's session-17 dispatch flagged this; I used `--` instead of `—` and `'` instead of `'` in the squash commit. Documented in architecture-decisions if Bentham steward-edits it later, but tactical note: just default to ASCII in commit titles intended for CF Pages production deploys.
+
+[PATTERN] **Stash dance for branch transitions when peers have dirty scratchpads**: `git stash push -m "<owner> scratchpad pre-<op>" -- teams/mvox-dev/memory/<owner>.md` before `git checkout main` / before push; `git stash pop` after. Done twice this session (B17 push + B17 merge); used `git stash push -m <label>` form for traceability when multiple stashes might queue.
+
+### Open items at session-17 close
+
+- **PO final-verify on production** (Step 7) — not yet relayed by team-lead at shutdown time. If it surfaces a regression, would land as fast-follow hotfix on main.
+- **CHORE-C** — Playwright fixture rewrite for browser-direct mode. YELLOW-B.2 scope. 11 Playwright failures still in test:e2e; all pre-flagged + tracked. Tallis-owned.
+- **Issues #16, #17, #19** — documentation / case study outputs (entu/research case study, Brilliant KB pattern, Argo ask). Deferred; not my scope.
+- **CHORE-49 (Biome rule enablement)** — still deferred (5 sub-cycles). Lint:fix in GREEN discipline has held without it.
+
+(*MVOX:Josquin*)
+
+---
+
 ## [PATTERN] 2026-05-23 session 16 — GREEN agents must run `pnpm lint:fix`, not just `pnpm test`
 
 CHORE-A's A5 verification gate (post-Byrd/Tallis GREEN reports for A1-A4) failed `pnpm lint` on 4 files: 3 from prior A1-A3 cycles (Byrd's `wrapper.ts`, Tallis's `wrapper.spec.ts` + `state.spec.ts`) + 1 from A4's Tallis RED (`client.spec.ts`). All 4 were Biome formatter complaints — line-break style on chained `vi.fn().mockResolvedValue(...)` calls — pure cosmetic, no semantic impact. `pnpm lint:fix` auto-resolved all 4 in one sweep.

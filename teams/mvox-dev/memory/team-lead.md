@@ -1,6 +1,93 @@
 # Palestrina — Team Lead Scratchpad
 
-### [NEXT SESSION] 2026-05-23 — session-16 → session-17
+### [NEXT SESSION] 2026-05-23 — session-17 → session-18
+
+**Headline: CHORE-B (Path C rewrite) shipped to production.** Squash `fc99291` on main; net −1580 lines (Path C is materially simpler than the BFF model). GH issues #53 + #57 auto-closed. PO live-tested 3 OAuth providers on production (Smart-ID, Google, e-mail) end-to-end; deferred 3 (mobile-id, id-card, apple) for one week via routine `trig_014xDo7ZTuzNLpBUuWdtEs32` firing 2026-05-30T09:00:00Z. Production URL: https://multivox.pages.dev/ — browser-direct architecture is live and verified.
+
+**Session 17 outcome — 1 squash merge (CHORE-B), 2 issues closed (#53 + #57), 2 issues filed (#57 mid-session before its own fix, #59 deferred-providers), 1 scheduled routine, 1 bonus live menu rationalization on polyphony.**
+
+| Slate | Issue / Artifact | SHA | What landed |
+|---|---|---|---|
+| 1 | CHORE-B Path C squash | `fc99291` | The whole rewrite as one merge commit. 49 files, +910/−2490. Closes #53 + #57. |
+| 2 | Pérotin menu usability live | `9297df7` | 17 UPDATE ops on polyphony — Voices ordinal collision fixed, Library group reordered (Works lead), Temporal group reordered (Events primary), Lending → Loans, sorts to start_date.date, "Programme Items" → "Programme". |
+| 3 | Pérotin scratchpad commit | `450280f` | Session-17 catalog + Q4 date-sort finding + affiliation-deep probe closure. |
+| — | Live-test hotfixes (subsumed in fc99291 squash) | 4 commits | bare next= + state-to-localStorage (`477f27f`); provider-in-state closes #57 (`5f2dcf4`); drop sessionStorage nonce verify — broke email auth (`4df0dea`); layout nav reactive (`2f771b8`); pre-merge cleanup gates auth UI on hydration + drops dev scaffold (`f4f7a0a`). |
+
+**Architecture-decisions.md gained (Bentham B16, in squash):**
+- NEW: "Data path — browser-direct to Entu (CHORE-53/Path C)" — codifies storage model, wire shapes, 5 RED review triggers (no new BFF data proxies; localStorage only via storage.ts; no user/accounts AFTER setToken; no consumer-side 401 handling; case-by-case for novel client→Entu calls).
+- NEW: "BFF elevated-ops list" — seeded empty; future additions need rationale + team-lead approval.
+- Prior "Client-side Entu carve-out" section retained with `SUPERSEDED 2026-05-23` header.
+- YELLOW-50.1 + 51.1 resolved (wire-shape literal/parenthetical now canonical in new section).
+- YELLOW-A.3 + A.4 folded (import-extension consistency + token-version invariant comment in storage.ts).
+
+**Bonus session work:**
+- **Pérotin menu usability pass** — proposal doc + 17-op live execution + post-exec verify. PO answered Q1-Q4 cleanly mid-session. `9297df7` clean piece on what was supposed to be an auth-refactor session.
+- **Finn research on `claude.ai/design/`** — source-verified report covering capabilities, fit assessment, handoff workflow. Headline: full-page-mockup tool (3 variants/prompt), HTML/CSS + tokens.json output, Send-to-Claude-Code handoff converts to Svelte. Pricing in Pro/Max/Team subscription pool; iteration sessions burn fast. Fit for mvox: viable for visual direction; Byrd-via-Claude-Code converts to Svelte. **See session-17 inbox archive for the full report.**
+- **GH comments on #6 + #54** — CF binding options at brainstorm time: Cron Triggers + Email Workers (for #6); Analytics Engine (for #54). No commitments; reminder-only.
+
+**Carry-forward queue for session 18 (priority order):**
+
+1. **PO final-verify on production status** — PO verified 3 providers (Smart-ID, Google, e-mail) before shutdown. Confirm no post-shutdown regression surfaced; if any, fast-follow on main.
+2. **UI/design brainstorm — Claude Design lane.** PO interested. Finn's research is the framing input (full-page-cards vs component-library question already partially answered: Claude Design is a page-mockup tool, not a primitive generator). Brainstorm could decide: (a) Claude Design for visual direction + Bits UI / Melt UI for headless primitives + Byrd integrates, (b) pre-built library (Skeleton/Flowbite Svelte), (c) hand-rolled continuation. **Suggested as session-18 headline.**
+3. **CHORE-C — Path C test infrastructure rewrite.** Plan exists at `docs/superpowers/plans/2026-05-23-chore-53-c-test-infra.md` (791 lines, 9 tasks). MSW + Playwright bootstrap + E2E coverage. Closes #36, #39, #33 + the 11 pre-existing Playwright failures (10 frontend-scaffolding.spec.ts + 1 tailwind/OKLCH). Tallis-heavy.
+4. **Routine fires 2026-05-30T09:00:00Z** (`trig_014xDo7ZTuzNLpBUuWdtEs32`) → emails PO with #59 deferred-providers checklist. May or may not be a session-18 thing depending on cadence.
+5. **Bentham deferred [DEFERRED → session 18]** (his scratchpad): lift "every-commit-GREEN on a feature branch" to settled arch-decisions entry, sibling to lint:fix-in-GREEN, with CHORE-B as canonical exemplar. Bentham endorsed; needs his stewardship commit.
+6. **entu-research case study (task #16, GH issue carry)** — now have production evidence + 4-hotfix cycle data. `$ENTU_RESEARCH/docs/case-studies/2026-05-3rd-party-frontend-on-entu.md`.
+7. **Brilliant KB entry (task #17)** — `Patterns/entu/3rd-party-frontend-browser-direct`. Lifts from the case study.
+8. **Argo ask (#19, task #19)** — `login_hint` passthrough request. Forward-compat is already shipped in mvox; this is purely about Entu accepting the parameter.
+9. **Dead nonce code cleanup** — `storeNonce` / `verifyNonce` / `createNonce` in `src/lib/auth/state.ts` still exported but no longer called from production. Small refactor.
+10. **#43 mvox.eu custom domain** — independent; PO DNS work.
+11. **#44 CF Pages Git-connected migration** — independent; brief outage during swap.
+12. **#49 Biome lint rule enablement** (5 sub-cycles) — incremental; no urgency.
+13. **#6 CHORE-6 Email Resend** — still blocked on PO SPF + DKIM DNS. Now has CF Cron Triggers + Email Workers as binding options to weigh at brainstorm.
+14. **#54 CHORE-54 client-side error capture** — deferred; has CF Analytics Engine as a tool-choice option.
+15. **#59 deferred-providers verification** — handled by scheduled routine fire 2026-05-30.
+
+**Live state at session-17 close:**
+- main: `fc99291` (CHORE-B) — PLUS the shutdown bundle commit when I push this seed.
+- Production deployment: `a9c9ad88.multivox.pages.dev` (alias `multivox.pages.dev` serving same build)
+- Tests: vitest 361/361 unit, pnpm check 0, pnpm lint 0, pnpm build clean
+- Playwright: 11 pre-existing failures (10 frontend-scaffolding mock the deleted BFF; 1 tailwind/OKLCH) — CHORE-C scope, YELLOW-B.2 in Bentham's review
+- Polyphony Entu db: menus rationalized + relabeled per Pérotin's `9297df7`. 18 v4E domain menus + 5 Entu meta. 6 orgs / 122 persons unchanged on instance side.
+- Agents at shutdown: finn, bentham, perotin, tallis, byrd, josquin all spawned + cleanly terminated this session
+- Scheduled routine: `trig_014xDo7ZTuzNLpBUuWdtEs32` next_run_at 2026-05-30T09:00:00Z. Manage at https://claude.ai/code/routines/trig_014xDo7ZTuzNLpBUuWdtEs32
+
+**Expected first action session 18:**
+1. Read this seed + `git log --oneline fc99291..HEAD` (the shutdown bundle commit + any post-shutdown commits)
+2. Verify production health: `curl -sI https://multivox.pages.dev/` and `/auth/login` — expect 200
+3. Spawn finn + bentham + perotin per Phase 5 (always-on). May spawn comenius if i18n work surfaces.
+4. **Confirm with PO: session-18 headline.** Three reasonable lanes:
+   - **(a) UI/design brainstorm** — kick off the Claude Design vs primitives vs library decision using `superpowers:brainstorming`. Finn's research is the input. Output: a deliberate visual system + handoff workflow.
+   - **(b) CHORE-C test infra** — execute the existing plan (`docs/superpowers/plans/2026-05-23-chore-53-c-test-infra.md`). Tallis-heavy, ~9 tasks. Closes 4 GH issues + 11 Playwright failures.
+   - **(c) Both, in parallel?** UI brainstorm doesn't need a feature branch; CHORE-C does. No conflict.
+
+**Process lessons from session 17 (worth carrying forward):**
+
+- **L68 — Per-commit-GREEN discipline on feature branches.** Surfaced by Josquin's surface-and-stop twice (B11 type-strip would break landing's PageData; B12 server-load → {} would strip data.session in-use). We adopted "every commit on a feature branch must independently pass full GREEN gate (check + unit + lint + build)" both times — re-sequenced B12+B13 into B13a→B13b→B12 (3 atomic GREEN commits instead of 1 commit + 1-2 broken intermediate states). Bentham endorsed lifting to settled arch-decisions entry next session. Bentham's review note "bisect viability + prevents transient broken hand-off landing in main on squash."
+- **L69 — Mirror the reference implementation FIRST when unfamiliar wire shape comes back from upstream.** Three of the four live-test hotfixes traced to "we should have followed entu/webapp exactly the first time" — bare `next=` URL (HOTFIX-1), no sessionStorage nonce (HOTFIX-3), provider encoded in state (HOTFIX-2). Each was 5-15 lines of code change but came at the cost of PO live-test interruption + redeploy. Plan-writing rule: when mirroring a reference, READ the reference's exact wire shape, don't infer.
+- **L70 — PO live-test on deployed surface is irreplaceable for architectural auth rewrites.** 361 unit tests passed + Bentham GREEN'd the branch + 11 Playwright failures were all pre-flagged as known. PO clicked Smart-ID and within 3 minutes surfaced a URL-construction bug no test could catch. Subsequent providers surfaced 2 more class-level issues (sessionStorage tab-jump, document.referrer strip). Path C-style architectural rewrites should explicitly BUDGET a hotfix-cycle window between merge-of-branch + ship-to-prod (Bentham's [LEARNED] in his shutdown brief).
+- **L71 — No FOIC (flash of incorrect content) for auth-state UI.** SSR + initial hydration default of `signedIn=false` renders the "Sign in" link briefly even when user is signed in. PO principle: "We shouldn't show any controls, ever, before we make sure they make sense." Fix: gate auth-state-dependent rendering on a `mounted` flag set in onMount. Empty space during SSR/first frame; correct controls after hydration. Applied to layout nav + landing page.
+- **L72 — ASCII-only commit messages when deploying via Wrangler / CF Pages.** Em-dash (U+2014) gets rejected with error 8000111 "Invalid commit message, it must be a valid UTF-8 string." Required a `--force-with-lease` amend on Byrd's HOTFIX-1 commit. Use `--` (double-dash) not `—` in any commit message that'll go through a CF Pages deploy.
+- **L73 — Dev scaffolds net-zero in feature branch.** For PO live-test ergonomics during a long PR cycle, adding a temporary `/dev/*` scaffold (e.g., debug-controls page) is legitimate. Add commit + remove commit both ride into the squash → net change in main is zero. No production exposure. Pattern beats "gate via env var + leave in main" because squash hides the noise entirely.
+- **L74 — Surface-and-stop as the implementer's preferred response to plan-ordering risk.** Josquin's two B11/B12 surfaces were the right move — they kept the branch in a GREEN state through every commit without bypassing the plan's intent. The replacement is small ordering tweaks (B12+B13 became B13a→B13b→B12) that preserve every step but reorder for atomicity. Template for future architectural rewrites where commit-by-commit GREEN matters.
+- **L75 — Routine scheduling for time-deferred follow-ups.** PO deferred 3 OAuth providers "for a week" — we filed GH #59 + scheduled `trig_014xDo7ZTuzNLpBUuWdtEs32` to fire 2026-05-30T09:00:00Z. The routine reads the issue + emails PO + comments on the issue. Reusable pattern for any "defer for N days" PO call where the artifact (issue with checklist) is clearly named.
+
+**Brilliant KB updates (deferred — when PO has bandwidth):**
+- New: `Patterns/per-commit-green-discipline` — codify L68 with CHORE-B as exemplar
+- New: `Patterns/mirror-reference-impl-on-unfamiliar-wire-shapes` — codify L69
+- New: `Patterns/po-live-test-irreplaceable-for-arch-rewrites` — codify L70 with the 4-hotfix-window note
+- New: `Patterns/no-foic-mounted-gate` — codify L71
+- New: `Patterns/ascii-only-commits-for-wrangler-cf-pages` — codify L72
+- New: `Patterns/dev-scaffold-net-zero-in-branch` — codify L73
+- New: `Patterns/surface-and-stop-on-plan-ordering` — codify L74
+- New: `Patterns/scheduled-routine-for-deferred-followup` — codify L75
+- Update: `Projects/mvox` — Path C live on production; browser-direct architecture; UI/design lane next
+
+(*MVOX:Palestrina*)
+
+---
+
+### [PROCESSED 2026-05-23 end-of-session-17] session-16 → session-17
 
 **Headline: CHORE-53 went from "architectural fork" to "spec + plans approved + CHORE-A merged + deployed" in one session.** The Path C decision is the call (mirror entu/webapp: localStorage JWT + browser-direct api.entu.app + IP-binding-as-security-model). Spec at `docs/superpowers/specs/2026-05-23-chore-53-path-c-design.md`. Implementation plans (A/B/C) at `docs/superpowers/plans/2026-05-23-chore-53-*.md`. **CHORE-A is merged + deployed; CHORE-B is the big rewrite + the headline for session 17.**
 

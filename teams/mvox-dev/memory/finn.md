@@ -195,3 +195,35 @@ These were NOT updated when CHORE-50 fixed `entu-config.ts`. They still pass (st
 - `src/tests/routes/api/organizations/server.spec.ts:45`
 - `src/tests/routes/api/organizations/id/sections/server.spec.ts:66`
 - Also: `callback-exchange-helper.spec.ts:67` asserts `/${DB}/auth` — needs updating to `?db=${DB}` pattern
+
+---
+
+## 2026-05-23 — Session 17 findings
+
+### [DECISION] entu/webapp OAuth URL pattern — source-verified (blocking find, session 17)
+
+`entu/webapp` `app/pages/auth/[provider].vue` (main branch):
+
+```js
+const callbackUrl = `${window.location.origin}/auth/callback?key=`
+await navigateTo(`${apiUrl}/auth/${provider}?next=${encodeURIComponent(callbackUrl)}`, { external: true })
+```
+
+- **`next` URL must end in `?key=` with no value** — Entu appends the session-token JWT by string concatenation directly after `key=`
+- **Param name is `key`** — callback reads `route.query.key` (i.e., `url.searchParams.get('key')`)
+- **No state in the URL at all** — entu/webapp stores return path in `localStorage('next')` before redirect; reads it back in callback
+- **No CSRF nonce in the URL** — their CSRF is implicit (localStorage only accessible same-origin)
+
+Our CHORE-B bug: `next` URL had `?state=<base64>` already in it; Entu concatenated JWT after the base64 → `?state=<base64><JWT>`, no `key=` param → `searchParams.get('key')` → null. Fixed in HOTFIX-48 by mirroring entu/webapp pattern (state to sessionStorage, `next` ends in `?key=`).
+
+### [LEARNED] Claude Design fit assessment for mvox (session 17)
+
+- Launched 2026-04-17, Anthropic Labs research preview, Opus 4.7, included in Pro/Max/Team/Enterprise
+- **Primary strength**: full-page layout generation (3 variants per prompt); not a component library tool
+- **Output**: HTML/CSS + handoff bundle (`tokens.json`, component HTML, `guidelines.md`) — NO native Svelte/React output
+- **"Send to Claude Code"** workflow: bundle → Claude Code converts to framework of choice
+- **No Figma export**, no Claude Projects integration, no version control (acknowledged gap)
+- **Credit-heavy**: Lenny's Newsletter host paid $200 extra in one session (Opus 4.7 canvas iteration)
+- **mvox fit**: PO iterates visuals in Claude Design → exports bundle → Byrd converts to Svelte via Claude Code. Two-step, not direct. Best for full-page designs; accessibility/headless logic remains Byrd's domain.
+
+(*MVOX:Finn*)

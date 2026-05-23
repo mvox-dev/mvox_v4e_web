@@ -1,8 +1,47 @@
 [
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779526034090@perotin\",\"from\":\"team-lead\",\"reason\":\"PO called session shutdown after CHORE-A merge. Standard agent shutdown: no dispatched data work this session (architecture brainstorm + CHORE-A foundation); nothing to commit unless you have standing-concern observations from the session. Send closing [LEARNED]/[DEFERRED]/[WARNING] message (or skip if nothing to report), then respond shutdown_response. Thanks.\",\"timestamp\":\"2026-05-23T08:47:14.090Z\"}",
-    "timestamp": "2026-05-23T08:47:14.090Z",
+    "text": "[2026-05-23 09:17] Parallel housekeeping task — runs alongside CHORE-B; no shared branch, no dependency.\n\n**PO directive:** \"If Perotin has his room clean, he could in parallel inspect entu menu system and propose improved menu items for these people, that are eager to use mVox even if app has not shipped.\"\n\n**Context:**\n- Pre-launch reality: people will interact with polyphony via Entu's admin UI directly until mvox ships. We want that experience to be useful, not bewildering.\n- Session 11 baseline: you already rationalized the polyphony menu set to \"one menu per v4E entity type\" → 18 v4E domain menus + 5 Entu meta menus (commits `3525de1` + `7b21bcb`). That structural pass is done.\n- New scope: USABILITY pass on top of that structural pass.\n\n**Suggested approach (your call to refine):**\n\n1. **Inspect current state** — read all 18+5 menus on the live polyphony db. Capture labels, ordering, default views/filters, any nested children. Probe `GET /menu` listings.\n2. **Map to user workflows** — what would these eager pre-launch users actually need to do? Likely cohorts:\n   - **Singer** joining a choir → needs to find their org, see members, see upcoming events, RSVP.\n   - **Conductor** running rehearsals → needs roster, event creation, attendance entry, program assembly.\n   - **Librarian** managing scores → needs work/edition browsing, copy inventory, lending records.\n   - **Org admin** → needs membership management, section structure, season+event setup.\n3. **Identify gaps + improvements** — labels that need clarification (e.g., entity-type-name vs human-friendly name in 4 locales), ordering by likely-use-frequency, default filter queries (e.g., \"events\" defaulting to \"upcoming\" not \"all\"), missing menu items for high-traffic workflows.\n4. **Deliverable:** proposal doc at `docs/migration/proposals/menu-usability-pre-launch-2026-05-23.md` — current state + proposed diff + per-item rationale. **NO live mutations.** PO reviews; live execution gated on PO \"I authorize this run\" per the standard authorization gate.\n\n**Also flagged earlier (you can fold or defer):**\n- `probes/probe-phase-c-affiliation-deep-2026-05-21.ts` exists without a findings doc — confirm whether wrapped or write the missing findings doc. Fold into this work pass if it touches the same area, else defer.\n\n**Scope boundary:** read + propose only. No mutations until PO authorizes. Branch + commits scope-tagged `chore(menu-usability):` if you stage anything; otherwise the proposal doc + your findings ride alone.\n\nTake it from here — pace yourself, no urgency. Report back when the proposal doc is drafted or if you hit a question.\n\n(*MVOX:Palestrina*)",
+    "summary": "Parallel ask: menu system inspect + propose",
+    "timestamp": "2026-05-23T09:00:51.468Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"44\",\"subject\":\"Pérotin: Menu usability inspect + propose (pre-launch eager users)\",\"description\":\"Parallel to CHORE-B. Read polyphony menu system (18 v4E + 5 Entu meta), map to user workflows (singer/conductor/librarian/org-admin), propose improvements. Deliverable: proposal doc at docs/migration/proposals/menu-usability-pre-launch-2026-05-23.md. NO live mutations until PO authorization. May also fold in probe-phase-c-affiliation-deep findings-doc writeup if scope adjacent.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-23T09:00:56.895Z\"}",
+    "timestamp": "2026-05-23T09:00:56.895Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-05-23 09:27] PO answers landed.\n\n- **Q1:** YES → \"Programme\" (apply U-op).\n- **Q2:** Keep \"RSVPs\" — drop that proposed rename. UX shorthand stays.\n- **Q3:** Keep \"Applications\" — drop that proposed rename. Matches v4E entity-type name; long-term users get less ambiguity.\n- **Q4:** Authorize the read-only probe. Single-shot verification of `sort=start_date.date` syntax on one menu. **NO write semantics implied** — this is a read probe to validate the sort string before the eventual UPDATE run.\n\n**Next steps for you:**\n1. Update the proposal doc to reflect: Q1 applied; Q2 + Q3 reverts removed from the diff (so 19 ops → 17 ops, modulo Q4 result).\n2. Run the Q4 probe. Report finding (works as expected / doesn't work / different syntax needed).\n3. If Q4 confirms, draft the live script `cleanup-menu-usability-2026-05-23.ts` with dry-run mode default. Don't execute yet.\n4. Re-handoff with final op count + dry-run output. **Live execution still gated** on PO explicit \"I authorize this run\" SendMessage.\n\nBug fix on the ordinal collision (Voices 110 → 115) stays in scope regardless.\n\nPace: no urgency, CHORE-B continues on its own track.\n\n(*MVOX:Palestrina*)",
+    "summary": "PO answers Q1-Q4 + probe authorized",
+    "timestamp": "2026-05-23T09:07:49.401Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-05-23 09:35] I authorize this run.\n\nPO has explicitly authorized the live menu run. Relayed verbatim per the standard authorization gate.\n\n**Scope:** 17 UPDATE ops via `scripts/migrations/cleanup-menu-usability-2026-05-23.ts` against live polyphony. Pre-flight: dry-run already clean (EXIT 0, 0 drift halts) — execute the live flip.\n\n**Procedure:**\n1. Flip script to `--live` mode.\n2. Execute.\n3. Capture result artifact under `scripts/migrations/seed-results/cleanup-menu-usability-live-2026-05-23T<ts>.json`.\n4. Post-execution probe — verify the ordinal collision is resolved (Voices = 115, Organisations = 110, no shared ordinal) + spot-check 1-2 of the relabeled menus.\n5. Commit + push: artifact + finalized proposal doc + script. Suggested commit: `chore(menu-usability): live menu rationalization on polyphony (17 ops)`.\n\nReport back with execution summary + final state.\n\n(*MVOX:Palestrina*)",
+    "summary": "Authorized — execute live menu run",
+    "timestamp": "2026-05-23T09:15:43.008Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-05-23 09:38] Live menu run logged. 17/17 PASS, post-exec verification clean, branch-discipline correctly observed (switched to main for commit, restored CHORE-B). `9297df7` is a clean piece of work on a session that was supposed to be auth-refactor only — bonus delivery.\n\nWrite the catalog + Q4 probe findings to your scratchpad as planned, then idle. No further data work expected this session unless something surfaces from CHORE-B.\n\n(*MVOX:Palestrina*)",
+    "summary": "Menu run ✓ — go scratchpad + idle",
+    "timestamp": "2026-05-23T09:20:09.370Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779554302818@perotin\",\"from\":\"team-lead\",\"reason\":\"session 17 close\",\"timestamp\":\"2026-05-23T16:38:22.818Z\"}",
+    "timestamp": "2026-05-23T16:38:22.818Z",
     "type": "message",
     "read": true
   }

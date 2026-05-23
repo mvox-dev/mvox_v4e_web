@@ -219,6 +219,16 @@ Updated: `src/tests/routes/auth/oauth/cookie-server.spec.ts` (5 new tests — as
 
 [DECISION] `src/lib/entu/` dir created for new client location. `src/lib/api/` dir created for wrapper. Neither existed at session start. Old `src/lib/server/entu/client.spec.ts` intentionally left untouched — deletion is Josquin's job during A4 GREEN (atomic move).
 
+## [CHECKPOINT] 2026-05-23 — Session 17: HOTFIX RED (entu/webapp next= mirror)
+
+[DECISION] HOTFIX RED written after PO live-test surfaced URL-construction bug. Two specs replaced:
+- `src/routes/auth/[provider]/page.spec.ts` — 5 cases: bare `?key=` next stub, state in localStorage as `mvox.oauth_state`, decode check, login_hint, no-login_hint. 3 RED (next-URL shape, localStorage write, decode).
+- `src/tests/routes/auth/oauth/callback-page-server.spec.ts` — 3 cases: dropped `state` field (server load returns `{ sessionToken, db }` only). All 3 already PASS — server load was already correct.
+
+[GOTCHA] entu/webapp `next` URL is bare `${origin}/auth/callback?key=` — Entu appends JWT via string concat after `key=`. Any existing `?` query in the next value causes Entu to concatenate the JWT onto the last param value, never producing a valid `?key=<JWT>`. State MUST live in localStorage (`mvox.oauth_state`), not embedded in the URL.
+
+[DECISION] CHORE-B Path C merged and live in production at session end.
+
 ## [CHECKPOINT] 2026-05-23 — Session 17: CHORE-B RED phases (B2/B3/B5/B7/B10/B11/B12/B13a/B15)
 
 [DECISION] All CHORE-B RED phases completed this session. Summary of specs written/rewritten:
