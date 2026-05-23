@@ -510,3 +510,28 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
 [DECISION] Branch discipline for data commits: always commit on main, not on active feature branches.
   Session 17: working tree was on feat/chore-53b-rewrite; switched to main for commit, then restored.
   Apply stash pattern if working tree is dirty when switching.
+
+## Session 19 — 2026-05-23
+
+### CHORE-60 librarian bundle seed (task #71)
+
+[CHECKPOINT] Strategy doc + seed script + dry-run complete. Awaiting live authorization.
+  Strategy doc: docs/migration/findings/2026-05-23-librarian-seed-strategy.md (040d8e2, chore/seed-librarian-bundle)
+  Script: scripts/migrations/seed-librarian-bundle-data.ts (4ffce6b, main)
+  Source manifest: scripts/migrations/seed-sources/librarian-bundle.json
+  Dry-run artifact: seed-librarian-bundle-dry-run-2026-05-23T19-41-58-480Z.json
+  Dry-run result: 0 errors, all entities WOULD CREATE
+
+[DECISION] CHORE-60 entity counts (corrected from strategy doc):
+  17 editions (not 21 — strategy doc miscounted), 552 copies, 4 lendings, 8 persons, 8 members, 13 works, 1 library
+
+[DECISION] EFK = EPCC: reuse existing 69c7f8718489bfcb0e81b065. No new org created.
+[DECISION] Location stored in copy.notes as "Location: Cabinet B · shelf 1" (no edition.location in v4E).
+[DECISION] Catalogue numbers stored in edition.license_note as "Catalogue: UE-19400" (no isbn field in v4E).
+
+[SEED CATALOG UPDATE]
+  seed-voices.ts                    — voice instances (5 voices), idempotent by name, last live: 2026-05-20
+  seed-collectives.ts               — org/section/person/member (120p, 235m, 6o, 16s), last live: session 8
+  seed-menu-items-per-entity-type-2026-05-21.ts — menu entity rationalization, last live: 2026-05-21
+  cleanup-menu-usability-2026-05-23.ts          — menu usability pass (17 UPDATE ops), last live: 2026-05-23
+  seed-librarian-bundle-data.ts     — CHORE-60 EPCC library subtree (1 lib, 8p, 8m, 13w, 17e, 552c, 4l), dry-run 2026-05-23; AWAITING LIVE AUTH
