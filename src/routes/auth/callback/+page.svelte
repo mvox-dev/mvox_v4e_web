@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { exchangeSession } from '$lib/auth/exchange';
 	import { setAccounts, setLastProvider, setToken, setUser } from '$lib/auth/storage';
-	import { decodeState, verifyNonce } from '$lib/auth/state';
+	import { decodeState } from '$lib/auth/state';
 	import { OAUTH_STATE_KEY } from '../[provider]/build-oauth-init-url';
 	import * as m from '$lib/paraglide/messages.js';
 
@@ -27,13 +27,6 @@
 		try {
 			decoded = decodeState(stateBlob);
 		} catch {
-			exchangeState = 'failed';
-			localStorage.removeItem(OAUTH_STATE_KEY);
-			goto('/auth/login?error=csrf_mismatch&picker=1');
-			return;
-		}
-
-		if (!verifyNonce(decoded.nonce)) {
 			exchangeState = 'failed';
 			localStorage.removeItem(OAUTH_STATE_KEY);
 			goto('/auth/login?error=csrf_mismatch&picker=1');

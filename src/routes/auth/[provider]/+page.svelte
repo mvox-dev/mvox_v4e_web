@@ -2,7 +2,7 @@
 	import { page } from '$app/state';
 	import { onMount } from 'svelte';
 	import { PUBLIC_ENTU_DB } from '$env/static/public';
-	import { createNonce, storeNonce } from '$lib/auth/state';
+	import { createNonce } from '$lib/auth/state';
 	import { buildOAuthInitUrl } from './build-oauth-init-url';
 	import * as m from '$lib/paraglide/messages.js';
 
@@ -13,7 +13,6 @@
 		const intent: 'login' | 'reauth' = intentParam === 'reauth' ? 'reauth' : 'login';
 
 		const nonce = createNonce();
-		storeNonce(nonce);
 
 		const url = buildOAuthInitUrl({
 			provider,
