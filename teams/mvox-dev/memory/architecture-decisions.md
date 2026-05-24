@@ -6,6 +6,25 @@ Format per entry: short title, decision, rationale, date. Most recent at the top
 
 ---
 
+## Dispatch-message `Co-authored-by:` trailers short-circuit prepare-commit-msg hook (2026-05-24, session 22)
+
+**Decision**: Team-lead dispatch messages MUST NOT include `Co-authored-by:` lines in commit-message templates. Use `Contributors:`, `Reviewed-by:`, `Helped-by:`, or body prose for team attribution instead. Implementers writing their own commits follow the same rule.
+
+**Rationale**: `.githooks/prepare-commit-msg` uses `git interpret-trailers --if-exists doNothing` to append the PO co-author trailer (`Mihkel Putrinš <mihkel.putrinsh@gmail.com>`). `interpret-trailers` deduplicates on trailer KEY, not on full value. When the dispatch-message template already contains ANY `Co-authored-by:` trailer — including malformed group forms like `Co-authored-by: Comenius, Tallis, Byrd, Bentham (review)` — the hook short-circuits on the existing key and the PO co-author trailer is silently dropped. The commit lands without the standing co-authorship convention being honored, and nothing surfaces at commit time.
+
+**Exemplar**: session-22 squash `9637eee` (closes #62 + #63). Squash landed cleanly but lacks the PO trailer because the dispatch template ended with `Co-authored-by: Comenius, Tallis, Byrd, Bentham (review)`. PO call 2026-05-24: leave the one-commit drift, codify the rule.
+
+**Rule**:
+- Dispatch templates: attribution lives in body prose or under `Contributors:` / `Reviewed-by:` / `Helped-by:` (any sentinel that isn't `Co-authored-by:`).
+- Genuine multi-author co-authorship: list each contributor on its own line as `Co-authored-by: Name <email>` with a real git identity + email. The hook's dedupe checks full value, so distinct properly-formatted lines all survive AND the PO trailer still appends.
+- Never write malformed group-form `Co-authored-by:` (multiple names on one line, parenthetical notes like `(review)`, names without emails).
+
+**Review enforcement (Bentham)**: Any commit on main or a feature branch missing the PO co-author trailer when other `Co-authored-by:` lines are present → YELLOW for trailer-discipline drift. Spot-check the commit message body for the group-form pattern; if found, the dispatch template was the cause.
+
+(*MVOX:Josquin*)
+
+---
+
 ## Per-commit GREEN on feature branches — every commit independently passes the full GREEN gate (2026-05-23, session 19)
 
 **Decision**: Every commit on a feature branch MUST independently pass the full GREEN gate — not just the branch tip. The gate is the same as the GREEN-phase quality gate below:
