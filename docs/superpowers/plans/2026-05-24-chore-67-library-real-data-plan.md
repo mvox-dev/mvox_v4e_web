@@ -42,40 +42,24 @@ This must be set in every shell session that commits to this branch. The pre-com
 
 ## Pérotin probe — canonical edition-fetch path
 
-### Task 2: Verify edition entity placement in v4E
+### Task 2: Verify edition entity placement in v4E — COMPLETE (strategy b)
 
 **Files:** none (read-only probe + scratchpad note)
 
-The spec's data flow assumes one of two strategies:
-- **(a)** Editions are direct children of the library (single query under library, group-by `edition.work`)
-- **(b)** Editions are children of works (N queries, one per work)
+- [x] **Step 1: Pérotin probes EFK Library structure** — DONE session-24 (commit `6a248b9` in `teams/mvox-dev/memory/perotin.md`).
 
-Pérotin probes the seeded librarian-bundle (EFK Library `6a12036c4ff8277cd4306b26`) to confirm which path matches reality before Tallis writes RED.
+Verdict evidence:
+- `GET /entity?_type.string=edition&limit=5&props=_parent,name,work` — all 5 sampled editions have `_parent.entity_type = "work"`
+- Edition `_parent.reference` = the work entity `_id`
+- `edition.work` is a string FORMULA (no `_id`, no `reference`) — returns work title string only; cannot use for grouping
 
-- [ ] **Step 1: Pérotin probes EFK Library structure**
+- [x] **Step 2: Pérotin reports back which strategy applies** — DONE session-24.
 
-Read-only Entu queries with Pérotin's own API key (no IP-bound issue for him). Verify:
-- What is `_parent` for entities of `_type.string=edition` under the EFK Library?
-- Are editions direct children of `6a12036c4ff8277cd4306b26` (library), or of individual work entities?
+**Verdict: strategy (b).** Editions are direct children of works.
 
-Sample probe commands (run from Pérotin's session):
-```bash
-set -a; . ~/.config/mvox/credentials.env; set +a
-# Find an edition under EFK library somehow — depends on structure
-curl -sH "Authorization: Bearer $ENTU_API_KEY" \
-  "https://api.entu.app/polyphony/entity?_type.string=edition&limit=3&props=_parent,name" | jq
-# Pick any edition's _parent.reference, look up that entity's type
-curl -sH "Authorization: Bearer $ENTU_API_KEY" \
-  "https://api.entu.app/polyphony/entity/<parent_id>?props=_type,name" | jq
-```
+**Secondary finding:** real edition entities have NO `isbn` key. ISBN equivalents stored in `license_note` (per session-19 seed). Task 4's `EntuEdition.isbn` type field should map to `license_note` in render code, or accept ISBN absent on real editions. See Task 4 update below.
 
-- [ ] **Step 2: Pérotin reports back which strategy applies**
-
-Pérotin sends a SendMessage to team-lead with verdict: "strategy (a)" or "strategy (b)". This determines the URL pattern in Task 7 (works fetch) and Task 9 (editions fetch).
-
-- [ ] **Step 3: Pin the choice in the spec**
-
-Team-lead updates the spec's "Data flow" section (search for "Pérotin verifies the canonical path") with the confirmed strategy. Tallis reads this before writing RED.
+- [x] **Step 3: Pin the choice in the spec** — DONE session-24 (this commit). Spec's "Data flow → Query sequence → step 3" now reads "strategy (b) LOCKED" with the canonical URL pattern + ISBN/license_note note. Spec's "Open items" entry struck through with resolution.
 
 ---
 
@@ -200,11 +184,11 @@ export interface EntuWork {
 
 export interface EntuEdition {
 	id: string;
-	workId: string;        // the work this edition belongs to (per Pérotin's strategy probe)
-	label: string;
+	workId: string;        // _parent.reference of the edition (the work entity _id) — strategy (b) per Pérotin probe 6a248b9
+	label: string;         // name[0].string
 	year?: number;
 	publisher?: string;
-	isbn?: string;
+	isbn?: string;         // Sourced from license_note[0].string on real entities (Pérotin verdict: no `isbn` key in v4E); undefined when not present
 }
 ```
 
@@ -596,7 +580,11 @@ git push
 - Modify: `src/lib/library/hydrateLibrary.spec.ts`
 - Modify: `src/lib/library/hydrateLibrary.ts`
 
-The exact fetch strategy depends on Pérotin's Task 2 verdict. **This task assumes strategy (a)**: editions are direct children of the library, fetched in a single query, then grouped by `edition._parent` or by an `edition.work.reference` property. **If Pérotin reports strategy (b)** (editions are children of works), this task swaps to N parallel fetches with `Promise.all`.
+**STRATEGY (B) LOCKED** (Pérotin probe `6a248b9`, session-24). Editions are children of works. **Use the GREEN code block labeled "If Pérotin's verdict was strategy (b)" in Step 3 below as the canonical implementation.** The Step 3 default code block (strategy a — single library-wide query with `edition.work.reference` grouping) is REJECTED and kept only for historical reference; do NOT implement it.
+
+**Secondary correction (Pérotin probe):** real edition entities have NO `isbn` key. ISBN equivalents are stored in `license_note`. In every GREEN code block in this task that reads `isbn: e.isbn?.[0]?.string`, replace with `isbn: e.license_note?.[0]?.string`. The URL `props=` list should request `license_note` instead of `isbn`. The Step 1 RED mock fixture (`isbn: [{ string: 'EP-8421' }]`) should be replaced with `license_note: [{ string: 'EP-8421' }]` to mirror the real wire shape; the assertion on `result.editionsByWork.get('work-a')[0].isbn === 'EP-8421'` stays as-is (our type field is still named `isbn` for UI clarity; just sourced from `license_note`).
+
+**Mock-chain shape under strategy (b):** with 1 work in the works mock, the editions phase fires 1 fetch (per-work). The Step 1 mock chain happens to remain structurally identical (3 sequential mocks: library, works, editions-for-work-a). When extending the test to multiple works, mock each per-work edition fetch.
 
 - [ ] **Step 1: Tallis adds editions spec (strategy a)**
 

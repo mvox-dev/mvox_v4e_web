@@ -141,12 +141,15 @@ Triggered by `$effect` on `$selectedOrgStore.id` (and on initial mount):
    ```
    200 should comfortably cover all real choirs (EFK has 28 in seeded data; large libraries are still well under 200). If we hit 200, future CHORE handles pagination.
 
-3. **Query editions for each work**
-   Pérotin verifies the canonical path during the data-manager kickoff (per `feedback_ui_parallels_with_seed`). Two candidate strategies:
-   - **(a)** Editions are direct children of the library: `GET /entity?_type.string=edition&_parent.reference=<libraryId>&props=name,year,publisher,isbn,work` — one query, then client-side groupBy `edition.work` to associate editions with works.
-   - **(b)** Editions are children of works: N queries, one per work. Acceptable for N < 30 but rough at scale. Batchable via Entu's multi-`_id` syntax if supported.
+3. **Query editions for each work — strategy (b) LOCKED**
+   Pérotin's session-24 probe (commit `6a248b9`) confirmed editions are direct children of works (`edition._parent.entity_type = "work"`), NOT children of the library. Strategy (b) is the canonical path:
+   ```
+   N parallel GETs via Promise.all:
+   GET /entity?_type.string=edition&_parent.reference=<workId>&props=name,year,publisher,license_note&limit=50
+   ```
+   One query per work, fired in parallel after the works fetch resolves. Acceptable for N < 200 (EFK seeded data has 28 works). If we hit scale issues at a real choir, batchable via Entu's multi-`_id` syntax (future CHORE).
 
-   Pérotin probes the seeded librarian-bundle (EFK Library `6a12036c4ff8277cd4306b26`) before Tallis writes RED to confirm which strategy fits the actual shape. The spec assumes (a) for now; (b) is fallback.
+   **Note on ISBN field:** real edition entities do NOT carry an `isbn` property. ISBN-equivalents are stored in `license_note` (per session-19 seed decision: "Catalogue: UE-19400"). The spec's UI mentions of "ISBN" should map to `license_note` in render code, or accept that ISBN is absent on all real editions. `i18n key library_field_isbn` stays; it labels the `license_note` value when present.
 
 ### Types
 
@@ -297,7 +300,7 @@ E2E (Playwright) is out of scope; CHORE-C (test infra) covers e2e bootstrap sepa
 
 These were surfaced during brainstorm but deferred:
 
-- **Edition data fetch strategy** — Pérotin confirms before Tallis writes RED (per `feedback_ui_parallels_with_seed`). Spec assumes strategy (a) above (single-query under library); falls back to (b) per-work queries if structure requires.
+- ~~**Edition data fetch strategy**~~ — RESOLVED session-24: strategy (b) confirmed by Pérotin probe (`6a248b9`). Editions are children of works; N parallel fetches per work via `Promise.all`. See "Data flow → Query sequence → step 3" above.
 - **Error toast on redirect-to-/** — When CHORE-67 redirects a user from /library to / due to no librarian rights, do we show a transient toast ("You're not the librarian for X") or silently redirect? Lean silent for now; revisit if user feedback suggests otherwise.
 - **Member chip on the master header** — Could show the librarian's name/initial in the master header. Currently the navbar already shows the user's identity; this would duplicate. Skip for CHORE-67.
 - **Search inside master** — The `PencilSearch` component is present in the top bar (CHORE-60). Wiring it to filter the master list is out of CHORE-67 scope.
