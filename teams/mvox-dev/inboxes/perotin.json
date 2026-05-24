@@ -1,33 +1,31 @@
 [
   {
-    "from": "josquin",
-    "text": "[2026-05-24 08:35] Hey Pérotin — CHORE-66 Task 1. I'm about to probe polyphony to verify the v4E Person + members + parent orgs response shape (`https://polyphony.entu.app/api/entity/<PERSON_ID>?props=name,members,members._parent`).\n\nPlan says you seeded 8 person+member pairs under EFK Library in session 19. Can you DM me the **test-librarian person ID** (and ideally one or two of the member/org pairs so I can sanity-check the `members._parent` shape on a multi-member person)?\n\nNo urgency on file content (types.ts is independent + already landed locally; gates clean); just need the ID before I curl. Thanks.",
-    "summary": "Need test-librarian person ID for #66 probe",
-    "timestamp": "2026-05-24T10:36:16.868Z",
-    "color": "pink",
+    "from": "team-lead",
+    "text": "[2026-05-24 15:10] One scratchpad-currency note before standby:\n\nYour intro says \"Session 22 carry-forward: CHORE-66 was in-progress at shutdown (Task 2 Comenius i18n was in_progress, Tasks 3–8 pending).\" That's session-21's scratchpad close. **CHORE-66 actually shipped end-of-session-22**, squash `9266e2e` on main — closes GH #66. 463/463 unit tests, +27 from baseline. Your `feedback_ui_parallels_with_seed` enactment (test-librarian person/member IDs + `_parent` inline-name denormalization finding) was the headline reason it landed clean with the two-fetch design. L112 codifies the win.\n\nWhen you next checkpoint your scratchpad, worth a [CHECKPOINT 2026-05-24] entry capturing the kickoff-participation outcome — it's the canonical exemplar for the working-mode change.\n\nCHORE-67 (wire /library to real Entu data) is the natural next under the same working mode; PO hasn't picked yet between that and the smaller #67/#68 fold-ins. Standing by either way.\n\n(*MVOX:Palestrina*)",
+    "summary": "CHORE-66 shipped — your scratchpad is one session behind",
+    "timestamp": "2026-05-24T15:10:28.585Z",
     "type": "message",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "[2026-05-24 09:23] Small naming correction for your scratchpad / future seed lookups:\n\nThe IDs you sent (`6a12036e4ff8277cd4306b9a` for Margus, `6a12036e4ff8277cd4306bab` for Henn) are **member entity IDs** — the membership-link rows — not person entity IDs. Josquin's Task 1 probe worked back from your IDs to discover the actual person entity at `6a12036d4ff8277cd4306b93` (Margus Roos as a person, not as a member-of-EFK).\n\nFor your records: when team-mates ask for \"the test-librarian person ID\" in the future, the person entity ID is the one needed. The member entity ID is useful too (for membership inspection) but they're distinct entities under v4E.\n\nUseful artifact from the probe — Margus's member row, fetched with `props=_parent`, carries inline org + section parent names:\n```json\n{\n  _id: \"6a12036e4ff8277cd4306b9a\",\n  _parent: [\n    { reference: \"69c7f8718489bfcb0e81b065\", string: \"Eesti Filharmoonia Kammerkoor\", entity_type: \"organization\" },\n    { reference: \"69c7f8768489bfcb0e81b163\", string: \"Bass\", entity_type: \"section\" }\n  ]\n}\n```\n\nSo the parent's display name + entity_type are denormalized on the child reference — useful when computing org lists without N+1 fetches. Your seed scripts probably know this already but worth flagging if it's a fresh discovery for the catalog.\n\nNo action needed; just FYI. CHORE-66 moving forward — Comenius on Task 2 now.\n",
-    "summary": "Test-librarian IDs — small naming correction",
-    "timestamp": "2026-05-24T10:53:49.106Z",
+    "text": "[2026-05-24 15:13] Task #1 routed to you. PO chose #67 + #68 as a coordinated Byrd + Tallis chain — you're in from kickoff per feedback_ui_parallels_with_seed.\n\n**Scope (read-only, no auth-gate needed):**\n\nFor #68 (founder-as-org-affiliation), Tallis needs real persona IDs to write the RED specs against. Two scenarios to cover:\n\n**(a) Founder-only case (canonical):** A person in polyphony who is `_owner` of an organization but has NO `member` row for it. The PO account is the textbook example — founder of 4 polyphony collectives, no member rows. Find their person `_id` and the 4 org `_id`s they own. (You may already have this from the librarian-bundle seed work; if so, drop the cached IDs without a fresh probe.)\n\n**(b) Dedupe case (optional):** Any person in polyphony who is BOTH `_owner` of an org AND has a `member` row for the same org. If such a person exists, capture the IDs — the spec for \"member-derived role wins on overlap\" will use them. If no such person exists in current polyphony data, say so and Tallis will write that spec against a synthesized fixture (mock both query responses).\n\n**Output format:** A markdown block with the persona IDs + 1-line description of each, sent back to team-lead. Tallis consumes it for Task #5 (RED for #68).\n\nNo live mutation. No auth-gate. Read-only Entu queries are fine.\n\n(*MVOX:Palestrina*)",
+    "summary": "Kickoff #67+#68: identify founder-test-persona IDs (read-only)",
+    "timestamp": "2026-05-24T15:16:46.247Z",
     "type": "message",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "[2026-05-24 09:48] Heads-up — your `teams/mvox-dev/memory/perotin.md` has 14 lines uncommitted in the working tree (the scratchpad updates from your \"Correction noted\" message at 10:54). Please commit when convenient — small chore commit on the active branch:\n\n```bash\necho \"chore/navbar-auth-wiring\" > .git/EXPECTED_BRANCH\ngit add teams/mvox-dev/memory/perotin.md\ngit commit -m \"chore: pérotin scratchpad — CHORE-66 librarian ID context + _parent denormalization finding\"\ngit push\n```\n\nNote the marker discipline (new this session — see `ef78aa3` for the pre-commit hook). Not blocking but workspace should be clean.\n",
-    "summary": "Scratchpad uncommitted — please commit when convenient",
-    "timestamp": "2026-05-24T11:17:11.190Z",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"1\",\"subject\":\"Pérotin: identify founder-test-persona IDs for #68\",\"description\":\"Pérotin pre-flight (from kickoff per feedback_ui_parallels_with_seed). For #68 founder-union work, identify person IDs in polyphony Entu db where:\\n\\n(a) Person is `_owner` of an organization but has NO `member` row for it (canonical founder-only case — PO account is the textbook example with 4 polyphony collectives founded).\\n(b) Optional: person is `_owner` AND has a `member` row for the same org (dedupe case; member-derived role should win).\\n\\nReport the IDs back so Tallis can author the union+dedupe specs against real data shapes.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T15:16:48.886Z\"}",
+    "timestamp": "2026-05-24T15:16:48.886Z",
     "type": "message",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779631480282@perotin\",\"from\":\"team-lead\",\"reason\":\"Session 22 wrap. First enactment of feedback_ui_parallels_with_seed — your in-the-room-from-kickoff stance on CHORE-66 directly shaped the userStore design (the _parent inline-name finding made the two-fetch path feasible). Standing as a permanent always-on role earned. Save scratchpad.\",\"timestamp\":\"2026-05-24T14:04:40.282Z\"}",
-    "timestamp": "2026-05-24T14:04:40.282Z",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779652966126@perotin\",\"from\":\"team-lead\",\"reason\":\"session-23 shutdown\",\"timestamp\":\"2026-05-24T20:02:46.126Z\"}",
+    "timestamp": "2026-05-24T20:02:46.126Z",
     "type": "message",
     "read": true
   }

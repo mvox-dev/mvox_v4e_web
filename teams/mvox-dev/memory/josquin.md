@@ -4,6 +4,45 @@ Personal notes. Only Josquin writes here.
 
 ---
 
+## [CHECKPOINT] 2026-05-24 session 23 — CHORE-67 + CHORE-68 squash + same-session deploy
+
+Shipped one squash to main and one production deploy:
+- `2012a84` — squash of CHORE-67 (`PUBLIC_ENTU_DB` env-lift on userStore) + CHORE-68 (founder-as-org-affiliation union via `_owner.reference` query). 3 src files / +274 / -10. PO co-author trailer landed clean (dispatch body free of `Co-authored-by:` per session-22 GOTCHA — self-dogfooded the rule again, hook worked).
+- CF Pages deploy `05355884.multivox.pages.dev` → `mvox.eu` HTTP 200 + `x-sveltekit-page: true` end-to-end. Build chunks: `app.CQqMPJyM.js` + `start.B1scTTuZ.js` (replaced session-22's `app.Bpbjc7CB.js`).
+
+### Durables worth keeping
+
+[PATTERN] **Bentham's "Option 1: merge main into chore branch first, then squash" is the right shape when the chore branch's merge-base lags main.** Bentham's session-23 review flagged that the chore branch was cut before two of his scratchpad commits (`c2c5029` + `3588e82`) landed on main. A naive `git merge --squash chore` from main WILL silently STRIP those interim commits because the merge-base is the older point. The fix is Phase A: `git checkout chore && git merge main --no-ff -m "..."`, then push, then squash. The intermediate merge commit (`12bf362` this session) gets squash-folded into the final commit anyway — no extra noise on main.
+
+The diff-shape verification (Phase C: `git log origin/main..HEAD` + `git diff --stat`) was load-bearing — confirmed (a) zero delta on `teams/mvox-dev/memory/bentham.md` (his commits now part of merge-base; net delta zero), (b) 4 implementer commits + 1 merge commit as expected, (c) only the 3 expected src files. **Without this verification, the "two commits got stripped" failure mode would only surface on `git log` later when Bentham noticed his scratchpad entries vanished.** The 30-second Phase C is non-negotiable for merges where the branch lags main.
+
+This generalizes: any time the chore/feature branch's merge-base is older than main HEAD, run Phase A inter-merge OR rebase. Squash from a lagging branch is a footgun.
+
+[PATTERN] **CHORE-C Playwright baseline check before declaring Phase B regression.** Phase B (`pnpm test && pnpm check && pnpm lint && pnpm build`) tripped at the Playwright tail with 12 failures (11 frontend-scaffolding + 1 tailwind). Before reporting RED to team-lead, I probed main directly (`git checkout main && pnpm playwright test`) and confirmed identical 12 failures. These are the pre-existing CHORE-C / YELLOW-B.2 set from session-17 CHORE-B Path C rewrite. Not a Phase A regression — branch was equivalent to main.
+
+**Rule**: any time `pnpm test` tail RED-flags Playwright failures that look architecturally pre-existing (frontend-scaffolding, tailwind, oauth-flow-skip), run the same test set on main FIRST before reporting blocking failure. The cost is ~90s of test runtime; the cost of misreporting as a regression is half an hour of team-lead reflexive task re-routing. Same discipline as "probe live, don't ask" but applied to test failures rather than wire shapes.
+
+[GOTCHA] **`set -a; . credentials.env; set +a` deploy pattern works flawlessly from team-lead direct context** — even without Pérotin's worktree isolation. The credentials.env file at `~/.config/mvox/credentials.env` already contains `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` from prior session. The `set -a` exports all defined vars to subprocesses (including the `pnpm exec wrangler` call); `set +a` resets default behavior. No xdg-utils needed. Deploy took ~1s upload after 8.3s install + 3.77s build (~13s total). Confirmed as documented in `project_wrangler_deploy_auth`.
+
+[CONTRACT] **Squash-merge dispatch template now battle-tested for "merge body verbatim from team-lead, no `Co-authored-by:` line"**. Session 22 found the trailer-collision; session 23 dogfooded the rule across a second squash and the hook appended PO co-author cleanly. Body conventions confirmed durable:
+- `Closes #N` lines (one per issue) for GH auto-close
+- `Contributors:` line (not `Co-authored-by:`) for crediting team agents
+- Imperative-mood title: `feat(#67, #68): <description>`
+- HEREDOC passes the multi-line body intact through bash
+- `git log -1 --format='%(trailers)'` post-commit verifies hook ran
+
+The rule plus the verification step together form a closed loop — no more silent trailer drops.
+
+### Open items at session-23 close
+
+- **CHORE-69** — `wrangler.json` dead `ENTU_DB` var (YELLOW-B from Bentham). Team-lead filing as GH issue. Mechanical 1-line fix.
+- **CHORE-70** — `src/routes/auth/callback/+page.server.ts:14` legacy `env.ENTU_DB ?? 'polyphony'` (YELLOW-C). Move server-side callback path to `PUBLIC_ENTU_DB` import too, or switch to `$env/static/public` symmetric with userStore. Worth a Finn pass on whether server-side callback can use `$env/static/public` (it's a server file but the env is publicly-namespaced — yes it can; SvelteKit allows public env on server too).
+- **PO navbar hydration repro** — PO was troubleshooting on the OLD `app.Bpbjc7CB.js` chunks; new `app.CQqMPJyM.js` deploy may or may not preserve the bug. If repro persists, it's a real hydration bug in CHORE-66 code unaffected by CHORE-67/68. If it disappears, it was a stale-cache artifact. Worth a follow-up dispatch from PO.
+
+(*MVOX:Josquin*)
+
+---
+
 ## [CHECKPOINT] 2026-05-24 session 22 — Two squashes + trailer-collision arch entry + twin surface-and-stops on CHORE-66
 
 Session shipped two merges + one doc-only commit:

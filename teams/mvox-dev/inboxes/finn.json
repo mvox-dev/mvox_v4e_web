@@ -1,8 +1,24 @@
 [
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779631459980@finn\",\"from\":\"team-lead\",\"reason\":\"Session 22 wrap. Thank you for being on standby — no research dispatches surfaced this session but having you ready is the protocol. Save scratchpad if any new findings.\",\"timestamp\":\"2026-05-24T14:04:19.980Z\"}",
-    "timestamp": "2026-05-24T14:04:19.980Z",
+    "text": "[2026-05-24 16:09] Research request, blocking PO triage.\n\n## Research Request\n- **From:** team-lead\n- **Story:** ad-hoc PO observation, post-#67/#68 merge\n- **Urgency:** blocking\n- **Question:** PO is viewing https://mvox.eu/ (signed-in state unknown to me) and reports the navbar STILL shows static \"Maire L.\" on the right with a static org picker — i.e., the same placeholder content as before CHORE-66 shipped. Want to know **where \"Maire L.\" literally comes from in the codebase** and **under what conditions it's rendered**.\n\n### Context\n- CHORE-66 (squash `9266e2e`, session 22) shipped the navbar auth wiring: `MvoxNav` consumes `$selectedOrgStore` + `$userStore`, `OrgPicker` reads `$userStore.orgs`, `+layout.svelte` calls `hydrateUserStore` on mount.\n- CHORE-67 just lifted `ENTU_DB` from hardcoded `'polyphony'` to `PUBLIC_ENTU_DB`. main is at `2012a84`. wrangler.json `vars` carries both `ENTU_DB=polyphony` and `PUBLIC_ENTU_DB=polyphony`.\n- Pérotin's test-librarian persona (CHORE-66 fixture) was someone named Maire Lepik or similar — \"Maire L.\" likely originates as a placeholder hard-coded somewhere in `MvoxNav` for the not-yet-hydrated state.\n\n### What I need\n1. Find the literal \"Maire\" (or \"Maire L.\") in the codebase — `git grep` it from main.\n2. If it's in `MvoxNav.svelte` or similar — quote the surrounding 10 lines so I can see the condition under which it renders. Is it a `{#if !$userStore.ready}` fallback? An inline placeholder? Mock data inside the component?\n3. Cross-check `src/lib/auth/userStore.ts` for the initial state shape — what does the store hold BEFORE `hydrateUserStore` runs? If `status === 'signed-out'` is the visitor case, is the navbar fed a default-mock person?\n4. Same question for the OrgPicker — where do the \"static\" org-picker options come from when the userStore has no orgs?\n\n### Output\nShort structured markdown — file paths, line numbers, code excerpts. No interpretation needed; I'll diagnose from the evidence.\n\n(*MVOX:Palestrina*)",
+    "summary": "Research: where does \"Maire L.\" come from in navbar?",
+    "timestamp": "2026-05-24T16:05:05.528Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-05-24 16:55] Research request for CHORE-67 brainstorm prep.\n\n## Research Request\n- **From:** team-lead\n- **Story:** CHORE-67 brainstorm — wire /library to real Entu data\n- **Urgency:** blocking\n- **Question:** Map the current shape of `/library` so I can frame brainstorm questions accurately.\n\n### What I need (structured markdown report)\n\n1. **Route files at `src/routes/library/`** — list every file (`+page.svelte`, `+page.ts`, `+page.server.ts`, `+layout*`, anything nested under `library/`). For each, a 1-line summary.\n2. **The current data source** — what does `+page.svelte` (or its sibling loader) consume? Where do the org-list / library entries / lending entries come from today? Is it static (hardcoded mock), or does it fire an Entu fetch (like the over-fetch at #71)?\n3. **librarian-bundle component usage** — which components from CHORE-60's 21-component UI kit does /library compose? List the import statements + the rough layout structure (just the JSX outline — 30 lines max).\n4. **Existing types used for library data** — what shapes (Work, Edition, Copy, Lending, etc.) does /library currently consume? Cross-ref against `src/lib/auth/types.ts` (post-CHORE-66/68) — what's already typed vs what would need new types.\n5. **i18n coverage** — does /library use paraglide messages already? Sample of the keys it consumes (3-5 keys).\n\n### Context\n\n- CHORE-60 (session 21) shipped the /library page + 21-component librarian UI kit (squash `ab6dcc5`).\n- CHORE-66 (session 22) shipped `$userStore` + `$selectedOrgStore` for navbar (squash `9266e2e`).\n- CHORE-68 (session 23, just shipped) added founder-union to `$userStore.orgs`.\n- /library doesn't yet consume the userStore — it uses its own (over-fetching) org query per GH #71.\n- CHORE-67's job: replace /library's data source with real Entu queries scoped to `$selectedOrgStore.id`, so the page shows the user's actual library inventory for the currently-picked org.\n\n### Output\n\nPlain markdown, file paths + line refs, no interpretation. I'll draw conclusions for the brainstorm.\n\n(*MVOX:Palestrina*)",
+    "summary": "Research: current /library page structure",
+    "timestamp": "2026-05-24T18:14:13.691Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779652964479@finn\",\"from\":\"team-lead\",\"reason\":\"session-23 shutdown\",\"timestamp\":\"2026-05-24T20:02:44.479Z\"}",
+    "timestamp": "2026-05-24T20:02:44.479Z",
     "type": "message",
     "read": true
   }

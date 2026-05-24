@@ -1,6 +1,72 @@
 # Palestrina — Team Lead Scratchpad
 
-### [NEXT SESSION] 2026-05-24 end-of-session-22 — session-22 → session-23
+### [NEXT SESSION] 2026-05-24 end-of-session-23 — session-23 → session-24
+
+**Headline: CHORE-67 (`ENTU_DB` env-lift) + CHORE-68 (founder-union) shipped at squash `2012a84`, deployed live to mvox.eu (build `app.CQqMPJyM.js`). Live navbar hydration debugged in the wild: PO seeing static "Maire L." was a stale Maire JWT in localStorage masquerading as broken hydration, not a code bug. CHORE-67 (wire /library to real Entu data) brainstormed end-to-end with the visual companion (v1→v6 iteration) — spec + 22-task plan written and committed. Ready to dispatch Task 1 at session-24 open.**
+
+**Session 23 outcome:**
+
+| Outcome | Artifact / SHA | What landed |
+|---|---|---|
+| ✅ CHORE-67 + CHORE-68 shipped | squash `2012a84` | env-lift to `PUBLIC_ENTU_DB` via `$env/static/public` + founder-union via `?_type.string=organization&_owner.reference=<pid>` query. 471/471 tests; check/lint/build all clean. Closes GH #67 + #68. Tallis RED → Byrd GREEN × 2 cycles → Bentham YELLOW (merge-main-first call) → Josquin Option-1 squash. |
+| ✅ Wrangler deploy live | per-build URL `05355884.multivox.pages.dev` | Josquin deployed `2012a84` build to multivox; chunks rotated from `app.Bpbjc7CB.js` → `app.CQqMPJyM.js` end-to-end on multivox + mvox.eu. PO confirmed navbar hydrates fully (6 orgs in picker + "Mihkel Putrinš") after clearing the stale Maire JWT. |
+| ✅ Follow-up CHOREs filed | GH #69, #70, #71 | #69 = drop dead `ENTU_DB` from wrangler.json `vars` (post-#67 cleanup). #70 = migrate auth callback `+page.server.ts` from legacy `env.ENTU_DB` to `PUBLIC_ENTU_DB`. Cross-linked. #71 = /library over-fetches all orgs (will be subsumed by CHORE-67 catalog wiring). |
+| ✅ CHORE-67 spec landed | `docs/superpowers/specs/2026-05-24-chore-67-library-real-data-design.md` (`8a0177f`) | 318 lines. Locked: minimal scope (catalog only; task stacks stay on mock), librarian-only audience, global picker, redirect-to-/ on no-librarian-rights, master-detail placement (Option B: replace catalog strip with master+detail), wood-grain DeskSurface, master fades 100→100→50→0, stacked-paper work cards with nested edition subcards, scrollbars hidden globally. URL `?work=<id>` per URL-overrides-persisted. |
+| ✅ CHORE-67 plan landed | `docs/superpowers/plans/2026-05-24-chore-67-library-real-data-plan.md` (`dd65a8c`) | 2097 lines, 22 tasks. Team-driven TDD chain. Pérotin's edition-fetch strategy probe is Task 2 (data-manager from kickoff per `feedback_ui_parallels_with_seed`). i18n keys upfront in Task 3 (per L100). Components leaf-up (EditionCard → WorkPaperStack → Master → EmptyState → MasterDetail). Bentham review + Josquin merge with Option-1 merge-main-first. |
+| ✅ L113 codified | `feedback_plan_execution_mode_baked_in.md` + MEMORY.md | An implementation plan is execution-mode-specific BY DEFINITION; the mode is chosen before writing, not offered as a post-write fork. The mvox-dev default is the team TDD chain. Don't offer subagent-driven as an alternative after writing a team-named plan. |
+| ✅ Visual companion brainstorm | 6 iteration screens at `.superpowers/brainstorm/<session>/content/library-*.html` | First mockup batch was "terrible" per PO (Georgia serif used incorrectly + crude positioning). v2 fixed font + UI-kit vocabulary. v3 added "wood dominates" (papers ON the desk, not paper-covered desk). v4 introduced "master is index, detail is document" pattern (full catalog scroll on right, sticky master nav). v5 made detail full-height + master sticky. v6 hid the page scrollbar too. v6 is the locked design. |
+
+**Live state at session-23 close:**
+- **main:** `dd65a8c` (plan commit; origin matches)
+- **Production:** `multivox.pages.dev` 200; `mvox.eu` 200; CHORE-67/#68 build live (`app.CQqMPJyM.js`, `start.B1scTTuZ.js`). PO has confirmed navbar fully hydrated with 6 founder orgs.
+- **Polyphony Entu db:** unchanged (607 librarian-bundle entities under EFK Library `6a12036c4ff8277cd4306b26`)
+- **Tests:** session-22 baseline 468/468 unit + 3 new spec assertions during #67/#68 RED/GREEN cycles = ~471/471. Check/lint/build clean. Playwright 12 pre-existing failures (CHORE-C scope; verified equal to main pre-merge per Josquin).
+- **Brilliant KB:** 281 entries (unchanged this session)
+- **Stale config entries:** `byrd` (post-session-22 stale; session-23 reused successfully). Cleanup at next TeamCreate.
+- **Stale local + remote branches:** unchanged housekeeping candidates from prior seeds (`chore/per-commit-green-arch-decision`, `chore/seed-librarian-bundle`, `feat/phase-b-live-wiring` local; `origin/feat/phase-a-migration`, `origin/fix/phase-a-partial-failure-recovery` remote).
+- **Scheduled routine:** `trig_014xDo7ZTuzNLpBUuWdtEs32` next_run_at 2026-05-30T09:00:00Z (deferred-providers re-prompt; unchanged).
+
+**Carry-forward queue for session 24 (priority order):**
+
+1. **CHORE-67 — dispatch Task 1.** Team-lead creates `chore/library-real-data` branch. Then Task 2 — Pérotin probes the canonical edition-fetch path (strategy `a` direct-children-of-library vs `b` children-of-works). Task 3 — Comenius adds 11 new `library_*` i18n keys × 4 locales. Then Tallis/Byrd TDD chain through Tasks 4-18, Bentham review (Task 21), Josquin merge with Option-1 merge-main-first (Task 22). Probable session-24 headline (or session-24+25 if it sprawls).
+2. **#69 + #70 cleanup chain.** ~20-min coordinated Byrd + Tallis chain. #70 (callback migration) lands first; #69 (wrangler.json dead var) follows. Could fold into CHORE-67's branch if desirable; or separate.
+3. **GH #65 — chip-width on long ET locale renderings** — 15 min Byrd. Defer until narrow-viewport is a requirement.
+4. **CHORE-C test infra** — plan at `docs/superpowers/plans/2026-05-23-chore-53-c-test-infra.md` (791 lines, 9 tasks). MSW + Playwright bootstrap. Tallis-heavy.
+5. **#54 client-side error capture (deferred).** Fires before mvox opens to real users.
+6. **#44 CF Pages Git-connected migration** — would let `git push` to main auto-deploy. Today it's manual wrangler-only.
+7. **#49 Biome lint rule enablement** (5 sub-cycles; incremental, no urgency).
+8. **#6 CHORE-6 Email Resend** — still blocked on PO SPF/DKIM DNS.
+9. **Routine fires 2026-05-30T09:00:00Z** → emails PO with #59 deferred-providers checklist.
+
+**Expected first action session 24:**
+1. Read this seed.
+2. Verify production health: `curl -sI https://multivox.pages.dev/` AND `curl -sI https://mvox.eu/library` — expect 200 + `x-sveltekit-page: true`. Build chunks should still be `app.CQqMPJyM.js` (we deployed end-of-session-23; no new pushes since).
+3. Spawn finn + bentham (always-on; read/review only — no isolation per L96).
+4. Spawn perotin (always-on per session-22 working-mode commitment).
+5. Confirm with PO: kick off CHORE-67? If yes, execute plan Task 1 (team-lead creates `chore/library-real-data` branch), then SendMessage Pérotin for Task 2 (strategy probe) in parallel with SendMessage Comenius for Task 3 (i18n keys).
+6. After Pérotin reports strategy verdict, spec needs a tiny update in its "Data flow" section to lock the chosen strategy explicitly (per plan Task 2 Step 3).
+
+**Process lessons from session 23 (L113-L116):**
+
+- **L113 — Implementation plan execution mode is baked in.** PO's correction: "you can't ask 'what kind of team will write the code' AFTER writing the plan." Plans are mode-specific by construction (named-roles for team-driven, generic-engineer for subagent-driven). Offering a mode fork after writing a team-named plan is incoherent. For mvox-dev the default is team-driven; don't offer alternatives unless PO explicitly chose subagent-driven up-front (session 20 first attempt was the exception, and it was rolled back). Codified to `feedback_plan_execution_mode_baked_in`.
+
+- **L114 — Visual companion design synthesis worked again (per L86 prior pattern).** 6 iterations through the brainstorm with the wood-grain desk. First two mockup batches were rejected ("terrible" — too crude, wrong fonts). Pattern that worked: read the Claude Design wireframe JSX (`L1Accordion.jsx`, `L2MasterDetail.jsx`, `L3CardShelves.jsx`, `LibraryPrimitives.jsx`) BEFORE drawing my own mockup, to inherit the right typography (Inter base, Caveat marginalia ONLY, JetBrains Mono for codes) + design vocabulary (sk-box, paper backgrounds, ink colors). Trying to invent the visual language from scratch fails; consuming the locked-design's primitives works. For any future librarian-bundle-adjacent design work, the JSX files in the Claude Design bundle are the canonical visual reference.
+
+- **L115 — Stale JWT in localStorage masquerades as broken hydration.** PO reported /library still showing static "Maire L." after CHORE-66 shipped. The literal "Maire L." doesn't exist anywhere in the codebase (verified by Finn's grep + my deployed-bundle scan). Cause: PO had Maire's JWT in localStorage from CHORE-66 dev testing. Entu JWTs are 48h-valid; signing in as PO didn't necessarily overwrite the existing one (depends on storage write semantics). Console probe pattern that diagnosed it: read `localStorage.token`, `localStorage.accounts`, decode JWT payload, check `claims.accounts[PUBLIC_ENTU_DB]`. The 4-step variant-comparison probe (A/B/C URL variants of `_type.string=organization&_owner.reference=<pid>`) was definitive — but the root cause was a stale session, not a code bug. Codify as Brilliant entry next batch.
+
+- **L116 — CF Pages auto-deploy is not configured on this project.** Per GH #44 still open. Main pushes don't auto-deploy; manual `wrangler pages deploy` required after every main push that should reach production. Already in memory `project_cf_pages_wrangler_vars`; reinforced this session when `2012a84` sat on main for 6 minutes before Josquin deployed and PO's mvox.eu test still showed the old build. Worth resolving #44 sooner rather than later if we want push-to-deploy mvox workflow.
+
+**Brilliant KB updates (deferred — session-23 lessons L113-L116):**
+- New: `Patterns/implementation-plan-execution-mode-baked-in` — codify L113 with the CHORE-67 plan-writing exemplar
+- New: `Patterns/visual-companion-consume-locked-design-primitives` — codify L114 with the JSX-first approach
+- New: `Patterns/stale-jwt-localStorage-masquerade-as-broken-hydration` — codify L115 with the Maire JWT debugging story + console probe template
+- Update: `Projects/mvox` — CHORE-67 + #68 shipped, deployed live; CHORE-67 spec + plan ready for dispatch
+
+(*MVOX:Palestrina*)
+
+---
+
+### [PROCESSED 2026-05-24 end-of-session-23] 2026-05-24 end-of-session-22 — session-22 → session-23
 
 **Headline: CHORE-66 (navbar auth wiring) shipped end-to-end. Squash `9266e2e` on main. Plus 4 process artefacts that materially change how we work: URL-overrides-persisted arch rule, trailer-collision arch rule, pre-commit branch-intent hook (env-var design), and stricter no-parallel-branches framing. Also CHORE-62 + #63 fold-ins from session-21 polish arc.**
 

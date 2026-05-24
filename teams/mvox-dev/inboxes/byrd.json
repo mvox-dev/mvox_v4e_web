@@ -1,114 +1,31 @@
 [
   {
     "from": "team-lead",
-    "text": "[2026-05-24 06:48] Dispatching Task #3 (GH #62 part 2). Branch `chore/mvoxnav-i18n-and-snippet-helper` is live with Comenius's keys (`a439228`).\n\n**Goal:** wire `src/lib/components/MvoxNav.svelte` to use the new paraglide keys.\n\n**Keys available (already in messages/{en,et,lv,uk}.json, paraglide-generated):**\n- `m.nav_tab_agenda()` · `m.nav_tab_library()` · `m.nav_tab_roster()` · `m.nav_tab_notices()` · `m.nav_tab_settings()`\n- `m.nav_chip_librarian()`\n- `m.nav_sign_in()` (already existed; verify it's used)\n\n**Current state of MvoxNav.svelte:4-ish:** `TABS = ['agenda', 'library', 'roster', 'notices', 'settings']` and renders bare strings; `LIBRARIAN` chip hardcoded.\n\n**Approach (your call on shape):** dynamic per-tab lookup. Options: switch/case, object map, or $derived array of `{ id, label: m.nav_tab_*() }` pairs. Pick what reads cleanest. Avoid restructuring beyond what's needed for the string substitution.\n\n**Per-commit-GREEN coordination with Tallis:** your component change WILL break MvoxNav.spec.ts assertions (they currently assert raw English literals like 'agenda'). The bundle MUST be ONE commit, not two. Workflow:\n1. `git fetch && git checkout chore/mvoxnav-i18n-and-snippet-helper && git pull`\n2. Edit MvoxNav.svelte. Run `pnpm test:unit` locally — MvoxNav.spec.ts will fail (expected).\n3. Capture: which assertions fail + what the new rendered text/DOM looks like. DM Tallis with that snapshot.\n4. Tallis updates MvoxNav.spec.ts in his working copy. He pushes nothing yet; he sends you the updated file content or commits it locally then you both stage.\n5. Practical: easiest if YOU (Byrd) `git add` both files (MvoxNav.svelte + MvoxNav.spec.ts) after Tallis has saved his .spec.ts edit on his side — coordinate via DM. One author commits, both names in trailer (co-author trailer handled by hook + add a `Co-authored-by: Tallis` if you want explicit dual authorship; OR Tallis commits and you co-author).\n6. ONE commit, ONE push. After push: `pnpm check` + `pnpm test:unit` + `pnpm lint` + `pnpm build` ALL green.\n\nCommit message style: `chore(#62): wire MvoxNav to paraglide nav_tab_* + nav_chip_librarian keys`\n\n**Heads-up from Comenius:** the Estonian translation of `LIBRARIAN` is `RAAMATUKOGUHOIDJA` (17 chars — long). If the chip layout clips at narrow widths, mention it and Comenius can revisit. Don't fix it yourself; surface as a YELLOW note in your hand-off.\n\nOnce Tallis has finished Task #5 (snippet helper fix — happening in parallel right now) AND you've atomically committed #3+#4, hand off to me for Bentham review.\n\nReport when component is ready and you've DM'd Tallis the spec snapshot.\n",
-    "summary": "Dispatch Task #3 — MvoxNav m.*() wiring",
-    "timestamp": "2026-05-24T06:48:42.550Z",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"4\",\"subject\":\"Byrd: GREEN for #67 — env-lift implementation\",\"description\":\"Replace `const ENTU_DB = 'polyphony';` at `src/lib/auth/userStore.ts:17` with `import { PUBLIC_ENTU_DB } from '$env/static/public';` and substitute all references. Verify `.env.example` documents `PUBLIC_ENTU_DB=polyphony` (likely already does from CHORE-B). Branch must end GREEN: `pnpm check` 0 errors, `pnpm test` all pass, `pnpm lint` clean, `pnpm build` clean. Commit atomically. Verify branch via `$MVOX_EXPECTED_BRANCH` hook before push.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T15:22:22.605Z\"}",
+    "timestamp": "2026-05-24T15:22:22.605Z",
     "type": "message",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"3\",\"subject\":\"Byrd: wire MvoxNav.svelte to m.nav_tab_*() + LIBRARIAN chip\",\"description\":\"Update src/lib/components/MvoxNav.svelte to render m.nav_tab_{tab}() instead of bare {tab}; also LIBRARIAN chip → m.nav_chip_librarian(); Sign-in link already uses m.nav_sign_in (verify). Bundle in SAME COMMIT as Tallis's spec update (task #4) to satisfy per-commit-GREEN. GH #62 part 2.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T06:48:43.272Z\"}",
-    "timestamp": "2026-05-24T06:48:43.272Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "[2026-05-24 06:50] Done. `src/lib/components/MvoxNav.spec.ts` updated — lines 19+20 changed to `'Agenda'` and `'Library'`. File is saved locally. You can stage both `MvoxNav.svelte` and `MvoxNav.spec.ts` and commit atomically.",
-    "summary": "spec updated — stage both files and commit",
-    "timestamp": "2026-05-24T06:50:56.192Z",
-    "color": "orange",
+    "text": "[2026-05-24 15:34] Task #6 routed. Tallis just shipped #68 RED at `e08ce06`. Branch state: 3 failing specs in `userStore.spec.ts`, 22 existing GREEN, your implementation makes the 3 RED tests pass.\n\n## Task #6 — GREEN for GH #68 (founder-union implementation)\n\n**Branch:** `chore/userstore-env-lift-and-founder-union`. First: `git fetch && git pull --ff-only` to get Tallis's `e08ce06`. Verify branch.\n\n**Handoff from Tallis (verbatim, his words):**\n\n> In `src/lib/auth/userStore.ts`: add `GET /entity?_type.string=organization&_owner.reference=${personId}&props=name` as a third parallel fetch in `Promise.all`. Union results with member-walk: founder-only orgs get `role: 'owner'`; orgs in both queries keep member-derived role (currently `undefined`).\n\n**RED signals to satisfy:**\n1. **`includes orgs where user is _owner with no member row`** → After hydration with EKBL `69c7f8718489bfcb0e81b05a` in the owner-query response, `userStore.orgs` must contain an entry with `id: '69c7f8718489bfcb0e81b05a'` and `role: 'owner'`.\n2. **`preserves member-derived role when org appears in both queries`** → When EFK `69c7f8718489bfcb0e81b065` appears in BOTH the owner-query AND the member-walk, the deduplicated result must keep the member-derived role (NOT `'owner'`). Current member-derived role is `undefined` — so on overlap, the entry's role is `undefined`.\n3. **`existing member-only orgs still appear when owner query returns empty`** → Regression guard. Owner-query empty doesn't break the existing member-walk.\n\nNote Tallis's spec uses a `fetchMock.mock.calls` assertion (`ownerQueryFired`) — this binds you to ACTUALLY issue the owner query (you can't satisfy the role logic without firing the fetch).\n\n**What to do:**\n1. Read Tallis's spec at line ~380 + the existing `hydrateUserStore` to map fetch sequence.\n2. Add a third fetch to the `Promise.all` (parallel — don't serialize). URL pattern: `${ENTU_API_BASE}/${PUBLIC_ENTU_DB}/entity?_type.string=organization&_owner.reference=${personId}&props=name` (verify the exact base + path against existing fetch calls in this file).\n3. Union logic: build a `Map<orgId, Org>` indexed by `_id`. First insert all member-walk-derived entries (these win on overlap). Then for each owner-query entity, only insert if the map doesn't already have that `_id`, and set `role: 'owner'`.\n4. Add `EntuOwnerSearchResponse` (or similar) type to `src/lib/auth/types.ts` if Tallis hasn't already. Coordinate via reading what he wrote — don't duplicate.\n5. Run `pnpm test src/lib/auth/userStore.spec.ts` — all 25 tests must pass (22 existing + 3 RED → GREEN). Then full suite `pnpm test`, `pnpm check`, `pnpm lint`, `pnpm build` — all clean.\n6. Branch ends GREEN.\n\n**Commit:**\n- `export MVOX_EXPECTED_BRANCH=chore/userstore-env-lift-and-founder-union`\n- Message: `feat(#68): union founder orgs from _owner.reference query`\n- No `Co-authored-by:` (L104). Hook adds PO automatically.\n- Push.\n\n**Report back to team-lead** — SHA + test count + clean gate confirmation + ready for Bentham review.\n\n(*MVOX:Palestrina*)",
+    "summary": "Task #6: GREEN for #68 founder-union implementation",
+    "timestamp": "2026-05-24T15:34:01.541Z",
     "type": "message",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "[2026-05-24 09:28] Task #13 / CHORE-66 Task 3 dispatched. You + Tallis bundle this atomically.\n\n**Goal:** Implement `src/lib/auth/userStore.ts` + `src/lib/auth/userStore.spec.ts` in ONE commit (per-commit-GREEN).\n\n**Branch:** `chore/navbar-auth-wiring` (tip `1c9e5da`, Comenius's i18n keys just landed). Pull before starting.\n\n**Plan section:** `docs/superpowers/plans/2026-05-24-chore-66-navbar-auth-wiring.md` → \"Task 3: userStore + spec (atomic)\" — has full step-by-step + code snippets.\n\n**CRITICAL — Contract is `src/lib/auth/types.ts` (Josquin's `e12522a`), NOT the plan's example code.** The plan was written before Josquin's probe; the types he committed are canonical and may have minor wire-shape divergences from what the plan's userStore example shows:\n\n- `EntuPersonResponse` has an **`entity` wrapper envelope** — the response shape is `{ entity: { _id, name?: [...] } }`. The plan's example code unwraps as `person.name?.[0]?.string` — that needs to become `person.entity.name?.[0]?.string` (or rename the variable to `personRes.entity.name?.[0]?.string`). Verify by reading `types.ts` TSDoc on `EntuPersonResponse`.\n- JWT claim is `accounts[dbName]`, NOT `sub` — Josquin added an `EntuJwtClaims` type; consume it. The plan's example already reflects this but double-check vs the type.\n- Two parallel fetches (`Promise.all`): one for person, one for member-search-by-person. No per-org follow-up. Map `member._parent[]` filtered by `entity_type === 'organization'`.\n- Use `ENTU_API_BASE` from `$lib/entu-config` — never hardcode the base URL.\n\n**Atomic bundle workflow:**\n1. `git fetch && git checkout chore/navbar-auth-wiring && git pull`\n2. Byrd: write `src/lib/auth/userStore.ts` consuming `types.ts` as canonical contract.\n3. Tallis: write `src/lib/auth/userStore.spec.ts` in parallel (you can begin from the plan's spec example; it has the `vi.mock('$app/navigation', ...)` setup and ~14 test cases). Mock both fetch endpoints with the wire shapes from `types.ts` TSDoc.\n4. Run `pnpm test:unit src/lib/auth/userStore.spec.ts` locally until all pass.\n5. Verify full gates: `pnpm check && pnpm test:unit && pnpm lint && pnpm build`.\n6. One of you stages both files + commits. **NO `Co-authored-by:` in commit body** (hook adds PO trailer per `3a37e42`). Other person co-authors via discussion-noted-in-body-prose if desired (use sentinel like `Contributors:` not `Co-authored-by:`).\n7. Verify trailer + push.\n\n**Commit message style:** `feat(#66): userStore + selectedOrgStore + pickerModeStore`\n\n**Surface-and-stop triggers:** if you discover ANOTHER wire-shape divergence from what types.ts says, OR if a test case behaves differently from what the spec example expects, stop + DM team-lead. Don't push partial-green.\n\nReport SHA + gate counts when done.\n\n(Tallis is being copied on this message so you coordinate from the same context.)\n",
-    "summary": "Task 3 — userStore + spec (atomic bundle with Tallis)",
-    "timestamp": "2026-05-24T10:55:56.781Z",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"6\",\"subject\":\"Byrd: GREEN for #68 — founder-union implementation\",\"description\":\"Augment `hydrateUserStore` in `src/lib/auth/userStore.ts` with a second Entu query: `GET /entity?_type.string=organization&_owner.reference=<personId>` returning `Organization` entities directly. Union with member-derived set, dedupe by `_id`, member-derived role wins on overlap, founder-only entries get `role='owner'`. Branch must end GREEN. Commit atomically.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T15:34:02.650Z\"}",
+    "timestamp": "2026-05-24T15:34:02.650Z",
     "type": "message",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"13\",\"subject\":\"Task 3 — Byrd + Tallis: userStore.ts + userStore.spec.ts (atomic)\",\"description\":\"CHORE-66 Task 3. Atomic commit. Tallis writes userStore.spec.ts (~14 cases including two-write symmetry); Byrd writes userStore.ts (JWT decode + Entu fetch + selectedOrgStore + pickerModeStore + selectOrg). vi.mock $app/navigation. Per-commit-GREEN.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T10:56:21.494Z\"}",
-    "timestamp": "2026-05-24T10:56:21.494Z",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779652967688@byrd\",\"from\":\"team-lead\",\"reason\":\"session-23 shutdown\",\"timestamp\":\"2026-05-24T20:02:47.688Z\"}",
+    "timestamp": "2026-05-24T20:02:47.688Z",
     "type": "message",
     "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "[2026-05-24 10:59] `src/lib/auth/userStore.spec.ts` written and verified. 20 tests, all pass. Full gate: 0 type errors, 456/456 tests, lint clean.\n\nKey spec decisions (derived from `types.ts`, not the plan example):\n- Token read via `localStorage.getItem('token')` (storage.ts key convention)\n- Person response shape: `{ entity: { _id, name } }` (with wrapper)\n- JWT claim: `accounts[db]` not `sub`\n- Two parallel fetches (person + member-search), section parents filtered out\n- `mvox.selectedOrgId` for the persisted org key\n\nGate results: `pnpm check` 0 errors / `pnpm test:unit` 456/456 / `pnpm lint` clean.\n\nReady for atomic commit. You can stage both `src/lib/auth/userStore.ts` and `src/lib/auth/userStore.spec.ts` and commit.",
-    "summary": "userStore.spec.ts ready — 20/20 pass, full gate GREEN, stage both",
-    "timestamp": "2026-05-24T10:59:54.854Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "[2026-05-24 11:02] Spec passes — file saved at `src/lib/auth/userStore.spec.ts`. 19/19 pass, lint clean (biome-formatted). Used your canonical version with all 3 corrections. Ready for atomic commit.",
-    "summary": "spec passes — file saved, ready for atomic commit",
-    "timestamp": "2026-05-24T11:02:49.520Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 09:52] Task #14 / CHORE-66 Task 4 dispatched. You + Tallis bundle atomically.\n\n**Goal:** Implement `src/lib/components/OrgPicker.svelte` + `src/lib/components/OrgPicker.spec.ts` in ONE commit.\n\n**Branch:** `chore/navbar-auth-wiring` (tip `bcdeb00`). Pull before starting.\n\n**Plan section:** `docs/superpowers/plans/2026-05-24-chore-66-navbar-auth-wiring.md` → \"Task 4: OrgPicker.svelte + spec (atomic)\" — full code snippets.\n\n**Component shape** (Svelte 5 Runes):\n- Reads `userStore` + `selectedOrgStore` directly (no props for org data)\n- Local `$state(false)` for open/close\n- Click chip → toggle; click menu item → call `selectOrg(orgId)` + close\n- Escape key closes; `$effect` registers keydown listener while open\n- Use `m.nav_org_picker_switch_to({ orgName: org.label })` for menu item aria-label\n- Tailwind v4 class names only, no dynamic template literals\n\n**Spec coverage:**\n- `@vitest-environment happy-dom`\n- `vi.mock('$app/navigation', ...)` for goto\n- `vi.mock('$lib/auth/storage', ...)` may also be needed for `getToken` if hydration is triggered indirectly\n- Pre-set `userStore` to ready+multi-org state in beforeEach\n- Test: chip renders closed by default; click opens menu; Escape closes; click org → URL + localStorage write + menu closes\n\n**Atomic bundle workflow (marker discipline):**\n1. `git fetch && git checkout chore/navbar-auth-wiring && git pull`\n2. **Write marker on chore branch BEFORE any commit:** `echo \"chore/navbar-auth-wiring\" > .git/EXPECTED_BRANCH`\n3. Byrd writes OrgPicker.svelte; Tallis writes OrgPicker.spec.ts\n4. Run `pnpm test:unit src/lib/components/OrgPicker.spec.ts` until all pass\n5. Verify full gates: `pnpm check && pnpm test:unit && pnpm lint && pnpm build`\n6. One of you stages both files + commits with `feat(#66): OrgPicker dropdown component`\n7. **NO `Co-authored-by:` in commit body** (hook adds PO trailer); use `Contributors:` sentinel or body prose for the co-author note\n8. Push, verify trailer\n\n**Pre-commit hook is now live** (installed at `ef78aa3` on main). If your marker doesn't match HEAD, the commit is rejected with a helpful error. Marker auto-clears on success.\n\n**Surface-and-stop** if anything diverges from the plan's expectations. Report SHA + gate counts when bundle commit lands.\n\n(Copying Tallis on a coordinated message.)\n",
-    "summary": "Task 4 — OrgPicker + spec (atomic bundle with Tallis)",
-    "timestamp": "2026-05-24T11:18:01.021Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"14\",\"subject\":\"Task 4 — Byrd + Tallis: OrgPicker.svelte + spec (atomic)\",\"description\":\"CHORE-66 Task 4. Atomic commit. Tallis writes OrgPicker.spec.ts (open/close/select/escape); Byrd writes OrgPicker.svelte (Svelte 5 Runes; reads userStore + selectedOrgStore directly; calls selectOrg on click). Per-commit-GREEN.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T11:18:16.414Z\"}",
-    "timestamp": "2026-05-24T11:18:16.414Z",
-    "type": "message",
-    "read": false
-  },
-  {
-    "from": "tallis",
-    "text": "[2026-05-24 11:19] `src/lib/components/OrgPicker.spec.ts` written. RED confirmed (module-not-found for OrgPicker.svelte), lint clean.\n\n5 tests across 3 describe blocks:\n- chip renders closed (no menu role)\n- click opens menu\n- Escape closes menu\n- click org → `localStorage.mvox.selectedOrgId='org-2'` + URL `?org=org-2` + menu closes\n\nContract pins:\n- `data-testid=\"org-picker-chip\"` on the trigger button\n- `role=\"menu\"` on the dropdown\n- `findByText('Other Org')` to locate the menu item\n\nPing me when OrgPicker.svelte is ready and I'll run the combined test + full gate before we commit atomically.",
-    "summary": "OrgPicker.spec.ts ready — RED, lint clean, awaiting your svelte",
-    "timestamp": "2026-05-24T11:19:10.782Z",
-    "color": "orange",
-    "type": "message",
-    "read": false
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 09:58] Quick update mid-flight: the pre-commit hook design swapped. Use **env var, not marker file** for Task 4's commit.\n\n**New invocation:**\n```bash\nMVOX_EXPECTED_BRANCH=chore/navbar-auth-wiring git commit -m \"feat(#66): OrgPicker dropdown component\"\n```\n\nOr export once for the session:\n```bash\nexport MVOX_EXPECTED_BRANCH=chore/navbar-auth-wiring\ngit commit -m \"...\"\n```\n\n**Why swapped:** the file-based version required writing into `.git/EXPECTED_BRANCH`, which some tool permission allowlists block silently. Env var works under any allowlist that lets you run git. No more file writes.\n\n**Same semantics:** unset/empty → no-op; matches HEAD → pass; mismatches → reject.\n\n**Hook source on main:** `8a42302` (committed clean with the env var dogfooded — `MVOX_EXPECTED_BRANCH=main git commit ...`).\n\nActive hook in `.git/hooks/pre-commit` is already the new env-var version (per-clone, not branch-tracked). If you're about to commit Task 4 right now, just prefix with the env var as shown above.\n\nCarry on with the bundle.\n",
-    "summary": "Hook swap: env var instead of marker file",
-    "timestamp": "2026-05-24T11:32:20.332Z",
-    "type": "message",
-    "read": false
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779622944753@byrd\",\"from\":\"team-lead\",\"reason\":\"appears stalled mid Task 4 (no progress reported since 09:43 — hook swap notice may have hit silent permission gate). Cleaning up + respawning fresh.\",\"timestamp\":\"2026-05-24T11:42:24.753Z\"}",
-    "timestamp": "2026-05-24T11:42:24.753Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779627117451@byrd\",\"from\":\"team-lead\",\"reason\":\"Task 4 was completed by your respawn byrd-2 at 7c455be while you were blocked on the .git/EXPECTED_BRANCH write permission prompt. The hook design has since swapped to env-var (MVOX_EXPECTED_BRANCH) so this failure mode is gone for future work. Stand down cleanly — your inbox queue from the past hour is obsolete. Thank you for the Task 3 work (bcdeb00).\",\"timestamp\":\"2026-05-24T12:51:57.451Z\"}",
-    "timestamp": "2026-05-24T12:51:57.451Z",
-    "type": "message",
-    "read": false
-  },
-  {
-    "from": "tallis",
-    "text": "[2026-05-24 12:58] `src/lib/components/MvoxNav.spec.ts` updated — added `vi.mock('$app/navigation', ...)` + `beforeEach` cleanup. 6/6 tests pass (3 existing + 3 new orgPickerMode cases). Full gate: 0 type errors / 463/463 / lint clean.\n\nReady for atomic commit. Stage both `MvoxNav.svelte` + `MvoxNav.spec.ts` with `MVOX_EXPECTED_BRANCH=chore/navbar-auth-wiring`.",
-    "summary": "MvoxNav.spec.ts ready — 6/6 pass, full gate GREEN",
-    "timestamp": "2026-05-24T12:58:27.896Z",
-    "color": "orange",
-    "type": "message",
-    "read": false
   }
 ]

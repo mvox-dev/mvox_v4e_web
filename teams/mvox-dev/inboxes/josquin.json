@@ -1,94 +1,23 @@
 [
   {
     "from": "team-lead",
-    "text": "[2026-05-24 06:55] Task #7 — squash-merge.\n\n**Approved.** Bentham verdict GREEN with 1 deferred carry-forward YELLOW (YELLOW-62.1, chip-width on long locale renderings, narrow-viewport scope — Palestrina will file as a follow-up CHORE post-merge; do NOT block on it).\n\n**Branch:** `chore/mvoxnav-i18n-and-snippet-helper` @ `19a0610`\n**Base:** `main` (`f3b792a`)\n**Closes:** GH #62 + #63\n\n**Procedure** (canonical local squash per common-prompt.md):\n```bash\ngit checkout main\ngit pull\ngit merge --squash chore/mvoxnav-i18n-and-snippet-helper\ngit commit -m \"$(cat <<'EOF'\nchore(#62 #63): MvoxNav i18n wiring + textSnippet helper single-element fix\n\nCloses #62 — wire MvoxNav.svelte to paraglide nav_tab_* + nav_chip_librarian keys. 6 new keys added across 4 locales (en/et/lv/uk). MvoxNav.spec.ts assertions updated to localized output.\n\nCloses #63 — wrap textSnippet helper content in <span> per Svelte 5 createRawSnippet single-element render contract. Eliminates invalid_raw_snippet_render warning on every test run.\n\nCarry-forward YELLOW-62.1 (deferred): chip width on long locale renderings (ET RAAMATUKOGUHOIDJA = 17 chars). Renders OK at typical desktop widths; layout fix (max-width + truncate, or breakpoint hide-below-md) defers to future narrow-viewport CHORE.\n\nCo-authored-by: Comenius, Tallis, Byrd, Bentham (review)\nEOF\n)\"\ngit push\n```\n\n(Prepare-commit-msg hook adds the PO co-author trailer.)\n\n**After push, also:**\n```bash\ngit push origin --delete chore/mvoxnav-i18n-and-snippet-helper\ngit branch -D chore/mvoxnav-i18n-and-snippet-helper\n```\n\n**Note: no GitHub PR was opened** for this branch (kept as branch-only per session-21 pattern). The squash commit body `Closes #62 #63` will auto-close both issues on push to main. If you prefer to open the PR first then merge via gh, also fine — your call, but local squash is the canonical path.\n\nVerify after push:\n- `git log --oneline main -5` shows your squash on top\n- `git status` clean\n- Trailers in `git log -1 --format=%B`\n\nReport SHA of the squash + branch deletion confirmation. After your push, I'll:\n1. Verify GH #62 + #63 auto-closed\n2. Add my closure comments (summary, files, AC verification)\n3. File new GH issue for YELLOW-62.1 (chip width follow-up)\n4. Deploy if Bentham confirms deploy is appropriate (actually Path C is live + auto-deploys from CF Pages on multivox.pages.dev — let me check; deferred to post-merge)\n",
-    "summary": "Squash-merge chore/mvoxnav-i18n-and-snippet-helper",
-    "timestamp": "2026-05-24T06:55:32.514Z",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"8\",\"subject\":\"Josquin: squash-merge to main\",\"description\":\"Per common-prompt merge procedure: `git checkout main && git pull && git merge --squash chore/userstore-env-lift-and-founder-union && git commit -m \\\"feat(#67,#68): userStore env-lift + founder-union\\\"`. Commit body lists both issues with `Closes #67` + `Closes #68`. Do NOT include `Co-authored-by:` lines in body prose (L104) — use `Contributors:` or body prose to credit Tallis/Byrd. Push. Then `gh pr close` if a PR was created, delete remote branch.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T15:56:16.721Z\"}",
+    "timestamp": "2026-05-24T15:56:16.721Z",
     "type": "message",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"7\",\"subject\":\"Josquin: squash-merge + close #62 + #63\",\"description\":\"After Bentham GREEN + Palestrina approval: locally squash-merge feat branch to main (git merge --squash → commit → push) so prepare-commit-msg hook runs; commit body includes \\\"Closes #62\\\" and \\\"Closes #63\\\". Then delete the branch on remote + local. Palestrina handles GH issue closure comments.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T06:55:33.266Z\"}",
-    "timestamp": "2026-05-24T06:55:33.266Z",
+    "text": "[2026-05-24 16:18] Production deploy authorized by PO. I AUTHORIZE THIS RUN.\n\n## Task — wrangler pages deploy main to multivox\n\n**Goal:** Bring main `2012a84` (squash of #67 env-lift + #68 founder-union) live on multivox.pages.dev → mvox.eu.\n\n**Why now:** PO is troubleshooting a navbar hydration issue on mvox.eu and the current build chunks (`app.Bpbjc7CB.js` / `start.y624_gjC.js`) are still session-22's CHORE-66 deploy. mvox is not Git-connected to CF Pages (GH #44 open) so main pushes don't auto-deploy. Manual wrangler push is the only path.\n\n## Procedure (per memory `project_wrangler_deploy_auth` + `project_cf_pages_wrangler_vars`)\n\n```bash\ncd /home/michelek/workspace && \\\n  git checkout main && \\\n  git pull --ff-only && \\\n  pnpm install --frozen-lockfile && \\\n  pnpm build\n```\n\nVerify build artifact: `.svelte-kit/cloudflare/` should be populated.\n\nThen:\n\n```bash\nset -a; . ~/.config/mvox/credentials.env; set +a\npnpm exec wrangler pages deploy .svelte-kit/cloudflare --project-name=multivox --branch=main\n```\n\n(`CLOUDFLARE_API_TOKEN` is pre-stashed in credentials.env. The `set -a` pattern is the workaround per memory — wrangler login needs xdg-utils which isn't installed.)\n\n## After deploy\n\n1. Capture the deploy URL (something like `<hash>.multivox.pages.dev`)\n2. Verify health: `curl -sI https://multivox.pages.dev/` and `curl -sI https://mvox.eu/` — both should return 200 with `x-sveltekit-page: true`\n3. Verify build hash rotated: `curl -s https://mvox.eu/ | grep -oE 'app\\.[A-Za-z0-9]+\\.js' | head -1` should NOT be `app.Bpbjc7CB.js` anymore. Different chunk hash = new deploy is live.\n4. Report deploy URL + new build chunk + curl status to team-lead.\n\n## Don't fold in\n\nSibling cleanups #69 (wrangler.json dead `ENTU_DB` var) and #70 (callback path legacy env read) are separate CHOREs — NOT part of this deploy. Push #2012a84` as-is.\n\n(*MVOX:Palestrina*)",
+    "summary": "Deploy CHORE-67+#68 to mvox.eu via wrangler — PO authorized",
+    "timestamp": "2026-05-24T16:17:18.473Z",
     "type": "message",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "[2026-05-24 06:58] PO call: **Leave as-is + log the lesson.** No amend, no follow-up commit. `9637eee` stays as the squash; the missing PO co-author trailer is accepted as one-commit drift.\n\nPlease append a short entry to `teams/mvox-dev/memory/architecture-decisions.md` codifying the rule. Suggested shape:\n\n---\n\n### Dispatch-message Co-authored-by trailers short-circuit prepare-commit-msg hook (2026-05-24, session 22)\n\n**Decision**: Team-lead dispatch messages MUST NOT include `Co-authored-by:` lines in commit-message templates. Use `Contributors:` (or body prose, or `Reviewed-by:`) for team attribution.\n\n**Why**: `.githooks/prepare-commit-msg` uses `git interpret-trailers --if-exists doNothing`. When the dispatch-message template already contains any `Co-authored-by:` trailer (even a malformed group form like `Co-authored-by: Comenius, Tallis, Byrd, Bentham (review)`), the hook short-circuits on key match and the PO co-author trailer (`mihkel.putrinsh@gmail.com`) is silently dropped.\n\n**Exemplar**: session-22 squash `9637eee` (CHORE-62 + CHORE-63). Closes #62 + #63 landed cleanly but the squash lacks the PO trailer.\n\n**Rule**: \n- Dispatch templates: attribution goes in body prose or under `Contributors:` / `Reviewed-by:` / `Helped-by:` (any sentinel that isn't `Co-authored-by:`).\n- Genuine multi-author co-authorship (where the second author is a real git identity with email): list each as its own `Co-authored-by: Name <email>` line. The hook deduplicates on full value, so distinct properly-formatted co-author trailers all survive.\n- Implementers writing their own commits: same rule — never write malformed group-form `Co-authored-by:` lines.\n\n(*MVOX:Josquin*)\n\n---\n\nAdjust the wording / tag (`[DECISION]` or similar) as you see fit. Commit + push the arch-decisions update directly to main (small doc-only commit, no branch needed).\n\nThen mark Tasks #1 + #7 done is on me — go idle when arch-decisions is committed. Bentham can review/prune later as steward.\n",
-    "summary": "Leave-as-is; log lesson to arch-decisions",
-    "timestamp": "2026-05-24T06:59:22.947Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 08:32] Task #11 / CHORE-66 Task 1 dispatched. GH issue #66 filed.\n\n**Goal:** Create branch `chore/navbar-auth-wiring` from `main` (`8ea562e`), write `src/lib/auth/types.ts` (auth shared types + v4E query contract + initials helper), probe polyphony to verify the contract, commit + push.\n\n**Plan section:** `docs/superpowers/plans/2026-05-24-chore-66-navbar-auth-wiring.md` → \"Task 1: Create branch + v4E query contract\" — has full step-by-step including the exact types.ts content + the probe curl.\n\n**Pérotin** is being spawned in parallel; he'll DM you the test-librarian person ID (from his session-19 EFK Library seed) before you need it for the probe in Step 4. Until then, run Steps 1-3 (branch + write file + gate). Don't wait for him to start; the file content is independent.\n\n**For Step 4 probe**: use the JWT from a fresh sign-in OR if `~/.config/mvox/credentials.env` carries an Entu JWT use that. Pérotin will provide the `<PERSON_ID>` for the librarian member; replace `<JWT>` with your token.\n\n**Commit body discipline**: no `Co-authored-by:` lines in commit body (the prepare-commit-msg hook adds the PO trailer cleanly per `3a37e42`). Verify with `git log -1 --format='%(trailers)'` after push.\n\nReport SHA when done + flag if the probe surfaced any schema differences from the contract (so we can adjust the plan downstream before Task 3).\n",
-    "summary": "Task 1 — CHORE-66 branch + types contract",
-    "timestamp": "2026-05-24T10:34:05.933Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"11\",\"subject\":\"Task 1 — Josquin: branch + v4E query contract types.ts\",\"description\":\"CHORE-66 Task 1. Create branch chore/navbar-auth-wiring from main, write src/lib/auth/types.ts with Org / UserState / EntuPersonResponse types + deriveInitials helper, probe polyphony Entu to verify the contract shape (Pérotin provides test-librarian person ID), adjust TSDoc if ?expand= works for batched query, commit + push. Per-commit-GREEN.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T10:34:06.481Z\"}",
-    "timestamp": "2026-05-24T10:34:06.481Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 10:35] Pérotin's test-librarian candidates:\n\n- **Margus Roos** — `6a12036e4ff8277cd4306b9a` (EFK member, seeded with overdue lendings — realistic state)\n- **Henn Kuusik** — `6a12036e4ff8277cd4306bab` (EFK member, also seeded with overdue lendings)\n\nEither works for the Task 1 Step 4 probe. Margus is the alphabetical default; pick whichever you prefer.\n\nPérotin is standing by to cross-check the live seed state if your probe surfaces any schema gaps. DM him directly if anything looks off.\n",
-    "summary": "Test-librarian IDs from Pérotin",
-    "timestamp": "2026-05-24T10:34:36.376Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "perotin",
-    "text": "[2026-05-24 10:36] Person + member IDs from the session-19 librarian bundle seed (all under EFK `69c7f8718489bfcb0e81b065`):\n\n| Person name | Person ID | Member ID |\n|---|---|---|\n| Margus Roos | `6a12036d4ff8277cd4306b93` | `6a12036e4ff8277cd4306b9a` |\n| Henn Kuusik | `6a12036e4ff8277cd4306ba4` | `6a12036e4ff8277cd4306bab` |\n| Maris Tamm | `6a12036c4ff8277cd4306b2d` | `6a12036c4ff8277cd4306b34` |\n| Liina Saar | `6a12036c4ff8277cd4306b3e` | `6a12036c4ff8277cd4306b45` |\n\nAll 8 bundle persons are single-org (EFK only) — no multi-org persons in this seed set. If you need a multi-member person to stress-test `members._parent` shape, the PO person (`69bcfd8e9c031ab8e6ce8079`) has members in all 4 collectives (EFK, Sireen, Rahvusmeeskoor, TAM) from the Phase B seed, though they're not a librarian.\n\nRecommended probe target: **Margus Roos** — he has an overdue lending (`assigned_at 2025-11-12`) so the librarian context is realistic. Curl `GET /entity/6a12036d4ff8277cd4306b93` on polyphony.",
-    "summary": "Test-librarian person + member IDs for CHORE-66 probe",
-    "timestamp": "2026-05-24T10:36:46.034Z",
-    "color": "cyan",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 08:48] **Path 1 approved.** Good catch.\n\nPlan document fixed too. Landed as `ed7f7b8` on main; chore branch fast-forwarded so you see the corrected plan when you pull/checkout. Your untracked `src/lib/auth/types.ts` is intact.\n\nNet changes propagated through the plan:\n- Task 1 (your file): TSDoc shows `https://api.entu.app/{db}/entity/{id}?props=...` with note pointing at `src/lib/entu-config.ts` for production consumers\n- Task 1 Step 4 (probe curl): fixed to `https://api.entu.app/polyphony/entity/<PERSON_ID>...`\n- Task 3 (Byrd's future userStore.ts): now imports `ENTU_API_BASE` from `$lib/entu-config` and uses `${ENTU_API_BASE}/${db}/...` template, no hardcoded base\n\n**Proceed as proposed:**\n1. Fix `src/lib/auth/types.ts` TSDoc URL form (re-read the plan; line 88-ish now correct)\n2. Await Pérotin's person ID (he DM'd you per his idle summary at 10:36 — Margus Roos `6a12036e4ff8277cd4306b9a` or Henn Kuusik `6a12036e4ff8277cd4306bab`)\n3. Run authenticated probe; note the response shape vs `EntuPersonResponse`; adjust types if needed\n4. Commit + push, verify trailer\n\nIf the probe reveals MORE schema differences beyond the URL form (e.g., property shape on members), surface-and-stop again — we'll adjust before locking the contract.\n\n**Process aside**: my plan-fix commit briefly landed on your branch (shared-tree flip from me chaining git ops on the wrong HEAD). Recovered non-destructively via reset --soft + stash + checkout main + commit + ff-merge back to chore. No force-push, no work lost. Lesson logged. Hard-earned reminder that team-lead git ops need an explicit `git checkout main` BEFORE any commit chain when an implementer is working on a feature branch in the shared tree.\n",
-    "summary": "Path 1 approved — fix landed in plan too",
-    "timestamp": "2026-05-24T10:41:07.400Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 09:15] Beautiful work. Your `e12522a` types match the corrected contract exactly (you went ahead with the data-model fix proactively — good call, that's what surface-and-stop is for).\n\n**Plan revision landed on main as `3d0ef30`** — Task 3 userStore code in the plan now uses parallel two-fetch flow (person + member-search), JWT `accounts[db]` decode, org-map built from `member._parent[]` filtered by `entity_type === 'organization'`. New `EntuMemberSearchResponse` type referenced. Founder-as-org-affiliation noted as known limitation + future CHORE.\n\n**Branch state:** chore now at `4eeedda` (merge of `3d0ef30` plan revision + your `e12522a` types). All in sync. Origin pushed.\n\n**Task #11 complete.** Marking done in tracker.\n\n**Pérotin:** I'll re-route him a thank-you for the test-librarian ID + flag for him that the \"person + member\" pair he sent was actually member IDs, not person IDs — your `6a12036d4ff8277cd4306b93` discovery (the actual Margus Roos person) is the truth. Useful note for future seed lookups.\n\n**Dispatching Comenius (Task #12 / Task 2)** in parallel now — he can land i18n keys while you stand by.\n\nNext time you're up: Task 4 (OrgPicker + spec atomic, with Tallis) after Byrd lands userStore in Task 3.\n",
-    "summary": "Task 1 done — types match the corrected plan",
-    "timestamp": "2026-05-24T10:51:23.804Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 11:44] Task #18 / CHORE-66 Task 8 dispatched. Squash-merge.\n\n**Approved.** Bentham verdict GREEN at `0a5a68e` with 2 YELLOWs (66.1 folded into the same branch as `0a5a68e`; 66.2 deferred to a follow-up CHORE Palestrina will file post-merge).\n\n**Branch:** `chore/navbar-auth-wiring` @ `0a5a68e`\n**Base:** `main` (`8a42302`)\n**Closes:** GH #66\n\n**Procedure (env-var marker discipline):**\n\n```bash\ngit checkout main && git pull\ngit merge --squash chore/navbar-auth-wiring\nMVOX_EXPECTED_BRANCH=main git commit -m \"$(cat <<'EOF'\nfeat(#66): navbar auth wiring — userStore + OrgPicker + layout integration\n\nCloses #66 — wire MvoxNav to real authenticated state. Adds userStore\n(Path C, localStorage JWT decode via storage.getToken + two-fetch Entu\nhydration for person identity + member-search → orgs), selectedOrgStore\n(URL-overrides-persisted rule per architecture-decisions 3a37e42, with\ntwo-write symmetry on read-time divergence), pickerModeStore (placeholder/\nstatic/dropdown derived from orgs cardinality), selectOrg (two-write on\nuser change: localStorage + soft-nav URL).\n\nNew OrgPicker.svelte renders only in dropdown mode. MvoxNav gains\norgPickerMode prop with 3-branch template. +layout.svelte invokes\nhydrateUserStore on mount; storage listener re-wired to re-hydrate on\ntoken-key change. Tests setup.ts gains afterEach(cleanup) for\n@testing-library/svelte under Vitest globals:false.\n\nFirst enactment of feedback_ui_parallels_with_seed — Pérotin confirmed\nthe test-librarian person (6a12036d4ff8277cd4306b93, Margus Roos, EFK\nLibrary) and surfaced the _parent inline-name denormalization finding,\nwhich informed the single-fetch member-search design.\n\nYELLOW-66.1 folded in: \\$app/stores → \\$app/state lift in +layout.svelte\n(runes-compatible convention on a fresh write).\n\nOut of scope (deferred):\n- YELLOW-66.2: ENTU_DB hardcode in userStore.ts (env-lift before prod).\n- Role-derived chip text (CONDUCTOR/ADMIN/MEMBER per selected org's rights).\n- /library data wiring (CHORE-67 territory).\n- 0-org onboarding flow.\n- Founder-as-org-affiliation corner (user is _owner but has no member row).\nEOF\n)\"\ngit push\n```\n\n(Prepare-commit-msg hook adds the PO co-author trailer. NO `Co-authored-by:` lines in the body — would short-circuit the hook per `7d078f7`.)\n\n**After push:**\n```bash\ngit push origin --delete chore/navbar-auth-wiring\ngit branch -D chore/navbar-auth-wiring\n```\n\nVerify:\n```bash\ngit log -1 --format='%(trailers)'\n```\nExpected: `Co-authored-by: Mihkel Putrinš <mihkel.putrinsh@gmail.com>` present.\n\n```bash\ngh issue view 66 --json state,closedAt\n```\nExpected: state `CLOSED`, closedAt within seconds of push.\n\nReport squash SHA + branch deletion confirmation. After your push, I'll:\n1. Post #66 closure comment (summary + files + AC)\n2. File YELLOW-66.2 as follow-up CHORE\n3. Mark CHORE-66 done\n",
-    "summary": "Task 8 — squash-merge CHORE-66 + close #66",
-    "timestamp": "2026-05-24T13:11:19.086Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"18\",\"subject\":\"Task 8 — Josquin: squash-merge + close #66\",\"description\":\"CHORE-66 Task 8. Local squash-merge with Closes #66 in body (no Co-authored-by lines — hook adds PO trailer). Delete branch local + remote. Verify GH #66 auto-closed.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T13:11:20.198Z\"}",
-    "timestamp": "2026-05-24T13:11:20.198Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779631473089@josquin\",\"from\":\"team-lead\",\"reason\":\"Session 22 wrap. Twin surface-and-stops on CHORE-66 Task 1 (URL form + data-model inverted) saved real rework. Two squash merges shipped (9637eee + 9266e2e). Trailer-collision arch entry at 7d078f7 dogfooded the rule. Save scratchpad.\",\"timestamp\":\"2026-05-24T14:04:33.089Z\"}",
-    "timestamp": "2026-05-24T14:04:33.089Z",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779652968425@josquin\",\"from\":\"team-lead\",\"reason\":\"session-23 shutdown\",\"timestamp\":\"2026-05-24T20:02:48.425Z\"}",
+    "timestamp": "2026-05-24T20:02:48.425Z",
     "type": "message",
     "read": true
   }
