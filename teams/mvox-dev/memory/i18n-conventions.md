@@ -146,5 +146,11 @@ Tab label keys for MvoxNav: `nav_tab_agenda`, `nav_tab_library`, `nav_tab_roster
 | `nav_chip_librarian` | et | `RAAMATUKOGUHOIDJA` | Uppercase per visual chip presentation. Long but correct Estonian term. |
 | `nav_chip_librarian` | lv | `BIBLIOTEKĀRS` | Uppercase; `bibliotekārs` = librarian in Latvian. |
 | `nav_chip_librarian` | uk | `БІБЛІОТЕКАР` | Uppercase; standard Ukrainian term. |
+| `nav_org_picker_placeholder` | et | `Organisatsioone pole` | "No organizations" — genitive plural (pole + gen.pl.); natural Estonian negative-existence phrasing. |
+| `nav_org_picker_placeholder` | lv | `Nav organizāciju` | "No organizations" — `nav` (there isn't/aren't) + gen.pl.; standard Latvian negative-existence form. |
+| `nav_org_picker_placeholder` | uk | `Немає організацій` | "No organizations" — `немає` + gen.pl.; standard Ukrainian negative-existence phrasing. |
+| `nav_org_picker_switch_to` | et | `Lülitu: {orgName}` | "Switch: {orgName}" — imperative singular; colon separates verb from target; aria-label context. Shorter than "Lülitu organisatsioonile" without losing clarity. |
+| `nav_org_picker_switch_to` | lv | `Pārslēgt uz {orgName}` | "Switch to {orgName}" — infinitive + `uz` (to/onto); standard Latvian action phrasing for aria-labels. |
+| `nav_org_picker_switch_to` | uk | `Перейти до {orgName}` | "Go to {orgName}" — infinitive + `до` (to/into); natural Ukrainian aria-label for navigation-style selection. |
 
 (*MVOX:Comenius*)

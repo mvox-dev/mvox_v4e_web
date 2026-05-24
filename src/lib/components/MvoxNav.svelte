@@ -1,6 +1,9 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import BrandMark from './BrandMark.svelte';
+	import OrgPicker from './OrgPicker.svelte';
+	import type { OrgPickerMode } from '$lib/auth/userStore';
+
 	type Tab = 'agenda' | 'library' | 'roster' | 'notices' | 'settings';
 	const TAB_LABELS: Record<Tab, () => string> = {
 		agenda: m.nav_tab_agenda,
@@ -11,26 +14,33 @@
 	};
 	const TABS: Tab[] = ['agenda', 'library', 'roster', 'notices', 'settings'];
 	const {
-		signedIn,
-		currentTab,
+		signedIn = false,
+		currentTab = 'agenda' as Tab,
 		orgLabel = '',
 		orgInitials = '',
 		userInitial = '',
 		userName = '',
+		orgPickerMode = 'placeholder' as OrgPickerMode,
 	}: {
-		signedIn: boolean;
-		currentTab: Tab;
+		signedIn?: boolean;
+		currentTab?: Tab;
 		orgLabel?: string;
 		orgInitials?: string;
 		userInitial?: string;
 		userName?: string;
+		orgPickerMode?: OrgPickerMode;
 	} = $props();
 </script>
 
 <header class="flex items-center justify-between py-2 px-6 border-b-[1.5px] border-ink-2 bg-paper">
 	<div class="flex items-center gap-4">
 		<a href="/"><BrandMark size="m" /></a>
-		{#if signedIn && orgLabel}
+		{#if orgPickerMode === 'placeholder'}
+			<span class="text-ink-4">/</span>
+			<span class="font-sans font-semibold text-[11px] text-ink-3"
+				>{m.nav_org_picker_placeholder()}</span
+			>
+		{:else if orgPickerMode === 'static'}
 			<span class="text-ink-4">/</span>
 			<span
 				class="inline-flex items-center gap-1.5 py-0.5 px-2 border border-[1.25px] border-ink-3 rounded"
@@ -40,8 +50,10 @@
 					>{orgInitials}</span
 				>
 				<span class="font-sans font-semibold text-[11px]">{orgLabel}</span>
-				<span class="text-ink-4">▾</span>
 			</span>
+		{:else}
+			<span class="text-ink-4">/</span>
+			<OrgPicker />
 		{/if}
 	</div>
 	<div class="flex items-center gap-3.5">

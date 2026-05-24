@@ -85,6 +85,8 @@
 	"library_top_eyebrow": "Raamatukogu · raamatukoguhoidja laud",
 	"library_top_heading": "Täna laual",
 	"nav_chip_librarian": "RAAMATUKOGUHOIDJA",
+	"nav_org_picker_placeholder": "Organisatsioone pole",
+	"nav_org_picker_switch_to": "Lülitu: {orgName}",
 	"nav_sign_in": "Logi sisse",
 	"nav_sign_out": "Logi välja",
 	"nav_tab_agenda": "Kava",

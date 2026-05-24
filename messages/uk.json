@@ -85,6 +85,8 @@
 	"library_top_eyebrow": "Бібліотека · стіл бібліотекаря",
 	"library_top_heading": "Сьогодні на столі",
 	"nav_chip_librarian": "БІБЛІОТЕКАР",
+	"nav_org_picker_placeholder": "Немає організацій",
+	"nav_org_picker_switch_to": "Перейти до {orgName}",
 	"nav_sign_in": "Увійти",
 	"nav_sign_out": "Вийти",
 	"nav_tab_agenda": "Програма",

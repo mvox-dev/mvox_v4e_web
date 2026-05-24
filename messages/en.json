@@ -85,6 +85,8 @@
 	"library_top_eyebrow": "Library · librarian's desk",
 	"library_top_heading": "On the desk today",
 	"nav_chip_librarian": "LIBRARIAN",
+	"nav_org_picker_placeholder": "No organizations",
+	"nav_org_picker_switch_to": "Switch to {orgName}",
 	"nav_sign_in": "Sign in",
 	"nav_sign_out": "Sign out",
 	"nav_tab_agenda": "Agenda",

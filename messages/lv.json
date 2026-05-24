@@ -85,6 +85,8 @@
 	"library_top_eyebrow": "Bibliotēka · bibliotekāra galds",
 	"library_top_heading": "Šodien uz galda",
 	"nav_chip_librarian": "BIBLIOTEKĀRS",
+	"nav_org_picker_placeholder": "Nav organizāciju",
+	"nav_org_picker_switch_to": "Pārslēgt uz {orgName}",
 	"nav_sign_in": "Pierakstīties",
 	"nav_sign_out": "Izrakstīties",
 	"nav_tab_agenda": "Programma",

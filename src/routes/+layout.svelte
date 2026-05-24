@@ -1,42 +1,39 @@
 <script lang="ts">
 	import '../app.css';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { onMount } from 'svelte';
-	import { getToken } from '$lib/auth/storage';
+	import { userStore, selectedOrgStore, pickerModeStore, hydrateUserStore } from '$lib/auth/userStore';
 	import MvoxNav from '$lib/components/MvoxNav.svelte';
 
 	let { children } = $props();
 
 	let mounted = $state(false);
-	let signedIn = $state(false);
-
-	function refreshSignedIn() {
-		signedIn = getToken() !== null;
-	}
 
 	onMount(() => {
-		refreshSignedIn();
+		hydrateUserStore();
 		mounted = true;
 		const onStorage = (e: StorageEvent) => {
-			if (e.key === 'token' || e.key === null) refreshSignedIn();
+			if (e.key === 'token' || e.key === null) hydrateUserStore();
 		};
 		window.addEventListener('storage', onStorage);
 		return () => window.removeEventListener('storage', onStorage);
 	});
 
-	$effect(() => {
-		$page.url;
-		refreshSignedIn();
-	});
+	const signedIn = $derived($userStore.status === 'ready');
+	const userName = $derived($userStore.status === 'ready' ? $userStore.name : '');
+	const userInitial = $derived($userStore.status === 'ready' ? $userStore.initial : '');
+	const orgLabel = $derived($selectedOrgStore?.label ?? '');
+	const orgInitials = $derived($selectedOrgStore?.initials ?? '');
+	const orgPickerMode = $derived($pickerModeStore);
 
 	const currentTab = $derived(
-		$page.url.pathname.startsWith('/library')
+		page.url.pathname.startsWith('/library')
 			? 'library'
-			: $page.url.pathname.startsWith('/roster')
+			: page.url.pathname.startsWith('/roster')
 				? 'roster'
-				: $page.url.pathname.startsWith('/notices')
+				: page.url.pathname.startsWith('/notices')
 					? 'notices'
-					: $page.url.pathname.startsWith('/settings')
+					: page.url.pathname.startsWith('/settings')
 						? 'settings'
 						: 'agenda',
 	);
@@ -44,12 +41,13 @@
 
 {#if mounted}
 	<MvoxNav
-		signedIn={signedIn}
-		currentTab={currentTab}
-		userInitial="M"
-		userName="Maire L."
-		orgLabel="Estonian Philharmonic Chamber Choir"
-		orgInitials="EP"
+		{signedIn}
+		{currentTab}
+		{userName}
+		{userInitial}
+		{orgLabel}
+		{orgInitials}
+		{orgPickerMode}
 	/>
 {/if}
 

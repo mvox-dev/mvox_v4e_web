@@ -539,8 +539,12 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
 [DATA STATE] Polyphony after CHORE-60 seed (2026-05-23T19:45Z):
   Library: 6a12036c4ff8277cd4306b26 ("EPCC Library") under EFK
   8 bundle persons/members created: Maris Tamm, Liina Saar, Ave Lepp, Kärt Põld,
-    Toomas Mägi, Andres Vahar, Margus Roos (member 6a12036e4ff8277cd4306b9a),
-    Henn Kuusik (member 6a12036e4ff8277cd4306bab)
+    Toomas Mägi, Andres Vahar,
+    Margus Roos (person 6a12036d4ff8277cd4306b93, member 6a12036e4ff8277cd4306b9a),
+    Henn Kuusik (person 6a12036e4ff8277cd4306ba4, member 6a12036e4ff8277cd4306bab)
+  [GOTCHA] person ID ≠ member ID — v4E has separate person entity + member entity.
+    When teammates ask for "the person ID", give the person entity ID (6a12036d...) not the
+    member entity ID (6a12036e...). Both are useful but distinct. Caught 2026-05-24 session 22.
   4 overdue lendings: Pärt Magnificat UE copies #14/#15 (Henn) + #22/#23 (Margus), assigned_at 2025-11-12
   13 works, 17 editions, 552 copies — all under the library
   Live artifact: seed-librarian-bundle-live-2026-05-23T19-45-07-408Z.json (commit 6d58544)
@@ -550,6 +554,12 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
   Enablers: manifest-first design (bundle.json written before script), toolkit reuse
   (isDryRun / writeResultArtifact / findOrCreateByName), clear schema-gaps pre-resolved
   in Q1+Q2 before authorization. Apply same pattern to future seed dispatches.
+
+[PROBE-RESULT] 2026-05-24 session 22 (Josquin's CHORE-66 Task 1 probe):
+  Member entity fetched with `props=_parent` carries inline org+section name + entity_type:
+    { reference: "69c7f8718...", string: "Eesti Filharmoonia Kammerkoor", entity_type: "organization" }
+  Display name + type are denormalized on the child reference — org list computable without N+1 fetches.
+  Probe entity: Margus Roos member 6a12036e4ff8277cd4306b9a.
 
 [LEARNED] 2026-05-23 session 19 — authorization routing-tag matters, not just content.
   The inbox messages carrying "I authorize this run" were tagged from: perotin (channel misroute),
