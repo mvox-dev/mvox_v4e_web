@@ -1,15 +1,8 @@
 [
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779558613265@finn\",\"from\":\"team-lead\",\"reason\":\"session 18 close — no further dispatches needed this session\",\"timestamp\":\"2026-05-23T17:50:13.265Z\"}",
-    "timestamp": "2026-05-23T17:50:13.265Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779566291840@finn\",\"from\":\"team-lead\",\"reason\":\"Stale config entry from recovery shutdown. If you are alive: please approve shutdown. If you are a dead config artifact: this will queue indefinitely — harmless.\",\"timestamp\":\"2026-05-23T19:58:11.840Z\"}",
-    "timestamp": "2026-05-23T19:58:11.840Z",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779581641008@finn\",\"from\":\"team-lead\",\"reason\":\"End of session 20. No dispatches this session — clean exit.\",\"timestamp\":\"2026-05-24T00:14:01.008Z\"}",
+    "timestamp": "2026-05-24T00:14:01.008Z",
     "type": "message",
     "read": true
   }

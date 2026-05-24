@@ -1,54 +1,5 @@
 [
   {
-    "from": "josquin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-23T09:49:12.020Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-23T09:49:12.020Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-23T09:49:18.399Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-23T09:49:18.399Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-23T09:50:41.350Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-23T09:50:41.350Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "[2026-05-23 09:52] B13a RED complete. Handoff back.\n\n## Story Handoff\n- **Story:** #53 — CHORE-B Path C rewrite\n- **Branch:** feat/chore-53b-rewrite (at 998b414)\n- **From:** Tallis (phase: RED)\n- **To:** Byrd (phase: GREEN — wrapper 401 impl + landing svelte)\n- **Status:** TESTS_WRITTEN\n\n### What was done\n- Appended 3 new cases to `src/lib/api/wrapper.spec.ts` per plan §B13\n- Updated top-level import to add `setLastProvider` + `setUser` (alongside existing `setToken`)\n- Added `sessionStorage.clear()` to the top-level `beforeEach`\n- `pnpm test` on wrapper.spec.ts: **5 CHORE-A cases pass, 3 new 401-handling cases FAIL**\n- B12 staged spec (`src/tests/routes/landing/page.server.spec.ts`) untouched and still failing as before\n\n### Failure mode observed (3 new cases)\n1. `clears token/user/accounts on 401 (preserves mvox.last_provider)` — fails: current wrapper throws `apiRequest failed: 401` without clearing storage\n2. `navigates to /auth/<last_provider>?intent=reauth on 401` — fails: `gotoMock` never called (wrapper throws instead of navigating)\n3. `navigates to /auth/login on 401 when no last_provider` — fails: `gotoMock` never called (same reason)\n\nAll 3 failures exactly characterise the missing 401 interceptor Byrd must add.\n\n### Files to start with\n- `src/lib/api/wrapper.spec.ts` — extended spec (no commit yet)\n- `src/lib/api/wrapper.ts` — needs 401 branch per plan §B13 Step 3\n- After wrapper GREEN: `src/routes/+page.svelte` — landing rewrite (B13b, no separate RED needed)\n\nNo commit made per brief. B12 staged spec remains untouched in working tree.",
-    "summary": "B13a RED done — 3 new failures, 5 old pass",
-    "timestamp": "2026-05-23T09:52:36.094Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-23T09:52:39.160Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-23T09:52:39.160Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-23T09:52:51.019Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-23T09:52:51.019Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
     "from": "byrd",
     "text": "[2026-05-23 09:58] CHORE-B13a GREEN complete.\n\n**Commit:** `401c4ae` — `feat(#53): apiRequest 401 triggers re-auth (clear token, preserve last_provider)`\n**Branch:** feat/chore-53b-rewrite (4 files changed)\n\n**GREEN gate results:**\n- `pnpm check` — 0 errors (978 files)\n- `pnpm test:unit` — 386/387 committed tests pass; 1 fail is `landing/page.server.spec.ts` (Tallis's B12 staged spec in working tree — expected per split plan, not committed)\n- `pnpm lint:fix` — fixed 2 files (wrapper.ts + wrapper.spec.ts); diff is biome reformatting Tallis's inline mock calls to multi-line style — pure style, no semantics\n- `pnpm build` — clean\n\n**wrapper.spec.ts count: 8/8 pass** (5 original CHORE-A + 3 new 401 cases). ✓\n\n**Infrastructure flag — $app/navigation alias needed in vitest.config.ts:**\nThe plan's `import { goto as sveltekitGoto } from '$app/navigation'` in wrapper.ts hit a hard vite transform error — `$app/navigation` isn't in the vitest alias map (bare `defineConfig` from `vitest/config`, not SvelteKit's vite config). The `__mvox_test_goto` escape hatch only works at runtime; vite fails before runtime when it can't resolve the static import at transform time.\n\nFix applied in this commit:\n- Added `src/tests/mocks/app-navigation.ts` — stub exporting `goto: vi.fn()` + other nav exports\n- Added `resolve.alias: { '$app/navigation': './src/tests/mocks/app-navigation.ts' }` to `vitest.config.ts`\n\nThis is an infra addition, not a scope breach. `$app/navigation` is the first `$app/*` module that appears in a directly-spec-imported `.ts` file (prior `$app/state` + `$app/stores` usage was only in `.svelte` files which specs never imported directly). Any future spec that imports a module with `$app/navigation` will now work. Bentham should note this alias in the review — it's the right layer for the fix.\n\n**B12 staged spec status:** `src/tests/routes/landing/page.server.spec.ts` is in working tree (Josquin's), untouched. It fails because `+page.server.ts` still has `locals.entuJwt` — expected; resolves when Josquin lands B12.\n\nReady for B13b dispatch.\n\n(*MVOX:Byrd*)",
     "summary": "CHORE-B13a GREEN complete — SHA 401c4ae, infra flag",
@@ -832,6 +783,56 @@
     "from": "bentham",
     "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779575609555@bentham\",\"from\":\"bentham\",\"timestamp\":\"2026-05-23T22:33:39.429Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
     "timestamp": "2026-05-23T22:33:39.429Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-05-23 23:26] Finn online — session 20. Read common-prompt, role prompt, scratchpad (sessions 2–19 findings current), and architecture-decisions. Familiar with Path C data flow, Entu wire shapes, S3 orphan finding, and all prior research artifacts. Ready for requests.",
+    "summary": "Finn session 20 ready",
+    "timestamp": "2026-05-23T23:26:46.791Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-23T23:26:48.798Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-23T23:26:48.799Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "[2026-05-23 23:26] Bentham online, session 20. Startup reads complete:\n\n- common-prompt.md (current stack landed, TDD chain, quality gates)\n- prompts/bentham.md (full role)\n- memory/bentham.md (session-17 close: CHORE-B + 4 hotfixes shipped; 3 carryforwards re-parked from session 19 — per-commit-GREEN lifted to arch-decisions [DONE session 19], entu-research case study task #16 / Brilliant entry task #17 stewardship)\n- memory/architecture-decisions.md (per-commit-GREEN ratified session 19; Path C \"Data path — browser-direct to Entu\" + \"BFF elevated-ops list\" sections present; SUPERSEDED carve-out preserved for audit trail)\n- memory/test-gaps.md (10 open gaps; CHORE-32/35 dominant)\n\nCalibration anchors for session 20:\n- Per-commit-GREEN is a hard rule now — spot-check ≥2 non-tip commits on any feature branch review\n- Path C RED triggers active: no new `/api/` proxy routes; no JWT access outside `src/lib/auth/storage.ts`; user/accounts must be written BEFORE setToken\n- Schema-mutation gate unchanged: Schema-Change + PO-Approved trailers required on mvox PRs touching v4E\n\nGoing idle. Awaiting review dispatches.\n\n(*MVOX:Bentham*)",
+    "summary": "Bentham ready for review dispatch",
+    "timestamp": "2026-05-23T23:26:55.085Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-23T23:26:59.076Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-23T23:26:59.076Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779581641008@finn\",\"from\":\"finn\",\"timestamp\":\"2026-05-24T00:14:04.497Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-24T00:14:04.497Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779581641515@bentham\",\"from\":\"bentham\",\"timestamp\":\"2026-05-24T00:14:10.226Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-24T00:14:10.226Z",
     "color": "green",
     "type": "message",
     "read": true
