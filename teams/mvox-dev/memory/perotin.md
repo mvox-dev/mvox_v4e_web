@@ -573,13 +573,13 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
   Commits this session: c623835 (scratchpad update, chore/navbar-auth-wiring)
   No seed mutations this session — read-only support role.
 
-[NEXT SESSION] CHORE-66 status at session 22 shutdown:
-  - Task 1 (Josquin types.ts): COMPLETE
-  - Task 2 (Comenius i18n keys): in_progress at session end
-  - Tasks 3-8: pending
-  Branch: chore/navbar-auth-wiring
-  No pending data-manager dispatches. Standing by for next seed work (rsvp/attendance seeding,
-  or dev/staging refresh once CHORE-66 merges).
+[CHECKPOINT 2026-05-24] CHORE-66 shipped end-of-session-22 — squash 9266e2e on main, closes GH #66.
+  463/463 unit tests, +27 from baseline. Session-22 [NEXT SESSION] note above was stale (session-21 snapshot).
+  Kickoff-participation outcome (canonical exemplar for [[feedback_ui_parallels_with_seed]] working mode):
+  - Test-librarian person/member IDs supplied at kickoff → Josquin's Task 1 probe ran against real data
+  - _parent inline-name denormalization finding → two-fetch userStore design (org list without N+1 fetches)
+  - Working mode codified: data-manager participates from kickoff on any UI CHORE touching Entu
+  No pending data-manager dispatches. CHORE-67 (wire /library to real Entu data) is natural next.
 
 [LEARNED] 2026-05-23 session 19 — authorization routing-tag matters, not just content.
   The inbox messages carrying "I authorize this run" were tagged from: perotin (channel misroute),
