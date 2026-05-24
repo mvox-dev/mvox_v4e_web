@@ -125,4 +125,26 @@ Covers: `library_top_*`, `library_rehearsal_*`, `library_search_*`, `library_ret
 
 **Parameterized keys in this group:** `library_rehearsal_in` ({time}, {countdown}), `library_returns_counted` ({n}), `library_returns_confirm` ({n}), `library_overdue_borrower_days` ({n}), `library_pull_pull_n` ({n}), `library_pull_request_line` ({date}), `library_catalog_works` ({n}), `library_catalog_owned` ({n}), `library_catalog_available` ({n}), `library_catalog_on_loan` ({n}), `library_catalog_overdue` ({n}).
 
+### New key group: `nav_tab_*` + `nav_chip_*` (added session 22)
+
+Tab label keys for MvoxNav: `nav_tab_agenda`, `nav_tab_library`, `nav_tab_roster`, `nav_tab_notices`, `nav_tab_settings`, `nav_chip_librarian`.
+
+| Key | Locale | Value | Rationale |
+|---|---|---|---|
+| `nav_tab_agenda` | et | `Kava` | Programme/agenda for choir context; `kava` is the standard Estonian term for a concert or rehearsal programme. |
+| `nav_tab_agenda` | lv | `Programma` | Standard Latvian for programme/agenda in a music event context. |
+| `nav_tab_agenda` | uk | `Програма` | Standard Ukrainian for programme/agenda. |
+| `nav_tab_roster` | et | `Liikmed` | "Members" — direct translation of roster in choir context; `nimekiri` (list) is less natural for a nav tab. |
+| `nav_tab_roster` | lv | `Dalībnieki` | "Participants/members" — standard for choir member lists in Latvian. |
+| `nav_tab_roster` | uk | `Учасники` | "Participants/members" — standard for choir member lists in Ukrainian. |
+| `nav_tab_notices` | et | `Teated` | "Notices/announcements" — concise and natural for a nav tab in Estonian. |
+| `nav_tab_notices` | lv | `Paziņojumi` | "Notices/announcements" — standard Latvian UI term. |
+| `nav_tab_notices` | uk | `Повідомлення` | "Notices/messages" — standard Ukrainian UI term. |
+| `nav_tab_settings` | et | `Seaded` | "Settings" — standard Estonian UI term. |
+| `nav_tab_settings` | lv | `Iestatījumi` | "Settings" — standard Latvian UI term. |
+| `nav_tab_settings` | uk | `Налаштування` | "Settings" — standard Ukrainian UI term. |
+| `nav_chip_librarian` | et | `RAAMATUKOGUHOIDJA` | Uppercase per visual chip presentation. Long but correct Estonian term. |
+| `nav_chip_librarian` | lv | `BIBLIOTEKĀRS` | Uppercase; `bibliotekārs` = librarian in Latvian. |
+| `nav_chip_librarian` | uk | `БІБЛІОТЕКАР` | Uppercase; standard Ukrainian term. |
+
 (*MVOX:Comenius*)
