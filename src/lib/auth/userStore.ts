@@ -1,10 +1,12 @@
 import { writable, derived, get, type Readable, type Writable } from 'svelte/store';
 import { goto } from '$app/navigation';
+import { PUBLIC_ENTU_DB } from '$env/static/public';
 import { ENTU_API_BASE } from '$lib/entu-config';
 import { getToken } from './storage';
 import type {
 	EntuJwtClaims,
 	EntuMemberSearchResponse,
+	EntuOwnerSearchResponse,
 	EntuPersonResponse,
 	Org,
 	UserState,
@@ -13,8 +15,6 @@ import { deriveInitials } from './types';
 
 const SELECTED_ORG_KEY = 'mvox.selectedOrgId';
 const ORG_URL_PARAM = 'org';
-// Dev db; derive from env when prod is wired
-const ENTU_DB = 'polyphony';
 
 export const userStore: Writable<UserState> = writable({ status: 'loading' });
 
@@ -41,19 +41,23 @@ export async function hydrateUserStore(): Promise<void> {
 	}
 
 	const claims = decodeJwt(token);
-	const personId = claims?.accounts?.[ENTU_DB];
+	const personId = claims?.accounts?.[PUBLIC_ENTU_DB];
 	if (!personId) {
 		userStore.set({ status: 'signed-out' });
 		return;
 	}
 
 	try {
-		const [personRes, memberRes] = await Promise.all([
-			fetch(`${ENTU_API_BASE}${ENTU_DB}/entity/${personId}?props=name`, {
+		const [personRes, memberRes, ownerRes] = await Promise.all([
+			fetch(`${ENTU_API_BASE}${PUBLIC_ENTU_DB}/entity/${personId}?props=name`, {
 				headers: { Authorization: `Bearer ${token}` },
 			}),
 			fetch(
-				`${ENTU_API_BASE}${ENTU_DB}/entity?_type.string=member&person.reference=${personId}&props=_parent`,
+				`${ENTU_API_BASE}${PUBLIC_ENTU_DB}/entity?_type.string=member&person.reference=${personId}&props=_parent`,
+				{ headers: { Authorization: `Bearer ${token}` } },
+			),
+			fetch(
+				`${ENTU_API_BASE}${PUBLIC_ENTU_DB}/entity?_type.string=organization&_owner.reference=${personId}&props=name`,
 				{ headers: { Authorization: `Bearer ${token}` } },
 			),
 		]);
@@ -66,9 +70,14 @@ export async function hydrateUserStore(): Promise<void> {
 			userStore.set({ status: 'error', reason: `member fetch ${memberRes.status}` });
 			return;
 		}
+		if (!ownerRes.ok) {
+			userStore.set({ status: 'error', reason: `owner fetch ${ownerRes.status}` });
+			return;
+		}
 
 		const personData = (await personRes.json()) as EntuPersonResponse;
 		const memberData = (await memberRes.json()) as EntuMemberSearchResponse;
+		const ownerData = (await ownerRes.json()) as EntuOwnerSearchResponse;
 
 		const name = personData.entity.name?.[0]?.string ?? '';
 		const initial = name ? name[0].toLocaleUpperCase() : '';
@@ -85,6 +94,15 @@ export async function hydrateUserStore(): Promise<void> {
 					role: undefined,
 				});
 			}
+		}
+		for (const org of ownerData.entities) {
+			if (orgMap.has(org._id)) continue;
+			orgMap.set(org._id, {
+				id: org._id,
+				label: org.name?.[0]?.string ?? '',
+				initials: deriveInitials(org.name?.[0]?.string ?? ''),
+				role: 'owner',
+			});
 		}
 
 		userStore.set({ status: 'ready', name, initial, orgs: Array.from(orgMap.values()) });

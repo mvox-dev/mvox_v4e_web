@@ -131,6 +131,26 @@ export type EntuMemberSearchResponse = {
 };
 
 /**
+ * v4E query contract — Owner org search (founder-affiliation).
+ *
+ * Endpoint: `GET https://api.entu.app/{db}/entity?_type.string=organization&_owner.reference={personId}&props=name`
+ *   - Returns organization entities where the user holds `_owner` rights.
+ *   - Used to surface founder-only orgs that have no `member` row.
+ *
+ * Mapping → `Org[]`: only insert if not already present from member-walk;
+ * set `role: 'owner'` for these entries.
+ */
+export type EntuOwnerSearchResponse = {
+	count: number;
+	limit: number;
+	skip: number;
+	entities: Array<{
+		_id: string;
+		name?: Array<{ string: string }>;
+	}>;
+};
+
+/**
  * Helper for chip/dropdown initials. 1-3 chars, uppercase, ASCII-fallback friendly.
  * Examples: "EFK Library" → "EL"; "Tartu Akadeemiline Meeskoor" → "TAM"; "Õla" → "Õ".
  */

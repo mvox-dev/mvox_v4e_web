@@ -8,6 +8,10 @@ vi.mock('$app/navigation', () => ({
 	}),
 }));
 
+vi.mock('$env/static/public', () => ({
+	PUBLIC_ENTU_DB: 'test-env-db',
+}));
+
 let userStore: typeof import('./userStore');
 
 const FAKE_HEADER = btoa(JSON.stringify({ alg: 'none', typ: 'JWT' }));
@@ -38,7 +42,7 @@ const makeMemberSearchResponse = (orgParents: Array<{ reference: string; string:
 });
 
 const PERSON_ID = 'person-abc';
-const DB = 'polyphony';
+const DB = 'test-env-db';
 const JWT_WITH_ACCOUNT = makeJwt({
 	accounts: { [DB]: PERSON_ID },
 	iat: 0,
@@ -84,7 +88,7 @@ describe('hydrateUserStore — fetch + ready state', () => {
 	it('moves to ready with name + initial + orgs after successful two fetches', async () => {
 		localStorage.setItem('token', JWT_WITH_ACCOUNT);
 		(globalThis.fetch as ReturnType<typeof vi.fn>).mockImplementation((url: string) => {
-			if (url.includes(`entity/${PERSON_ID}`)) {
+			if (url.includes(`entity/${PERSON_ID}`) && !url.includes('_type')) {
 				return Promise.resolve({
 					ok: true,
 					json: () => Promise.resolve(makePersonResponse(PERSON_ID, 'Margus Roos')),
@@ -97,6 +101,12 @@ describe('hydrateUserStore — fetch + ready state', () => {
 						Promise.resolve(
 							makeMemberSearchResponse([{ reference: 'org-efk', string: 'EFK Library' }]),
 						),
+				});
+			}
+			if (url.includes('_type.string=organization') && url.includes('_owner.reference')) {
+				return Promise.resolve({
+					ok: true,
+					json: () => Promise.resolve(makeOwnerSearchResponse([])),
 				});
 			}
 			return Promise.reject(new Error(`Unexpected URL: ${url}`));
@@ -123,7 +133,7 @@ describe('hydrateUserStore — fetch + ready state', () => {
 	it('moves to ready with empty orgs[] when member search returns no entities', async () => {
 		localStorage.setItem('token', JWT_WITH_ACCOUNT);
 		(globalThis.fetch as ReturnType<typeof vi.fn>).mockImplementation((url: string) => {
-			if (url.includes(`entity/${PERSON_ID}`)) {
+			if (url.includes(`entity/${PERSON_ID}`) && !url.includes('_type')) {
 				return Promise.resolve({
 					ok: true,
 					json: () => Promise.resolve(makePersonResponse(PERSON_ID, 'Solo User')),
@@ -133,6 +143,12 @@ describe('hydrateUserStore — fetch + ready state', () => {
 				return Promise.resolve({
 					ok: true,
 					json: () => Promise.resolve(makeMemberSearchResponse([])),
+				});
+			}
+			if (url.includes('_type.string=organization') && url.includes('_owner.reference')) {
+				return Promise.resolve({
+					ok: true,
+					json: () => Promise.resolve(makeOwnerSearchResponse([])),
 				});
 			}
 			return Promise.reject(new Error(`Unexpected URL: ${url}`));
@@ -149,7 +165,7 @@ describe('hydrateUserStore — fetch + ready state', () => {
 	it('filters section parents and only maps organization parents to orgs', async () => {
 		localStorage.setItem('token', JWT_WITH_ACCOUNT);
 		(globalThis.fetch as ReturnType<typeof vi.fn>).mockImplementation((url: string) => {
-			if (url.includes(`entity/${PERSON_ID}`)) {
+			if (url.includes(`entity/${PERSON_ID}`) && !url.includes('_type')) {
 				return Promise.resolve({
 					ok: true,
 					json: () => Promise.resolve(makePersonResponse(PERSON_ID, 'Test User')),
@@ -160,6 +176,12 @@ describe('hydrateUserStore — fetch + ready state', () => {
 					ok: true,
 					json: () =>
 						Promise.resolve(makeMemberSearchResponse([{ reference: 'org-1', string: 'Org One' }])),
+				});
+			}
+			if (url.includes('_type.string=organization') && url.includes('_owner.reference')) {
+				return Promise.resolve({
+					ok: true,
+					json: () => Promise.resolve(makeOwnerSearchResponse([])),
 				});
 			}
 			return Promise.reject(new Error(`Unexpected URL: ${url}`));
@@ -248,6 +270,210 @@ describe('selectOrg — two-write on user change', () => {
 		expect(localStorage.getItem('mvox.selectedOrgId')).toBe('org-2');
 		expect(new URL(window.location.href).searchParams.get('org')).toBe('org-2');
 		expect(get(userStore.selectedOrgStore)?.id).toBe('org-2');
+	});
+});
+
+describe('hydrateUserStore — ENTU_DB from $env/static/public', () => {
+	const ENV_DB = 'test-env-db';
+	const JWT_WITH_ENV_DB = makeJwt({
+		accounts: { [ENV_DB]: PERSON_ID },
+		iat: 0,
+		exp: 9999999999,
+		aud: '127.0.0.1',
+	});
+
+	it('resolves personId from the env-injected db name', async () => {
+		localStorage.setItem('token', JWT_WITH_ENV_DB);
+		(globalThis.fetch as ReturnType<typeof vi.fn>).mockImplementation((url: string) => {
+			if (url.includes(`${ENV_DB}/entity/${PERSON_ID}`)) {
+				return Promise.resolve({
+					ok: true,
+					json: () => Promise.resolve(makePersonResponse(PERSON_ID, 'Env User')),
+				});
+			}
+			if (url.includes(`${ENV_DB}/entity`) && url.includes('_type.string=member')) {
+				return Promise.resolve({
+					ok: true,
+					json: () => Promise.resolve(makeMemberSearchResponse([])),
+				});
+			}
+			if (url.includes('_type.string=organization') && url.includes('_owner.reference')) {
+				return Promise.resolve({
+					ok: true,
+					json: () => Promise.resolve(makeOwnerSearchResponse([])),
+				});
+			}
+			return Promise.reject(new Error(`Unexpected URL: ${url}`));
+		});
+
+		await userStore.hydrateUserStore();
+		expect(get(userStore.userStore).status).toBe('ready');
+	});
+
+	it('issues fetch URLs containing the env db name, not hardcoded polyphony', async () => {
+		localStorage.setItem('token', JWT_WITH_ENV_DB);
+		const fetchMock = globalThis.fetch as ReturnType<typeof vi.fn>;
+		fetchMock.mockImplementation((url: string) => {
+			if (url.includes(`${ENV_DB}/entity/${PERSON_ID}`)) {
+				return Promise.resolve({
+					ok: true,
+					json: () => Promise.resolve(makePersonResponse(PERSON_ID, 'Env User')),
+				});
+			}
+			if (url.includes(`${ENV_DB}/entity`) && url.includes('_type.string=member')) {
+				return Promise.resolve({
+					ok: true,
+					json: () => Promise.resolve(makeMemberSearchResponse([])),
+				});
+			}
+			if (url.includes('_type.string=organization') && url.includes('_owner.reference')) {
+				return Promise.resolve({
+					ok: true,
+					json: () => Promise.resolve(makeOwnerSearchResponse([])),
+				});
+			}
+			return Promise.reject(new Error(`Unexpected URL: ${url}`));
+		});
+
+		await userStore.hydrateUserStore();
+
+		const calledUrls = fetchMock.mock.calls.map((c: unknown[]) => c[0] as string);
+		expect(calledUrls.some((u) => u.includes(`/${ENV_DB}/`))).toBe(true);
+		expect(calledUrls.every((u) => !u.includes('/polyphony/'))).toBe(true);
+	});
+});
+
+// Fixtures for founder-union tests using real persona IDs from Pérotin probe (CHORE-68)
+const FOUNDER_PERSON_ID = '69bcfd8e9c031ab8e6ce8079';
+const EKBL_ORG_ID = '69c7f8718489bfcb0e81b05a';
+const EFK_ORG_ID = '69c7f8718489bfcb0e81b065';
+const EFK_MEMBER_ID = '69c7f8728489bfcb0e81b085';
+
+const makeOwnerSearchResponse = (orgs: Array<{ id: string; name: string }>) => ({
+	count: orgs.length,
+	limit: 100,
+	skip: 0,
+	entities: orgs.map((o) => ({
+		_id: o.id,
+		name: [{ string: o.name }],
+	})),
+});
+
+const JWT_FOUNDER = makeJwt({
+	accounts: { 'test-env-db': FOUNDER_PERSON_ID },
+	iat: 0,
+	exp: 9999999999,
+	aud: '127.0.0.1',
+});
+
+const setupFounderFetch = (opts: {
+	ownerOrgs: Array<{ id: string; name: string }>;
+	memberOrgParents: Array<{ reference: string; string: string; memberId?: string }>;
+}) => {
+	(globalThis.fetch as ReturnType<typeof vi.fn>).mockImplementation((url: string) => {
+		if (url.includes(`entity/${FOUNDER_PERSON_ID}`) && !url.includes('_type')) {
+			return Promise.resolve({
+				ok: true,
+				json: () => Promise.resolve(makePersonResponse(FOUNDER_PERSON_ID, 'PO User')),
+			});
+		}
+		if (url.includes('_type.string=organization') && url.includes('_owner.reference')) {
+			return Promise.resolve({
+				ok: true,
+				json: () => Promise.resolve(makeOwnerSearchResponse(opts.ownerOrgs)),
+			});
+		}
+		if (url.includes('_type.string=member')) {
+			const entities =
+				opts.memberOrgParents.length === 0
+					? []
+					: [
+							{
+								_id: opts.memberOrgParents[0].memberId ?? 'member-x',
+								_parent: opts.memberOrgParents.map((p) => ({
+									reference: p.reference,
+									string: p.string,
+									entity_type: 'organization',
+								})),
+							},
+						];
+			return Promise.resolve({
+				ok: true,
+				json: () => Promise.resolve({ count: entities.length, limit: 100, skip: 0, entities }),
+			});
+		}
+		return Promise.reject(new Error(`Unexpected URL: ${url}`));
+	});
+};
+
+describe('hydrateUserStore — founder-as-org-affiliation union', () => {
+	it('includes orgs where user is _owner with no member row', async () => {
+		localStorage.setItem('token', JWT_FOUNDER);
+		setupFounderFetch({
+			ownerOrgs: [{ id: EKBL_ORG_ID, name: 'EKBL' }],
+			memberOrgParents: [],
+		});
+
+		await userStore.hydrateUserStore();
+		const state = get(userStore.userStore);
+		expect(state.status).toBe('ready');
+		if (state.status === 'ready') {
+			const ekbl = state.orgs.find((o) => o.id === EKBL_ORG_ID);
+			expect(ekbl).toBeDefined();
+			expect(ekbl?.role).toBe('owner');
+		}
+	});
+
+	it('preserves member-derived role when org appears in both queries', async () => {
+		localStorage.setItem('token', JWT_FOUNDER);
+		const fetchMock = globalThis.fetch as ReturnType<typeof vi.fn>;
+		setupFounderFetch({
+			ownerOrgs: [{ id: EFK_ORG_ID, name: 'EFK' }],
+			memberOrgParents: [{ reference: EFK_ORG_ID, string: 'EFK', memberId: EFK_MEMBER_ID }],
+		});
+
+		await userStore.hydrateUserStore();
+		const state = get(userStore.userStore);
+		expect(state.status).toBe('ready');
+
+		const ownerQueryFired = fetchMock.mock.calls.some(
+			(c: unknown[]) =>
+				typeof c[0] === 'string' &&
+				c[0].includes('_type.string=organization') &&
+				c[0].includes('_owner.reference'),
+		);
+		expect(ownerQueryFired).toBe(true);
+
+		if (state.status === 'ready') {
+			const efkEntries = state.orgs.filter((o) => o.id === EFK_ORG_ID);
+			expect(efkEntries).toHaveLength(1);
+			expect(efkEntries[0].role).not.toBe('owner');
+		}
+	});
+
+	it('existing member-only orgs still appear when owner query returns empty', async () => {
+		localStorage.setItem('token', JWT_FOUNDER);
+		const fetchMock = globalThis.fetch as ReturnType<typeof vi.fn>;
+		setupFounderFetch({
+			ownerOrgs: [],
+			memberOrgParents: [{ reference: EFK_ORG_ID, string: 'EFK', memberId: EFK_MEMBER_ID }],
+		});
+
+		await userStore.hydrateUserStore();
+		const state = get(userStore.userStore);
+		expect(state.status).toBe('ready');
+
+		const ownerQueryFired = fetchMock.mock.calls.some(
+			(c: unknown[]) =>
+				typeof c[0] === 'string' &&
+				c[0].includes('_type.string=organization') &&
+				c[0].includes('_owner.reference'),
+		);
+		expect(ownerQueryFired).toBe(true);
+
+		if (state.status === 'ready') {
+			expect(state.orgs.some((o) => o.id === EFK_ORG_ID)).toBe(true);
+		}
 	});
 });
 
