@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+# pre-commit — branch-intent verifier (mvox-dev shared-tree defense)
+#
+# Honors an OPTIONAL marker file at .git/EXPECTED_BRANCH. If present and its
+# content doesn't match `git branch --show-current`, the commit is REJECTED
+# with a clear error message.
+#
+# Agents (and team-lead) should write the marker before any commit chain:
+#   echo "main" > .git/EXPECTED_BRANCH
+# or
+#   echo "chore/navbar-auth-wiring" > .git/EXPECTED_BRANCH
+#
+# If no marker exists, this hook is a no-op — interactive humans (PO) aren't
+# forced to use the marker.
+#
+# After a matched commit, the marker is removed so each new commit chain
+# re-asserts intent. (Re-set the marker per chain.)
+#
+# Rationale: session-22 logged three branch-flip incidents on a shared working
+# tree where team-lead or agent commits landed on the wrong branch. See
+# architecture-decisions.md "Branch-intent verification via .git/EXPECTED_BRANCH"
+# and feedback_no_parallel_branches in the auto-memory layer.
+
+set -e
+
+MARKER=".git/EXPECTED_BRANCH"
+
+# No marker → no opinion. Allow.
+if [ ! -f "$MARKER" ]; then
+	exit 0
+fi
+
+EXPECTED=$(tr -d '[:space:]' < "$MARKER")
+CURRENT=$(git symbolic-ref --short HEAD 2>/dev/null || echo "")
+
+# Empty marker → treat as no opinion.
+if [ -z "$EXPECTED" ]; then
+	exit 0
+fi
+
+# Detached HEAD → reject (marker present but no branch to compare).
+if [ -z "$CURRENT" ]; then
+	cat >&2 <<EOF
+
+✗ BRANCH MISMATCH — commit aborted (detached HEAD)
+
+  Expected branch: $EXPECTED  (from .git/EXPECTED_BRANCH)
+  Current state:   detached HEAD
+
+  Marker says you intended to commit to '$EXPECTED' but HEAD is not on any
+  branch. Either checkout '$EXPECTED' or remove the marker.
+
+EOF
+	exit 1
+fi
+
+if [ "$EXPECTED" != "$CURRENT" ]; then
+	cat >&2 <<EOF
+
+✗ BRANCH MISMATCH — commit aborted
+
+  Expected branch: $EXPECTED  (from .git/EXPECTED_BRANCH)
+  Current branch:  $CURRENT  (HEAD)
+
+  The .git/EXPECTED_BRANCH marker says you intended to commit to '$EXPECTED'
+  but HEAD is on '$CURRENT'. This protects against shared-tree branch flips
+  (session-22 incidents on mvox-dev).
+
+  To proceed, either:
+    1. Switch branches first:    git checkout $EXPECTED
+    2. Update the marker:        echo "$CURRENT" > .git/EXPECTED_BRANCH
+    3. Remove the marker:        rm .git/EXPECTED_BRANCH
+
+EOF
+	exit 1
+fi
+
+# Match — clear the marker so the next commit chain must re-assert intent.
+rm -f "$MARKER"
+exit 0
