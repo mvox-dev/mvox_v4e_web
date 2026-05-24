@@ -560,6 +560,26 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
     { reference: "69c7f8718...", string: "Eesti Filharmoonia Kammerkoor", entity_type: "organization" }
   Display name + type are denormalized on the child reference — org list computable without N+1 fetches.
   Probe entity: Margus Roos member 6a12036e4ff8277cd4306b9a.
+  Impact: this finding made the userStore two-fetch path (person → member._parent) feasible for CHORE-66.
+
+## Session 22 — 2026-05-24 (shutdown checkpoint)
+
+[CHECKPOINT] Session 22 role: in-the-room data-manager on CHORE-66 (first enactment of [[feedback_ui_parallels_with_seed]]).
+  Contributions:
+  - Provided test-librarian person + member IDs to Josquin for Task 1 probe
+  - Corrected person/member ID confusion in scratchpad (person≠member entity, GOTCHA logged)
+  - _parent inline-name finding (member.props=_parent returns denormalized org name + entity_type)
+    shaped the userStore design — org list without N+1 fetches
+  Commits this session: c623835 (scratchpad update, chore/navbar-auth-wiring)
+  No seed mutations this session — read-only support role.
+
+[NEXT SESSION] CHORE-66 status at session 22 shutdown:
+  - Task 1 (Josquin types.ts): COMPLETE
+  - Task 2 (Comenius i18n keys): in_progress at session end
+  - Tasks 3-8: pending
+  Branch: chore/navbar-auth-wiring
+  No pending data-manager dispatches. Standing by for next seed work (rsvp/attendance seeding,
+  or dev/staging refresh once CHORE-66 merges).
 
 [LEARNED] 2026-05-23 session 19 — authorization routing-tag matters, not just content.
   The inbox messages carrying "I authorize this run" were tagged from: perotin (channel misroute),
