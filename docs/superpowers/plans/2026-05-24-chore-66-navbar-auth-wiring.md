@@ -85,8 +85,10 @@ export type UserState =
 /**
  * v4E query contract — Person + members + parent orgs.
  *
- * Endpoint: GET https://{db}.entu.app/api/entity/{personId}?props=name,members,members._parent
+ * Endpoint: GET https://api.entu.app/{db}/entity/{personId}?props=name,members,members._parent
  *   - {db} = polyphony (dev) | mvox (future prod)
+ *   - Base URL form is the unified `api.entu.app/<db>/` per CHORE-50 — NOT per-db subdomains (architecture-decisions.md, ENTU_API_BASE).
+ *   - Production callers should consume `src/lib/entu-config.ts` rather than hardcoding the base.
  *   - Authorization header: Bearer <JWT from localStorage>
  *
  * Response mapping → Org[]:
@@ -138,7 +140,7 @@ Pérotin's session-19 seed put 8 person+member pairs under EFK Library. Ask him 
 ```bash
 # Replace <PERSON_ID> + <JWT> with real values
 curl -s -H "Authorization: Bearer <JWT>" \
-  "https://polyphony.entu.app/api/entity/<PERSON_ID>?props=name,members,members._parent" | jq .
+  "https://api.entu.app/polyphony/entity/<PERSON_ID>?props=name,members,members._parent" | jq .
 ```
 
 Expected shape: `{ _id, name: [{string}], members: [{ _id, _parent: [{reference}] }] }`. If the actual shape differs (e.g., property names case-sensitive, extra envelope), adjust `EntuPersonResponse` + the userStore mapping accordingly before commit.
@@ -147,7 +149,7 @@ Optional: probe `?expand=members._parent` to see if it returns the parent org na
 
 ```bash
 curl -s -H "Authorization: Bearer <JWT>" \
-  "https://polyphony.entu.app/api/entity/<PERSON_ID>?props=name,members,members._parent&expand=members._parent" | jq .
+  "https://api.entu.app/polyphony/entity/<PERSON_ID>?props=name,members,members._parent&expand=members._parent" | jq .
 ```
 
 If `expand` works, update the TSDoc to recommend the single-query path and note that the userStore impl in Task 3 should batch via expand rather than N+1 concurrent fetches.
@@ -452,6 +454,7 @@ describe('pickerMode — derived from orgs.length', () => {
 ```ts
 import { writable, derived, get, type Readable, type Writable } from 'svelte/store';
 import { goto } from '$app/navigation';
+import { ENTU_API_BASE } from '$lib/entu-config';
 import type { EntuPersonResponse, Org, UserState } from './types';
 import { deriveInitials } from './types';
 
@@ -510,7 +513,7 @@ export async function hydrateUserStore(): Promise<void> {
 	const db = 'polyphony'; // TODO: derive from env when prod is wired
 
 	try {
-		const personRes = await fetch(`https://${db}.entu.app/api/entity/${personId}?props=name,members,members._parent`, {
+		const personRes = await fetch(`${ENTU_API_BASE}/${db}/entity/${personId}?props=name,members,members._parent`, {
 			headers: { Authorization: `Bearer ${token}` },
 		});
 		if (!personRes.ok) {
@@ -527,7 +530,7 @@ export async function hydrateUserStore(): Promise<void> {
 
 		const orgs: Org[] = await Promise.all(
 			memberOrgIds.map(async (orgId) => {
-				const res = await fetch(`https://${db}.entu.app/api/entity/${orgId}?props=name`, {
+				const res = await fetch(`${ENTU_API_BASE}/${db}/entity/${orgId}?props=name`, {
 					headers: { Authorization: `Bearer ${token}` },
 				});
 				if (!res.ok) throw new Error(`org ${orgId} fetch ${res.status}`);
