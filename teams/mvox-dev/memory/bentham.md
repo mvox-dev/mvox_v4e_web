@@ -20,6 +20,10 @@ metadata:
 
 [DEFERRED → next session start] **YELLOW-66.2 needs an issue filed** before any prod-deployment-related CHORE touches `userStore.ts:17`. Implementer pre-flagged with `// Dev db; derive from env when prod is wired`. If next-session-Bentham reviews any CHORE that exercises Path C against mvox prod and ENTU_DB is still hardcoded, RED unless lifted in the same PR. Cross-reference: architecture-decisions.md Path C section uses `PUBLIC_ENTU_DB` via `$env/static/public` everywhere else.
 
+[STATUS-UPDATE 2026-05-24 session-23 start] Team-lead filed YELLOW-66.2 as **GH #67** at session-22 shutdown ("CHORE-66.2: Lift `ENTU_DB` from hardcoded `'polyphony'` to env via `$env/static/public`"). Verified at session-23 start: `src/lib/auth/userStore.ts:17` reads `const ENTU_DB = 'polyphony';` — team-lead's #67 title is correct; my session-22 carry-forward note said `'mvox'` in error. Path is `src/lib/auth/userStore.ts`, not `src/lib/stores/userStore.ts`. **Calibration for future-me**: when carrying a hot-RED literal forward across sessions, copy the verbatim string from the file at write-time — don't paraphrase from memory ("I think it was 'mvox'") because the file-path/literal pair IS the RED trigger and a wrong literal in the scratchpad makes the trigger fail at evaluation time. Hot-RED stance unchanged: prod-deploy-touching PR must lift `ENTU_DB` to env in the same PR.
+
+Also filed end-of-session-22: **GH #65** (MvoxNav chip-width on long ET locale renderings — layout-only, deferred until narrow-viewport is a real requirement; was carry-forward YELLOW-62.1) + **GH #68** (founder-as-org-affiliation: `_owner`-derived orgs unioned with member-derived in `hydrateUserStore`). Neither carries a Bentham RED trigger today; both are scope-not-correctness CHOREs.
+
 [PRUNED 2026-05-24] Session-21 CHORE-60 entries dropped — closed by the session-22 follow-up reviews above. Session-13 through session-17 entries retained below for historical calibration; consider pruning at next steward pass if the carryforward review patterns section continues covering the load-bearing rules.
 
 (*MVOX:Bentham*)
