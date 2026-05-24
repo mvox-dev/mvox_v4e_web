@@ -1,6 +1,14 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
 	import BrandMark from './BrandMark.svelte';
 	type Tab = 'agenda' | 'library' | 'roster' | 'notices' | 'settings';
+	const TAB_LABELS: Record<Tab, () => string> = {
+		agenda: m.nav_tab_agenda,
+		library: m.nav_tab_library,
+		roster: m.nav_tab_roster,
+		notices: m.nav_tab_notices,
+		settings: m.nav_tab_settings,
+	};
 	const TABS: Tab[] = ['agenda', 'library', 'roster', 'notices', 'settings'];
 	const {
 		signedIn,
@@ -45,11 +53,11 @@
 							? 'text-ink font-semibold border-b-2 border-ink pb-1'
 							: 'text-ink-3 font-medium'} inline-flex items-center gap-1"
 					>
-						{tab}
+						{TAB_LABELS[tab]()}
 						{#if tab === 'library' && tab === currentTab}
 							<span
 								class="font-sans text-[7px] tracking-wider py-px px-1 bg-ink text-paper rounded-sm font-semibold"
-								>LIBRARIAN</span
+								>{m.nav_chip_librarian()}</span
 							>
 						{/if}
 					</span>
@@ -64,7 +72,7 @@
 				<span class="font-medium">{userName}</span>
 			</span>
 		{:else}
-			<a href="/auth/login" class="font-sans text-[11.5px] text-ink-3">Sign in</a>
+			<a href="/auth/login" class="font-sans text-[11.5px] text-ink-3">{m.nav_sign_in()}</a>
 		{/if}
 	</div>
 </header>

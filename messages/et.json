@@ -84,6 +84,12 @@
 	"library_search_placeholder": "⌘K · hüppa teose, eksemplari nr, laenutaja juurde…",
 	"library_top_eyebrow": "Raamatukogu · raamatukoguhoidja laud",
 	"library_top_heading": "Täna laual",
+	"nav_chip_librarian": "RAAMATUKOGUHOIDJA",
 	"nav_sign_in": "Logi sisse",
-	"nav_sign_out": "Logi välja"
+	"nav_sign_out": "Logi välja",
+	"nav_tab_agenda": "Kava",
+	"nav_tab_library": "Raamatukogu",
+	"nav_tab_notices": "Teated",
+	"nav_tab_roster": "Liikmed",
+	"nav_tab_settings": "Seaded"
 }

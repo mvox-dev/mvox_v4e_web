@@ -16,8 +16,8 @@ describe('MvoxNav', () => {
 			},
 		});
 		expect(container.textContent).toContain('mvox');
-		expect(container.textContent).toContain('agenda');
-		expect(container.textContent).toContain('library');
+		expect(container.textContent).toContain('Agenda');
+		expect(container.textContent).toContain('Library');
 		expect(container.textContent).toContain('Maire L.');
 	});
 

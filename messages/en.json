@@ -84,6 +84,12 @@
 	"library_search_placeholder": "⌘K · jump to work, copy #, borrower…",
 	"library_top_eyebrow": "Library · librarian's desk",
 	"library_top_heading": "On the desk today",
+	"nav_chip_librarian": "LIBRARIAN",
 	"nav_sign_in": "Sign in",
-	"nav_sign_out": "Sign out"
+	"nav_sign_out": "Sign out",
+	"nav_tab_agenda": "Agenda",
+	"nav_tab_library": "Library",
+	"nav_tab_notices": "Notices",
+	"nav_tab_roster": "Roster",
+	"nav_tab_settings": "Settings"
 }

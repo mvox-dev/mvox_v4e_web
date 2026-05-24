@@ -84,6 +84,12 @@
 	"library_search_placeholder": "⌘K · pāriet uz darbu, eksemplāra nr., aizņēmēju…",
 	"library_top_eyebrow": "Bibliotēka · bibliotekāra galds",
 	"library_top_heading": "Šodien uz galda",
+	"nav_chip_librarian": "BIBLIOTEKĀRS",
 	"nav_sign_in": "Pierakstīties",
-	"nav_sign_out": "Izrakstīties"
+	"nav_sign_out": "Izrakstīties",
+	"nav_tab_agenda": "Programma",
+	"nav_tab_library": "Bibliotēka",
+	"nav_tab_notices": "Paziņojumi",
+	"nav_tab_roster": "Dalībnieki",
+	"nav_tab_settings": "Iestatījumi"
 }
