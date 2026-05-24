@@ -1,54 +1,48 @@
 #!/usr/bin/env bash
 # pre-commit — branch-intent verifier (mvox-dev shared-tree defense)
 #
-# Honors an OPTIONAL marker file at .git/EXPECTED_BRANCH. If present and its
-# content doesn't match `git branch --show-current`, the commit is REJECTED
-# with a clear error message.
+# Honors the OPTIONAL environment variable MVOX_EXPECTED_BRANCH. If set and
+# non-empty, the hook rejects the commit when its value doesn't match the
+# current branch. Unset / empty = no-op (humans default to no-op).
 #
-# Agents (and team-lead) should write the marker before any commit chain:
-#   echo "main" > .git/EXPECTED_BRANCH
-# or
-#   echo "chore/navbar-auth-wiring" > .git/EXPECTED_BRANCH
+# Agents (and team-lead) declare intent per-commit:
+#   MVOX_EXPECTED_BRANCH=main git commit -m "..."
+#   MVOX_EXPECTED_BRANCH=chore/navbar-auth-wiring git commit -m "..."
 #
-# If no marker exists, this hook is a no-op — interactive humans (PO) aren't
-# forced to use the marker.
+# Or export once per shell session:
+#   export MVOX_EXPECTED_BRANCH=main
+#   git commit -m "..."
 #
-# After a matched commit, the marker is removed so each new commit chain
-# re-asserts intent. (Re-set the marker per chain.)
+# No file writes, no .git/ access, no per-clone bootstrap. Works under any
+# tool-permission allowlist that lets the agent run git itself.
 #
 # Rationale: session-22 logged three branch-flip incidents on a shared working
 # tree where team-lead or agent commits landed on the wrong branch. See
-# architecture-decisions.md "Branch-intent verification via .git/EXPECTED_BRANCH"
-# and feedback_no_parallel_branches in the auto-memory layer.
+# architecture-decisions.md and feedback_no_parallel_branches in the
+# auto-memory layer.
 
 set -e
 
-MARKER=".git/EXPECTED_BRANCH"
+EXPECTED="${MVOX_EXPECTED_BRANCH:-}"
 
-# No marker → no opinion. Allow.
-if [ ! -f "$MARKER" ]; then
-	exit 0
-fi
-
-EXPECTED=$(tr -d '[:space:]' < "$MARKER")
-CURRENT=$(git symbolic-ref --short HEAD 2>/dev/null || echo "")
-
-# Empty marker → treat as no opinion.
+# No declaration → no opinion. Allow.
 if [ -z "$EXPECTED" ]; then
 	exit 0
 fi
 
-# Detached HEAD → reject (marker present but no branch to compare).
+CURRENT=$(git symbolic-ref --short HEAD 2>/dev/null || echo "")
+
+# Detached HEAD → reject (declared intent but no branch to compare).
 if [ -z "$CURRENT" ]; then
 	cat >&2 <<EOF
 
 ✗ BRANCH MISMATCH — commit aborted (detached HEAD)
 
-  Expected branch: $EXPECTED  (from .git/EXPECTED_BRANCH)
+  Expected branch: $EXPECTED  (from \$MVOX_EXPECTED_BRANCH)
   Current state:   detached HEAD
 
-  Marker says you intended to commit to '$EXPECTED' but HEAD is not on any
-  branch. Either checkout '$EXPECTED' or remove the marker.
+  Declared intent says you intended to commit to '$EXPECTED' but HEAD is
+  not on any branch. Either checkout '$EXPECTED' or unset the env var.
 
 EOF
 	exit 1
@@ -59,22 +53,20 @@ if [ "$EXPECTED" != "$CURRENT" ]; then
 
 ✗ BRANCH MISMATCH — commit aborted
 
-  Expected branch: $EXPECTED  (from .git/EXPECTED_BRANCH)
+  Expected branch: $EXPECTED  (from \$MVOX_EXPECTED_BRANCH)
   Current branch:  $CURRENT  (HEAD)
 
-  The .git/EXPECTED_BRANCH marker says you intended to commit to '$EXPECTED'
-  but HEAD is on '$CURRENT'. This protects against shared-tree branch flips
+  \$MVOX_EXPECTED_BRANCH says you intended to commit to '$EXPECTED' but
+  HEAD is on '$CURRENT'. This protects against shared-tree branch flips
   (session-22 incidents on mvox-dev).
 
   To proceed, either:
     1. Switch branches first:    git checkout $EXPECTED
-    2. Update the marker:        echo "$CURRENT" > .git/EXPECTED_BRANCH
-    3. Remove the marker:        rm .git/EXPECTED_BRANCH
+    2. Update the declaration:   export MVOX_EXPECTED_BRANCH=$CURRENT
+    3. Unset the declaration:    unset MVOX_EXPECTED_BRANCH
 
 EOF
 	exit 1
 fi
 
-# Match — clear the marker so the next commit chain must re-assert intent.
-rm -f "$MARKER"
 exit 0
