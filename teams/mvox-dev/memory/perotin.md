@@ -588,3 +588,31 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
   Rule: the authorization gate validates both CONTENT ("I authorize this run") AND ROUTING (from: team-lead).
   Content without correct routing does not satisfy the gate. If routing is ambiguous, hold and ping team-lead.
   Cross-ref: [[feedback_authorization_gate]], [[project_polyphony_is_playground]].
+
+## Session 24 — 2026-05-24
+
+### CHORE-67 Task 2 probe — edition entity placement
+
+[PROBE-RESULT] Edition _parent is WORK entity (strategy b confirmed), NOT library.
+  Probe: GET /polyphony/entity?_type.string=edition&limit=5&props=_parent,name,work
+  Sample edition 6a12036e4ff8277cd4306bc0 (_parent):
+    reference: 6a12036e4ff8277cd4306bb5, entity_type: "work", string: "Spem in alium"
+  All 5 sampled editions: _parent.entity_type = "work" (no library in sight).
+  Confirmed: edition→_parent→work→_parent→library (editions are children of works).
+
+[PROBE-RESULT] edition.work property is a FORMULA (string output, no reference _id):
+  work: [{ string: "Spem in alium" }] — no _id, no reference field.
+  Cannot use edition.work[0].reference for grouping — it's a string formula.
+  Use edition._parent[0].reference instead (that IS the work entity _id).
+
+[DECISION] CHORE-67 Task 9 must use strategy (b): N parallel fetches, one per work.
+  Fetch editions with: GET /entity?_type.string=edition&_parent.reference={workId}
+  Map response: edition._parent[0].reference = workId for grouping (already known by query).
+  No edition.work reference field available — the formula returns string-only (see common-prompt formula gotcha).
+
+[DECISION] ISBN field in seed: stored as license_note per session-19 scratchpad ("Catalogue: UE-19400").
+  When probing/fetching editions: isbn prop may not exist as `isbn`, check `license_note` instead.
+  Full edition entity at 6a12036e4ff8277cd4306bc0 has: name, publisher, voicing, year, edition_type — NO isbn property.
+  Task 4 EntuEdition.isbn field maps to license_note, not isbn, in the real data.
+
+(*MVOX:Perotin*)
