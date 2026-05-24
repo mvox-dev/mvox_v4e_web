@@ -6,6 +6,73 @@ Format per entry: short title, decision, rationale, date. Most recent at the top
 
 ---
 
+## URL parameters override persisted state — project-wide resolution rule for UI state (2026-05-24, session 22)
+
+**Decision**: For any UI state that has BOTH a URL representation AND a persisted representation (localStorage, IndexedDB, Svelte stores), resolution follows a fixed order.
+
+**On read** (initial mount, navigation, hydration):
+
+1. URL parameter — when present and valid.
+2. Persisted store — when present and valid.
+3. Application default — last resort.
+
+**On user-initiated change** (click handlers, programmatic updates, etc.):
+
+1. Update URL via SvelteKit soft-nav (`goto(...)` with `replaceState`/`noScroll` as appropriate).
+2. Update persisted store.
+3. UI re-renders from the derived store.
+
+**Rationale**: Deep-linking + shareability is the win. A user can copy `https://mvox.eu/library?org=foo&work=bar` and paste into another tab, device, or share with a teammate, and the recipient sees the same view. The persisted store carries the silent everyday default (no params in URL → "where I was last time"). The two-write on change keeps both representations in sync so subsequent navigation without params still reads the right value. The read order (URL → persisted → default) honors the explicit-over-implicit principle: a URL param IS an explicit user choice (typed, pasted, or linked); the persisted store is a silent inference from prior behavior; the default is what we fall back to when neither speaks.
+
+### Applies to (current + foreseeable)
+
+| Pattern | Example use site |
+|---|---|
+| `?org=<id>` | Organization selector (CHORE-66, immediate) |
+| `?work=<id>` | Library drill-down (future CHORE) |
+| `?status=<x>` / `?sort=<x>` | Filter + sort state on list pages |
+| `?q=<text>` | Search query |
+| `?lang=<locale>` | Explicit locale override (Paraglide normally infers; URL is the escape hatch) |
+| `?page=<n>` / `?cursor=<x>` | Pagination |
+| Future | Tab selectors, drawer state, modal state — any state users may want to deep-link to |
+
+### Doesn't apply to
+
+- **Secret/sensitive state** (auth tokens, session ids, OAuth nonces) — never in URL. URLs leak via referer headers, browser history, server logs, screenshots.
+- **Ephemeral UI state** (focus, hover, transient validation, animation state) — neither URL nor persisted. Lives in component-local `$state` only.
+- **Server-side state** — Path C means we don't have server state to coordinate with; the rule is browser-side only.
+
+### Convention shape
+
+- localStorage key naming: `mvox.<scope>Id` for entity ids (e.g., `mvox.selectedOrgId`); `mvox.<scope>.<facet>` for compound state (e.g., `mvox.library.sort`).
+- URL param naming: lowercase, short, matches the dimension it represents (`org`, `work`, `status`, `sort`, `q`, `lang`, `page`).
+- When the URL and persisted store disagree at read time, the URL wins AND a backfill write to the persisted store happens (so the next "everyday nav" without params keeps the URL's intent). This is the "two-write" symmetry: change writes URL+store; read writes store-from-URL if they diverge.
+
+### Spec exemplar
+
+`docs/superpowers/specs/2026-05-24-navbar-auth-wiring-design.md` Section "Selected-org resolution" is the first concrete implementation. The MvoxNav `?org=` ↔ `localStorage('mvox.selectedOrgId')` ↔ first-org pattern is the canonical shape — read order URL → localStorage → first-account; change order goto-with-`?org=` → setItem → derived re-render.
+
+### Review enforcement (Bentham)
+
+Any future spec or PR that introduces UI state needing persistence MUST follow this pattern. Verdicts:
+
+- **RED**: New state is persisted in localStorage but NOT also expressible in URL, and no reasonable "doesn't apply to" exemption (secret / ephemeral / server-only) applies. The shareability/deep-link contract is structural; opting out of it leaks state that other devs reasonably expect to round-trip.
+- **RED**: URL param exists but persisted store is missing. Deep-links work but everyday nav forgets — asymmetric, surprising, and a regression on the prior session's UX.
+- **RED**: Write order is reversed (persisted-first, URL-as-decoration). That lets reload diverge from URL: the user navigates explicitly, then a refresh silently rewrites the URL back from the store, hiding the deep-link they just executed.
+- **YELLOW**: Implementation diverges in non-blocking ways — e.g., URL param works AND localStorage works AND read order is correct, but the localStorage key name doesn't follow the `mvox.<scope>Id` / `mvox.<scope>.<facet>` convention; or the `goto` call uses `pushState` where `replaceState` would avoid history pollution.
+
+### Cross-links
+
+- First implementation: CHORE-66 navbar auth wiring (org selector). Spec: `docs/superpowers/specs/2026-05-24-navbar-auth-wiring-design.md`.
+- Browser-direct data path (parent decision): "Data path — browser-direct to Entu" below. Path C means there's no server-side hop to fight over state ownership — the browser is authoritative for UI state, which is what makes the URL ↔ localStorage symmetry work cleanly.
+- Storage naming precedent: see the `entu/webapp` parity rules in the same Path C section (`token` / `accounts` / `user` unprefixed for Entu compatibility; `mvox.*` prefix for mvox-owned keys).
+
+**Source**: PO direction 2026-05-24, session 22. First exercised in CHORE-66; lifted to settled patterns at dispatch time so subsequent UI state work has a single rule to consult rather than re-deriving from the exemplar.
+
+(*MVOX:Bentham*)
+
+---
+
 ## Dispatch-message `Co-authored-by:` trailers short-circuit prepare-commit-msg hook (2026-05-24, session 22)
 
 **Decision**: Team-lead dispatch messages MUST NOT include `Co-authored-by:` lines in commit-message templates. Use `Contributors:`, `Reviewed-by:`, `Helped-by:`, or body prose for team attribution instead. Implementers writing their own commits follow the same rule.
