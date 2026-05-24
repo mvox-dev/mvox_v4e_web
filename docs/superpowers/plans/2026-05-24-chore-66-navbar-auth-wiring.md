@@ -83,34 +83,70 @@ export type UserState =
 	| { status: 'error'; reason: string };
 
 /**
- * v4E query contract — Person + members + parent orgs.
+ * v4E query contract — TWO fetches (person + member-search). Updated 2026-05-24
+ * after Josquin's Task 1 probe revealed the actual model: Person does NOT inline
+ * members; member entities are separate, linked to person via `person.reference`.
  *
- * Endpoint: GET https://api.entu.app/{db}/entity/{personId}?props=name,members,members._parent
- *   - {db} = polyphony (dev) | mvox (future prod)
- *   - Base URL form is the unified `api.entu.app/<db>/` per CHORE-50 — NOT per-db subdomains (architecture-decisions.md, ENTU_API_BASE).
- *   - Production callers should consume `src/lib/entu-config.ts` rather than hardcoding the base.
- *   - Authorization header: Bearer <JWT from localStorage>
+ * Base URL form: unified `https://api.entu.app/{db}/` per CHORE-50 — consumers use
+ * `src/lib/entu-config.ts` (ENTU_API_BASE).
  *
- * Response mapping → Org[]:
- *   For each `members[i]`:
- *     - Read `_parent[0].reference` → org entity id
- *     - Fetch the org entity name (single-hop via `?props=name` on /entity/{orgId})
- *     - Map to Org: { id, label: org.name[0].string, initials: derive(label), role: undefined }
+ * Authorization header: Bearer <JWT from localStorage> for both calls.
  *
- * For CHORE-66 the simplest path is: hydrate person → for each member, do one
- * concurrent fetch for the org name. Polyphony seed has 8 members under EFK
- * Library so worst-case is 8 small concurrent fetches per hydration.
+ * ## Fetch 1: Person identity
  *
- * Optimisation deferred: a single batched query via `?expand=members._parent`
- * (Entu API supports nested prop expansion). Confirm shape during impl; if it
- * works, use it instead of N+1.
+ *   GET {ENTU_API_BASE}/{db}/entity/{personId}?props=name
+ *
+ *   Response: EntuPersonResponse. Use `name[0].string` for display name; first
+ *   character for initial.
+ *
+ * ## Fetch 2: Member search → orgs
+ *
+ *   GET {ENTU_API_BASE}/{db}/entity?_type.string=member&person.reference={personId}&props=_parent
+ *
+ *   Response: EntuMemberSearchResponse. Each `entities[i]._parent[]` contains BOTH
+ *   organization AND section parent refs, distinguished by `entity_type`. Each
+ *   parent ref ARRIVES INLINE with `string` (the parent's display name) — no
+ *   per-org fetch required.
+ *
+ *   Filter `_parent[]` by `entity_type === 'organization'` and map each to Org:
+ *     { id: parent.reference, label: parent.string, initials: derive(label), role: undefined }
+ *
+ *   Total round-trips per hydration: 2 (regardless of org count).
+ *
+ * ## JWT claim shape
+ *
+ *   The Entu JWT does NOT carry a `sub` field. The person ID lives at
+ *   `accounts[dbName]` (e.g., `claims.accounts.polyphony`). Decode the JWT,
+ *   then read `claims.accounts[db]` to get the person ID.
+ *
+ *   IP-bound `aud` claim is documented in [[project_entu_jwt_ip_bound]] —
+ *   Path C client-side calls handle this naturally (same IP from same browser).
+ *
+ * ## Known limitation: founder-as-org-affiliation
+ *
+ *   A user who is `_owner` of an org but has no `member` row will return 0 orgs
+ *   from the member search. This is consistent with v4E intent — `member`
+ *   represents joined-by-invitation, not founded-by-ownership. For CHORE-66 the
+ *   librarian persona is the primary user (always has a member row); PO testing
+ *   as the founder account would see placeholder mode. Follow-up CHORE deferred.
  */
 export type EntuPersonResponse = {
 	_id: string;
 	name?: Array<{ string: string }>;
-	members?: Array<{
+};
+
+/**
+ * Result of the member-search query (see EntuPersonResponse TSDoc for the URL).
+ *
+ * Each entity is a member row; its `_parent[]` carries BOTH the org parent AND
+ * the section parent(s), distinguished by `entity_type`. Filter to organisation
+ * parents to build Org[].
+ */
+export type EntuMemberSearchResponse = {
+	count: number;
+	entities: Array<{
 		_id: string;
-		_parent?: Array<{ reference: string }>;
+		_parent?: Array<{ reference: string; string: string; entity_type: string }>;
 	}>;
 };
 
@@ -133,26 +169,21 @@ Expected: 0 errors, clean lint, clean build (the file is consumed by nothing yet
 
 - [ ] **Step 4: Probe Entu to verify the contract**
 
-Run a one-shot probe against polyphony to verify the response shape matches `EntuPersonResponse`. Use a fresh sign-in or a stashed token (`~/.config/mvox/credentials.env` if it carries an Entu JWT; otherwise sign in via the dev server).
-
-Pérotin's session-19 seed put 8 person+member pairs under EFK Library. Ask him for the test-librarian person ID via SendMessage if not documented. Then:
+Verify the two-fetch shape against polyphony. Use a stashed token from `~/.config/mvox/credentials.env` (API_KEY → exchange via `GET https://api.entu.app/auth?db=polyphony` Bearer API_KEY → returns 48h JWT, IP-bound).
 
 ```bash
-# Replace <PERSON_ID> + <JWT> with real values
+# Fetch 1: person identity
 curl -s -H "Authorization: Bearer <JWT>" \
-  "https://api.entu.app/polyphony/entity/<PERSON_ID>?props=name,members,members._parent" | jq .
+  "https://api.entu.app/polyphony/entity/<PERSON_ID>?props=name" | jq .
+
+# Fetch 2: member search by person
+curl -s -H "Authorization: Bearer <JWT>" \
+  "https://api.entu.app/polyphony/entity?_type.string=member&person.reference=<PERSON_ID>&props=_parent" | jq .
 ```
 
-Expected shape: `{ _id, name: [{string}], members: [{ _id, _parent: [{reference}] }] }`. If the actual shape differs (e.g., property names case-sensitive, extra envelope), adjust `EntuPersonResponse` + the userStore mapping accordingly before commit.
+Expected shapes match `EntuPersonResponse` + `EntuMemberSearchResponse` in types.ts. If either probe surfaces ANOTHER divergence, surface-and-stop again before commit.
 
-Optional: probe `?expand=members._parent` to see if it returns the parent org name inline (would avoid N+1):
-
-```bash
-curl -s -H "Authorization: Bearer <JWT>" \
-  "https://api.entu.app/polyphony/entity/<PERSON_ID>?props=name,members,members._parent&expand=members._parent" | jq .
-```
-
-If `expand` works, update the TSDoc to recommend the single-query path and note that the userStore impl in Task 3 should batch via expand rather than N+1 concurrent fetches.
+**Reference test-librarian (probed 2026-05-24):** Margus Roos person `6a12036d4ff8277cd4306b93` returns 1 member row with `_parent[]` containing the EFK Library org + a Bass section, both inline-named.
 
 - [ ] **Step 5: Commit + push**
 
@@ -455,7 +486,7 @@ describe('pickerMode — derived from orgs.length', () => {
 import { writable, derived, get, type Readable, type Writable } from 'svelte/store';
 import { goto } from '$app/navigation';
 import { ENTU_API_BASE } from '$lib/entu-config';
-import type { EntuPersonResponse, Org, UserState } from './types';
+import type { EntuMemberSearchResponse, EntuPersonResponse, Org, UserState } from './types';
 import { deriveInitials } from './types';
 
 const TOKEN_KEY = 'mvox.entu_token';
@@ -504,41 +535,61 @@ export async function hydrateUserStore(): Promise<void> {
 	}
 
 	const claims = decodeJwt(token);
-	if (!claims || typeof claims.sub !== 'string') {
+	const db = 'polyphony'; // TODO: derive from env when prod is wired
+	const accounts = (claims && typeof claims === 'object'
+		? (claims as { accounts?: Record<string, string> }).accounts
+		: undefined) ?? {};
+	const personId = accounts[db];
+	if (!personId) {
 		userStore.set({ status: 'signed-out' });
 		return;
 	}
 
-	const personId = claims.sub;
-	const db = 'polyphony'; // TODO: derive from env when prod is wired
-
 	try {
-		const personRes = await fetch(`${ENTU_API_BASE}/${db}/entity/${personId}?props=name,members,members._parent`, {
-			headers: { Authorization: `Bearer ${token}` },
-		});
+		// Two fetches in parallel — person identity + member search.
+		// Member's _parent[] carries inline org names; no per-org follow-up fetch.
+		const [personRes, memberRes] = await Promise.all([
+			fetch(`${ENTU_API_BASE}/${db}/entity/${personId}?props=name`, {
+				headers: { Authorization: `Bearer ${token}` },
+			}),
+			fetch(
+				`${ENTU_API_BASE}/${db}/entity?_type.string=member&person.reference=${personId}&props=_parent`,
+				{ headers: { Authorization: `Bearer ${token}` } },
+			),
+		]);
+
 		if (!personRes.ok) {
 			userStore.set({ status: 'error', reason: `person fetch ${personRes.status}` });
 			return;
 		}
+		if (!memberRes.ok) {
+			userStore.set({ status: 'error', reason: `member fetch ${memberRes.status}` });
+			return;
+		}
+
 		const person = (await personRes.json()) as EntuPersonResponse;
+		const memberSearch = (await memberRes.json()) as EntuMemberSearchResponse;
+
 		const name = person.name?.[0]?.string ?? '';
 		const initial = name ? name[0].toLocaleUpperCase() : '';
 
-		const memberOrgIds = (person.members ?? [])
-			.map((m) => m._parent?.[0]?.reference)
-			.filter((id): id is string => typeof id === 'string');
-
-		const orgs: Org[] = await Promise.all(
-			memberOrgIds.map(async (orgId) => {
-				const res = await fetch(`${ENTU_API_BASE}/${db}/entity/${orgId}?props=name`, {
-					headers: { Authorization: `Bearer ${token}` },
+		// Each member row's _parent[] carries org + section parents inline. Filter
+		// to organisations; dedupe by ID (a member can theoretically link multiple
+		// orgs but the typical case is one).
+		const orgMap = new Map<string, Org>();
+		for (const member of memberSearch.entities) {
+			for (const parent of member._parent ?? []) {
+				if (parent.entity_type !== 'organization') continue;
+				if (orgMap.has(parent.reference)) continue;
+				orgMap.set(parent.reference, {
+					id: parent.reference,
+					label: parent.string,
+					initials: deriveInitials(parent.string),
+					role: undefined,
 				});
-				if (!res.ok) throw new Error(`org ${orgId} fetch ${res.status}`);
-				const org = (await res.json()) as { _id: string; name?: Array<{ string: string }> };
-				const label = org.name?.[0]?.string ?? orgId;
-				return { id: orgId, label, initials: deriveInitials(label), role: undefined };
-			}),
-		);
+			}
+		}
+		const orgs = Array.from(orgMap.values());
 
 		userStore.set({ status: 'ready', name, initial, orgs });
 	} catch (err) {
