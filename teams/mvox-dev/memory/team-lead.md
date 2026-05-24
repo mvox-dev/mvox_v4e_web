@@ -11,12 +11,12 @@
 | ✅ CHORE-60 shipped | squash `ab6dcc5` on main (was 33 commits on feat/library-page-ui-kit, branch deleted) | /library page + 21-component UI kit + design tokens + Caveat/Inter/Mono fonts + 64 paraglide keys + /auth/login + /auth/logout redesigns. 63 files, +2690/-80, 436/436 unit tests (was 361 baseline; +75). Closes GH #60. |
 | ✅ Architecture correction mid-branch | `1be3b39` | Margin/PaperStack/DeskSurface/PaperCard children flipped from `() => string` to canonical `Snippet` + `{@render}` per `[ARCH-VERDICT 2026-05-24 CHORE-60]`. Bentham caught at /library page composition; scope correction (3→4 components) from his review. |
 | ✅ Production deploy to multivox.pages.dev | per-build URL `5cd51fd7.multivox.pages.dev` | Wrangler pages deploy clean. Live: `https://multivox.pages.dev/library` returns 200 with `x-sveltekit-page: true`. |
-| ❌ mvox.eu wiring | tracked at GH #64 | mvox.eu/library returns 404 (CF default page). Finn's CF API probe: Pages binding `mvox.eu` on multivox project is `status: pending` since 2026-05-23 22:58 UTC because apex CNAME → `multivox.pages.dev` was never created. Apex A/AAAA records route to some unknown origin (Workers/old-Pages/static — token scope can't read DNS to identify). PO dashboard fix needed (5-step recipe in #64); takes ~30s + ~60s for binding to activate. |
+| ✅ mvox.eu wiring | GH #64 CLOSED post-shutdown-round-1 | First attempt (Task #74) blocked on token scope (Pages-only). PO edited the token in CF dashboard to add `Zone: DNS: Edit` on mvox.eu; re-spawned Josquin retried as Task #75: DNS state had drifted (only 1 apex A `185.31.240.240` proxied — zone.eu parking IP — instead of original 4 A+AAAA Finn found); deleted the A, created proxied CNAME `mvox.eu` → `multivox.pages.dev` (ID `542ba32d1c94525b990f55e7f653401e`); Pages binding `verification_data.status` flipped pending → **active** in ~69s. All 3 mvox.eu endpoints now serve 200 with `x-sveltekit-page: true` and matching CHORE-60 build chunks. Top-level `status` still `pending` (CF SSL validation runs as background; serving is live). |
 | ✅ Carry-forward YELLOWs filed | GH #62, #63 | #62 = MvoxNav i18n keys missing (6 keys + spec touch-up, ~30 min). #63 = textSnippet helper Svelte warning (`invalid_raw_snippet_render` — 1-line fix). |
 
 **Live state at session-21 close:**
 - main: `ab6dcc5` (origin matches)
-- Production: `multivox.pages.dev` 200 on `/`, `/library`, `/auth/login`. `mvox.eu/` 200 but stale (Dec 2025 build); `/library` + `/auth/login` → 404. NOT shipping live as `mvox.eu` URL until #64 lands.
+- Production: `multivox.pages.dev` 200 on `/`, `/library`, `/auth/login`. **`mvox.eu` ALSO 200 on all 3 endpoints, x-sveltekit-page: true, fresh CHORE-60 chunks** (rebound post-shutdown-round-1 per #64 close).
 - Tests: 436/436 unit; check 0; lint clean; build clean. 12 pre-existing Playwright failures (no new regressions — verified identical on main).
 - Polyphony Entu db: unchanged from session 20 (607 librarian-bundle entities under EFK Library `6a12036c4ff8277cd4306b26`).
 - Brilliant KB: 270 entries (unchanged this session — session-21 lessons L96-L103 are deferred).
@@ -27,21 +27,20 @@
 
 **Carry-forward queue for session 22 (priority order):**
 
-1. **GH #64 — mvox.eu DNS fix (PO action).** 5 dashboard steps: delete apex A `188.114.97.3` + `188.114.96.3` + apex AAAA `2a06:98c1:3120::3` + `2a06:98c1:3121::3`, create proxied CNAME `@` → `multivox.pages.dev`. Pages binding auto-activates within ~60s. Unblocks shipping `mvox.eu` as the live customer URL. Full recipe + diagnosis in issue body.
-2. **GH #62 — MvoxNav i18n keys.** Coordinated chain: Comenius adds 6 keys × 4 locales (`nav_tab_*` + `nav_chip_librarian`) → Byrd wires `m.*()` calls → Tallis updates MvoxNav.spec.ts assertions. ~30 min.
-3. **GH #63 — textSnippet helper Svelte warning.** One-line fix in `src/tests/snippet-helpers.ts`: wrap text in `<span>${text}</span>` per Svelte 5 createRawSnippet contract.
-4. **3 TODO et/lv/uk markers** for `library_overdue_marginalia` — PO copy decision (or confirm English passthrough is fine).
-5. **CHORE-C test infra** — plan at `docs/superpowers/plans/2026-05-23-chore-53-c-test-infra.md` (791 lines, 9 tasks). MSW + Playwright bootstrap. Closes #36, #39, #33 + the 11 pre-existing Playwright failures. Tallis-heavy.
-6. **Brilliant KB updates (deferred — session-21 lessons L96-L103).** See list below.
-7. **Stale branch housekeeping** (local + remote).
-8. **#54 client-side error capture (deferred).** Fires before mvox opens to real users.
-9. **#44 CF Pages Git-connected migration.**
-10. **#49 Biome lint enable (5 sub-cycles).**
-11. **#6 CHORE-6 Email Resend** — still blocked on PO SPF/DKIM DNS.
-12. **Routine fires 2026-05-30T09:00:00Z** → emails PO with GH #59 deferred-providers checklist.
+1. **GH #62 — MvoxNav i18n keys.** Coordinated chain: Comenius adds 6 keys × 4 locales (`nav_tab_*` + `nav_chip_librarian`) → Byrd wires `m.*()` calls → Tallis updates MvoxNav.spec.ts assertions. ~30 min.
+2. **GH #63 — textSnippet helper Svelte warning.** One-line fix in `src/tests/snippet-helpers.ts`: wrap text in `<span>${text}</span>` per Svelte 5 createRawSnippet contract.
+3. **3 TODO et/lv/uk markers** for `library_overdue_marginalia` — PO copy decision (or confirm English passthrough is fine).
+4. **CHORE-C test infra** — plan at `docs/superpowers/plans/2026-05-23-chore-53-c-test-infra.md` (791 lines, 9 tasks). MSW + Playwright bootstrap. Closes #36, #39, #33 + the 11 pre-existing Playwright failures. Tallis-heavy.
+5. **Brilliant KB updates (deferred — session-21 lessons L96-L103).** See list below.
+6. **Stale branch housekeeping** (local + remote).
+7. **#54 client-side error capture (deferred).** Fires before mvox opens to real users.
+8. **#44 CF Pages Git-connected migration.**
+9. **#49 Biome lint enable (5 sub-cycles).**
+10. **#6 CHORE-6 Email Resend** — still blocked on PO SPF/DKIM DNS.
+11. **Routine fires 2026-05-30T09:00:00Z** → emails PO with GH #59 deferred-providers checklist.
 
 **Expected first action session 22:**
-1. Read this seed; verify production health: `curl -sI https://multivox.pages.dev/` (expect 200) and `curl -sI https://mvox.eu/library` (still 404 unless PO did #64 between sessions).
+1. Read this seed; verify production health: `curl -sI https://multivox.pages.dev/` AND `curl -sI https://mvox.eu/library` — BOTH should return 200 with `x-sveltekit-page: true` (mvox.eu rebound end-of-session-21 round 2; verify CF SSL validation has cleared if `validation_data.status` was still pending at session close).
 2. Spawn finn + bentham (always-on, read/review only — no isolation per L96).
 3. Confirm with PO: priority among #62 / #63 / CHORE-C / KB-batch / housekeeping. Recommend #62 + #63 fold-ins first (small, complete the CHORE-60 polish arc) before kicking off CHORE-C heavy work.
 

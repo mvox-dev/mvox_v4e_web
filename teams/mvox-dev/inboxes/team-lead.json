@@ -1,65 +1,6 @@
 [
   {
     "from": "tallis",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-24T01:44:37.817Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T01:44:37.817Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-24T01:44:41.251Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T01:44:41.251Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "Task #52 complete. MiniWorkCard.svelte committed at 3d1e0fe, pushed to feat/library-page-ui-kit. Gates: 424/424 tests, 0 type errors, 0 lint errors, clean build. Ready for Task 23.",
-    "summary": "Task 52 done -- MiniWorkCard 3d1e0fe",
-    "timestamp": "2026-05-24T01:46:37.223Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-24T01:46:40.019Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T01:46:40.019Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "Duplicate task_assignment for #52. Already completed — commit 3d1e0fe on feat/library-page-ui-kit, TaskUpdate marked completed. Ready for Task 23 (DeskSurface).",
-    "summary": "Task 52 duplicate — already done at 3d1e0fe",
-    "timestamp": "2026-05-24T01:46:53.084Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-24T01:46:55.464Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T01:46:55.464Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "[2026-05-24 01:48] CHORE-60 Task 23 RED — DONE. taskId=53.\n\nsrc/lib/components/DeskSurface.spec.ts written (2 tests: renders slot content; inlines repeating-linear-gradient wood-grain with 110deg).\n- vitest: FAIL (Cannot find module './DeskSurface.svelte') — RED confirmed.\n- pnpm lint: clean (0 errors).\n- File untracked, not committed. Byrd to commit with GREEN.\n\nNo flags for Byrd.",
-    "summary": "Task 23 RED complete — DeskSurface.spec.ts",
-    "timestamp": "2026-05-24T01:47:33.897Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
     "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-24T01:47:38.365Z\",\"idleReason\":\"available\"}",
     "timestamp": "2026-05-24T01:47:38.365Z",
     "color": "purple",
@@ -837,6 +778,66 @@
     "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779603118131@byrd\",\"from\":\"byrd\",\"timestamp\":\"2026-05-24T06:14:22.804Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
     "timestamp": "2026-05-24T06:14:22.804Z",
     "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "[2026-05-24 06:23] Josquin online — picking up Task #75 (DNS rebind retry with expanded token scope). Starting Step 1 probe now.",
+    "summary": "Josquin online — Task 75",
+    "timestamp": "2026-05-24T06:23:30.112Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "[2026-05-24 06:23] Step 1 probe SUCCESS — token now scoped correctly (success: true, 7 records returned).\n\nDNS state has CHANGED since the brief was written:\n- Brief expected: 2× apex A (188.114.97.3, 188.114.96.3) + 2× apex AAAA (2a06:98c1:3120::3, 2a06:98c1:3121::3)\n- Actual found: 1× apex A only — `185.31.240.240` proxied (id: d2897984ef87fb6f5b0fa20c87663629), NO AAAAs\n\nOther records (KEEP, not touching):\n- CNAME www.mvox.eu → mvox.eu (proxied)\n- 3× MX route{1,2,3}.mx.cloudflare.net\n- TXT cf2024-1._domainkey (DKIM)\n- TXT mvox.eu SPF\n\n185.31.240.240 looks like zone.eu (parking IP). Likely PO or CF cleaned up the multiple A/AAAA between Task #74 and now. The intent is unchanged — replace whatever apex routing exists with CNAME → multivox.pages.dev. Proceeding with Step 3 (delete the 1 A record) + Step 4 (create CNAME).",
+    "summary": "DNS state changed since brief — proceeding",
+    "timestamp": "2026-05-24T06:24:10.301Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "[2026-05-24 06:27] Task #75 COMPLETE — mvox.eu serving mvox build.\n\n## Step 1 — DNS probe (token scope verified)\n`success: true`, 7 records returned. Token edit applied correctly.\n\n## Step 2 — Apex records to remove (state had drifted from brief)\nBrief expected 2× A + 2× AAAA. Actual: ONE proxied apex A only.\n- `d2897984ef87fb6f5b0fa20c87663629` — A `mvox.eu` → `185.31.240.240` proxied (zone.eu parking IP)\n\nNo apex AAAAs present. Brief's 4 records were apparently cleaned up earlier.\n\n## Step 3 — Deleted apex A\n```\nDELETE /dns_records/d2897984ef87fb6f5b0fa20c87663629\n→ {\"result\":{\"id\":\"d2897984ef87fb6f5b0fa20c87663629\"},\"success\":true}\n```\n\n## Step 4 — Created apex CNAME\n```\nPOST /dns_records {\"type\":\"CNAME\",\"name\":\"mvox.eu\",\"content\":\"multivox.pages.dev\",\"proxied\":true,\"ttl\":1}\n→ id: 542ba32d1c94525b990f55e7f653401e, success:true, created_on: 2026-05-24T06:24:32Z\n```\n\n## Step 5 — Pages binding + endpoint verification\n\nBinding `verification_data.status` transitions:\n- poll 1 (06:25:09, ~37s after CNAME): pending — \"CNAME record not set\"\n- poll 2 (06:25:25): pending — \"CNAME record not set\"\n- poll 3 (06:25:41, ~69s after CNAME): **active** — verification cleared\n- polls 4-6: verification stable at `active`\n\nNOTE: top-level `status` remains `pending` because `validation_data.status: pending` (HTTP-method SSL validation, runs after DNS verify). That's a CF background task — serving is already live.\n\nEndpoint smoke (post-binding-active):\n- `https://mvox.eu/library` → **HTTP/2 200**, `content-type: text/html`, SvelteKit preload chunks present\n- `https://mvox.eu/auth/login` → **HTTP/2 200**, `x-sveltekit-page: true`, `server: cloudflare`, `cf-ray: a00a3b540a2e360b-FRA`\n- `https://mvox.eu/` → **HTTP/2 200**, `x-sveltekit-page: true`\n\nAll three serve the mvox CHORE-60 build (matching preload hashes: `start.y624_gjC.js`, `app.Bpbjc7CB.js`, asset `0.IbWz0Ef4.css`).\n\n## Records preserved (untouched)\n- CNAME `www.mvox.eu` → `mvox.eu`\n- 3× MX `route{1,2,3}.mx.cloudflare.net`\n- TXT `cf2024-1._domainkey` (DKIM)\n- TXT `mvox.eu` (SPF)\n\nNo commits, no git operations. Task #75 marked completed. Ready for next assignment.",
+    "summary": "Task #75 COMPLETE — mvox.eu live, 200 OK",
+    "timestamp": "2026-05-24T06:27:25.587Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-24T06:27:30.125Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T06:27:30.125Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-24T06:27:36.038Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T06:27:36.038Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "[2026-05-24 06:28] Josquin shutdown closing.\n\n- [LEARNED] CF Pages domain binding has TWO inner status fields (`verification_data` + `validation_data`); top-level `status` only flips when both clear. Serving starts at `verification_data: active`, NOT at top-level `status: active`. Future binding-poll tasks should gate on inner status + endpoint smoke, not top-level. Saved to scratchpad.\n- [LEARNED] Always re-probe live DNS state before executing brief-supplied record IDs — they drift. Task #75 brief expected 4 records, actual was 1; surface-the-diff before mutating. Saved to scratchpad.\n- [WARNING] none. mvox.eu serving GREEN on all 3 endpoint smokes. validation_data SSL flip still pending in background but doesn't block serving.\n\nApproving shutdown.",
+    "summary": "Josquin shutdown closing",
+    "timestamp": "2026-05-24T06:29:22.976Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779604084949@josquin\",\"from\":\"josquin\",\"timestamp\":\"2026-05-24T06:29:26.972Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-24T06:29:26.972Z",
+    "color": "yellow",
     "type": "message",
     "read": true
   }

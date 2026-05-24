@@ -4,6 +4,42 @@ Personal notes. Only Josquin writes here.
 
 ---
 
+## [LEARNED] 2026-05-24 session 21 — CF Pages custom-domain binding has two-stage `_data` state machine
+
+Task #75 (mvox.eu DNS rebind). After creating the apex CNAME `mvox.eu` → `multivox.pages.dev`, the Pages domains API returns THREE status fields, not one:
+
+```json
+{ "name": "mvox.eu", "status": "pending",
+  "verification_data": { "status": "active" },
+  "validation_data":   { "status": "pending", "method": "http" } }
+```
+
+- `verification_data.status` flips to `active` once the CNAME resolves to a project the account owns (~69s post-CNAME for me; expected window ~30-120s).
+- `validation_data.status` is a SEPARATE background check — HTTP-method TLS/SSL cert issuance + ACME challenge. Runs AFTER verification clears. Top-level `status` only becomes `active` when BOTH inner statuses are `active`.
+- **Serving (HTTP 200 from `mvox.eu/library`) starts the moment `verification_data` flips, NOT when top-level `status` does.** Verified 200s with `x-sveltekit-page: true` while top-level `status` was still `pending` and `validation_data.status` was still `pending`.
+
+**Implication for completion criteria**: don't gate task-completion on top-level `status: active`. Gate on either (a) `verification_data.status: active` + curl returns 200, or (b) endpoint smoke alone. The brief's "binding active within ~90s" is too coarse — the right read is "verification active + endpoint serves," which is faster and is the actual user-visible thing.
+
+For future CF Pages binding work (custom domains, federation hosts, etc.), poll BOTH nested status fields independently and report the transition timestamps separately. The top-level summary status will lag and may look "broken" while everything actually works.
+
+(*MVOX:Josquin*)
+
+---
+
+## [GOTCHA] 2026-05-24 session 21 — DNS state can drift between dispatch + execution; always probe before mutating
+
+Task #75 brief expected 2× apex A + 2× apex AAAA records (per Task #74's snapshot). Actual live state when I probed: ONE apex A only (`185.31.240.240`, zone.eu parking IP) — the 4 IPv4/IPv6 records from the brief were gone. Someone (PO, CF auto-prune, registrar) had cleaned them up in the gap between Task #74 surfacing the issue and Task #75 executing.
+
+If I had blindly executed Step 3 with the brief's record IDs, the DELETEs would have 404'd silently and Step 4's CNAME create would have COLLIDED with the still-present `185.31.240.240` A record at the apex (CF rejects A + CNAME co-existing for the same name). The whole rebind would have failed and looked like a token-scope problem again.
+
+**Always re-probe the actual list BEFORE forming the mutation plan**, even when the dispatching agent gave you specific IDs/values. Then surface-the-diff to team-lead before mutating ("brief said X, actual is Y, plan is now Z") — the round-trip cost is ~30s of inbox latency, the cost of guessing wrong on a DNS apex is hours of debugging plus a stale-cache window.
+
+This generalizes beyond DNS — any time the dispatch brief specifies entity IDs / record IDs / property values captured at a prior point, treat them as REFERENCE not GOSPEL. The probe-fresh-then-execute discipline is the same as my session 14 [PATTERN] on diagnostics: stop-and-surface beats blind retry.
+
+(*MVOX:Josquin*)
+
+---
+
 ## [PATTERN] 2026-05-23 session 17 — Surface-and-stop when type-check would RED, propose Path 2 split
 
 CHORE-B11 + B12 both hit a transient "production code would type-check-RED if I land the planned commit alone" scenario. The plan ordering was opportunistic, not load-bearing — it assumed downstream commits would close the type gap. Team-lead's dispatch in BOTH cases said "if check warns, surface and stop." I did, and both times team-lead chose **Path 2**: split the commit so the load-bearing change lands alone (keeping branch GREEN), defer the cosmetic type-cleanup to a later commit that has zero consumers left.

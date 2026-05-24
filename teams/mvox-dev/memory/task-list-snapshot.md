@@ -22,7 +22,6 @@ If State C wipes the list at session 22, recreate as:
 
 | GH # | Subject | Notes |
 |---|---|---|
-| **#64** | **mvox.eu wiring: replace apex A/AAAA records with CNAME → multivox.pages.dev** | **PO action** (CF dashboard, 5 steps, ~30s). Unblocks shipping mvox.eu as live URL. Full diagnosis + recipe in issue body. |
 | **#62** | **CHORE: i18n keys missing for MvoxNav tab labels + LIBRARIAN chip** | Coordinated chain: Comenius (6 keys × 4 locales) + Byrd (wire) + Tallis (spec touch-up). ~30 min. |
 | **#63** | **CHORE: textSnippet helper emits Svelte warning (single-element render contract)** | One-line fix in src/tests/snippet-helpers.ts: wrap text in `<span>${text}</span>`. |
 | #54 | CHORE-54 — Client-side runtime error capture (deferred) | Fires before mvox opens to real users |
@@ -33,7 +32,8 @@ If State C wipes the list at session 22, recreate as:
 | #38 | YELLOW-35.2 + 35.3: Svelte 5 + types cleanup | Survives Path C |
 | #39 | YELLOW-35.4: lift session population to +layout.server.ts | **Effectively obsolete** — Path C has no server-side session |
 | #33 | YELLOW-32.1: BFF helper factor-out | **Obsolete** — BFF data routes deleted in CHORE-B |
-| #43 | CHORE-42: Wire mvox.eu custom domain | **CLOSED end-of-session-19** (but actually still pending per #64) |
+| #43 | CHORE-42: Wire mvox.eu custom domain | **CLOSED end-of-session-19**; mvox.eu actually rebound + serving GREEN end-of-session-21 round 2 (see #64) |
+| #64 | mvox.eu DNS rebind | **CLOSED end-of-session-21** (Josquin Task #75, post-token-edit) |
 | #44 | CHORE-43: Migrate multivox to CF Pages Git-connected | Independent |
 | #48 | CHORE-48: ESLint + Biome linting setup (parent) | Stays open until CHORE-49 sub-rule cycles complete |
 | #49 | CHORE-49: Incremental Biome lint rule enablement (5 sub-cycles) | Filed but no urgency |
@@ -57,7 +57,7 @@ If State C wipes the list at session 22, recreate as:
 ### Live state at shutdown
 
 - **Main:** `ab6dcc5` (origin/main matches)
-- **Production:** `multivox.pages.dev` 200 on all routes (fresh build); `mvox.eu` stale (Dec 2025 build, /library + /auth/login → 404) pending PO DNS fix per #64
+- **Production:** `multivox.pages.dev` 200 on all routes (fresh build); **`mvox.eu` ALSO 200 on /`, /library, /auth/login with x-sveltekit-page: true** — rebound in shutdown round 2 after PO unblocked the CF token; CF SSL validation may still be in background but serving is live
 - **Polyphony Entu db:** unchanged from session 20 (607 librarian-bundle entities under EFK Library `6a12036c4ff8277cd4306b26`)
 - **Tests:** 436/436 unit (was 361 baseline; +75 new in CHORE-60); check 0; lint clean; build clean. 12 pre-existing Playwright failures (verified identical on main before merge)
 - **Brilliant KB:** 270 entries (unchanged this session — KB updates deferred)
