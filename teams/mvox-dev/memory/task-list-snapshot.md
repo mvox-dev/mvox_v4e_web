@@ -1,89 +1,93 @@
-# Task List Snapshot — 2026-05-24 (end of session 21)
+# Task List Snapshot — 2026-05-24 (end of session 22)
 
-State at shutdown. If session 22 hits State C in Phase 2, restore the active rows below into fresh TaskCreate IDs.
+State at shutdown. If session 23 hits State C in Phase 2, restore the active rows below into fresh TaskCreate IDs.
 
 ## Active tasks at shutdown
 
-None `in_progress`. One `pending`:
-- **#1** [DEFERRED] RFC: propose Path C case study into official entu docs
+None `in_progress`. None `pending`.
 
-All CHORE-60 phase tasks (#10-#74) are `completed`. Snapshot does NOT recreate them — they were transient session-internal IDs for executing the plan.
+All session-22 work tasks (#1-#18) are `completed`. CHORE-62 / #63 + CHORE-66 + the trailer-collision rule + URL-overrides-persisted rule + pre-commit hook installations all landed cleanly.
 
-## Open carry-forward (pending session 22+)
+## Open carry-forward (pending session 23+)
 
 | Task ID | Subject | Source / Notes |
 |---|---|---|
-| #1 | [DEFERRED] RFC: propose Path C case study into official entu docs | Long-tail. Lift from Brilliant entry `Patterns/entu/3rd-party-frontend-browser-direct` (KB id `06e6196e-21e1-4ed4-b77e-9ebff4740875`) + entu/research PR #50. |
 
-If State C wipes the list at session 22, recreate as:
-- TaskCreate("[DEFERRED] RFC: propose Path C case study into official entu docs", "Long-tail. Lift from Brilliant entry 06e6196e... + entu/research PR #50.")
+(empty — all carry-forward work is tracked via GH issues, not local task IDs)
 
-## Open GH issues — priority for session 22
+If State C wipes the list at session 23, no local recreations needed.
+
+## Open GH issues — priority for session 23
 
 | GH # | Subject | Notes |
 |---|---|---|
-| **#62** | **CHORE: i18n keys missing for MvoxNav tab labels + LIBRARIAN chip** | Coordinated chain: Comenius (6 keys × 4 locales) + Byrd (wire) + Tallis (spec touch-up). ~30 min. |
-| **#63** | **CHORE: textSnippet helper emits Svelte warning (single-element render contract)** | One-line fix in src/tests/snippet-helpers.ts: wrap text in `<span>${text}</span>`. |
+| **#65** | CHORE: MvoxNav chip width on long locale renderings (narrow viewport) | Filed CHORE-62 carry-forward. ~15 min Byrd. Layout-only fix for ET `RAAMATUKOGUHOIDJA` (17 chars). Defer until narrow-viewport support is a requirement. |
+| **#67** | CHORE-66.2: Lift `ENTU_DB` from hardcoded `'polyphony'` to env (`$env/static/public`) | Filed CHORE-66 carry-forward. ~10 min Byrd or Josquin. **Must land before any prod deploy touching `userStore.ts`.** |
+| **#68** | CHORE: Founder-as-org-affiliation — surface orgs where user is `_owner` but has no member row | Filed CHORE-66 documented-limitation follow-up. ~30 min Byrd + Tallis atomic. Augments `hydrateUserStore` with a second membership-query path (union with `_owner`-derived orgs). |
 | #54 | CHORE-54 — Client-side runtime error capture (deferred) | Fires before mvox opens to real users |
 | #6 | CHORE-6 — Email Resend wiring | Still blocked on PO SPF + DKIM DNS records |
 | #7-#23 | A1-D2 user stories + ADMIN-1-5 | Backlog |
 | #31 | YELLOW: relax OKLCH regex on next Tailwind upgrade | Fires on next Tailwind minor/major bump |
-| #36 | CHORE-36: E2E Entu mock harness + flip landing to SSR | Closes in CHORE-C (MSW + Playwright bootstrap) |
-| #38 | YELLOW-35.2 + 35.3: Svelte 5 + types cleanup | Survives Path C |
-| #39 | YELLOW-35.4: lift session population to +layout.server.ts | **Effectively obsolete** — Path C has no server-side session |
 | #33 | YELLOW-32.1: BFF helper factor-out | **Obsolete** — BFF data routes deleted in CHORE-B |
-| #43 | CHORE-42: Wire mvox.eu custom domain | **CLOSED end-of-session-19**; mvox.eu actually rebound + serving GREEN end-of-session-21 round 2 (see #64) |
-| #64 | mvox.eu DNS rebind | **CLOSED end-of-session-21** (Josquin Task #75, post-token-edit) |
+| #36 | CHORE-36: E2E Entu mock harness + flip landing to SSR | Closes in CHORE-C (MSW + Playwright bootstrap) |
+| #38 | YELLOW-35.2 + 35.3: Svelte 5 + types cleanup | `$app/stores` → `$app/state` lift partially done in CHORE-66 (+layout); audit remaining sites |
+| #39 | YELLOW-35.4: lift session population to +layout.server.ts | **Effectively obsolete** — Path C has no server-side session |
 | #44 | CHORE-43: Migrate multivox to CF Pages Git-connected | Independent |
 | #48 | CHORE-48: ESLint + Biome linting setup (parent) | Stays open until CHORE-49 sub-rule cycles complete |
 | #49 | CHORE-49: Incremental Biome lint rule enablement (5 sub-cycles) | Filed but no urgency |
 | #59 | Production verify: deferred providers (mobile-id + id-card + apple) | Scheduled routine `trig_014xDo7ZTuzNLpBUuWdtEs32` fires 2026-05-30T09:00:00Z |
-| **#60** | **CHORE-60: Convert Claude Design librarian bundle to Svelte 5 source** | **CLOSED end-of-session-21** (ab6dcc5 merged) |
 
 ## Stewardship items parked
 
-- Brilliant KB deferred-updates queue from session 20 (lessons L90-L95) — unchanged from session-20 snapshot
-- Brilliant KB deferred-updates queue from session 21 (lessons L96-L103) — new this session; see team-lead.md [NEXT SESSION] seed
-- 3 TODO et/lv/uk markers for `library_overdue_marginalia` — PO copy decision
+- Brilliant KB deferred-updates queue from session 22 (lessons L104-L112) — see team-lead.md [NEXT SESSION] seed
+- CHORE-67 (wire /library to real Entu data) — natural-next CHORE per `feedback_ui_parallels_with_seed`; brainstorm-first at session-23 kickoff if PO chooses
 
-## Session 21 outcome summary
+## Session 22 outcome summary
 
-### Closed via PR / push this session
+### Closed via push this session
 
-- ✅ **CHORE-60 shipped end-to-end.** Squash commit `ab6dcc5` on main. 31 plan tasks delivered across 33 actual commits on `feat/library-page-ui-kit` (extra commits = Snippet typing fix + YELLOW-A/D fold-ins). Closes GH #60. Live at multivox.pages.dev.
-- ✅ **Architecture correction mid-branch.** Margin/PaperStack/DeskSurface/PaperCard children typing flipped from `() => string` → canonical `Snippet` + `{@render}`. Bentham architectural verdict `[ARCH-VERDICT 2026-05-24 CHORE-60]`.
-- ✅ **3 GH issues filed** for carry-forward YELLOWs (#62, #63, #64).
+- ✅ **CHORE-62 + #63 shipped.** Squash `9637eee` on main. MvoxNav i18n wiring + textSnippet helper single-element fix. Closes GH #62 + #63. (Trailer-collision incident: PO co-author trailer missing on this commit; recovery decision was leave-as-is + log lesson.)
+- ✅ **Trailer-collision arch rule landed.** Doc commit `7d078f7` on main. Codifies the `Co-authored-by:` in dispatch body → hook short-circuit failure mode.
+- ✅ **URL-overrides-persisted arch rule landed.** Doc commit `3a37e42` on main (Bentham authored). Project-wide rule: URL params override persisted state on read; two-write symmetry on user change AND on read-time divergence.
+- ✅ **Pre-commit branch-intent hook landed.** `ef78aa3` (v1: file marker) + `8a42302` (v2: env var, current). Hook source at `.githooks/pre-commit`; active at `.git/hooks/pre-commit` per-clone.
+- ✅ **`feedback_no_parallel_branches` strengthened.** Default-no + exception-with-proof framing. Memory updated; not committed (lives in `.claude/projects/.../memory/`).
+- ✅ **KB batch.** 12 new Pattern entries + 3 updates + 9 typed cross-links. Brilliant KB went 269 → 281. Cleared deferred-KB queue from sessions 20-21 + session-22 trailer-collision pattern.
+- ✅ **CHORE-66 navbar auth wiring shipped.** Squash `9266e2e` on main. 15 files / +852 / -33. 463/463 unit tests (+27). Closes GH #66. First enactment of `feedback_ui_parallels_with_seed`. YELLOW-66.1 folded; YELLOW-66.2 deferred as #67.
 
 ### Live state at shutdown
 
-- **Main:** `ab6dcc5` (origin/main matches)
-- **Production:** `multivox.pages.dev` 200 on all routes (fresh build); **`mvox.eu` ALSO 200 on /`, /library, /auth/login with x-sveltekit-page: true** — rebound in shutdown round 2 after PO unblocked the CF token; CF SSL validation may still be in background but serving is live
+- **Main:** `9266e2e` (origin/main matches; the shutdown bundle will add one more commit when pushed)
+- **Production:** `multivox.pages.dev` 200; `mvox.eu` 200. CF auto-deploy of CHORE-66 in progress; verify build chunks at session-23 open.
 - **Polyphony Entu db:** unchanged from session 20 (607 librarian-bundle entities under EFK Library `6a12036c4ff8277cd4306b26`)
-- **Tests:** 436/436 unit (was 361 baseline; +75 new in CHORE-60); check 0; lint clean; build clean. 12 pre-existing Playwright failures (verified identical on main before merge)
-- **Brilliant KB:** 270 entries (unchanged this session — KB updates deferred)
+- **Tests:** 463/463 unit; check 0; lint clean; build clean. Playwright 11 pre-existing failures (CHORE-C scope, unchanged)
+- **Brilliant KB:** 281 entries (was 269 pre-session)
+- **Stale config entries:** `byrd` (original, terminated mid-session — cleanup at next TeamCreate)
 - **Stale local branches:** `chore/per-commit-green-arch-decision`, `chore/seed-librarian-bundle`, `feat/phase-b-live-wiring` (unchanged housekeeping candidates)
 - **Stale remote branches:** `origin/feat/phase-a-migration`, `origin/fix/phase-a-partial-failure-recovery`
 
 ### Team composition this session
 
-- **palestrina (me)** — coordinator; final-step GH issue filing + #60 closure comment
-- **finn** — always-on; dispatched once (Task #73: mvox.eu CF wiring probe)
-- **bentham** — always-on; dispatched once (Task #68: branch-level review) + earlier ARCH-VERDICT mid-branch
-- **josquin** — dispatched for: Task #10 branch+dep, Task #14 GREEN library types, Task #16 GREEN fixtures+derive, Task #63 typing-fix, Task #71 merge, Task #72 deploy, Task #74 DNS rebind (blocked on token scope)
-- **tallis** — RED phase for every component task (Tasks #11, #13, #15, #17, #19, #21, #23, #25, #27, #29, #31, #33, #35, #37, #39, #41, #43, #45, #47, #49, #51, #53, #55, #57, #60) + Task #62 typing-fix RED + Task #67 final verification
-- **byrd** — GREEN phase for every component + page task (Tasks #12, #14 GREEN, #16 GREEN, #18, #20, #22, #24, #26, #28, #30, #32, #34, #36, #38, #40, #42, #44, #46, #48, #50, #52, #54, #56, #58, #59 layout, #61 page, #63 typing-fix, #65 login, #66 logout)
-- **comenius** — spawned mid-session (Phase 4 i18n); dispatched for Task #64 i18n keys, Task #69 YELLOW-A wiring, Task #70 YELLOW-D split
-- **victoria, perotin** — not spawned this session
+- **palestrina (me)** — coordinator; brainstorm + spec + plan author for CHORE-66; KB batch dispatch; closeout
+- **finn** — always-on; not dispatched this session (no research request surfaced)
+- **bentham** — always-on; authored arch-decision entries (URL-overrides-persisted `3a37e42`), branch reviews for CHORE-62 + CHORE-66 (RED + re-verify GREEN)
+- **josquin** — Task 1 contract types + TWO surface-and-stops on plan divergences (URL form + data-model inverted); squash-merges for CHORE-62 (`9637eee`) + CHORE-66 (`9266e2e`); trailer-collision arch entry (`7d078f7`)
+- **tallis** — RED specs for CHORE-62 + CHORE-66 Tasks 3/4/5; discarded one experimental spec refactor (good discipline)
+- **byrd** (byrd-1) — Task 3 atomic bundle (`bcdeb00`); stalled on permission gate at Task 4; shut down + respawned as byrd-2
+- **byrd-2** — Tasks 4-6 (OrgPicker + MvoxNav update + +layout wiring); RED-1 + YELLOW-66.1 fix; bonus discovery of `tests/setup.ts` cleanup gotcha (L111)
+- **comenius** — i18n keys for CHORE-62 (`a439228`) + CHORE-66 (`1c9e5da`); two scratchpad commits for translation decisions
+- **perotin** — session-22 first enactment of `feedback_ui_parallels_with_seed`; provided test-librarian person/member IDs + the `_parent` inline-name denormalization finding that shaped the two-fetch userStore design
+- **victoria** — not spawned this session
 
-### Process lessons (L96-L103; all in team-lead.md)
+### Process lessons (L104-L112; all in team-lead.md)
 
-- L96 — `isolation: "worktree"` parameter doesn't combine with `team_name` on Agent
-- L97 — Convention errors propagate fast in a chain (Margin precedent → 4-component fix)
-- L98 — createRawSnippet requires single-element HTML render output (Bentham-on-Bentham)
-- L99 — Tallis indent + biome arrow-paren style codified mid-session
-- L100 — i18n key tasks must precede consuming-page tasks within a feature branch
-- L101 — Hardcoded English in newly-created .svelte gets Bentham YELLOW when matching keys exist
-- L102 — Pages custom-domain binding can sit `status: pending` indefinitely if apex CNAME never created
-- L103 — Token-scope mismatch is a real workflow blocker (Pages-only token can't do DNS work)
+- L104 — `Co-authored-by:` in dispatch body short-circuits prepare-commit-msg hook
+- L105 — Plan-time URL hardcodes drift fast; cite settled architectural exports by name
+- L106 — Surface-and-stop on plan-vs-impl divergence catches data-model bugs early
+- L107 — Shared-tree branch flips bite team-lead doc commits too
+- L108 — In-process team agents can't be OS-killed; spawn-with-disambiguation is the respawn
+- L109 — Marker-file branch-intent design hits silent tool-permission gates; env vars sidestep
+- L110 — Verify diff-shape post-merge before squash
+- L111 — `@testing-library/svelte` auto-cleanup silently skips under Vitest `globals: false`
+- L112 — `feedback_ui_parallels_with_seed` enactment proved the principle in real time (Pérotin from kickoff)
 
 (*MVOX:Palestrina*)

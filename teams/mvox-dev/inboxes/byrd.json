@@ -1,452 +1,114 @@
 [
   {
     "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"12\",\"subject\":\"CHORE-60 Task 2 GREEN: src/app.css tokens + commit\",\"description\":\"Replace src/app.css with token block from plan L163-201 (Tailwind import, fonts @import, @theme with color/voice/desk/font tokens). Run pnpm vitest run src/tests/tokens.spec.ts → expect 6/6 PASS. Run full GREEN gate (pnpm check + pnpm test:unit + pnpm lint + pnpm build). Commit both src/app.css + src/tests/tokens.spec.ts together: `feat(library): add design tokens + Caveat/Inter/Mono fonts`. Push to origin/feat/library-page-ui-kit. Per per-commit-GREEN discipline. Plan L98-213.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T00:28:32.652Z\"}",
-    "timestamp": "2026-05-24T00:28:32.652Z",
+    "text": "[2026-05-24 06:48] Dispatching Task #3 (GH #62 part 2). Branch `chore/mvoxnav-i18n-and-snippet-helper` is live with Comenius's keys (`a439228`).\n\n**Goal:** wire `src/lib/components/MvoxNav.svelte` to use the new paraglide keys.\n\n**Keys available (already in messages/{en,et,lv,uk}.json, paraglide-generated):**\n- `m.nav_tab_agenda()` · `m.nav_tab_library()` · `m.nav_tab_roster()` · `m.nav_tab_notices()` · `m.nav_tab_settings()`\n- `m.nav_chip_librarian()`\n- `m.nav_sign_in()` (already existed; verify it's used)\n\n**Current state of MvoxNav.svelte:4-ish:** `TABS = ['agenda', 'library', 'roster', 'notices', 'settings']` and renders bare strings; `LIBRARIAN` chip hardcoded.\n\n**Approach (your call on shape):** dynamic per-tab lookup. Options: switch/case, object map, or $derived array of `{ id, label: m.nav_tab_*() }` pairs. Pick what reads cleanest. Avoid restructuring beyond what's needed for the string substitution.\n\n**Per-commit-GREEN coordination with Tallis:** your component change WILL break MvoxNav.spec.ts assertions (they currently assert raw English literals like 'agenda'). The bundle MUST be ONE commit, not two. Workflow:\n1. `git fetch && git checkout chore/mvoxnav-i18n-and-snippet-helper && git pull`\n2. Edit MvoxNav.svelte. Run `pnpm test:unit` locally — MvoxNav.spec.ts will fail (expected).\n3. Capture: which assertions fail + what the new rendered text/DOM looks like. DM Tallis with that snapshot.\n4. Tallis updates MvoxNav.spec.ts in his working copy. He pushes nothing yet; he sends you the updated file content or commits it locally then you both stage.\n5. Practical: easiest if YOU (Byrd) `git add` both files (MvoxNav.svelte + MvoxNav.spec.ts) after Tallis has saved his .spec.ts edit on his side — coordinate via DM. One author commits, both names in trailer (co-author trailer handled by hook + add a `Co-authored-by: Tallis` if you want explicit dual authorship; OR Tallis commits and you co-author).\n6. ONE commit, ONE push. After push: `pnpm check` + `pnpm test:unit` + `pnpm lint` + `pnpm build` ALL green.\n\nCommit message style: `chore(#62): wire MvoxNav to paraglide nav_tab_* + nav_chip_librarian keys`\n\n**Heads-up from Comenius:** the Estonian translation of `LIBRARIAN` is `RAAMATUKOGUHOIDJA` (17 chars — long). If the chip layout clips at narrow widths, mention it and Comenius can revisit. Don't fix it yourself; surface as a YELLOW note in your hand-off.\n\nOnce Tallis has finished Task #5 (snippet helper fix — happening in parallel right now) AND you've atomically committed #3+#4, hand off to me for Bentham review.\n\nReport when component is ready and you've DM'd Tallis the spec snapshot.\n",
+    "summary": "Dispatch Task #3 — MvoxNav m.*() wiring",
+    "timestamp": "2026-05-24T06:48:42.550Z",
     "type": "message",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "[2026-05-24 00:37] CHORE-60 Task 3 GREEN — Team Task #14.\n\n### Pre-flight\n\n```bash\npwd                                  # expect /home/michelek/workspace\ngit rev-parse --abbrev-ref HEAD      # expect feat/library-page-ui-kit\ngit status --porcelain               # expect: \"?? src/lib/types/\" (Tallis's RED spec)\ngit log --oneline -1                 # expect 8306550\n```\n\nIf pre-flight fails, STOP and report.\n\n### Context\n\nTallis wrote `src/lib/types/library.spec.ts` (46 lines, untracked). One amendment from the plan: the spec dropped `Copy` from the import line because the plan never defines `Copy` anywhere and the test body never uses it. So your `library.ts` should NOT export `Copy`. Stick to the type set the spec actually uses: Voice, Choir, Member, Loan, Edition, Work, Task.\n\nThe spec currently passes at runtime (type-only imports erase) but `pnpm check` fails because `./library` doesn't exist. Your GREEN flips `pnpm check` from ERROR → 0.\n\n### GREEN implementation\n\nCreate `src/lib/types/library.ts` with this EXACT content (per plan L283-360, ASCII-only):\n\n```typescript\nexport type Voice = 'S1' | 'S2' | 'A' | 'T1' | 'T2' | 'B1' | 'B2';\n\nexport interface Choir {\n  name: string;\n  short: string;\n  slug: string;\n  initials: string;\n  rehearsal_size: number;\n}\n\nexport interface Member {\n  id: string;\n  name: string;\n  voice: Voice;\n}\n\nexport interface Loan {\n  copy: string;\n  member: string;\n  since: string;\n  days_overdue: number;\n}\n\nexport interface Edition {\n  id: string;\n  label: string;\n  voicing: string;\n  publisher: string;\n  year: number;\n  isbn?: string;\n  location?: string;\n  total: number;\n  on_loan: number;\n  overdue: number;\n  returned_today: number;\n  limitless?: boolean;\n  loans?: Loan[];\n}\n\nexport interface Work {\n  id: string;\n  composer: string;\n  title: string;\n  title_alt?: string;\n  year: number;\n  lang: string;\n  period: string;\n  tags: string[];\n  notes?: string;\n  editions: Edition[];\n}\n\nexport type TaskKind = 'returns' | 'overdue' | 'pull';\n\nexport interface Task {\n  id: string;\n  rank: number;\n  kind: TaskKind;\n  title: string;\n  summary: string;\n  work_id?: string;\n  edition_id?: string;\n  work_ids?: string[];\n  count?: number;\n  confirmed?: number;\n  pending?: number;\n  borrowers?: string[];\n  days?: number;\n  pulled?: Record<string, number>;\n}\n\nexport interface Today {\n  iso: string;\n  dow: string;\n  date: string;\n  time: string;\n}\n```\n\n### Verification + commit (atomic chain)\n\n```bash\npnpm vitest run src/lib/types/library.spec.ts && \\\n  pnpm check && pnpm test:unit && pnpm lint && pnpm build && \\\n  git add src/lib/types/library.ts src/lib/types/library.spec.ts && \\\n  git commit -m \"$(cat <<'EOF'\nfeat(library): add library entity types\n\nCo-authored-by: Mihkel Putrinš <mihkel.putrinsh@gmail.com>\nEOF\n)\" && \\\n  git push origin feat/library-page-ui-kit\n```\n\nGates expected:\n- `vitest run library.spec.ts` → 7/7 PASS\n- `pnpm check` → 0 errors (was: cannot find `./library` module)\n- `pnpm test:unit` → 374/374 PASS (367 baseline + 7 new types tests)\n- `pnpm lint` → 0 errors\n- `pnpm build` → clean\n\n### Report\n\nSendMessage to team-lead: commit SHA, gate results with test counts, `git rev-parse --abbrev-ref HEAD`, anything unexpected.\n\n### Mark task\n\nAfter push + report: `TaskUpdate(taskId=14, status=completed)`.\n\nSame constraints — shared main checkout, ASCII-only commit, stay on feat branch.\n\nProceed.\n",
-    "summary": "CHORE-60 Task 3 GREEN — library types",
-    "timestamp": "2026-05-24T00:37:30.189Z",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"3\",\"subject\":\"Byrd: wire MvoxNav.svelte to m.nav_tab_*() + LIBRARIAN chip\",\"description\":\"Update src/lib/components/MvoxNav.svelte to render m.nav_tab_{tab}() instead of bare {tab}; also LIBRARIAN chip → m.nav_chip_librarian(); Sign-in link already uses m.nav_sign_in (verify). Bundle in SAME COMMIT as Tallis's spec update (task #4) to satisfy per-commit-GREEN. GH #62 part 2.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T06:48:43.272Z\"}",
+    "timestamp": "2026-05-24T06:48:43.272Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "[2026-05-24 06:50] Done. `src/lib/components/MvoxNav.spec.ts` updated — lines 19+20 changed to `'Agenda'` and `'Library'`. File is saved locally. You can stage both `MvoxNav.svelte` and `MvoxNav.spec.ts` and commit atomically.",
+    "summary": "spec updated — stage both files and commit",
+    "timestamp": "2026-05-24T06:50:56.192Z",
+    "color": "orange",
     "type": "message",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"14\",\"subject\":\"CHORE-60 Task 3 GREEN: src/lib/types/library.ts + commit\",\"description\":\"Create src/lib/types/library.ts with Voice, Choir, Member, Loan, Edition, Work, TaskKind, Task, Today exports per plan L283-360. (Copy dropped per session-21 amendment — never defined in plan, never used in test body.) Run pnpm vitest run src/lib/types/library.spec.ts (7/7 PASS), pnpm check (0 errors), then full GREEN gate. Commit src/lib/types/library.ts + src/lib/types/library.spec.ts together: `feat(library): add library entity types`. Push.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T00:37:31.242Z\"}",
-    "timestamp": "2026-05-24T00:37:31.242Z",
+    "text": "[2026-05-24 09:28] Task #13 / CHORE-66 Task 3 dispatched. You + Tallis bundle this atomically.\n\n**Goal:** Implement `src/lib/auth/userStore.ts` + `src/lib/auth/userStore.spec.ts` in ONE commit (per-commit-GREEN).\n\n**Branch:** `chore/navbar-auth-wiring` (tip `1c9e5da`, Comenius's i18n keys just landed). Pull before starting.\n\n**Plan section:** `docs/superpowers/plans/2026-05-24-chore-66-navbar-auth-wiring.md` → \"Task 3: userStore + spec (atomic)\" — has full step-by-step + code snippets.\n\n**CRITICAL — Contract is `src/lib/auth/types.ts` (Josquin's `e12522a`), NOT the plan's example code.** The plan was written before Josquin's probe; the types he committed are canonical and may have minor wire-shape divergences from what the plan's userStore example shows:\n\n- `EntuPersonResponse` has an **`entity` wrapper envelope** — the response shape is `{ entity: { _id, name?: [...] } }`. The plan's example code unwraps as `person.name?.[0]?.string` — that needs to become `person.entity.name?.[0]?.string` (or rename the variable to `personRes.entity.name?.[0]?.string`). Verify by reading `types.ts` TSDoc on `EntuPersonResponse`.\n- JWT claim is `accounts[dbName]`, NOT `sub` — Josquin added an `EntuJwtClaims` type; consume it. The plan's example already reflects this but double-check vs the type.\n- Two parallel fetches (`Promise.all`): one for person, one for member-search-by-person. No per-org follow-up. Map `member._parent[]` filtered by `entity_type === 'organization'`.\n- Use `ENTU_API_BASE` from `$lib/entu-config` — never hardcode the base URL.\n\n**Atomic bundle workflow:**\n1. `git fetch && git checkout chore/navbar-auth-wiring && git pull`\n2. Byrd: write `src/lib/auth/userStore.ts` consuming `types.ts` as canonical contract.\n3. Tallis: write `src/lib/auth/userStore.spec.ts` in parallel (you can begin from the plan's spec example; it has the `vi.mock('$app/navigation', ...)` setup and ~14 test cases). Mock both fetch endpoints with the wire shapes from `types.ts` TSDoc.\n4. Run `pnpm test:unit src/lib/auth/userStore.spec.ts` locally until all pass.\n5. Verify full gates: `pnpm check && pnpm test:unit && pnpm lint && pnpm build`.\n6. One of you stages both files + commits. **NO `Co-authored-by:` in commit body** (hook adds PO trailer per `3a37e42`). Other person co-authors via discussion-noted-in-body-prose if desired (use sentinel like `Contributors:` not `Co-authored-by:`).\n7. Verify trailer + push.\n\n**Commit message style:** `feat(#66): userStore + selectedOrgStore + pickerModeStore`\n\n**Surface-and-stop triggers:** if you discover ANOTHER wire-shape divergence from what types.ts says, OR if a test case behaves differently from what the spec example expects, stop + DM team-lead. Don't push partial-green.\n\nReport SHA + gate counts when done.\n\n(Tallis is being copied on this message so you coordinate from the same context.)\n",
+    "summary": "Task 3 — userStore + spec (atomic bundle with Tallis)",
+    "timestamp": "2026-05-24T10:55:56.781Z",
     "type": "message",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "[2026-05-24 00:41] CHORE-60 Task 4 GREEN — Team Task #16.\n\n### Pre-flight\n\n```bash\npwd                                  # /home/michelek/workspace\ngit rev-parse --abbrev-ref HEAD      # feat/library-page-ui-kit\ngit status --porcelain               # expect: \"?? src/lib/library/\"\ngit log --oneline -1                 # 29e49cd\n```\n\nIf pre-flight fails, STOP and report.\n\n### Context\n\nTallis wrote `src/lib/library/derive.spec.ts` (48 lines, tabs, lint-clean). Currently FAILs (Cannot find module). Your GREEN creates 2 files (fixtures + derive helpers) and commits all 3.\n\n**Biome note:** Tallis hit `arrow-function paren style` rule — biome wants `(w) =>` not `w =>`. The plan's derive.ts code uses `m => m.id === id` style. Either:\n- write the code with parens already → `members.find((m) => m.id === id)` (recommended; saves a reformat round-trip)\n- OR write per plan + run `biome format --write` after; same outcome.\n\n### GREEN implementation — File 1: src/lib/fixtures/library-mock.ts\n\nPer plan L446-545. ASCII-only, tabs for indent. Content:\n\n```typescript\nimport type { Choir, Member, Work, Task, Today } from '../types/library';\n\nexport const TODAY: Today = { iso: '2026-05-26', dow: 'Tue', date: '26 May 2026', time: '14:32' };\n\nexport const CHOIR: Choir = {\n\tname: 'Estonian Philharmonic Chamber Choir',\n\tshort: 'EPCC',\n\tslug: 'epcc',\n\tinitials: 'EP',\n\trehearsal_size: 48,\n};\n\nexport const MEMBERS: Member[] = [\n\t{ id: 'mt', name: 'Maris Tamm',    voice: 'S1' },\n\t{ id: 'ls', name: 'Liina Saar',    voice: 'S2' },\n\t{ id: 'al', name: 'Ave Lepp',      voice: 'A'  },\n\t{ id: 'kp', name: 'Kärt Põld',     voice: 'A'  },\n\t{ id: 'tm', name: 'Toomas Mägi',   voice: 'T1' },\n\t{ id: 'av', name: 'Andres Vahar',  voice: 'T2' },\n\t{ id: 'mr', name: 'Margus Roos',   voice: 'B1' },\n\t{ id: 'hk', name: 'Henn Kuusik',   voice: 'B2' },\n];\n\nexport const WORKS: Work[] = [\n\t{\n\t\tid: 'tallis-spem', composer: 'Thomas Tallis', title: 'Spem in alium', year: 1570,\n\t\tlang: 'Latin', period: 'Renaissance', tags: ['sacred', 'motet', '40-voice'],\n\t\tnotes: 'Returned this morning from December concert. Twelve copies counted.',\n\t\teditions: [\n\t\t\t{ id: 'tallis-40', label: '40-part original', voicing: 'SSSSAAAATTTTBBBB ×5', publisher: 'Chester Novello', year: 1928, total: 12, on_loan: 0, overdue: 0, returned_today: 12 },\n\t\t\t{ id: 'tallis-8',  label: '8-part reduction (Cooke)', voicing: 'SSAATTBB', publisher: 'OUP', year: 1989, total: 6, on_loan: 0, overdue: 0, returned_today: 0 },\n\t\t],\n\t},\n\t{\n\t\tid: 'part-magnificat', composer: 'Arvo Pärt', title: 'Magnificat', year: 1989,\n\t\tlang: 'Latin', period: 'Contemporary', tags: ['sacred', 'Estonian', 'tintinnabuli'],\n\t\tnotes: 'Four copies still out with two basses since November.',\n\t\teditions: [\n\t\t\t{ id: 'mag-ue', label: 'Universal Edition · original', voicing: 'SSSAATBB', publisher: 'Universal Edition', year: 1989, isbn: 'UE-19400',\n\t\t\t\ttotal: 30, on_loan: 4, overdue: 4, returned_today: 0,\n\t\t\t\tloans: [\n\t\t\t\t\t{ copy: '#14', member: 'hk', since: '2025-11-12', days_overdue: 195 },\n\t\t\t\t\t{ copy: '#15', member: 'hk', since: '2025-11-12', days_overdue: 195 },\n\t\t\t\t\t{ copy: '#22', member: 'mr', since: '2025-11-12', days_overdue: 195 },\n\t\t\t\t\t{ copy: '#23', member: 'mr', since: '2025-11-12', days_overdue: 195 },\n\t\t\t\t],\n\t\t\t},\n\t\t\t{ id: 'mag-rh',  label: 'Hyperion · reduced (Layton ed.)', voicing: 'SATB div.', publisher: 'Hyperion Eds.', year: 2001, total: 24, on_loan: 0, overdue: 0, returned_today: 0 },\n\t\t\t{ id: 'mag-org', label: 'UE · with organ', voicing: 'SATB + org.', publisher: 'Universal Edition', year: 1996, total: 0, on_loan: 0, overdue: 0, returned_today: 0, limitless: true },\n\t\t],\n\t},\n\t{\n\t\tid: 'tormis-raua', composer: 'Veljo Tormis', title: 'Raua needmine', title_alt: 'Curse upon Iron', year: 1972,\n\t\tlang: 'Estonian', period: 'Contemporary', tags: ['Estonian', 'runo', 'shaman drum'],\n\t\tnotes: 'Conductor wants to try tonight. 48 singers expected.',\n\t\teditions: [\n\t\t\t{ id: 'raua-fg', label: 'Fennica Gehrman · SATB + shaman drum', voicing: 'SATB · drum', publisher: 'Fennica Gehrman', year: 1991, isbn: 'FG-552', total: 52, on_loan: 0, overdue: 0, returned_today: 0, location: 'Cabinet B · shelf 1' },\n\t\t\t{ id: 'raua-pl', label: 'Pelle Pyy · a cappella reduction', voicing: 'SATB', publisher: 'Pyy', year: 2003, total: 18, on_loan: 0, overdue: 0, returned_today: 0 },\n\t\t],\n\t},\n\t{\n\t\tid: 'kreek-onnis', composer: 'Cyrillus Kreek', title: 'Õnnis on inimene', title_alt: 'Blessed is the man', year: 1923,\n\t\tlang: 'Estonian', period: '20th century', tags: ['Estonian', 'sacred', 'psalm'],\n\t\tnotes: 'For tonight. Owned in one edition — count is tight.',\n\t\teditions: [\n\t\t\t{ id: 'onnis-sp', label: 'SP Muusikaprojekt', voicing: 'SATB', publisher: 'SP Muusikaprojekt', year: 1998, total: 42, on_loan: 2, overdue: 0, returned_today: 0, location: 'Cabinet A · shelf 4' },\n\t\t],\n\t},\n\t{\n\t\tid: 'esenvalds-stars', composer: 'Ēriks Ešenvalds', title: 'Stars', year: 2011,\n\t\tlang: 'English', period: 'Contemporary', tags: ['Latvian', 'contemporary', 'tuned glasses'],\n\t\tnotes: 'For tonight. Needs tuned water-glasses.',\n\t\teditions: [\n\t\t\t{ id: 'stars-mt', label: 'Musica Baltica · SATB + glasses', voicing: 'SSAATTBB', publisher: 'Musica Baltica', year: 2011, isbn: 'MB-2089', total: 50, on_loan: 0, overdue: 0, returned_today: 0, location: 'Cabinet C · shelf 2' },\n\t\t],\n\t},\n\t{ id: 'part-beatitudes',  composer: 'Arvo Pärt',          title: 'The Beatitudes',       year: 1990, lang: 'English', period: 'Contemporary', tags: ['sacred', 'Estonian', 'tintinnabuli'], editions: [{ id: 'beat-ue', label: 'Universal Edition', voicing: 'SATB + org.', publisher: 'Universal Edition', year: 1990, total: 32, on_loan: 0, overdue: 0, returned_today: 0 }] },\n\t{ id: 'esenvalds-sleep',  composer: 'Ēriks Ešenvalds',    title: 'Only in Sleep',        year: 2010, lang: 'English', period: 'Contemporary', tags: ['Latvian', 'soprano solo'],            editions: [{ id: 'sleep-mb', label: 'Musica Baltica', voicing: 'SSAATTBB + sop. solo', publisher: 'Musica Baltica', year: 2010, total: 48, on_loan: 0, overdue: 0, returned_today: 0 }] },\n\t{ id: 'byrd-ave',         composer: 'William Byrd',       title: 'Ave verum corpus',     year: 1605, lang: 'Latin',   period: 'Renaissance',  tags: ['sacred', 'English'],                  editions: [{ id: 'ave-st', label: 'Stainer & Bell', voicing: 'SATB', publisher: 'Stainer & Bell', year: 1923, total: 60, on_loan: 0, overdue: 0, returned_today: 0 }] },\n\t{ id: 'byrd-mass5',       composer: 'William Byrd',       title: 'Mass for Five Voices', year: 1595, lang: 'Latin',   period: 'Renaissance',  tags: ['sacred', 'English', 'mass'],          editions: [{ id: 'mass5-cs', label: 'Chester · ed. Fellowes', voicing: 'SSATB', publisher: 'Chester', year: 1922, total: 24, on_loan: 0, overdue: 0, returned_today: 0 }] },\n\t{ id: 'hildegard-pastor', composer: 'Hildegard von Bingen', title: 'O Pastor Animarum', year: 1150, lang: 'Latin',   period: 'Medieval',     tags: ['sacred', 'plainchant'],                editions: [{ id: 'pastor-am', label: 'A-R Editions · transcription', voicing: 'Unison + drone', publisher: 'A-R Editions', year: 1998, total: 0, on_loan: 0, overdue: 0, returned_today: 0, limitless: true }] },\n\t{ id: 'whitacre-sleep',   composer: 'Eric Whitacre',      title: 'Sleep',                year: 2000, lang: 'English', period: 'Contemporary', tags: ['American'],                           editions: [{ id: 'wh-sleep', label: 'Walton Music', voicing: 'SATB div.', publisher: 'Walton Music', year: 2000, total: 56, on_loan: 6, overdue: 0, returned_today: 0 }] },\n\t{ id: 'nystedt-immortal', composer: 'Knut Nystedt',      title: 'Immortal Bach',         year: 1988, lang: 'German',  period: 'Contemporary', tags: ['Norwegian'],                          editions: [{ id: 'im-no', label: 'Norsk Musikforlag', voicing: 'SATB div.', publisher: 'Norsk Musikforlag', year: 1988, total: 50, on_loan: 0, overdue: 0, returned_today: 0 }] },\n\t{ id: 'lauridsen-om',     composer: 'Morten Lauridsen',  title: 'O Magnum Mysterium',    year: 1994, lang: 'Latin',   period: 'Contemporary', tags: ['sacred', 'American'],                  editions: [{ id: 'om-pe', label: 'Peer Music', voicing: 'SATB', publisher: 'Peer Music', year: 1994, total: 48, on_loan: 0, overdue: 0, returned_today: 0 }] },\n];\n\nexport const TASKS: Task[] = [\n\t{ id: 'returns', rank: 1, kind: 'returns', title: 'Mark Tallis copies returned',\n\t\tsummary: '12 copies of Spem in alium back from December concert',\n\t\twork_id: 'tallis-spem', edition_id: 'tallis-40', count: 12, confirmed: 8, pending: 4 },\n\t{ id: 'overdue', rank: 2, kind: 'overdue', title: 'Chase Pärt Magnificat',\n\t\tsummary: '4 copies still out with two basses since November',\n\t\twork_id: 'part-magnificat', edition_id: 'mag-ue', count: 4, borrowers: ['hk', 'mr'], days: 195 },\n\t{ id: 'pull', rank: 3, kind: 'pull', title: \"Pull tonight's three pieces\",\n\t\tsummary: 'Tormis · Kreek · Ešenvalds — 48 singers',\n\t\twork_ids: ['tormis-raua', 'kreek-onnis', 'esenvalds-stars'],\n\t\tpulled: { 'tormis-raua': 48, 'kreek-onnis': 0, 'esenvalds-stars': 0 } },\n];\n```\n\nNote: this file contains non-ASCII characters in DATA (Estonian/Latvian/diacritics, em-dash in TASKS summary, middot · in edition labels). These are FILE CONTENT, not commit message — ASCII-only applies only to commit messages per L72. The file itself is UTF-8 and that's fine; vite + vitest handle it.\n\n### GREEN implementation — File 2: src/lib/library/derive.ts\n\nPer plan L549-606. With parens-on-single-arg-arrows applied preemptively:\n\n```typescript\nimport type { Work, Member } from '../types/library';\n\nexport interface LibStats {\n\tworks: number;\n\teditions: number;\n\tcopies: number;\n\ton_loan: number;\n\toverdue: number;\n\tavailable: number;\n}\n\nexport interface WorkStats {\n\ttotal: number;\n\tloaned: number;\n\toverdue: number;\n\treturned_today: number;\n\tavailable: number;\n\thas_limitless: boolean;\n}\n\nexport function libStats(works: Work[]): LibStats {\n\tlet editions = 0, copies = 0, on_loan = 0, overdue = 0;\n\tfor (const w of works) {\n\t\teditions += w.editions.length;\n\t\tfor (const e of w.editions) {\n\t\t\tcopies += e.total || 0;\n\t\t\ton_loan += e.on_loan || 0;\n\t\t\toverdue += e.overdue || 0;\n\t\t}\n\t}\n\treturn { works: works.length, editions, copies, on_loan, overdue, available: copies - on_loan };\n}\n\nexport function workStats(w: Work): WorkStats {\n\tlet total = 0, loaned = 0, overdue = 0, returned_today = 0, has_limitless = false;\n\tfor (const e of w.editions) {\n\t\tif (e.limitless) { has_limitless = true; continue; }\n\t\ttotal += e.total || 0;\n\t\tloaned += e.on_loan || 0;\n\t\toverdue += e.overdue || 0;\n\t\treturned_today += e.returned_today || 0;\n\t}\n\treturn { total, loaned, overdue, returned_today, available: total - loaned, has_limitless };\n}\n\nexport function byMemberId(members: Member[], id: string): Member | undefined {\n\treturn members.find((m) => m.id === id);\n}\n\nexport function workById(works: Work[], id: string): Work | undefined {\n\treturn works.find((w) => w.id === id);\n}\n\nexport function editionById(work: Work | undefined, eid: string) {\n\treturn work?.editions.find((e) => e.id === eid);\n}\n```\n\n### Verification + commit (atomic chain)\n\n```bash\npnpm vitest run src/lib/library/derive.spec.ts && \\\n  pnpm check && pnpm test:unit && pnpm lint && pnpm build && \\\n  git add src/lib/fixtures/library-mock.ts src/lib/library/derive.ts src/lib/library/derive.spec.ts && \\\n  git commit -m \"$(cat <<'EOF'\nfeat(library): mock fixtures + derive helpers from bundle Data.jsx\n\nCo-authored-by: Mihkel Putrinš <mihkel.putrinsh@gmail.com>\nEOF\n)\" && \\\n  git push origin feat/library-page-ui-kit\n```\n\nGates expected:\n- derive.spec → 7/7 PASS\n- pnpm check → 0 errors\n- pnpm test:unit → 381/381 PASS (374 baseline + 7 new derive tests)\n- pnpm lint → 0 errors\n- pnpm build → clean\n\n### Report + mark\n\nSendMessage team-lead with commit SHA, gate results, branch confirm. Then `TaskUpdate(taskId=16, status=completed)`.\n\nSame constraints. Proceed.\n",
-    "summary": "CHORE-60 Task 4 GREEN — fixtures + derive",
-    "timestamp": "2026-05-24T00:42:34.530Z",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"13\",\"subject\":\"Task 3 — Byrd + Tallis: userStore.ts + userStore.spec.ts (atomic)\",\"description\":\"CHORE-66 Task 3. Atomic commit. Tallis writes userStore.spec.ts (~14 cases including two-write symmetry); Byrd writes userStore.ts (JWT decode + Entu fetch + selectedOrgStore + pickerModeStore + selectOrg). vi.mock $app/navigation. Per-commit-GREEN.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T10:56:21.494Z\"}",
+    "timestamp": "2026-05-24T10:56:21.494Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "[2026-05-24 10:59] `src/lib/auth/userStore.spec.ts` written and verified. 20 tests, all pass. Full gate: 0 type errors, 456/456 tests, lint clean.\n\nKey spec decisions (derived from `types.ts`, not the plan example):\n- Token read via `localStorage.getItem('token')` (storage.ts key convention)\n- Person response shape: `{ entity: { _id, name } }` (with wrapper)\n- JWT claim: `accounts[db]` not `sub`\n- Two parallel fetches (person + member-search), section parents filtered out\n- `mvox.selectedOrgId` for the persisted org key\n\nGate results: `pnpm check` 0 errors / `pnpm test:unit` 456/456 / `pnpm lint` clean.\n\nReady for atomic commit. You can stage both `src/lib/auth/userStore.ts` and `src/lib/auth/userStore.spec.ts` and commit.",
+    "summary": "userStore.spec.ts ready — 20/20 pass, full gate GREEN, stage both",
+    "timestamp": "2026-05-24T10:59:54.854Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "[2026-05-24 11:02] Spec passes — file saved at `src/lib/auth/userStore.spec.ts`. 19/19 pass, lint clean (biome-formatted). Used your canonical version with all 3 corrections. Ready for atomic commit.",
+    "summary": "spec passes — file saved, ready for atomic commit",
+    "timestamp": "2026-05-24T11:02:49.520Z",
+    "color": "orange",
     "type": "message",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"16\",\"subject\":\"CHORE-60 Task 4 GREEN: library-mock.ts + derive.ts + commit\",\"description\":\"Create src/lib/fixtures/library-mock.ts (97 lines per plan L446-545) + src/lib/library/derive.ts (57 lines per plan L549-606). Run derive.spec vitest (7/7 PASS), pnpm check (0), full gate. Commit library-mock.ts + derive.ts + derive.spec.ts together as `feat(library): mock fixtures + derive helpers from bundle Data.jsx`. Push. Heads up: biome wants single-arg arrows with parens, `(w) =>` not `w =>` — pre-format if needed.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T00:42:35.141Z\"}",
-    "timestamp": "2026-05-24T00:42:35.141Z",
+    "text": "[2026-05-24 09:52] Task #14 / CHORE-66 Task 4 dispatched. You + Tallis bundle atomically.\n\n**Goal:** Implement `src/lib/components/OrgPicker.svelte` + `src/lib/components/OrgPicker.spec.ts` in ONE commit.\n\n**Branch:** `chore/navbar-auth-wiring` (tip `bcdeb00`). Pull before starting.\n\n**Plan section:** `docs/superpowers/plans/2026-05-24-chore-66-navbar-auth-wiring.md` → \"Task 4: OrgPicker.svelte + spec (atomic)\" — full code snippets.\n\n**Component shape** (Svelte 5 Runes):\n- Reads `userStore` + `selectedOrgStore` directly (no props for org data)\n- Local `$state(false)` for open/close\n- Click chip → toggle; click menu item → call `selectOrg(orgId)` + close\n- Escape key closes; `$effect` registers keydown listener while open\n- Use `m.nav_org_picker_switch_to({ orgName: org.label })` for menu item aria-label\n- Tailwind v4 class names only, no dynamic template literals\n\n**Spec coverage:**\n- `@vitest-environment happy-dom`\n- `vi.mock('$app/navigation', ...)` for goto\n- `vi.mock('$lib/auth/storage', ...)` may also be needed for `getToken` if hydration is triggered indirectly\n- Pre-set `userStore` to ready+multi-org state in beforeEach\n- Test: chip renders closed by default; click opens menu; Escape closes; click org → URL + localStorage write + menu closes\n\n**Atomic bundle workflow (marker discipline):**\n1. `git fetch && git checkout chore/navbar-auth-wiring && git pull`\n2. **Write marker on chore branch BEFORE any commit:** `echo \"chore/navbar-auth-wiring\" > .git/EXPECTED_BRANCH`\n3. Byrd writes OrgPicker.svelte; Tallis writes OrgPicker.spec.ts\n4. Run `pnpm test:unit src/lib/components/OrgPicker.spec.ts` until all pass\n5. Verify full gates: `pnpm check && pnpm test:unit && pnpm lint && pnpm build`\n6. One of you stages both files + commits with `feat(#66): OrgPicker dropdown component`\n7. **NO `Co-authored-by:` in commit body** (hook adds PO trailer); use `Contributors:` sentinel or body prose for the co-author note\n8. Push, verify trailer\n\n**Pre-commit hook is now live** (installed at `ef78aa3` on main). If your marker doesn't match HEAD, the commit is rejected with a helpful error. Marker auto-clears on success.\n\n**Surface-and-stop** if anything diverges from the plan's expectations. Report SHA + gate counts when bundle commit lands.\n\n(Copying Tallis on a coordinated message.)\n",
+    "summary": "Task 4 — OrgPicker + spec (atomic bundle with Tallis)",
+    "timestamp": "2026-05-24T11:18:01.021Z",
     "type": "message",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "[2026-05-24 00:47] CHORE-60 Task 5 GREEN — Team Task #18.\n\n### Pre-flight\n- branch: feat/library-page-ui-kit @ ac42258\n- status: `?? src/lib/components/` (Tallis's spec untracked) + `M teams/mvox-dev/memory/tallis.md` (scratchpad — NOT yours to touch; leave as-is)\n\n### Scope\n\nPlan: `docs/superpowers/plans/2026-05-23-library-page-ui-kit.md` Task 5 at L642-705. **Read it directly.** Your write: `src/lib/components/Voice.svelte` per L678-693 (Svelte 5 runes, $props with `v: Voice` type, voice-family bg class lookup).\n\n### Standing rules\n- Tabs for indent in any .svelte / .ts you author\n- Single-arg arrows with parens\n- Commit message ASCII-only\n- Stage ONLY your two files (`git add src/lib/components/Voice.svelte src/lib/components/Voice.spec.ts`) — do NOT git-add the tallis.md scratchpad mod; that's Tallis's\n\n### Atomic verify+commit+push chain\n\n```bash\npnpm vitest run src/lib/components/Voice.spec.ts && \\\n  pnpm check && pnpm test:unit && pnpm lint && pnpm build && \\\n  git add src/lib/components/Voice.svelte src/lib/components/Voice.spec.ts && \\\n  git commit -m \"$(cat <<'EOF'\nfeat(library): Voice badge component\n\nCo-authored-by: Mihkel Putrinš <mihkel.putrinsh@gmail.com>\nEOF\n)\" && \\\n  git push origin feat/library-page-ui-kit\n```\n\nGates expected:\n- Voice.spec → 2/2 PASS\n- pnpm check → 0\n- pnpm test:unit → 383/383 PASS (381 baseline + 2 new)\n- pnpm lint → 0\n- pnpm build → clean\n\n### Report + mark\n\nSendMessage with commit SHA + gates + branch confirm. `TaskUpdate(taskId=18, status=completed)`.\n\nProceed.\n",
-    "summary": "CHORE-60 Task 5 GREEN — Voice.svelte",
-    "timestamp": "2026-05-24T00:46:51.513Z",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"14\",\"subject\":\"Task 4 — Byrd + Tallis: OrgPicker.svelte + spec (atomic)\",\"description\":\"CHORE-66 Task 4. Atomic commit. Tallis writes OrgPicker.spec.ts (open/close/select/escape); Byrd writes OrgPicker.svelte (Svelte 5 Runes; reads userStore + selectedOrgStore directly; calls selectOrg on click). Per-commit-GREEN.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T11:18:16.414Z\"}",
+    "timestamp": "2026-05-24T11:18:16.414Z",
+    "type": "message",
+    "read": false
+  },
+  {
+    "from": "tallis",
+    "text": "[2026-05-24 11:19] `src/lib/components/OrgPicker.spec.ts` written. RED confirmed (module-not-found for OrgPicker.svelte), lint clean.\n\n5 tests across 3 describe blocks:\n- chip renders closed (no menu role)\n- click opens menu\n- Escape closes menu\n- click org → `localStorage.mvox.selectedOrgId='org-2'` + URL `?org=org-2` + menu closes\n\nContract pins:\n- `data-testid=\"org-picker-chip\"` on the trigger button\n- `role=\"menu\"` on the dropdown\n- `findByText('Other Org')` to locate the menu item\n\nPing me when OrgPicker.svelte is ready and I'll run the combined test + full gate before we commit atomically.",
+    "summary": "OrgPicker.spec.ts ready — RED, lint clean, awaiting your svelte",
+    "timestamp": "2026-05-24T11:19:10.782Z",
+    "color": "orange",
+    "type": "message",
+    "read": false
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-05-24 09:58] Quick update mid-flight: the pre-commit hook design swapped. Use **env var, not marker file** for Task 4's commit.\n\n**New invocation:**\n```bash\nMVOX_EXPECTED_BRANCH=chore/navbar-auth-wiring git commit -m \"feat(#66): OrgPicker dropdown component\"\n```\n\nOr export once for the session:\n```bash\nexport MVOX_EXPECTED_BRANCH=chore/navbar-auth-wiring\ngit commit -m \"...\"\n```\n\n**Why swapped:** the file-based version required writing into `.git/EXPECTED_BRANCH`, which some tool permission allowlists block silently. Env var works under any allowlist that lets you run git. No more file writes.\n\n**Same semantics:** unset/empty → no-op; matches HEAD → pass; mismatches → reject.\n\n**Hook source on main:** `8a42302` (committed clean with the env var dogfooded — `MVOX_EXPECTED_BRANCH=main git commit ...`).\n\nActive hook in `.git/hooks/pre-commit` is already the new env-var version (per-clone, not branch-tracked). If you're about to commit Task 4 right now, just prefix with the env var as shown above.\n\nCarry on with the bundle.\n",
+    "summary": "Hook swap: env var instead of marker file",
+    "timestamp": "2026-05-24T11:32:20.332Z",
+    "type": "message",
+    "read": false
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779622944753@byrd\",\"from\":\"team-lead\",\"reason\":\"appears stalled mid Task 4 (no progress reported since 09:43 — hook swap notice may have hit silent permission gate). Cleaning up + respawning fresh.\",\"timestamp\":\"2026-05-24T11:42:24.753Z\"}",
+    "timestamp": "2026-05-24T11:42:24.753Z",
     "type": "message",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"18\",\"subject\":\"CHORE-60 Task 5 GREEN: Voice.svelte + commit\",\"description\":\"Create src/lib/components/Voice.svelte per plan L678-693. Svelte 5 runes ($props). Voice badge with voice-family bg class. Run vitest (2/2 PASS), full gate. Commit Voice.svelte + Voice.spec.ts: `feat(library): Voice badge component`. Push. Plan L642-705.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T00:46:52.630Z\"}",
-    "timestamp": "2026-05-24T00:46:52.630Z",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779627117451@byrd\",\"from\":\"team-lead\",\"reason\":\"Task 4 was completed by your respawn byrd-2 at 7c455be while you were blocked on the .git/EXPECTED_BRANCH write permission prompt. The hook design has since swapped to env-var (MVOX_EXPECTED_BRANCH) so this failure mode is gone for future work. Stand down cleanly — your inbox queue from the past hour is obsolete. Thank you for the Task 3 work (bcdeb00).\",\"timestamp\":\"2026-05-24T12:51:57.451Z\"}",
+    "timestamp": "2026-05-24T12:51:57.451Z",
     "type": "message",
-    "read": true
+    "read": false
   },
   {
-    "from": "team-lead",
-    "text": "[2026-05-24 00:52] CHORE-60 Task 6 GREEN — Team Task #20.\n\nPlan Task 6 at L709+. Write `src/lib/components/PencilCheckbox.svelte` per plan (Svelte 5 runes; props `checked`/`red`/`onclick`; emit `data-checked` attr; click handler). Apply `$derived` for any prop-computed values per session-21 Voice precedent. Standing rules.\n\nPre-flight: branch feat/library-page-ui-kit @ 480067f, status `?? src/lib/components/PencilCheckbox.spec.ts` + `M teams/mvox-dev/memory/tallis.md` (don't stage tallis.md).\n\nAtomic chain: vitest + full gate + git add (only component + spec) + commit `feat(library): PencilCheckbox component` + push.\n\nGates expected: PencilCheckbox.spec → 3/3 PASS; total unit tests → 386/386 (383 + 3).\n\nReport + `TaskUpdate(taskId=20, status=completed)`.\n\nProceed.\n",
-    "summary": "CHORE-60 Task 6 GREEN — PencilCheckbox.svelte",
-    "timestamp": "2026-05-24T00:52:08.940Z",
+    "from": "tallis",
+    "text": "[2026-05-24 12:58] `src/lib/components/MvoxNav.spec.ts` updated — added `vi.mock('$app/navigation', ...)` + `beforeEach` cleanup. 6/6 tests pass (3 existing + 3 new orgPickerMode cases). Full gate: 0 type errors / 463/463 / lint clean.\n\nReady for atomic commit. Stage both `MvoxNav.svelte` + `MvoxNav.spec.ts` with `MVOX_EXPECTED_BRANCH=chore/navbar-auth-wiring`.",
+    "summary": "MvoxNav.spec.ts ready — 6/6 pass, full gate GREEN",
+    "timestamp": "2026-05-24T12:58:27.896Z",
+    "color": "orange",
     "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"20\",\"subject\":\"CHORE-60 Task 6 GREEN: PencilCheckbox.svelte + commit\",\"description\":\"Implement src/lib/components/PencilCheckbox.svelte per plan L753+ (Svelte 5 runes, props: checked/red/onclick, data-checked attr, click handler). Stage only the two component files. Commit `feat(library): PencilCheckbox component`. Push.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T00:52:09.514Z\"}",
-    "timestamp": "2026-05-24T00:52:09.514Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 00:56] CHORE-60 Task 7 GREEN — Team Task #22.\n\nPlan Task 7 at L804+. Write `src/lib/components/Rank.svelte` per plan. Apply $derived where appropriate. Commit `feat(library): Rank component`. Push.\n\nPre-flight: branch feat/library-page-ui-kit @ ac42c07, status `?? src/lib/components/Rank.spec.ts` + `M teams/mvox-dev/memory/tallis.md` (don't stage tallis.md).\n\nAtomic chain + report + `TaskUpdate(taskId=22, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 7 GREEN — Rank.svelte",
-    "timestamp": "2026-05-24T00:55:57.442Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"22\",\"subject\":\"CHORE-60 Task 7 GREEN: Rank.svelte + commit\",\"description\":\"Implement src/lib/components/Rank.svelte per plan Task 7 (L804+). Commit `feat(library): Rank component`. Push.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T00:55:57.978Z\"}",
-    "timestamp": "2026-05-24T00:55:57.978Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 00:59] CHORE-60 Task 8 GREEN — Team Task #24. Plan Task 8 at L884+. Branch feat/library-page-ui-kit @ b99c5dd, `?? Stamp.spec.ts` + scratchpad mod. Commit `feat(library): Stamp component`. Report + `TaskUpdate(taskId=24, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 8 GREEN — Stamp.svelte",
-    "timestamp": "2026-05-24T00:58:45.215Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"24\",\"subject\":\"CHORE-60 Task 8 GREEN: Stamp.svelte + commit\",\"description\":\"Plan Task 8 at L884+. Commit `feat(library): Stamp component`. Push.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T00:58:45.768Z\"}",
-    "timestamp": "2026-05-24T00:58:45.768Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 01:02] CHORE-60 Task 9 GREEN — Team Task #26. Plan Task 9 at L957+. Branch feat/library-page-ui-kit @ 95d5218, `?? Tally.spec.ts`. Commit `feat(library): Tally component`. Report + `TaskUpdate(taskId=26, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 9 GREEN — Tally.svelte",
-    "timestamp": "2026-05-24T01:01:21.745Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"26\",\"subject\":\"CHORE-60 Task 9 GREEN: Tally.svelte + commit\",\"description\":\"Plan Task 9 at L957+. Commit `feat(library): Tally component`. Push.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T01:01:22.893Z\"}",
-    "timestamp": "2026-05-24T01:01:22.893Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 01:04] CHORE-60 Task 10 GREEN — Team Task #28. Plan Task 10 at L1029+. Branch feat/library-page-ui-kit @ cdfcb74, `?? WorkTitle.spec.ts`. Commit `feat(library): WorkTitle component`. Report + `TaskUpdate(taskId=28, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 10 GREEN — WorkTitle.svelte",
-    "timestamp": "2026-05-24T01:04:16.906Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"28\",\"subject\":\"CHORE-60 Task 10 GREEN: WorkTitle.svelte + commit\",\"description\":\"Plan Task 10 at L1029+. Commit `feat(library): WorkTitle component`. Push.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T01:04:17.534Z\"}",
-    "timestamp": "2026-05-24T01:04:17.534Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 01:07] CHORE-60 Task 11 GREEN — Team Task #30. Plan Task 11 at L1119+. Branch feat/library-page-ui-kit @ 5d18359, `?? Margin.spec.ts`. Commit `feat(library): Margin component` (ASCII-only — sub `--` for em-dashes). Report + `TaskUpdate(taskId=30, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 11 GREEN — Margin.svelte",
-    "timestamp": "2026-05-24T01:07:01.795Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"30\",\"subject\":\"CHORE-60 Task 11 GREEN: Margin.svelte + commit\",\"description\":\"Plan Task 11 at L1119+. Commit `feat(library): Margin component`. Push.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T01:07:02.384Z\"}",
-    "timestamp": "2026-05-24T01:07:02.384Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 01:11] CHORE-60 Task 12 GREEN — Team Task #32. Plan Task 12 at L1190+. Branch feat/library-page-ui-kit @ 003a9ef, `?? KeyHint.spec.ts`. No snippet on this component (only k/label string props). Commit `feat(library): KeyHint component`. Report + `TaskUpdate(taskId=32, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 12 GREEN — KeyHint.svelte",
-    "timestamp": "2026-05-24T01:11:34.083Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"32\",\"subject\":\"CHORE-60 Task 12 GREEN: KeyHint.svelte + commit\",\"description\":\"Plan Task 12 at L1190+. Commit `feat(library): KeyHint component`. Push.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T01:11:34.633Z\"}",
-    "timestamp": "2026-05-24T01:11:34.633Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 01:15] CHORE-60 Task 13 GREEN — Team Task #34. Plan Task 13 at L1250+. Branch feat/library-page-ui-kit @ 58c35fa, `?? BrandMark.spec.ts`.\n\n**Plan mismatch from Tallis:** the spec asserts `wordmark.className` matches `/text-\\[22px\\]/` for the `l` size. The plan's impl uses inline `style=\"font-size:{wordSize}px\"`. To make GREEN: use a Tailwind class map for size variants (e.g. `{ s: 'text-[14px]', m: 'text-[18px]', l: 'text-[22px]' }[size]`) on the `data-wordmark` span, not inline style. Apply $derived for the size-class lookup.\n\nCommit `feat(library): BrandMark component`. Report + `TaskUpdate(taskId=34, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 13 GREEN — BrandMark",
-    "timestamp": "2026-05-24T01:14:54.905Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"34\",\"subject\":\"CHORE-60 Task 13 GREEN: BrandMark.svelte + commit\",\"description\":\"Plan Task 13 at L1250+. Use Tailwind class for size variant (text-[22px] etc.) not inline style — spec asserts className regex. Commit `feat(library): BrandMark component`. Push.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T01:14:55.407Z\"}",
-    "timestamp": "2026-05-24T01:14:55.407Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 01:20] CHORE-60 Task 14 GREEN — Team Task #36. Plan Task 14 at L1318+. Branch feat/library-page-ui-kit @ 22c41ee, `?? VoiceTally.spec.ts`. Composes Voice + Tally components. Commit `feat(library): VoiceTally component`. Report + `TaskUpdate(taskId=36, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 14 GREEN — VoiceTally.svelte",
-    "timestamp": "2026-05-24T01:20:03.908Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"36\",\"subject\":\"CHORE-60 Task 14 GREEN: VoiceTally.svelte + commit\",\"description\":\"Plan Task 14 at L1318+. Composes Voice + Tally. Commit `feat(library): VoiceTally component`. Push.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T01:20:04.450Z\"}",
-    "timestamp": "2026-05-24T01:20:04.450Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 01:23] CHORE-60 Task 15 GREEN — Team Task #38. Plan Task 15 at L1386+. Branch feat/library-page-ui-kit @ f3894e3, `?? CopyChip.spec.ts`. Commit `feat(library): CopyChip (checkbox + copy number cell)`. Report + `TaskUpdate(taskId=38, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 15 GREEN — CopyChip",
-    "timestamp": "2026-05-24T01:22:56.411Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"38\",\"subject\":\"CHORE-60 Task 15 GREEN: CopyChip.svelte + commit\",\"description\":\"Plan Task 15 at L1386+. Commit `feat(library): CopyChip component`. Push.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T01:22:57.536Z\"}",
-    "timestamp": "2026-05-24T01:22:57.536Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 01:26] CHORE-60 Task 16 GREEN — Team Task #40. Plan Task 16 at L1451+. Branch feat/library-page-ui-kit @ 91469c3, `?? PencilSearch.spec.ts`. Commit `feat(library): PencilSearch component`. Report + `TaskUpdate(taskId=40, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 16 GREEN — PencilSearch",
-    "timestamp": "2026-05-24T01:25:47.668Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"40\",\"subject\":\"CHORE-60 Task 16 GREEN: PencilSearch.svelte + commit\",\"description\":\"Plan Task 16 at L1451+. Commit `feat(library): PencilSearch component`. Push.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T01:25:48.231Z\"}",
-    "timestamp": "2026-05-24T01:25:48.231Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 01:29] CHORE-60 Task 17 GREEN — Team Task #42. Plan Task 17 at L1524+. Branch feat/library-page-ui-kit @ eb1e754, `?? PaperStack.spec.ts`.\n\n**Children prop:** apply Margin precedent — type children as `() => string`, use `{children()}` not `{@render children()}`. Tallis's spec passes `children: () => '...'` (function returning string), same pattern that broke Margin's snippet rendering. Don't follow plan's Snippet api; align impl to spec.\n\nCommit `feat(library): PaperStack component`. Report + `TaskUpdate(taskId=42, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 17 GREEN — PaperStack",
-    "timestamp": "2026-05-24T01:28:39.145Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"42\",\"subject\":\"CHORE-60 Task 17 GREEN: PaperStack.svelte + commit\",\"description\":\"Plan Task 17 at L1524+. Apply Margin precedent for children prop: type as `() => string`, use `{children()}` not `{@render children()}`. Commit `feat(library): PaperStack component`. Push.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T01:28:40.207Z\"}",
-    "timestamp": "2026-05-24T01:28:40.207Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 01:34] CHORE-60 Task 18 GREEN — Team Task #44. Plan Task 18 at L1625+. Branch feat/library-page-ui-kit @ ece7054, `?? StackHeader.spec.ts`. Commit `feat(library): StackHeader component`. Report + `TaskUpdate(taskId=44, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 18 GREEN — StackHeader",
-    "timestamp": "2026-05-24T01:33:31.016Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"44\",\"subject\":\"CHORE-60 Task 18 GREEN: StackHeader.svelte + commit\",\"description\":\"Plan Task 18 at L1625+. Commit `feat(library): StackHeader component`. Push.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T01:33:31.575Z\"}",
-    "timestamp": "2026-05-24T01:33:31.575Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 01:37] CHORE-60 Task 19 GREEN — Team Task #46. Plan Task 19 at L1699+. Branch feat/library-page-ui-kit @ a461938, `?? PaperCard.spec.ts`. Watch stretch invariant (no fixed height — test asserts it). Commit `feat(library): PaperCard component`. Report + `TaskUpdate(taskId=46, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 19 GREEN — PaperCard",
-    "timestamp": "2026-05-24T01:36:16.820Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"46\",\"subject\":\"CHORE-60 Task 19 GREEN: PaperCard.svelte + commit\",\"description\":\"Plan Task 19 at L1699+. Watch stretch invariant — no fixed height. Commit `feat(library): PaperCard component`. Push.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T01:36:17.928Z\"}",
-    "timestamp": "2026-05-24T01:36:17.928Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 01:39] CHORE-60 Task 20 GREEN — Team Task #48. Plan Task 20 at L1780+. Branch feat/library-page-ui-kit @ caf7ab7, `?? BorrowerCard.spec.ts`. Commit `feat(library): BorrowerCard component`. Report + `TaskUpdate(taskId=48, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 20 GREEN — BorrowerCard",
-    "timestamp": "2026-05-24T01:39:02.408Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"48\",\"subject\":\"CHORE-60 Task 20 GREEN: BorrowerCard.svelte + commit\",\"description\":\"Plan Task 20 at L1780+. Commit `feat(library): BorrowerCard component`. Push.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T01:39:03.189Z\"}",
-    "timestamp": "2026-05-24T01:39:03.189Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 01:42] CHORE-60 Task 21 GREEN — Team Task #50. Plan Task 21 at L1861+. Branch feat/library-page-ui-kit @ 8cab60c, `?? PullItemCard.spec.ts`. Commit `feat(library): PullItemCard component`. Report + `TaskUpdate(taskId=50, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 21 GREEN — PullItemCard",
-    "timestamp": "2026-05-24T01:41:58.367Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"50\",\"subject\":\"CHORE-60 Task 21 GREEN: PullItemCard.svelte + commit\",\"description\":\"Plan Task 21 at L1861+. Commit `feat(library): PullItemCard component`. Push.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T01:41:59.441Z\"}",
-    "timestamp": "2026-05-24T01:41:59.441Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 01:45] CHORE-60 Task 22 GREEN — Team Task #52. Plan Task 22 at L1966+. Branch feat/library-page-ui-kit @ b678d65, `?? MiniWorkCard.spec.ts`. Commit `feat(library): MiniWorkCard component`. Report + `TaskUpdate(taskId=52, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 22 GREEN — MiniWorkCard",
-    "timestamp": "2026-05-24T01:44:48.230Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"52\",\"subject\":\"CHORE-60 Task 22 GREEN: MiniWorkCard.svelte + commit\",\"description\":\"Plan Task 22 at L1966+. Commit `feat(library): MiniWorkCard component`. Push.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T01:44:48.795Z\"}",
-    "timestamp": "2026-05-24T01:44:48.795Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 01:48] CHORE-60 Task 23 GREEN — Team Task #54. Plan Task 23 at L2051+. Branch feat/library-page-ui-kit @ 3d1e0fe, `?? DeskSurface.spec.ts`.\n\nApply Margin precedent for `children` (function returning string + `{children()}`, not `Snippet` / `{@render}`).\n\nWatch wood-grain assertion: spec checks for `repeating-linear-gradient` at `110deg`. This was a known session-19 design bug where wood-grain went invisible without the repeating form — make sure the inline style includes both `repeating-linear-gradient` AND the 110deg angle.\n\nCommit `feat(library): DeskSurface component`. Report + `TaskUpdate(taskId=54, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 23 GREEN — DeskSurface",
-    "timestamp": "2026-05-24T01:47:52.128Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"54\",\"subject\":\"CHORE-60 Task 23 GREEN: DeskSurface.svelte + commit\",\"description\":\"Plan Task 23 at L2051+. Apply Margin precedent for children prop. Watch wood-grain assertion (repeating-linear-gradient, 110deg). Commit `feat(library): DeskSurface component`. Push.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T01:47:52.720Z\"}",
-    "timestamp": "2026-05-24T01:47:52.720Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 01:51] CHORE-60 Task 24 GREEN — Team Task #56. Plan Task 24 at L2123+. Branch feat/library-page-ui-kit @ b193555, `?? MvoxNav.spec.ts`. Self-contained component (no layout wiring this task). Commit `feat(library): MvoxNav component (replaces inline layout nav)`. Report + `TaskUpdate(taskId=56, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 24 GREEN — MvoxNav",
-    "timestamp": "2026-05-24T01:51:01.300Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"56\",\"subject\":\"CHORE-60 Task 24 GREEN: MvoxNav.svelte + commit\",\"description\":\"Plan Task 24 at L2123+. Self-contained component (NOT yet wired into layout). Commit `feat(library): MvoxNav component (replaces inline layout nav)`. Push.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T01:51:01.898Z\"}",
-    "timestamp": "2026-05-24T01:51:01.898Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 01:54] CHORE-60 Task 25 GREEN — Team Task #58. Plan Task 25 at L2237+. Branch feat/library-page-ui-kit @ c7696af, `?? ProviderButton.spec.ts`. **Last primitive — Task 26 onwards touches layout + page composition.** Commit `feat(library): ProviderButton component`. Report + `TaskUpdate(taskId=58, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 25 GREEN — ProviderButton",
-    "timestamp": "2026-05-24T01:53:55.952Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"58\",\"subject\":\"CHORE-60 Task 25 GREEN: ProviderButton.svelte + commit\",\"description\":\"Plan Task 25 at L2237+. Last component before layout/page composition. Commit `feat(library): ProviderButton component`. Push.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T01:53:56.507Z\"}",
-    "timestamp": "2026-05-24T01:53:56.507Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 01:56] CHORE-60 Task 26 — Team Task #59. Plan Task 26 at L2340-2425. **No RED — Byrd-only task** (no new spec; coverage extended in Task 27).\n\n### Scope\n\n1. **Replace `src/routes/+layout.svelte`** with plan's L2351-2398 content. Removes max-w-5xl wrapper. Renders MvoxNav once mounted. Uses CHORE-B's `getToken` from `$lib/auth/storage`. Preserves the storage-event refresh + mounted gate (anti-FOIC per L71).\n2. **Create `src/routes/library/+layout.svelte`** with plan's L2402-2408 content (pass-through; no wrapper).\n\n### Watch for regression\n\nRemoving `max-w-5xl` from the root layout affects EVERY existing route — landing, /auth/login, /auth/logout, and any other page. Tests:\n- If any unit / page test depends on the `max-w-5xl` class being present in the rendered tree, it'll fail. Mechanical fix is yours (refactor rule). Update the test to match the new layout.\n- Visual regression on the landing page won't show in tests — that's a deferred YELLOW. The auth pages will be redesigned in Task 28-29 so the wrapper-removal there is intentional.\n\n### Atomic chain\n\n```bash\npnpm check && pnpm test:unit && pnpm lint && pnpm build && \\\n  git add src/routes/+layout.svelte src/routes/library/+layout.svelte && \\\n  git commit -m \"$(cat <<'EOF'\nfeat(library): restructure layout for nested /library escape from max-w-5xl\n\nCo-authored-by: Mihkel Putrinš <mihkel.putrinsh@gmail.com>\nEOF\n)\" && \\\n  git push origin feat/library-page-ui-kit\n```\n\nIf tests fail on layout-wrapper assertions, fix them in the same commit. If a deeper structural test breakage emerges, surface-and-stop per L74 — report what broke before forcing through.\n\nPre-flight: branch feat/library-page-ui-kit @ 7d4f6e1.\n\nReport + `TaskUpdate(taskId=59, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 26 — Layout restructure (no RED)",
-    "timestamp": "2026-05-24T01:56:36.537Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"59\",\"subject\":\"CHORE-60 Task 26: Layout restructure + nested library layout\",\"description\":\"Replace src/routes/+layout.svelte to use MvoxNav (no max-w-5xl wrapper). Create src/routes/library/+layout.svelte (no wrapper). Run full test suite + check; if any test broke on the wrapper removal, mechanical fix per refactor rule. Commit `feat(library): restructure layout for nested /library escape from max-w-5xl`. Push. No RED phase — Byrd-only task. Plan L2340-2425.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T01:56:37.075Z\"}",
-    "timestamp": "2026-05-24T01:56:37.075Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 02:01] CHORE-60 Task 27 GREEN — Team Task #61. Plan Task 27 at L2484-2630. Branch feat/library-page-ui-kit @ 6ad59cf, `?? src/routes/library/page.spec.ts`.\n\nCreate `src/routes/library/+page.svelte` per plan. Composes everything (DeskSurface + 3 PaperStacks + ambient catalog strip). Uses fixture data (TODAY, MEMBERS, WORKS, TASKS, libStats, byMemberId, workById).\n\nUTF-8 chars in file content are fine (`librarian's desk` etc.) — ASCII-only rule applies to commit message only (L72 / CF Pages). The fixture already has raw UTF-8.\n\nTallis used `\\xe4` / `\\xb7` hex escapes in the spec for `Pärt` / middle dot — those normalize to the same byte values at runtime, so `container.textContent` comparisons will match the fixture's raw chars in your impl. No change needed on your side.\n\nAtomic chain + report + `TaskUpdate(taskId=61, status=completed)`. Commit message `feat(library): compose /library page from UI kit`. Proceed.\n",
-    "summary": "CHORE-60 Task 27 GREEN — /library page",
-    "timestamp": "2026-05-24T02:00:38.403Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"61\",\"subject\":\"CHORE-60 Task 27 GREEN: /library/+page.svelte + commit\",\"description\":\"Plan Task 27 at L2484-2630. Compose page from UI kit. Source UTF-8 strings from fixture (don't redeclare). Commit `feat(library): compose /library page from UI kit`. Push.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T02:00:39.514Z\"}",
-    "timestamp": "2026-05-24T02:00:39.514Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 02:05] **Stand down on Task #61.** PO call: defer + escalate to Bentham for architectural verdict.\n\n- Leave working tree as-is (PaperStack reverted to passing; +page.svelte sitting uncommitted).\n- Do NOT touch any file until Bentham's verdict lands.\n- Task #61 stays in_progress under your name; will re-brief once we have direction.\n\nStay idle. Sorry for the false start on this one — real architecture call, not your call to make solo.\n",
-    "summary": "Stand down Task 61 — Bentham verdict pending",
-    "timestamp": "2026-05-24T04:16:50.805Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 04:24] **Typing-fix GREEN — Team Task #63.** Bentham's verdict tag `[ARCH-VERDICT 2026-05-24 CHORE-60]`. Tallis's RED amendment landed at Task #62 — 4 specs + 1 helper sitting uncommitted in working tree, 12 spec tests failing with TypeError.\n\n### Your scope: flip 4 components + atomic commit\n\n**The flip** — same change per component:\n\nType:\n```typescript\n// BEFORE\nconst { children }: { children: () => string } = $props();\n// AFTER\nimport type { Snippet } from 'svelte';\nconst { children }: { children: Snippet } = $props();\n```\n\nRender:\n```svelte\n{children()}    →    {@render children()}\n```\n\n**4 components:**\n- `src/lib/components/Margin.svelte`\n- `src/lib/components/PaperStack.svelte`\n- `src/lib/components/DeskSurface.svelte`\n- `src/lib/components/PaperCard.svelte`\n\nFor each: add `Snippet` type import (if not already), change `children` prop typing, change render call. NOTHING ELSE — don't touch class/style/structure.\n\n### Verify GREEN\n\nAfter the 4 flips:\n\n```bash\npnpm vitest run src/lib/components/Margin.spec.ts src/lib/components/PaperStack.spec.ts src/lib/components/DeskSurface.spec.ts src/lib/components/PaperCard.spec.ts\n```\n\nExpected: all 12 tests PASS.\n\nThen full gate:\n\n```bash\npnpm check && pnpm test:unit && pnpm lint && pnpm build\n```\n\nExpected: 432/432 unit tests pass (no change in count — same tests, now passing), 0 type errors, 0 lint errors, clean build.\n\nIf any test outside the 4 specs above broke, surface-and-stop — that's a downstream consumer using these components with `() => string`. Should be none unless there's a sneak.\n\n### Atomic commit — 9 files exactly\n\n```bash\ngit add \\\n  src/tests/snippet-helpers.ts \\\n  src/lib/components/Margin.spec.ts \\\n  src/lib/components/PaperStack.spec.ts \\\n  src/lib/components/DeskSurface.spec.ts \\\n  src/lib/components/PaperCard.spec.ts \\\n  src/lib/components/Margin.svelte \\\n  src/lib/components/PaperStack.svelte \\\n  src/lib/components/DeskSurface.svelte \\\n  src/lib/components/PaperCard.svelte\ngit commit -m \"$(cat <<'EOF'\nfix(library): use Snippet type for children props in primitives\n\nPer Bentham architecture verdict 2026-05-24: Margin, PaperStack,\nDeskSurface, PaperCard now type children as Snippet and render via\n{@render children()}, the canonical Svelte 5 idiom matching the\nlayouts. Specs use new src/tests/snippet-helpers.ts (textSnippet)\nto construct proper snippet values via createRawSnippet.\n\nCo-authored-by: Mihkel Putrinš <mihkel.putrinsh@gmail.com>\nEOF\n)\"\ngit push origin feat/library-page-ui-kit\n```\n\n**DO NOT stage these** (they stay in working tree for separate tasks):\n- `src/routes/library/+page.svelte` (your Task #61 work)\n- `src/routes/library/page.spec.ts` (Tallis's Task #27 RED)\n- `teams/mvox-dev/memory/bentham.md`, `teams/mvox-dev/memory/tallis.md` (scratchpads — owners commit at shutdown)\n\n### Pre-flight\n\n```bash\npwd                                  # /home/michelek/workspace\ngit rev-parse --abbrev-ref HEAD      # feat/library-page-ui-kit\ngit status --porcelain               # expect Tallis's 4 spec M + bentham/tallis scratchpads + 3 ?? (helper + page + page.spec)\ngit log --oneline -1                 # 6ad59cf\n```\n\n### Report + mark\n\nSendMessage with commit SHA + gate results + branch confirm + the new HEAD. Tag `[ARCH-FIX 2026-05-24 CHORE-60]`. Then `TaskUpdate(taskId=63, status=completed)`.\n\nAfter this lands, I'll re-brief you on Task #61 (which finally proceeds — your /library/+page.svelte should now work against the canonical-snippet primitives).\n\nProceed.\n",
-    "summary": "Typing-fix GREEN — flip 4 components",
-    "timestamp": "2026-05-24T04:23:41.479Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"63\",\"subject\":\"CHORE-60 Typing-fix GREEN: flip 4 components to Snippet + atomic commit\",\"description\":\"Per Bentham [ARCH-VERDICT 2026-05-24 CHORE-60]. Flip Margin, PaperStack, DeskSurface, PaperCard components: children type () => string → Snippet, render {children()} → {@render children()}. Verify all 432 unit tests stay GREEN after flip. Atomic commit covering: 4 components + 4 specs + 1 new helper file. Commit message `fix(library): use Snippet type for children props in primitives`. Push. DO NOT stage /library/+page.svelte in this commit (lives in Byrd's working tree for Task 61).\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T04:23:42.414Z\"}",
-    "timestamp": "2026-05-24T04:23:42.414Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 04:27] **Task #61 re-brief.** Typing-fix landed (1be3b39, 436/436 GREEN). Primitives now accept real Snippets. Your previously-written /library/+page.svelte should compose without the TypeError.\n\n### Verify your existing /library/+page.svelte still in working tree\n\n```bash\nls src/routes/library/+page.svelte\ngit status --porcelain | grep library\n```\n\nExpect both `+page.svelte` and `page.spec.ts` listed as `??`.\n\n### Verify GREEN with new typing\n\n```bash\npnpm vitest run src/routes/library/page.spec.ts\n```\n\nExpect: 4/4 PASS (Tallis's Task #27 RED assertions). If still FAIL — re-read your +page.svelte for any lingering function-call-style `children()` you may have written; everything should be slot syntax (`<PaperStack>...</PaperStack>`) now.\n\nIf your earlier +page.svelte was structurally aligned with the plan (slot syntax), no changes needed.\n\n### Atomic commit + push\n\n```bash\npnpm vitest run src/routes/library/page.spec.ts && \\\n  pnpm check && pnpm test:unit && pnpm lint && pnpm build && \\\n  git add src/routes/library/+page.svelte src/routes/library/page.spec.ts && \\\n  git commit -m \"$(cat <<'EOF'\nfeat(library): compose /library page from UI kit\n\nCo-authored-by: Mihkel Putrinš <mihkel.putrinsh@gmail.com>\nEOF\n)\" && \\\n  git push origin feat/library-page-ui-kit\n```\n\nGates expected:\n- library/page.spec.ts → 4/4 PASS\n- pnpm check → 0\n- pnpm test:unit → 440/440 (436 + 4 new)\n- lint + build clean\n\nDO NOT stage scratchpads.\n\n### Report + mark\n\nSendMessage with commit SHA + gates + new HEAD. `TaskUpdate(taskId=61, status=completed)`.\n\nPre-flight: branch feat/library-page-ui-kit @ 1be3b39.\n\nProceed.\n",
-    "summary": "Task 61 re-brief — proceed",
-    "timestamp": "2026-05-24T04:27:04.270Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 04:38] CHORE-60 Task 28 — Team Task #65. Plan Task 28 at L2657-2775. Branch feat/library-page-ui-kit @ f6247af (Comenius's i18n landed; m.auth_login_*/m.auth_provider_* keys now exist).\n\n### Scope\n\n**Replace** `src/routes/auth/login/+page.svelte` entirely per plan L2665-2751.\n\n**Critical: preserve all CHORE-B auth logic** — the page-data shape `{ providers }` is unchanged; the auto-redirect-to-lastProvider behavior is preserved; error and returnTo derived from URL; storage import preserved. Don't touch `+page.server.ts` or `+page.ts` (data load is upstream).\n\n**No new test** — existing tests on `data.providers` shape still apply (per plan note).\n\n**New imports** in the page:\n- `getLastProvider` from `$lib/auth/storage` (CHORE-B)\n- `m` from `$lib/paraglide/messages.js` (Comenius's keys)\n- DeskSurface, PaperCard, BrandMark, ProviderButton, Margin (your primitives)\n\n### Atomic chain\n\n```bash\npnpm check && pnpm test:unit && pnpm lint && pnpm build && \\\n  git add src/routes/auth/login/+page.svelte && \\\n  git commit -m \"$(cat <<'EOF'\nfeat(library): /auth/login redesign on the design system\n\nCo-authored-by: Mihkel Putrinš <mihkel.putrinsh@gmail.com>\nEOF\n)\" && \\\n  git push origin feat/library-page-ui-kit\n```\n\nGates expected:\n- pnpm check → 0 errors (m.auth_* now resolves)\n- pnpm test:unit → 436/436 (no test count change; login page-data test still applies)\n- lint + build clean\n\nIf any existing /auth/login test breaks because of the redesign, surface-and-stop — that's a meaningful behavior regression we need to think about, not auto-fix.\n\n### Pre-flight\n\n```bash\npwd                                  # /home/michelek/workspace\ngit rev-parse --abbrev-ref HEAD      # feat/library-page-ui-kit\ngit status --porcelain               # scratchpad mods only; leave them\ngit log --oneline -1                 # f6247af i18n(library): add keys for...\n```\n\n### Report + mark\n\nSendMessage with commit SHA, gates, new HEAD. `TaskUpdate(taskId=65, status=completed)`.\n\nAfter this lands, Task 29 (logout redesign) follows immediately, then Task 31 (final verification).\n\nProceed.\n",
-    "summary": "CHORE-60 Task 28 — /auth/login redesign",
-    "timestamp": "2026-05-24T04:37:39.497Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"65\",\"subject\":\"CHORE-60 Task 28: /auth/login redesign\",\"description\":\"Replace src/routes/auth/login/+page.svelte per plan L2665-2751. Preserve all CHORE-B logic (getLastProvider, returnTo, error handling, auto-redirect to last provider). New imports: DeskSurface, PaperCard, BrandMark, ProviderButton, Margin. m.auth_login_* keys now exist (Task 30 / f6247af). No new test — existing tests on `data: { providers }` shape still apply. Commit `feat(library): /auth/login redesign on the design system`. Push.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T04:37:40.634Z\"}",
-    "timestamp": "2026-05-24T04:37:40.634Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 04:41] CHORE-60 Task 29 — Team Task #66. Plan Task 29 at L2779-2872. Branch feat/library-page-ui-kit @ 3a0f0d9.\n\n### Scope\n\n**Replace** `src/routes/auth/logout/+page.svelte` entirely per plan L2787-2848.\n\nPreserves `performLogout` import from `./perform-logout`. Adds:\n- 5-second auto-redirect to `/` after performLogout\n- Escape-key handler to cancel the auto-redirect\n- `cancelled = $state(false)` for the UI conditional\n\nNew imports: DeskSurface, PaperCard, BrandMark, Stamp, ProviderButton, Margin, m (paraglide).\n\n**No new test** — existing logout/page.spec.ts only covers `performLogout`; that test stays unchanged (plan note L2850).\n\n### Atomic chain\n\n```bash\npnpm check && pnpm test:unit && pnpm lint && pnpm build && \\\n  git add src/routes/auth/logout/+page.svelte && \\\n  git commit -m \"$(cat <<'EOF'\nfeat(library): /auth/logout redesign with 5s auto-redirect + Esc-to-cancel\n\nCo-authored-by: Mihkel Putrinš <mihkel.putrinsh@gmail.com>\nEOF\n)\" && \\\n  git push origin feat/library-page-ui-kit\n```\n\nGates expected: 436/436 tests, 0 type errors, lint + build clean.\n\nIf existing logout test breaks (e.g., the new auto-redirect behavior somehow surfaces in a test mock), surface-and-stop — don't auto-update; tell me.\n\nApply session-21 lessons: if plan's `$props<Generic>()` syntax has the same type-flow issue you hit in Task 28, switch to explicit-typed destructure same way.\n\n### Report + mark\n\nSendMessage with commit SHA + gates + new HEAD. `TaskUpdate(taskId=66, status=completed)`.\n\nAfter this lands, Task 31 is final verification — likely team-lead direct or quick Tallis-only run, then we're done with CHORE-60. Branch will be ready for Bentham branch-level review.\n\nProceed.\n",
-    "summary": "CHORE-60 Task 29 — /auth/logout redesign",
-    "timestamp": "2026-05-24T04:41:27.803Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"66\",\"subject\":\"CHORE-60 Task 29: /auth/logout redesign\",\"description\":\"Replace src/routes/auth/logout/+page.svelte per plan L2787-2848. Preserves performLogout import (CHORE-B). Adds 5s auto-redirect to / + Esc-to-cancel. m.auth_logout_* keys exist (Comenius). No new test — existing performLogout test unchanged. Commit `feat(library): /auth/logout redesign with 5s auto-redirect + Esc-to-cancel`. Push.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T04:41:28.359Z\"}",
-    "timestamp": "2026-05-24T04:41:28.359Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779603118131@byrd\",\"from\":\"team-lead\",\"reason\":\"session-21 close after CHORE-60 ship\",\"timestamp\":\"2026-05-24T06:11:58.131Z\"}",
-    "timestamp": "2026-05-24T06:11:58.131Z",
-    "type": "message",
-    "read": true
+    "read": false
   }
 ]

@@ -1,6 +1,91 @@
 # Palestrina — Team Lead Scratchpad
 
-### [NEXT SESSION] 2026-05-24 end-of-session-21 — session-21 → session-22
+### [NEXT SESSION] 2026-05-24 end-of-session-22 — session-22 → session-23
+
+**Headline: CHORE-66 (navbar auth wiring) shipped end-to-end. Squash `9266e2e` on main. Plus 4 process artefacts that materially change how we work: URL-overrides-persisted arch rule, trailer-collision arch rule, pre-commit branch-intent hook (env-var design), and stricter no-parallel-branches framing. Also CHORE-62 + #63 fold-ins from session-21 polish arc.**
+
+**Session 22 outcome:**
+
+| Outcome | Artifact / SHA | What landed |
+|---|---|---|
+| ✅ CHORE-62 + #63 (polish-arc fold-ins) | squash `9637eee` | MvoxNav i18n wiring (`nav_tab_*` + `nav_chip_librarian` × 4 locales) + textSnippet `<span>` wrap. Closes #62 + #63. Two-incident-day for me on shared-tree branch flips — `9637eee` shipped without PO co-author trailer because I wrote `Co-authored-by: <list of names>` in the dispatch body, which short-circuited the prepare-commit-msg hook. PO chose leave-as-is; lesson codified at `7d078f7`. |
+| ✅ URL-overrides-persisted arch rule | `3a37e42` | Project-wide rule by Bentham (stewardship): URL params source-of-truth on read; persisted store fallback; two-write symmetry on user change AND on read-time divergence. RED triggers for any future spec/PR that introduces UI state without honoring the pattern. CHORE-66's selectedOrgStore is the canonical exemplar. |
+| ✅ Co-authored-by trailers short-circuit hook arch rule | `7d078f7` | Josquin-authored: dispatch templates must NOT include `Co-authored-by:` lines; use `Contributors:` / `Reviewed-by:` / body prose. `git interpret-trailers --if-exists doNothing` dedupes on KEY so any pre-existing `Co-authored-by:` (even malformed group form) skips the hook's PO-trailer append. |
+| ✅ Pre-commit branch-intent hook | `ef78aa3` (v1: file marker) + `8a42302` (v2: env var, current) | Engineering response to three branch-flip incidents I caused. v1 used `.git/EXPECTED_BRANCH` file marker; that hit silent tool-permission gates for some agents (per `[feedback_agent_spawn_prompt]`). v2 uses `$MVOX_EXPECTED_BRANCH` env var per-commit — works under any allowlist that lets agents run git. Hook is in `.git/hooks/pre-commit` (per-clone) + `.githooks/pre-commit` (in-repo source). |
+| ✅ Stricter no-parallel-branches rule | `feedback_no_parallel_branches` memory rewrite | PO directive: default-no on parallel work across branches; exception ONLY with advance proof of zero conflict AND a committed plan of who-changes-what-in-what-order. Extends to team-lead's own doc/main commits, not just feature dispatches. |
+| ✅ CHORE-66 navbar auth wiring | squash `9266e2e` | 15 files / +852 / -33. NEW: `src/lib/auth/{types,userStore,userStore.spec}.ts`, `OrgPicker.{svelte,spec.ts}`. UPDATED: `MvoxNav.{svelte,spec.ts}`, `+layout.svelte`, `tests/setup.ts`, 4× `messages/*.json`. 463/463 unit tests (+27 from 436 baseline). First enactment of `feedback_ui_parallels_with_seed`. Closes #66. YELLOW-66.1 (`$app/state` lift) folded in same branch; YELLOW-66.2 (`ENTU_DB` env-lift) deferred as #67. |
+| ✅ KB batch — sessions 20-22 lessons codified | 12 new Pattern entries + 3 updates + 9 cross-links via background subagent | Brilliant KB went 269 → 281. Cleared deferred-KB-updates queue from sessions 20-21 + added session-22's trailer-collision pattern. Detailed list in scratchpad + the subagent's report. |
+
+**Live state at session-22 close:**
+- **main:** `9266e2e` (origin matches). Plus the shutdown bundle commit when I push this seed.
+- **Production:** `multivox.pages.dev` 200; `mvox.eu` 200 (rebound end-of-session-21 round 2; verify both serve the new CHORE-66 build hash after CF auto-deploy completes).
+- **Tests:** 463/463 unit · check 0 · lint clean · build clean. Playwright still has 11 pre-existing failures (CHORE-C scope, unchanged).
+- **Polyphony Entu db:** unchanged from session 20 (607 librarian-bundle entities under EFK Library `6a12036c4ff8277cd4306b26`).
+- **Brilliant KB:** 281 entries.
+- **Agents at shutdown:** finn + bentham + comenius + tallis + josquin + byrd-2 + perotin all spawned + being shut down now. byrd-1 was already shut down mid-session (stalled on permission gate; respawned as byrd-2 who carried Tasks 4-6).
+- **Stale config entries:** `byrd` (the original, terminated mid-session — config still has the entry but agent is dead). Cleanup at next TeamCreate.
+- **Stale local + remote branches (housekeeping candidates):** `chore/per-commit-green-arch-decision`, `chore/seed-librarian-bundle`, `feat/phase-b-live-wiring` (local); `origin/feat/phase-a-migration`, `origin/fix/phase-a-partial-failure-recovery` (remote).
+- **Scheduled routine:** `trig_014xDo7ZTuzNLpBUuWdtEs32` next_run_at 2026-05-30T09:00:00Z (deferred-providers re-prompt; unchanged).
+
+**Carry-forward queue for session 23 (priority order):**
+
+1. **CHORE-67 — wire /library to real Entu data** (new natural-next CHORE per `feedback_ui_parallels_with_seed`). Brainstorm-first (PO did pure-hydration scope earlier; aggregate-by-work top-level + drill-down approach decided pre-walkback). After CHORE-66 the userStore is the foundation; /library page will consume `$selectedOrgStore` to know which library to fetch. Brainstorm output: a small spec + plan, then team TDD chain.
+2. **#65 — chip-width on long locale renderings** (15 min, Byrd). Carry-forward from CHORE-62. Layout-only fix when narrow-viewport support becomes a real requirement.
+3. **#67 — `ENTU_DB` env-lift** (10 min, Byrd or Josquin). Before any prod deploy touching `userStore.ts`. Filed during CHORE-66 shutdown.
+4. **#68 — founder-as-org-affiliation** (30 min, Byrd + Tallis atomic). Union `_owner`-derived orgs with member-derived orgs; surface founder-only orgs in the picker. Filed during CHORE-66 shutdown.
+5. **CHORE-C test infra** (plan at `docs/superpowers/plans/2026-05-23-chore-53-c-test-infra.md`, 791 lines, 9 tasks). MSW + Playwright bootstrap. Closes #36, #39, #33 + 11 pre-existing Playwright failures. Tallis-heavy.
+6. **#54 client-side error capture** (deferred). Fires before mvox opens to real users.
+7. **#44 CF Pages Git-connected migration** (independent; brief outage during swap).
+8. **#49 Biome lint rule enablement** (5 sub-cycles; incremental, no urgency).
+9. **#6 CHORE-6 Email Resend** — still blocked on PO SPF/DKIM DNS.
+10. **Routine fires 2026-05-30T09:00:00Z** → emails PO with #59 deferred-providers checklist.
+
+**Expected first action session 23:**
+1. Read this seed.
+2. Verify production health: `curl -sI https://multivox.pages.dev/` AND `curl -sI https://mvox.eu/library` — both should return 200 with `x-sveltekit-page: true` and CHORE-66 build chunks (the navbar OrgPicker should be present in the response).
+3. Spawn finn + bentham (always-on; no isolation per L96).
+4. Spawn perotin (always-on per the working-mode commitment; he'll participate from kickoff on any UI CHORE).
+5. Confirm with PO: priority among #65, #67, #68, CHORE-67, CHORE-C. Recommend small follow-ups (#67 then #68, both touch userStore.ts; could be a single ~40-min coordinated chain by Byrd + Tallis) before kicking off CHORE-67 brainstorm.
+6. Sanity: `git branch -a` to confirm the stale-branch housekeeping list still matches before any cleanup pass.
+
+**Process lessons from session 22 (L104-L112):**
+
+- **L104 — `Co-authored-by:` in dispatch body short-circuits prepare-commit-msg hook.** When my dispatch wrote `Co-authored-by: Comenius, Tallis, Byrd, Bentham (review)` as a freeform trailer-shaped line, the hook saw an existing `Co-authored-by:` key and skipped adding the PO trailer. Squash `9637eee` shipped without PO trailer. Codified at `7d078f7`. Future dispatch templates: `Contributors:` or `Reviewed-by:` or body prose, never `Co-authored-by:` unless it's a properly-formatted `Name <email>` line (the hook dedupes on full value, so distinct correctly-formatted Co-authored-by lines all survive).
+
+- **L105 — Plan-time URL hardcodes drift fast.** My CHORE-66 plan had `https://{db}.entu.app/api/entity/...` (old per-db-subdomain convention) instead of `https://api.entu.app/{db}/entity/...` (the production form settled in CHORE-50). Josquin caught it in Task 1 probe via surface-and-stop. Plan revision landed as `ed7f7b8`. Future plans should cite settled architectural exports by NAME (e.g., `ENTU_API_BASE` from `src/lib/entu-config.ts`) rather than hardcoding the URL string.
+
+- **L106 — surface-and-stop on plan-vs-impl divergence catches data-model bugs before they propagate.** Josquin's TWO surface-and-stops on Task 1 (URL form + data-model inverted): the second was bigger — my plan had `EntuPersonResponse` with inline `members: Array<...>` when the actual model has members as SEPARATE entities linked via `person.reference`. Catching this at the contract-authoring task (before Byrd touches Task 3) saved 2-3 task-pairs of rework. Plan revision landed at `3d0ef30`. Pattern: contract-first task with explicit probe step is the cheapest place to discover schema mismatches.
+
+- **L107 — Shared-tree branch flips bite team-lead doc commits too.** My plan-fix commit (`b89d4aa`) landed on Josquin's `chore/navbar-auth-wiring` branch because I didn't `git checkout main` before the commit chain — three separate incidents this morning, all the same root cause. The atomic-chaining memory already said to do this; discipline failed three times. Engineering response: pre-commit branch-intent hook at `8a42302`. New strict rule: every team-lead commit chain MUST begin with explicit `git checkout main`, even when HEAD is "obviously" already there. Logged as `feedback_atomic_git_chaining` addendum.
+
+- **L108 — In-process team agents can't be OS-killed.** When byrd-1 appeared stalled, I tried `TaskStop` with his agentId — failed ("No task found"). All team-context agents have `backendType: "in-process"` per `config.json`; they don't have separate OS PIDs. The only ways to terminate are: SendMessage shutdown_request (queued behind any blocking tool call) OR spawn-with-disambiguation (byrd-2 picked up the work; original byrd was killed by shutdown_request once unblocked from the permission gate). Practical respawn path: just spawn the same `name:` and the harness disambiguates with a `-2` suffix.
+
+- **L109 — Marker-file branch-intent design hits silent tool-permission gates.** v1 of the hook (`ef78aa3`) used `.git/EXPECTED_BRANCH` as a file marker. Byrd-1 tried to write it and hit a PO permission prompt for `.git/` writes — silent block per `[feedback_agent_spawn_prompt]`. PO denied, agent stalled. v2 (`8a42302`) uses `$MVOX_EXPECTED_BRANCH` env var per-commit. No file writes, no `.git/` access, works under any tool-permission allowlist. Universal lesson: agent-facing engineering should sidestep `.git/` writes entirely (env vars over magic files).
+
+- **L110 — Verify diff-shape post-merge before squash.** Bentham caught the RED on `7f593ae`: my mid-CHORE merge `4eeedda` was done BEFORE the hook commits landed on main, so the chore branch was missing `ef78aa3` + `8a42302`. The squash would have DELETED the hook from main. Fix: Byrd-2 ran `git merge main --no-ff` again to pick up the missing commits (`5dd8461`), then `git diff --name-only main..HEAD | grep -i githook` confirmed empty before re-review. Bentham's "diff-shape" review pass is load-bearing for branches that take long enough that main can drift underneath them. Add to branch-review checklist.
+
+- **L111 — `@testing-library/svelte` auto-cleanup silently skips under Vitest `globals: false`.** Byrd-2's bonus find in Task 4 — every render() needs an `afterEach(() => cleanup())` registered explicitly when Vitest globals are off. Without it, open/close tests pollute each other's DOM. Fix in `tests/setup.ts` covers all specs globally. Logged in `byrd.md` scratchpad. Future-Tallis (or any spec author) should know this gotcha; consider adding to test-gaps.md or common-prompt.
+
+- **L112 — `feedback_ui_parallels_with_seed` enactment proved the principle in real time.** Pérotin participated from CHORE-66 kickoff (provided test-librarian person/member IDs) and during impl surfaced the `_parent` inline-name denormalization finding — which IS what made the two-fetch design feasible (no N+1). If we'd dispatched the CHORE without him, Byrd would have written the N+1 first then refactored. Concrete TIME saved: ~30 min of rework + one more bundle commit. Codify: data-manager participates from kickoff on EVERY UI CHORE that touches Entu, not just the ones we expect to need him.
+
+**Brilliant KB updates (deferred — session-22 lessons L104-L112):**
+- New: `Patterns/co-authored-by-trailers-short-circuit-prepare-commit-msg` (L104; already landed earlier this session via the background KB batch — verify in next session-23 audit if it captured the right form)
+- New: `Patterns/plan-time-url-hardcodes-drift-fast` (L105) — recommend citing settled architectural exports by name
+- New: `Patterns/surface-and-stop-on-plan-vs-impl-divergence` (L106) — contract-first task with explicit probe step
+- New: `Patterns/team-lead-commit-chains-must-explicit-checkout-main` (L107) — extension of atomic-chaining pattern
+- New: `Patterns/in-process-team-agents-cant-be-os-killed` (L108) — spawn-with-disambiguation is the practical respawn
+- New: `Patterns/agent-facing-engineering-sidesteps-dotgit-writes` (L109) — env vars over magic files
+- New: `Patterns/diff-shape-verify-after-mid-chore-merge` (L110) — load-bearing for long-running branches
+- New: `Patterns/testing-library-svelte-cleanup-globals-false` (L111) — explicit afterEach(cleanup) gotcha
+- Update: `Patterns/worktree-isolation-for-coding-agents` — note the practical respawn path when isolation isn't available (L108)
+- Update: `Patterns/atomic-git-chaining` — already updated this session; cross-reference the L107 strict rule explicitly
+- Update: `Projects/mvox` — CHORE-66 shipped, 3 new arch rules, pre-commit hook landed, KB at 281
+
+(*MVOX:Palestrina*)
+
+---
+
+### [PROCESSED 2026-05-24 end-of-session-22] session-21 → session-22
 
 **Headline: CHORE-60 (/library page + 21-component UI kit) shipped end-to-end. Squash `ab6dcc5` on main, live at `multivox.pages.dev`. mvox.eu still stale pending PO CF-dashboard fix (#64).**
 

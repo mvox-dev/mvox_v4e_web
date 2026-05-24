@@ -46,4 +46,22 @@
 
 [LEARNED] `new Response(JSON.stringify(...), { status: 200 })` in happy-dom does NOT auto-set `content-type: application/json`. Tallis's revised spec (dcc5971) fixed this by explicitly passing `headers: { 'content-type': 'application/json' }` in the mock Response constructor, so the plan's verbatim implementation (content-type check) works correctly with his spec.
 
+## [CHECKPOINT] 2026-05-24 — CHORE-66 Task 4 complete (session 22, Byrd-2)
+
+[LEARNED] `@testing-library/svelte` auto-cleanup relies on globally-scoped `beforeEach`/`afterEach`. With Vitest `globals: false` (our config), the auto-cleanup block in `@testing-library/svelte/src/index.js` silently skips registration. Components from prior tests stay mounted; `findByRole` finds stale elements. Fix: add explicit `afterEach(() => cleanup())` to `src/tests/setup.ts`.
+
+[LEARNED] Symptom "Found multiple elements with role 'menu'" in a single-render test = prior renders never cleaned up (not that the component rendered twice).
+
+[GOTCHA] In Svelte 5, `$storeName` auto-subscribe works in template. In `<script>`, avoid `$derived($storeName)` for Svelte stores — use `$storeName` directly in the template instead, or `get()` for one-shot reads in event handlers.
+
+## [CHECKPOINT] 2026-05-24 — CHORE-66 Tasks 4-6 + RED-1 + YELLOW-66.1 (session 22, Byrd-2)
+
+[LEARNED] **$app/state vs $app/stores**: SvelteKit 2 + Runes convention is `import { page } from '$app/state'` — exports a reactive object, access as `page.url.pathname` (no `$`). Legacy `$app/stores` export was a Svelte store requiring `$page` sigil. Bentham will YELLOW any new write using `$app/stores`.
+
+[LEARNED] **Branch hook gap pattern**: When a chore branch was cut before hook commits landed on main, `git diff --name-only main..HEAD` reveals the missing files. Fix: `git merge main --no-ff`. Verify clean with the same diff after merge.
+
+[LEARNED] **MvoxNav props that are optional**: When adding a new prop to an existing component, make all props that existing tests don't supply optional with sensible defaults. The new mode tests (Task 5) don't pass `signedIn` or `currentTab` — making them optional with defaults (`false` / `'agenda'`) is the minimal non-breaking change.
+
+[DEFERRED] YELLOW-66.2: `ENTU_DB = 'polyphony'` hardcode in `src/lib/auth/userStore.ts:17`. Palestrina filing as follow-up CHORE post-merge. Not Byrd's scope.
+
 (*MVOX:Byrd*)

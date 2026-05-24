@@ -1,843 +1,836 @@
 [
   {
-    "from": "tallis",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-24T01:47:38.365Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T01:47:38.365Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-24T01:47:43.599Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T01:47:43.599Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "Task #54 complete. DeskSurface.svelte committed at b193555, pushed to feat/library-page-ui-kit. Wood-grain inline style has both repeating-linear-gradient and 110deg -- both spec assertions pass. Gates: 426/426 tests, 0 type errors, 0 lint errors, clean build. Ready for Task 24.",
-    "summary": "Task 54 done -- DeskSurface b193555",
-    "timestamp": "2026-05-24T01:49:37.029Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-24T01:49:48.614Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T01:49:48.614Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "Duplicate task_assignment for #54. Already completed — commit b193555 on feat/library-page-ui-kit, TaskUpdate marked completed. Ready for Task 24 (MvoxNav).",
-    "summary": "Task 54 duplicate — already done at b193555",
-    "timestamp": "2026-05-24T01:49:56.258Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-24T01:50:02.565Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T01:50:02.565Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "[2026-05-24 01:51] CHORE-60 Task 24 RED — DONE. taskId=55.\n\nsrc/lib/components/MvoxNav.spec.ts written (3 tests: renders brand + section tabs; LIBRARIAN chip on library tab; no user pill when not signed in).\n- vitest: FAIL (Cannot find module './MvoxNav.svelte') — RED confirmed.\n- pnpm lint: clean (0 errors).\n- File untracked, not committed. Byrd to commit with GREEN.\n\nNo flags for Byrd.",
-    "summary": "Task 24 RED complete — MvoxNav.spec.ts",
-    "timestamp": "2026-05-24T01:50:46.560Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-24T01:50:50.823Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T01:50:50.823Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-24T01:50:54.105Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T01:50:54.105Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "Task #56 complete. MvoxNav.svelte committed at c7696af, pushed to feat/library-page-ui-kit. Gates: 429/429 tests, 0 type errors, 0 lint errors, clean build. Ready for Task 25.",
-    "summary": "Task 56 done -- MvoxNav c7696af",
-    "timestamp": "2026-05-24T01:52:53.652Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-24T01:52:56.263Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T01:52:56.263Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "Duplicate task_assignment for #56. Already completed — commit c7696af on feat/library-page-ui-kit, TaskUpdate marked completed. Ready for Task 25 (ProviderButton).",
-    "summary": "Task 56 duplicate — already done at c7696af",
-    "timestamp": "2026-05-24T01:53:03.565Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-24T01:53:05.386Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T01:53:05.386Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "[2026-05-24 01:54] CHORE-60 Task 25 RED — DONE. taskId=57.\n\nsrc/lib/components/ProviderButton.spec.ts written (3 tests: renders provider name; renders sub-label; applies bg-highlight when featured=true).\n- vitest: FAIL (Cannot find module './ProviderButton.svelte') — RED confirmed.\n- pnpm lint: clean (0 errors).\n- File untracked, not committed. Byrd to commit with GREEN.\n\nNo flags for Byrd.",
-    "summary": "Task 25 RED complete — ProviderButton.spec.ts",
-    "timestamp": "2026-05-24T01:53:39.323Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-24T01:53:44.082Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T01:53:44.082Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-24T01:53:48.424Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T01:53:48.424Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "Task #58 complete. ProviderButton.svelte committed at 7d4f6e1, pushed to feat/library-page-ui-kit. Last primitive done. Gates: 432/432 tests, 0 type errors, 0 lint errors, clean build. Ready for Task 26 (layout restructure).",
-    "summary": "Task 58 done -- ProviderButton 7d4f6e1",
-    "timestamp": "2026-05-24T01:55:37.045Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-24T01:55:40.274Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T01:55:40.274Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "Duplicate task_assignment for #58. Already completed — commit 7d4f6e1 on feat/library-page-ui-kit, TaskUpdate marked completed. Ready for Task 26 (layout restructure).",
-    "summary": "Task 58 duplicate — already done at 7d4f6e1",
-    "timestamp": "2026-05-24T01:55:53.062Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-24T01:56:00.072Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T01:56:00.072Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "Task #59 complete. Layout restructure committed at 6ad59cf, pushed to feat/library-page-ui-kit. No test regressions -- no existing spec asserted on max-w-5xl or old nav structure. Gates: 432/432 tests, 0 type errors, 0 lint errors, clean build. src/routes/library/+layout.svelte created (pass-through). Ready for Task 27.",
-    "summary": "Task 59 done -- layout restructure 6ad59cf",
-    "timestamp": "2026-05-24T01:58:45.760Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-24T01:58:49.107Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T01:58:49.107Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "Duplicate task_assignment for #59. Already completed — commit 6ad59cf on feat/library-page-ui-kit, TaskUpdate marked completed. Ready for Task 27 (/library page composition).",
-    "summary": "Task 59 duplicate — already done at 6ad59cf",
-    "timestamp": "2026-05-24T01:58:57.907Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-24T01:59:00.401Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T01:59:00.401Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "[2026-05-24 02:01] CHORE-60 Task 27 RED — DONE. taskId=60.\n\nsrc/routes/library/page.spec.ts written (4 tests: three task stacks; On the desk today; catalog strip; Tallis/Part/Tormis content).\n- vitest: FAIL (Cannot find module './+page.svelte') — RED confirmed.\n- pnpm lint: clean (0 errors).\n- File untracked, not committed. Byrd to commit with GREEN.\n\nASCII flag: plan L2472 has `'Arvo Pärt'` (non-ASCII ä) and L2464 has `'Catalog · 13 works'` (non-ASCII middle dot). I used \\xe4 and \\xb7 escape sequences in the spec so the file stays byte-clean while the runtime strings match the fixture. Byrd's +page.svelte implementation will need the same treatment if it hardcodes these strings — or it can source them from the fixture (which already has the raw UTF-8 chars, since library-mock.ts was committed by a prior GREEN pass).",
-    "summary": "Task 27 RED complete — library/page.spec.ts; ASCII flag",
-    "timestamp": "2026-05-24T02:00:10.409Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-24T02:00:15.852Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T02:00:15.852Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-24T02:00:19.301Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T02:00:19.301Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "Task #61 blocked. Structural conflict discovered between PaperStack/DeskSurface primitives and the page composition:\n\n**The problem:** PaperStack and DeskSurface type `children` as `() => string` and use `{children()}` direct call. This works for Tallis's unit specs (which pass `() => 'text'`). But the /library page uses these components as real Svelte slot containers (`<PaperStack>...markup...</PaperStack>`), which passes a Svelte 5 `Snippet` — a function with internal `.before` property. Calling a Snippet as a plain function throws `TypeError: Cannot read properties of undefined (reading 'before')`.\n\n**What I confirmed:** Switching to `Snippet` + `{@render children()}` fixes the page but breaks the PaperStack spec (`container.textContent` gets whitespace only, not `'stack body'`). `{@render fn()}` silently ignores string return values — same root cause as the Margin bug from earlier sessions.\n\n**The gap:** The plan's children typing (`() => string`) was designed for isolated unit testability (Margin precedent), but the page composition at Task 27 requires real Svelte snippets. These two constraints are mutually exclusive with a single children prop type.\n\n**Options I see:**\n1. Update the PaperStack/DeskSurface specs (Tallis's RED files) to use a proper Svelte snippet wrapper — `render(PaperStack, { props: { rotate: 0 } }, { slot: 'default', component: ... })` or similar. Then switch components to `Snippet` + `{@render}`. This is the principled fix but touches Tallis's specs.\n2. Keep `() => string` on primitives; restructure the page to NOT use slot syntax — pass content as explicit function props. Ugly but avoids touching specs.\n3. Use `Snippet | (() => string)` union type with runtime dispatch — fragile.\n\nI've reverted PaperStack to its passing state. The page file exists at `src/routes/library/+page.svelte` but the spec fails. Awaiting your call on approach before proceeding.",
-    "summary": "Task 61 blocked -- Snippet vs () =&gt; string conflict",
-    "timestamp": "2026-05-24T02:03:40.110Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-24T02:03:44.042Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T02:03:44.042Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-24T02:03:50.000Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T02:03:50.000Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-24T04:16:58.192Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T04:16:58.192Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "[2026-05-24 02:30] **[ARCH-VERDICT 2026-05-24 CHORE-60] Option 1 (createRawSnippet in specs) — GREEN. Options 2 and 3 — RED.**\n\n## Scope correction first\n\nThe bad-typing surface is **FOUR** components, not three. **PaperCard** (`src/lib/components/PaperCard.svelte:6`) has the same `() => string` precedent — three of its spec assertions follow the same shape. Don't ship a partial fix that leaves PaperCard wrong. Verified by reading the branch tip directly.\n\n## The verdict\n\n- **Option 1 GREEN.** `createRawSnippet` is the canonical helper for @testing-library/svelte v5 + Svelte 5 runes per the testing-library docs themselves (their `examples/snippets/readme.md` calls it out explicitly for \"complex snippet\" cases; for simple text-content assertions it's the cleanest fit). The `.test.svelte` wrapper-file pattern is the documented alternative — also acceptable — but it adds a per-component file and breaks the existing one-spec-per-component layout this branch follows. Prefer `createRawSnippet` unless a per-component `.test.svelte` is clearly more readable for a specific spec.\n\n- **Option 2 RED.** The \"renders slot content\" assertions are LOAD-BEARING on each primitive — they pin that the component actually surfaces children, the ONE thing every wrapper component must do. Dropping them shifts the safety net entirely onto `/library/page.spec.ts`. That single page spec catches composition errors but can't pinpoint which primitive is broken on a regression. Violates the per-commit-GREEN lift's intent: empty specs satisfy the gate vacuously.\n\n- **Option 3 RED.** Forces every consumer call site to construct child trees as TypeScript functions instead of Svelte template fragments. Defeats Svelte's composition model + reads as fighting the framework + locks us out of slot syntax for foundational wrappers. The plan uses slot syntax everywhere for a reason.\n\n## Per-commit-GREEN mapping\n\nThis is ONE coordinated commit, NOT two:\n\n**Commit-A (single atomic commit on the branch):** Tallis updates 4 specs (`Margin.spec.ts`, `PaperStack.spec.ts`, `DeskSurface.spec.ts`, `PaperCard.spec.ts`) to use `createRawSnippet`-constructed children. Byrd flips the 4 components' types from `() => string` → `Snippet` and render calls from `{children()}` → `{@render children()}`. All 432 specs MUST stay GREEN after the commit lands. Splitting into \"specs amend\" + \"components flip\" leaves a transient broken intermediate — per-commit-GREEN forbids that.\n\n**Commit-B (Task 27 GREEN):** `/library/+page.svelte` lands using canonical slot syntax. `/library/page.spec.ts` covers end-to-end composition. This is the original Task 27 work.\n\n## Snippet helper suggestion (YELLOW if skipped, not RED)\n\nOnce 4 specs need `createRawSnippet(() => ({ render: () => 'string body' }))` boilerplate, it crosses the \"three similar lines\" bar. Lift to `src/tests/snippet-helpers.ts`:\n\n```typescript\nimport { createRawSnippet, type Snippet } from 'svelte';\nexport const textSnippet = (text: string): Snippet =>\n  createRawSnippet(() => ({ render: () => text }));\n```\n\nThen each spec writes `children: textSnippet('a note')` — same readability as the original `() => 'a note'`, correct typing. Implementer's call whether to factor in Commit-A or defer; I won't RED a deferred extraction provided the duplication is uniform across all 4 specs (one-direction inconsistency is worse than uniform duplication — if one spec uses the helper and the others copy-paste, THAT's RED).\n\n## Canonical idiom is already on this branch\n\n`src/routes/+layout.svelte:56` and `src/routes/library/+layout.svelte:5` both use `{@render children()}` — the load-bearing precedent. The 4 primitives shipped against the Margin convention-error; this fix aligns them with the precedent the layouts already established.\n\n## Margin-precedent retrospective\n\nThe four `() => string` typings entered as a session-21 convention error. I should have RED'd the typing choice on the FIRST primitive (Margin) before the precedent propagated. Logged a calibration note for future Bentham: any new children-prop typing that isn't `Snippet` (or `Snippet<[arg]>`) gets a discretionary YELLOW asking \"why not Snippet?\" before the next primitive lands.\n\nByrd + Tallis are clear to proceed under your dispatch. Verdict logged at `teams/mvox-dev/memory/bentham.md` session-21 entry; tag `[ARCH-VERDICT 2026-05-24 CHORE-60]` for cross-ref.",
-    "summary": "ARCH-VERDICT CHORE-60: Option 1 + scope correction",
-    "timestamp": "2026-05-24T04:20:06.103Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-24T04:20:15.167Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T04:20:15.167Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "[2026-05-24 04:20] Not stuck — verdict shipped at 02:30, message must have crossed wires or your inbox is behind. Re-sending headline now; full verdict + reasoning is in my 02:30 message + logged at `teams/mvox-dev/memory/bentham.md` under the session-21 entry.\n\n## [ARCH-VERDICT 2026-05-24 CHORE-60]\n\n**Option 1 (createRawSnippet in specs) — GREEN. Options 2 and 3 — RED.**\n\n## Scope correction (important)\n\nSurface is **FOUR** components, not three. **PaperCard** (`src/lib/components/PaperCard.svelte:6`) has the same `() => string` typing + 3 spec assertions in the same shape. Don't ship a partial fix that leaves PaperCard wrong.\n\n## Verdict in one screen\n\n- **Option 1 GREEN.** `createRawSnippet` is the canonical helper per @testing-library/svelte v5 docs (their `examples/snippets/readme.md` calls it out explicitly). The `.test.svelte` wrapper file is the documented alternative — acceptable but breaks the existing one-spec-per-component layout. Prefer `createRawSnippet`.\n- **Option 2 RED.** The \"renders slot content\" assertions are LOAD-BEARING — each primitive's core contract. Dropping them shifts the entire safety net onto `/library/page.spec.ts`, which catches composition errors but can't pinpoint which primitive broke on a regression. Violates per-commit-GREEN intent.\n- **Option 3 RED.** Forces consumers to construct child trees as TypeScript functions instead of Svelte template fragments. Defeats Svelte's composition model + locks foundational wrappers out of slot syntax.\n\n## Per-commit-GREEN mapping\n\nONE atomic commit fixes the typing (NOT two):\n\n**Commit-A:** Tallis amends 4 specs (Margin, PaperStack, DeskSurface, PaperCard) to use `createRawSnippet`-constructed children. Byrd flips the 4 components: `() => string` → `Snippet` and `{children()}` → `{@render children()}`. All 432 specs MUST stay GREEN after the commit lands.\n\n**Commit-B (= the original Task 27 GREEN):** `/library/+page.svelte` lands using canonical slot syntax.\n\n## Suggested test helper (YELLOW if skipped, not RED)\n\n```typescript\n// src/tests/snippet-helpers.ts\nimport { createRawSnippet, type Snippet } from 'svelte';\nexport const textSnippet = (text: string): Snippet =>\n  createRawSnippet(() => ({ render: () => text }));\n```\n\nEach spec writes `children: textSnippet('a note')`. Implementer's call whether to factor in Commit-A or defer. RED only if applied inconsistently (one spec uses the helper, others copy-paste).\n\n## Cross-reference\n\n`src/routes/+layout.svelte:56` and `src/routes/library/+layout.svelte:5` already use canonical `{@render children()}` — load-bearing precedent the 4 primitives diverged from.\n\nByrd + Tallis clear to proceed. If your inbox still doesn't show the 02:30 message, this one carries the load-bearing content; no need to chase the earlier one.",
-    "summary": "Verdict resend: shipped 02:30, headline below",
-    "timestamp": "2026-05-24T04:22:30.537Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-24T04:22:36.619Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T04:22:36.619Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "[ARCH-FIX 2026-05-24 CHORE-60] Typing-fix RED — DONE. taskId=62.\n\n**5 files touched (uncommitted):**\n- `src/tests/snippet-helpers.ts` — 4 lines, new helper\n- `src/lib/components/Margin.spec.ts` — 26 lines, amended\n- `src/lib/components/PaperStack.spec.ts` — 40 lines, amended\n- `src/lib/components/DeskSurface.spec.ts` — 20 lines, amended\n- `src/lib/components/PaperCard.spec.ts` — 31 lines, amended\n\n**vitest result:** 4 test files failed, 12 tests failed — all with `TypeError: Cannot read properties of undefined (reading 'before')`. Fresh RED confirmed uniformly across all 4.\n\n**lint:** clean — 0 errors, 5 ESLint \"file ignored\" warnings (expected pattern for spec files).\n\n**git status --porcelain:**\n```\nM src/lib/components/DeskSurface.spec.ts\n M src/lib/components/Margin.spec.ts\n M src/lib/components/PaperCard.spec.ts\n M src/lib/components/PaperStack.spec.ts\n M teams/mvox-dev/memory/bentham.md\n M teams/mvox-dev/memory/tallis.md\n?? src/routes/library/+page.svelte\n?? src/routes/library/page.spec.ts\n?? src/tests/snippet-helpers.ts\n```\n\nReady for Byrd (Task #63): flip 4 components to proper `Snippet` typing + atomic commit of 9 files.",
-    "summary": "[ARCH-FIX 2026-05-24 CHORE-60] Typing-fix RED complete — taskId=62",
-    "timestamp": "2026-05-24T04:22:57.875Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-24T04:23:04.107Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T04:23:04.107Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-24T04:23:07.811Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T04:23:07.811Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "[ARCH-FIX 2026-05-24 CHORE-60] Task #63 complete. 9-file atomic commit at 1be3b39, pushed to feat/library-page-ui-kit.\n\nMargin, PaperStack, DeskSurface, PaperCard: all flipped to Snippet + {@render children()}. 4 specs + snippet-helpers.ts staged together with the 4 component files. Scratchpads and +page.svelte/page.spec.ts left in working tree.\n\nGates: 436/436 tests (up from 432 -- the 4 amended specs have more tests now all passing), 0 type errors, 0 lint errors, clean build. HEAD: 1be3b39. Ready for Task 61 re-brief.",
-    "summary": "[ARCH-FIX 2026-05-24 CHORE-60] Task 63 done -- 1be3b39",
-    "timestamp": "2026-05-24T04:26:37.297Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-24T04:26:40.939Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T04:26:40.939Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "Duplicate task_assignment for #63. Already completed — commit 1be3b39 on feat/library-page-ui-kit, TaskUpdate marked completed. Ready for Task 61 re-brief.",
-    "summary": "Task 63 duplicate — already done at 1be3b39",
-    "timestamp": "2026-05-24T04:26:52.555Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-24T04:26:54.650Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T04:26:54.650Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "Task #61 complete. /library/+page.svelte committed at 14e772f, pushed to feat/library-page-ui-kit. Slot syntax composed cleanly against the Snippet-typed primitives -- zero changes needed to the page file from before the arch fix.\n\nGates: 436/436 tests (page.spec.ts was already being picked up by vitest from the untracked file, so count unchanged), 0 type errors, 0 lint errors, clean build. HEAD: 14e772f. Ready for whatever comes next.",
-    "summary": "Task 61 done -- /library page 14e772f",
-    "timestamp": "2026-05-24T04:29:19.385Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-24T04:29:22.812Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T04:29:22.812Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
     "from": "comenius",
-    "text": "[2026-05-24 04:31] Comenius online. Read common-prompt, scratchpad, and i18n-conventions. Session 14 work (OAuth + landing i18n) is the last logged activity. Ready and idle — awaiting Task 30 dispatch.",
-    "summary": "Comenius ready, session 21",
-    "timestamp": "2026-05-24T04:31:10.616Z",
-    "color": "pink",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"comenius\",\"timestamp\":\"2026-05-24T06:47:46.867Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T06:47:46.867Z",
+    "color": "yellow",
     "type": "message",
     "read": true
   },
   {
-    "from": "comenius",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"comenius\",\"timestamp\":\"2026-05-24T04:31:22.518Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T04:31:22.518Z",
-    "color": "pink",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "comenius",
-    "text": "[2026-05-24 04:37] Task 30 COMPLETE.\n\n**Commit:** f6247af on feat/library-page-ui-kit\n**New keys:** 60 total (39 library_*, 7 auth_login_*, 8 auth_provider_*, 6 auth_logout_*)\n**Updated key:** auth_login_heading changed from \"Sign in to mvox\" to \"Welcome back\" (all 4 locales)\n\n**TODO markers per locale:**\n- et: 1 (library_overdue_marginalia)\n- lv: 1 (library_overdue_marginalia)\n- uk: 1 (library_overdue_marginalia)\n\nAll 3 TODOs are for the same key — free-text marginalia with a hardcoded date (\"31 May\"); deferred for PO to supply locale copy or confirm English passthrough.\n\n**Gate results:** pnpm check (0 errors) + pnpm test:unit (436/436) + pnpm lint (clean) + pnpm build (success). Paraglide bindings regenerated (gitignored, not committed).\n\n**i18n-conventions.md** updated with auth_login_heading redesign rationale, logout/email_sub translation decisions, and library_* group documentation.\n\nTasks 28 and 29 now have their auth keys — unblocked to proceed.",
-    "summary": "Task 30 complete — i18n keys committed",
-    "timestamp": "2026-05-24T04:37:12.652Z",
-    "color": "pink",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "comenius",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"comenius\",\"timestamp\":\"2026-05-24T04:37:17.446Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T04:37:17.446Z",
-    "color": "pink",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "comenius",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"comenius\",\"timestamp\":\"2026-05-24T04:37:29.652Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T04:37:29.652Z",
-    "color": "pink",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "Task #65 complete. /auth/login redesign committed at 3a0f0d9, pushed to feat/library-page-ui-kit.\n\nOne fix needed vs plan: `$props<...>()` generic syntax didn't flow types through to filter callbacks (implicit any). Switched to `type Provider = { id: string; label: string }` + `$props()` destructure with explicit type annotation -- cleaner and strict-clean. All CHORE-B logic preserved (auto-redirect, lastProvider ordering, error handling, returnTo).\n\nGates: 436/436 tests, 0 type errors, 0 lint errors, clean build. HEAD: 3a0f0d9. Ready for Task 29 (logout redesign).",
-    "summary": "Task 65 done -- /auth/login redesign 3a0f0d9",
-    "timestamp": "2026-05-24T04:40:55.712Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-24T04:40:59.626Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T04:40:59.626Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "Duplicate task_assignment for #65. Already completed — commit 3a0f0d9 on feat/library-page-ui-kit, TaskUpdate marked completed. Ready for Task 29 (logout redesign).",
-    "summary": "Task 65 duplicate — already done at 3a0f0d9",
-    "timestamp": "2026-05-24T04:41:10.213Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-24T04:41:14.083Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T04:41:14.083Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "Task #66 complete. /auth/logout redesign committed at a3e4124, pushed to feat/library-page-ui-kit. No $props typing issues (no props on this page). Existing logout test unchanged and passing. 5s auto-redirect + Esc-to-cancel wired via onMount return cleanup. Gates: 436/436 tests, 0 type errors, 0 lint errors, clean build. HEAD: a3e4124. Ready for Task 31 (final verification).",
-    "summary": "Task 66 done -- /auth/logout redesign a3e4124",
-    "timestamp": "2026-05-24T04:43:32.973Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-24T04:43:35.963Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T04:43:35.963Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "Duplicate task_assignment for #66. Already completed — commit a3e4124 on feat/library-page-ui-kit, TaskUpdate marked completed. Ready for Task 31 (final verification).",
-    "summary": "Task 66 duplicate — already done at a3e4124",
-    "timestamp": "2026-05-24T04:43:45.247Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-24T04:43:47.516Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T04:43:47.516Z",
+    "from": "tallis",
+    "text": "[2026-05-24 06:49] Task #5 (#63) complete. SHA `e8eeb11` on `chore/mvoxnav-i18n-and-snippet-helper`.\n\n- `pnpm check`: 0 errors\n- `pnpm test:unit`: 436/436 pass — `invalid_raw_snippet_render` warning absent from output\n- `pnpm lint`: clean\n\nPushed. Now waiting for Byrd's DM on Task #3 completion to coordinate the atomic #3+#4 bundle.",
+    "summary": "Task #5 done — SHA e8eeb11, warning gone, 436/436",
+    "timestamp": "2026-05-24T06:49:57.280Z",
     "color": "orange",
     "type": "message",
     "read": true
   },
   {
     "from": "tallis",
-    "text": "[CHORE-60 VERIFIED] Task 31 final verification — DONE. taskId=67.\n\n---\n\n### Gate results\n\n| Check | Result |\n|---|---|\n| `pnpm check` | 0 errors, 0 warnings (1050 files) |\n| `pnpm test:unit` | **436/436 passed** (62 test files) |\n| `pnpm lint` | Clean — biome: 0 fixes; eslint: 0 errors |\n| `pnpm build` | Clean — CF Pages adapter, 3.67s |\n\n---\n\n### Playwright\n\n**12 failures — identical set on main AND on feat/library-page-ui-kit.**\n\nI ran `pnpm test:e2e` on main to confirm: same 12 failures exist on main before CHORE-60. Zero new regressions introduced by this branch.\n\nFailures (all pre-existing):\n- 11 × `tests/frontend-scaffolding.spec.ts` (signed-out nav, /auth/login Entu CTA, signed-in org list/cards/nav, zero-orgs, BFF 500)\n- 1 × `tests/tailwind.spec.ts` (OKLCH computed color — #31 YELLOW)\n\nNote: I initially flagged `login-cta` as possibly new (CHORE-60 redesigned `/auth/login` removing that testid), but confirmed it was already failing on main before this branch — not a regression.\n\n---\n\n### Branch commits (32 total — squash-merge preview)\n\n```\na3e4124 feat(library): /auth/logout redesign with 5s auto-redirect + Esc-to-cancel\n3a0f0d9 feat(library): /auth/login redesign on the design system\nf6247af i18n(library): add keys for /library + redesigned /auth/login + /auth/logout\n14e772f feat(library): compose /library page from UI kit\n1be3b39 fix(library): use Snippet type for children props in primitives\n6ad59cf feat(library): restructure layout for nested /library escape from max-w-5xl\n7d4f6e1 feat(library): ProviderButton component (auth OAuth button)\nc7696af feat(library): MvoxNav component (replaces inline layout nav)\nb193555 feat(library): DeskSurface wood-grain background wrapper\n3d1e0fe feat(library): MiniWorkCard (ambient catalog strip item)\nb678d65 feat(library): PullItemCard (pull-stack per-work item)\n8cab60c feat(library): BorrowerCard (overdue-stack body item)\ncaf7ab7 feat(library): PaperCard single-sheet wrapper (for auth screens)\na461938 feat(library): StackHeader (Rank + Caveat title + Stamp)\nece7054 feat(library): PaperStack component\neb1e754 feat(library): PencilSearch sketch-styled search input\n91469c3 feat(library): CopyChip (checkbox + copy number cell)\nf3894e3 feat(library): VoiceTally horizontal counts strip\n22c41ee feat(library): BrandMark component\n58c35fa feat(library): KeyHint component\n003a9ef feat(library): Margin component\n5d18359 feat(library): WorkTitle component (composer -- *title*)\ncdfcb74 feat(library): Tally component\n95d5218 feat(library): Stamp component\nb99c5dd feat(library): Rank component\nac42c07 feat(library): PencilCheckbox component\n480067f feat(library): Voice badge component\nac42258 feat(library): mock fixtures + derive helpers from bundle Data.jsx\n29e49cd feat(library): add library entity types\n8306550 feat(library): add design tokens + Caveat/Inter/Mono fonts\n8ae9e7c chore: add @testing-library/svelte for component tests\n```\n(31 commits shown; `git log` count matches)\n\n---\n\n### Diff summary\n\n**63 files changed, +2672 / -80 lines**\n\n---\n\n### Noteworthy for test-gaps.md\n\n- E2E test `frontend-scaffolding.spec.ts:136` (`/auth/login: renders login page with Entu CTA`) checks for `data-testid=\"login-cta\"` which no longer exists after the login redesign. This test should be updated to match the new ProviderButton-based layout — currently it fails on main too (pre-existing), but CHORE-60 makes it semantically stale. Worth flagging to Victoria for a new E2E spec covering the redesigned login.\n- No E2E coverage for `/library` page — the page exists but has no Playwright tests. Worth a future E2E task once MSW harness lands (CHORE-36).",
-    "summary": "[CHORE-60 VERIFIED] Final gate GREEN — taskId=67",
-    "timestamp": "2026-05-24T04:50:15.521Z",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-24T06:50:00.323Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T06:50:00.324Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-24T06:50:05.576Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T06:50:05.576Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-24T06:50:16.816Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T06:50:16.816Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "[2026-05-24 06:50] MvoxNav.svelte is wired to paraglide keys (`m.nav_tab_*`, `m.nav_chip_librarian`, `m.nav_sign_in`). Used a `TAB_LABELS: Record<Tab, () => string>` map — reads cleanest for the lookup.\n\nRan `pnpm test:unit`. One failure in MvoxNav.spec.ts: two `toContain('agenda')` / `toContain('library')` assertions that expected raw lowercase IDs now see capitalized EN strings `'Agenda'` / `'Library'`. LIBRARIAN chip test passes unchanged.\n\nSent snapshot DM to Tallis with exact lines to fix (lines 19+20). Waiting for his edit confirmation before staging the atomic commit.\n\n**YELLOW note for Bentham:** Estonian `nav_chip_librarian` = `RAAMATUKOGUHOIDJA` (17 chars). Chip layout may clip at narrow widths — Comenius should review.",
+    "summary": "MvoxNav wired, spec snapshot sent to Tallis",
+    "timestamp": "2026-05-24T06:50:22.461Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-24T06:50:27.155Z\",\"idleReason\":\"available\",\"summary\":\"[to tallis] MvoxNav spec snapshot — 1 assertion to update\"}",
+    "timestamp": "2026-05-24T06:50:27.155Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-24T06:50:40.890Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T06:50:40.890Z",
     "color": "purple",
     "type": "message",
     "read": true
   },
   {
     "from": "tallis",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-24T04:50:23.804Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T04:50:23.804Z",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-24T06:51:04.624Z\",\"idleReason\":\"available\",\"summary\":\"[to byrd] spec updated — stage both files and commit\"}",
+    "timestamp": "2026-05-24T06:51:04.624Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "[2026-05-24 06:52] Tasks #3 + #4 complete. Atomic commit `19a0610` pushed to `chore/mvoxnav-i18n-and-snippet-helper`.\n\n## Story Handoff\n- **Story:** #62 — MvoxNav i18n wiring\n- **Branch:** chore/mvoxnav-i18n-and-snippet-helper\n- **From:** Byrd (phase: GREEN)\n- **To:** Bentham (phase: REVIEW)\n- **Status:** TESTS_PASSING\n\n### What was done\n- `MvoxNav.svelte`: `TAB_LABELS: Record<Tab, () => string>` map wires each tab id to its `m.nav_tab_*()` function; chip uses `m.nav_chip_librarian()`; sign-in link uses `m.nav_sign_in()`\n- `MvoxNav.spec.ts`: `toContain('agenda')` → `'Agenda'`, `toContain('library')` → `'Library'` (Tallis co-authored)\n- Full GREEN gate passed: `pnpm check` 0 errors, `pnpm test:unit` 436/436, `pnpm lint:fix` no fixes, `pnpm build` clean\n\n### What to do next\nDispatch Bentham for branch review. Pending Tallis finishing Task #5 (snippet helper fix) if not already done.\n\n### YELLOW note for Bentham\nEstonian `nav_chip_librarian` = `RAAMATUKOGUHOIDJA` (17 chars). The chip has no `max-width` or `overflow` guard — may clip at narrow viewports. Comenius owns the fix if Bentham flags it.\n\n### Files to start with\n- `src/lib/components/MvoxNav.svelte`\n- `src/lib/components/MvoxNav.spec.ts`",
+    "summary": "Task #3 + #4 GREEN — commit 19a0610 pushed",
+    "timestamp": "2026-05-24T06:52:37.275Z",
     "color": "purple",
     "type": "message",
     "read": true
   },
   {
-    "from": "tallis",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-24T04:50:28.814Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T04:50:28.814Z",
+    "from": "byrd",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-24T06:52:40.368Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T06:52:40.368Z",
     "color": "purple",
     "type": "message",
     "read": true
   },
   {
     "from": "bentham",
-    "text": "[2026-05-24 05:05] **[CHORE-60 BRANCH-REVIEW 2026-05-24] YELLOW.** Three YELLOWs, no REDs. Squash-merge eligible after PO weighs YELLOW-A.\n\n## Verification (ran on review machine, fresh)\n\n- `pnpm check` → 0 errors, 0 warnings (1050 files). ✓\n- `pnpm test:unit` → **436/436 PASS**, 62/62 files. ✓ (Emits a new console warning per textSnippet call — YELLOW-C below.)\n- `pnpm lint` → 137 files, biome + eslint clean. ✓\n- All **31 commits** carry `Co-authored-by: Mihkel Putrinš`. ✓\n- Snippet fix `1be3b39` verified line-by-line: 4 components flipped to `Snippet` + `{@render children()}`; `src/tests/snippet-helpers.ts` is the 4-line `textSnippet` helper I prescribed. ✓\n\n## YELLOW-A — `/library/+page.svelte` ships with hardcoded English (BLOCKER if PO wants real i18n on day one; non-blocker if \"main is also English-everywhere today\")\n\nThe page imports **zero paraglide** and uses **zero `m.*()` calls** — but `f6247af` lands 60 paraglide keys in all 4 locales specifically for this page. ~25 substitutions needed: \"Library · librarian's desk\", \"On the desk today\", \"Returns\", \"Overdue\", \"Pull for tonight\", \"Catalog · 13 works\", \"Open full catalog ↗\", \"Confirm ✓\", \"Nudge both ✉\", \"Folder · Bass section\", the Margin marginalia, etc.\n\nProof the wiring works on this branch: auth/login and auth/logout DID wire `m.*()` correctly (16+ calls). The library page just shipped before the wiring pass.\n\n**Why YELLOW not RED:** the keys exist in all 4 locales (no translation work is lost), the fix is mechanical, and the page renders English-everywhere today — same locale-state as main. Fix path: Comenius i18n pass on this one file, ~15 minutes.\n\nPO call: fold in pre-merge (15 min) or open follow-up issue + merge as-is? My lean: **fold in pre-merge** — same logic as YELLOW-B.1 in session 17 (small fix where the implementer's own intent already pointed to it). The 60 keys ARE the implementer's stated intent.\n\n## YELLOW-B — MvoxNav hardcoded labels\n\n`src/lib/components/MvoxNav.svelte:4` declares `TABS = ['agenda', 'library', 'roster', 'notices', 'settings']` and renders the array elements directly. Also \"LIBRARIAN\" chip + \"Sign in\" link. Keys don't exist (distinct from YELLOW-A — keys missing, not just unwired). Spec asserts the English literals (`'agenda'`, `'LIBRARIAN'`), so the fix is coordinated (component + spec + new keys).\n\n**Why YELLOW not RED:** MvoxNav is the ONLY nav, gap is real but bounded. Fix: add `nav_tab_*` (5 keys) + `nav_chip_librarian` (1 key) — `nav_sign_in` already exists; replace literals; spec switches to presence-of-localized-strings or asserts via paraglide compile output. ~30 minutes Comenius + Tallis touch-up.\n\nRecommend deferring to a follow-up GitHub issue — this one is bigger than YELLOW-A and is less obviously \"the keys already exist.\"\n\n## YELLOW-C — `textSnippet` helper emits Svelte warning (Bentham-on-Bentham)\n\nTests pass, but Svelte 5's `createRawSnippet` contract requires `render` to return HTML for a **single element**, not bare text. My session-21 verdict prescribed `() => text` (bare text) — the warning fires:\n\n```\n[svelte] invalid_raw_snippet_render\nThe `render` function passed to `createRawSnippet` should return HTML for a single element\n```\n\nFix is one wrapping element:\n\n```typescript\n// src/tests/snippet-helpers.ts\nexport const textSnippet = (text: string): Snippet =>\n  createRawSnippet(() => ({ render: () => `<span>${text}</span>` }));\n```\n\ntextContent assertions still pass (wrapper's content includes the text). Self-found — my own verdict's helper has a sub-spec error. YELLOW because cosmetic + one-line fix, but the warning will accumulate noise in every test run that uses the helper. Lift after merge; not a blocker.\n\n## Calibration carry-forwards\n\n1. **i18n review heuristic broadened**: any new `.svelte` file with >2 English noun-phrases not passed as props gets a discretionary \"where's the paraglide import?\" YELLOW. Auth pages pass; library page would have been caught. Extending the session-13 #35 calibration (suffix-to-data-value).\n\n2. **`createRawSnippet` contract requires single-element HTML.** Encoded for future snippet-helper authoring.\n\n3. **vitest infra commit `480067f` subject is \"Voice badge component\" but body explains the infra change.** Squash mitigates entirely; just mention if you want a \"test infra changes get their own commit\" rule going forward. Not a YELLOW.\n\n## Squash-merge commit body should mention\n\n1. Snippet typing correction (cross-ref to [ARCH-VERDICT 2026-05-24 CHORE-60]).\n2. vitest `mergeConfig(viteConfig) + resolve.conditions=['browser']` infra change.\n3. Carry-forward YELLOWs A/B/C with disposition (fold-in pre-merge / GH-issue / post-merge fix).\n4. Pre-existing Playwright `login-cta` test stale post-redesign — new test-id is `provider-google`. Tallis pre-flagged.\n\n## Bottom line\n\nBranch is mergeable. The Snippet correction landed clean. Per-commit-GREEN discipline held across all 31 commits. No security concerns, no architectural regressions, no broken intermediates. The three YELLOWs are:\n- A (library page i18n wiring) — small + keys exist; recommend pre-merge fold-in.\n- B (MvoxNav i18n keys) — medium + coordinated; recommend GH-issue + merge.\n- C (textSnippet warning fix) — one-line; recommend post-merge follow-up.\n\nFull reasoning + verification log in `teams/mvox-dev/memory/bentham.md` session-21 BRANCH-REVIEW entry.\n\nVerdict tag for cross-ref: `[CHORE-60 BRANCH-REVIEW 2026-05-24]`. Ready for your routing.",
-    "summary": "CHORE-60 BRANCH-REVIEW YELLOW (3 follow-ups, no REDs)",
-    "timestamp": "2026-05-24T04:56:52.732Z",
+    "text": "[2026-05-24 07:01] **Branch review verdict: GREEN with 1 YELLOW carryforward** — `chore/mvoxnav-i18n-and-snippet-helper` @ `19a0610`.\n\n## Verification\n\n- **Commit log**: 3 commits, all carry `Co-authored-by: Mihkel Putrinš` trailer.\n- **Per-commit-GREEN spot-check (`a439228`, keys-only)**: verified structurally. Component still renders `{tab}` (lowercase) and the spec asserts `'agenda'`/`'library'` lowercase + `'LIBRARIAN'`. Locale additions are additive JSON — no consumer broke. Implementer's gate report at the tip is consistent with this layering.\n- **TDD compliance on `19a0610`**: spec + impl change ride together in one atomic commit (spec asserts `'Agenda'`/`'Library'` AFTER component emits paraglide-resolved strings). Satisfies test-co-with-impl rule.\n- **Locale parity**: 93 keys × 4 locales, key-set identical (diff clean).\n- **Snippet helper fix `e8eeb11`**: structurally sound. All 4 consumers (Margin, PaperStack, DeskSurface, PaperCard specs) assert via `container.textContent.toContain(...)`; wrapping body in `<span>` does not change textContent — assertions still hold. Tallis verified empirically per report; my structural read agrees.\n- **MvoxNav residual hardcoded-English scan**: zero. `orgLabel`/`orgInitials`/`userInitial`/`userName` are prop-passed (caller's responsibility); `'mvox'` in BrandMark is a brand mark not a translatable string. All visible string-literal usage in MvoxNav.svelte goes through `m.*()`.\n- **Translation sanity (non-nuance pass)**: et/lv/uk renderings of the 5 tabs + LIBRARIAN look reasonable and follow each language's normal conventions. No obvious mistakes; nuance is Comenius's domain.\n\n## Closes both YELLOW carryforwards\n\n- **YELLOW-A (`#62` MvoxNav i18n)** — closed by `a439228` + `19a0610`. Wiring landed cleanly.\n- **YELLOW-C (`#63` textSnippet wrapper)** — closed by `e8eeb11`. Cosmetic warning eliminated; specs preserved.\n\n## Carry-forward YELLOW (acknowledge implementer's pre-flag, not double-flagging)\n\n**YELLOW-62.1 — chip width on long locale renderings.** ET `RAAMATUKOGUHOIDJA` is 17 chars; chip class is `font-sans text-[7px] tracking-wider py-px px-1` with no `max-width`/`overflow` guard. At narrow viewports the chip + the long ET tab label `Raamatukogu` together can push the right-cluster into wrap/overflow. UK `Налаштування` widens the rightmost tab similarly. NOT a blocker because: (a) renders OK at typical desktop widths (where the design was built), (b) fix is a layout-touch (`max-w-[...]` + `truncate` on chip, or breakpoint hide-chip-below-md), not an i18n change. Comenius pre-flagged correctly. Route to a follow-up CHORE if/when narrow-viewport support becomes a real requirement; defer if mvox is desktop-first MVP.\n\n## Calibration note (self)\n\nThe session-21 calibration \"any new `.svelte` with more than 2 English noun-phrases gets a discretionary YELLOW\" worked exactly as intended here — `#62` was the YELLOW; `#63` was the codified scratchpad self-find; both closed in one tight branch. No new arch-decisions entry needed (the rule is already lived).\n\n## Verdict\n\n**GREEN.** Approve + Josquin squash-merges. Suggested squash subject body should mention: (1) `#62` MvoxNav i18n wiring (closes), (2) `#63` textSnippet `<span>` wrapping (closes), (3) carry-forward YELLOW-62.1 chip-width on long locale renderings (deferred, narrow-viewport scope).",
+    "summary": "CHORE-62+63 branch review: GREEN with 1 YELLOW carryforward",
+    "timestamp": "2026-05-24T06:54:49.509Z",
     "color": "green",
     "type": "message",
     "read": true
   },
   {
     "from": "bentham",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-24T04:57:01.087Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T04:57:01.087Z",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-24T06:54:56.024Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T06:54:56.024Z",
     "color": "green",
     "type": "message",
     "read": true
   },
   {
     "from": "bentham",
-    "text": "[2026-05-24 05:10] Task #68 ack — verdict already delivered at 05:05 (preceded the task-assignment by ~5 min; likely a routing race). Marked #68 completed.\n\n**Summary repeat for convenience:**\n- `[CHORE-60 BRANCH-REVIEW 2026-05-24]` **YELLOW**, no REDs.\n- 3 YELLOWs: A=library page i18n unwired (lean: fold-in pre-merge), B=MvoxNav i18n keys missing (lean: GH-issue), C=my own textSnippet helper emits Svelte warning (lean: post-merge one-line fix).\n- All verification ran clean: check 0/0, test 436/436, lint clean, 31/31 commits co-authored.\n- Snippet fix `1be3b39` verified line-by-line — matches the architecture verdict exactly.\n\nFull content in my 05:05 SendMessage + at `teams/mvox-dev/memory/bentham.md` session-21 BRANCH-REVIEW entry. Standing by for Josquin's merge-coordination questions or follow-up dispatch on YELLOW-A pre-merge fold-in.",
-    "summary": "Task #68 ack — verdict already shipped 05:05",
-    "timestamp": "2026-05-24T04:57:19.925Z",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-24T06:55:18.965Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T06:55:18.965Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "[2026-05-24 06:48] **Squash-merge #62 + #63 complete — but PO co-author trailer is MISSING on the merge commit.**\n\n**Squash SHA:** `9637eee` on `main`\n**Pushed:** `f3b792a..9637eee main -> main`\n**Branch deleted:** local + remote `chore/mvoxnav-i18n-and-snippet-helper` (was `19a0610`)\n**Diff:** 7 files / +42 / -10 (4 locale JSONs + MvoxNav.{spec.ts,svelte} + snippet-helpers.ts)\n**Stash dance:** Comenius's i18n-conventions.md unstaged edit stashed pre-checkout, restored post-push, clean.\n\n**Trailer issue:** the dispatch-message commit body ended with `Co-authored-by: Comenius, Tallis, Byrd, Bentham (review)` — git's `interpret-trailers --if-exists doNothing` in `.githooks/prepare-commit-msg` saw an existing `Co-authored-by:` trailer key and SHORT-CIRCUITED, so the PO trailer (`Mihkel Putrinš <mihkel.putrinsh@gmail.com>`) was NOT appended. The hook dedupes on KEY, not on full value — so when a human-style \"Co-authored-by: <list of names>\" line precedes the hook run, the PO trailer is silently dropped.\n\nTrailers on `9637eee` per `git log -1 --format='%(trailers)'`:\n```\nCo-authored-by: Comenius, Tallis, Byrd, Bentham (review)\n```\n\nPO co-author IS absent. Three options for your call:\n\n1. **Leave as-is** — the team-list trailer captures the contributing agents; PO co-authorship convention is missed on this one commit. Cost: convention drift; benefit: nothing destructive.\n2. **Fixup via amend + force-push to main** — `git commit --amend` to add the PO trailer, `git push --force-with-lease`. Destructive on main; needs explicit PO/your sign-off per memory's git-safety rules.\n3. **Add an empty commit on main** with the PO trailer referencing the squash SHA — clean history, non-destructive, but adds noise.\n\nRecommend **Option 2 with `--force-with-lease`** only if you authorize it. Otherwise default to **Option 1** + I'll add a note to architecture-decisions about the hook+human-trailer collision pattern so future dispatches use a different sentinel (\"Contributors:\" or \"Reviewed-by:\" or move the team-list to body prose, not trailer).\n\nStanding by for your call. Task #1 + #7 should be marked completed regardless — the merge IS landed; this is just trailer hygiene on top.",
+    "summary": "Squash @ 9637eee + trailer gap",
+    "timestamp": "2026-05-24T06:56:37.784Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-24T06:56:41.820Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T06:56:41.820Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "[2026-05-24 06:55] Stale task_assignment for #7 — already completed at `9637eee` (reported 06:48 with PO-trailer-gap flag). Holding for your call on Option 1/2/3 re: trailer.",
+    "summary": "Stale task_assignment #7 ack",
+    "timestamp": "2026-05-24T06:56:50.434Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-24T06:56:52.732Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T06:56:52.732Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "[2026-05-24 07:01] Done. Architecture-decision entry \"Dispatch-message Co-authored-by trailers short-circuit prepare-commit-msg hook (2026-05-24, session 22)\" appended at the TOP of the most-recent section in `teams/mvox-dev/memory/architecture-decisions.md`. Includes rule, rationale, exemplar (squash `9637eee`), permitted alternatives (`Contributors:` / `Reviewed-by:` / `Helped-by:` / body prose), and a Bentham review-enforcement note for future trailer-discipline drift.\n\n**SHA:** `7d078f7` on `main` (doc-only, 1 file / +19)\n**Pushed:** `9637eee..7d078f7 main -> main`\n**Verified:** PO co-author trailer present on `7d078f7` (kept my own commit body free of `Co-authored-by:` lines, exactly per the rule just codified — clean dogfood).\n\nComenius's `i18n-conventions.md` is still unstaged in the worktree — not mine to touch, left alone.\n\nGoing idle.",
+    "summary": "Arch-decision logged + pushed @ 7d078f7",
+    "timestamp": "2026-05-24T07:00:21.624Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-24T07:00:24.922Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T07:00:24.922Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "comenius",
+    "text": "[2026-05-24 07:04] Done.\n\n**SHA:** `afc1a85` on main.\n**Trailer verified:** `Co-authored-by: Mihkel Putrinš <mihkel.putrinsh@gmail.com>` — hook landed cleanly.",
+    "summary": "i18n-conventions committed to main, trailer verified",
+    "timestamp": "2026-05-24T07:04:17.163Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "comenius",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"comenius\",\"timestamp\":\"2026-05-24T07:04:19.267Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T07:04:19.267Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "[2026-05-24 08:13] **URL-overrides-persisted decision shipped.** Doc-only commit, on main.\n\n- **SHA**: `3a37e42`\n- **Trailer verified**: `Co-authored-by: Mihkel Putrinš <mihkel.putrinsh@gmail.com>` present (hook fired cleanly — no `Co-authored-by:` in my dispatch template, per the session-22 rule we just codified).\n- **File**: `teams/mvox-dev/memory/architecture-decisions.md` — new section at the top of the most-recent list (above the prepare-commit-msg-hook entry, since both are session-22 and this is the active CHORE-66 enabler).\n- **Author trailer**: `(*MVOX:Bentham*)` per stewardship.\n\nSection structure followed your spec: Decision (split into On-read / On-change) → Rationale → Applies / Doesn't-apply tables → Convention shape (key naming, param naming, two-write symmetry on read-time divergence) → Spec exemplar (cross-ref to navbar auth wiring design) → Review enforcement (3 RED triggers + 1 YELLOW trigger, calibrated to your spec) → Cross-links.\n\nOne small lift beyond your dispatch: I added a \"two-write symmetry on read-time divergence\" sub-rule under Convention shape — when URL and localStorage disagree at read time, the URL wins AND we backfill the store. Without that, an old persisted value would silently shadow a freshly-pasted deep-link on the very next no-params nav. Reads as natural-extension-of-the-rule rather than novel addition; can downgrade or pull if you'd rather keep the section tight to your dispatch.\n\nCHORE-66 spec can now resolve its forthcoming-citation. Standing by.",
+    "summary": "Arch-decision shipped: 3a37e42 with PO trailer verified",
+    "timestamp": "2026-05-24T08:05:54.172Z",
     "color": "green",
     "type": "message",
     "read": true
   },
   {
     "from": "bentham",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-24T04:57:23.361Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T04:57:23.361Z",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-24T08:06:05.564Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T08:06:05.564Z",
     "color": "green",
     "type": "message",
     "read": true
   },
   {
-    "from": "comenius",
-    "text": "[2026-05-24 05:37] YELLOW-A COMPLETE. Task #69 done.\n\n**Commit:** 615a7e0 on feat/library-page-ui-kit\n**New HEAD:** 615a7e0\n\n**Substitutions made: 28 total**\n- `library_top_*` (2): eyebrow + heading\n- `library_rehearsal_in` (1): parameterized with {time, countdown}\n- `library_search_placeholder` (1): PencilSearch placeholder prop\n- `library_returns_*` (6): title, subtitle, stamp, folder_label, counted({n}), ticked_label, confirm({n})\n- `library_overdue_*` (6): title, subtitle, stamp, marginalia (split on \\n for <br/>), copies_out, nudge_both\n- `library_pull_*` (7): title, subtitle, stamp, request_line({date}), singers_tonight\n- `library_catalog_*` (5): works({n}), owned({n}), available({n}), on_loan({n}), overdue({n}), open_full\n\n**One gotcha resolved:** `{@const}` is invalid outside `{#if}/{#each}` blocks in Svelte 5. Moved `marginaliaLines` split into the `<script>` block.\n\n**Note on catalog stats:** the original had colored `<span>` wrappers around numbers. Restructured to full parameterized messages (`m.library_catalog_owned({ n: String(stats.copies) })` etc.) — numbers are now inline in the message string, losing per-number color. The spec assertions pass cleanly. If Bentham flags the color loss as a separate YELLOW, it's a design call (would need separate label-only keys without the `{n}` param).\n\n**Gate:** pnpm check (0 errors) + pnpm test:unit (436/436) + pnpm lint (clean) + pnpm build (success). No spec changes needed.\n\nReady for Josquin Phase 6 merge.",
-    "summary": "YELLOW-A complete — m.*() wired into /library page",
-    "timestamp": "2026-05-24T05:38:13.188Z",
+    "from": "bentham",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-24T08:06:09.752Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T08:06:09.752Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "perotin",
+    "text": "[2026-05-24 10:33] Pérotin ready.\n\nSession-19 baseline confirmed: EPCC Library `6a12036c4ff8277cd4306b26` under EFK, 607 entities. Test librarian member candidates from the seed: Margus Roos `6a12036e4ff8277cd4306b9a` and Henn Kuusik `6a12036e4ff8277cd4306bab` (both EFK members, active, seeded with overdue lendings — realistic test state).\n\nStanding by for CHORE-66 dispatch. If Josquin's userStore on-mount query reveals schema gaps (e.g., member properties not returning as expected), flag to me and I'll cross-check against the live seed state.",
+    "summary": "Pérotin ready — CHORE-66 context loaded",
+    "timestamp": "2026-05-24T10:34:04.551Z",
+    "color": "cyan",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"9\",\"subject\":\"CHORE-66 brainstorm → spec → plan → ship navbar auth wiring\",\"description\":\"Brainstorm done. Spec at docs/superpowers/specs/2026-05-24-navbar-auth-wiring-design.md. Awaiting PO spec review. After approval: invoke writing-plans skill to create implementation plan. After plan: file GH issue #66, dispatch through TDD chain (Tallis RED → Byrd+Josquin GREEN with userStore + OrgPicker → Comenius i18n → Bentham REVIEW → Josquin MERGE). First enactment of feedback_ui_parallels_with_seed (Pérotin on roster from kickoff for librarian-member identification + schema-gap surfacing).\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T10:34:07.100Z\"}",
+    "timestamp": "2026-05-24T10:34:07.101Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "perotin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"perotin\",\"timestamp\":\"2026-05-24T10:34:11.593Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T10:34:11.593Z",
+    "color": "cyan",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "perotin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"perotin\",\"timestamp\":\"2026-05-24T10:36:47.814Z\",\"idleReason\":\"available\",\"summary\":\"[to josquin] Test-librarian person + member IDs for CHORE-66 probe\"}",
+    "timestamp": "2026-05-24T10:36:47.814Z",
+    "color": "cyan",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "[2026-05-24 08:38] **Surface-and-stop on Task 1 before commit.**\n\n**Status:** branch `chore/navbar-auth-wiring` created off `8ea562e`, `src/lib/auth/types.ts` written, `pnpm check + lint + build` all GREEN (lint:fix auto-formatted the `deriveInitials` chain). NOT YET COMMITTED.\n\n**Issue:** the plan's URL form in the `EntuPersonResponse` TSDoc is **wrong** for production:\n\n```\nPlan says:  https://{db}.entu.app/api/entity/{id}?props=...\nReality:    https://api.entu.app/{db}/entity/{id}?props=...\n```\n\nVerified empirically just now:\n```\n$ curl -sSo /dev/null -w \"%{http_code}\\n\" \"https://api.entu.app/polyphony/entity?_type.string=organization&limit=1\"\n200\n\n$ curl -sSo /dev/null -w \"%{http_code}\\n\" \"https://polyphony.entu.app/api/entity?...\"\ncurl: (6) Could not resolve host: polyphony.entu.app  (DNS NXDOMAIN)\n```\n\nThis matches the **session-15 architecture-decisions entry** (`[DECISION] ENTU_API_BASE unified at https://api.entu.app/` per CHORE-50) — `src/lib/entu-config.ts` exports the subdomain form `https://api.entu.app/`, NOT per-db subdomains. The plan's URL pattern is from an older Entu convention that doesn't exist live.\n\nTwo paths:\n\n**Path 1 — fix TSDoc + userStore impl URLs before commit.** Land `types.ts` with the correct production form `https://api.entu.app/{db}/entity/{id}?props=...`. Task 3 (userStore.ts) plan code at L513 + L530 also has the wrong shape — both need correcting then too (Byrd's work, but the TSDoc contract sets the consumer's expectation). Net change: TSDoc URL form only on my file; Task 3 commit updates the impl URLs to match.\n\n**Path 2 — land types.ts with the wrong URL as-written, defer correction to Task 3.** Saves a plan-vs-impl divergence in this commit; costs misleading TSDoc on `EntuPersonResponse` that survives the merge.\n\nRecommend **Path 1** — TSDoc IS the contract for downstream agents; landing it wrong creates a documentation-vs-code skew immediately and forces Task 3 to either match the wrong TSDoc or contradict it. Cost of Path 1 is ~3 lines diff vs the plan template.\n\nPérotin DM'd for the person ID; haven't curled the probe yet (would just confirm the same URL finding via an authenticated path). Once you greenlight Path 1, I'll: (a) fix TSDoc URL, (b) await Pérotin's ID, (c) run the authenticated probe to verify response shape against `EntuPersonResponse`, (d) report findings + commit + push.\n\nHolding for your call.",
+    "summary": "Surface-and-stop: plan URL form wrong",
+    "timestamp": "2026-05-24T10:37:18.998Z",
     "color": "pink",
     "type": "message",
     "read": true
   },
   {
-    "from": "comenius",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"comenius\",\"timestamp\":\"2026-05-24T05:38:17.480Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T05:38:17.480Z",
-    "color": "pink",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "comenius",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"comenius\",\"timestamp\":\"2026-05-24T05:38:22.036Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T05:38:22.036Z",
-    "color": "pink",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "comenius",
-    "text": "[2026-05-24 05:44] YELLOW-D COMPLETE. Task #70 done.\n\n**Commit:** 0aa63d8 on feat/library-page-ui-kit\n**New HEAD:** 0aa63d8\n\n**4 new unit keys added** (all 4 locales, no TODOs — directly derivable from existing parameterized translations):\n- `library_catalog_owned_unit`: \"copies owned\" / \"eksemplari omandis\" / \"eksemplāri īpašumā\" / \"примірників у власності\"\n- `library_catalog_available_unit`: \"available\" / \"saadaval\" / \"pieejami\" / \"доступно\"\n- `library_catalog_on_loan_unit`: \"on loan\" / \"laenutuses\" / \"iznomāti\" / \"на позичці\"\n- `library_catalog_overdue_unit`: \"overdue\" / \"tähtaja ületanud\" / \"nokavēti\" / \"прострочено\"\n\nParameterized `library_catalog_{owned,available,on_loan,overdue}` keys left in place (now unused but not removed per scope).\n\nCatalog strip in `+page.svelte` restored to per-number colored spans + unit-label calls.\n\n**Gate:** pnpm i18n:gen (clean) + pnpm check (0 errors) + pnpm test:unit (436/436) + pnpm lint (clean).\n\nBranch ready for Josquin Phase 6 merge.",
-    "summary": "YELLOW-D complete — catalog color spans restored",
-    "timestamp": "2026-05-24T05:44:56.146Z",
-    "color": "pink",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "comenius",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"comenius\",\"timestamp\":\"2026-05-24T05:45:02.656Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T05:45:02.656Z",
-    "color": "pink",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "comenius",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"comenius\",\"timestamp\":\"2026-05-24T05:45:12.309Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T05:45:12.309Z",
+    "from": "josquin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-24T10:37:31.917Z\",\"idleReason\":\"available\",\"summary\":\"[to perotin] Need test-librarian person ID for #66 probe\"}",
+    "timestamp": "2026-05-24T10:37:31.917Z",
     "color": "pink",
     "type": "message",
     "read": true
   },
   {
     "from": "josquin",
-    "text": "[2026-05-24 05:48] CHORE-60 Phase 6 COMPLETE — squash-merged to main, feature branch deleted.\n\n**Squash commit on main:** `ab6dcc52ec2ca65dd5008a59f3a9a42b2365e78c`\n- 63 files changed, 2690 insertions(+), 80 deletions(-)\n- Push: `120cdd9..ab6dcc5  main -> main` (accepted)\n\n**`git log --oneline -2` post-push:**\n```\nab6dcc5 feat(#60): /library page + 21-component UI kit on the design system\n120cdd9 chore(mvox-dev): session-20 shutdown -- scratchpads + task snapshot + inboxes\n```\nClean linear history; squash sits directly on top of the prior session-20 shutdown commit.\n\n**Branch deletion:**\n- Remote: `- [deleted]         feat/library-page-ui-kit` (success)\n- Local: `git branch -d` refused with \"not fully merged\" (expected — squash creates a different SHA than `0aa63d8`); fell back to `-D` per dispatch instruction, deleted cleanly (`Deleted branch feat/library-page-ui-kit (was 0aa63d8)`)\n- `git branch -a` confirms only `main` + `remotes/origin/main` remain — no stray `feat/library-page-ui-kit` anywhere\n\n**Pre-flight:** All checks passed before the chain. cwd, branch, tip, 33-commit count all matched dispatch.\n\n**Pre-flight chain:** `git fetch origin && git checkout main && git pull --ff-only && git merge --squash feat/library-page-ui-kit && git commit -m '...' && git push origin main && git status` — all steps green, no unexpected output. The \"Already up to date\" line is from `git pull --ff-only` (origin/main was already at 120cdd9 = my HEAD on `main` before checkout), normal.\n\n**Scratchpad mods untouched** (`teams/mvox-dev/memory/bentham.md`, `i18n-conventions.md`, `tallis.md`) — `git status` post-push confirms they're still unstaged, will bundle at shutdown per your instruction.\n\n**Nothing unexpected.** Hook trailer on the squash commit looks correct (the inline `Co-authored-by` from the heredoc is present once in the commit message; the `prepare-commit-msg` hook may or may not have deduplicated — either way the trailer is there).\n\nMarking task #71 completed now. This was the last code action for CHORE-60. Ready for #60 closure ceremony (your job, per dispatch).",
-    "summary": "CHORE-60 Phase 6 done — merged + branch deleted",
-    "timestamp": "2026-05-24T05:48:59.482Z",
-    "color": "yellow",
+    "text": "[2026-05-24 10:34] Stale task_assignment for #11 — Task 1 already in-progress, surface-and-stop sent at 08:38 (plan URL `https://{db}.entu.app/api/...` doesn't resolve; production is `https://api.entu.app/{db}/...`). Holding for Path 1 vs Path 2 call + Pérotin's person ID before commit.",
+    "summary": "Stale task_assignment #11 ack",
+    "timestamp": "2026-05-24T10:37:43.289Z",
+    "color": "pink",
     "type": "message",
     "read": true
   },
   {
     "from": "josquin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-24T05:49:03.271Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T05:49:03.271Z",
-    "color": "yellow",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-24T10:37:49.702Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T10:37:49.702Z",
+    "color": "pink",
     "type": "message",
     "read": true
   },
   {
     "from": "josquin",
-    "text": "[2026-05-24 05:49] Re: task_assignment #71 just received — this crossed my completion report in flight (assignment ts 05:47:06Z, my completion report ts 05:48). Nothing to redo.\n\nCurrent state (just re-verified via TaskGet #71 = `completed`):\n- Squash commit on main: `ab6dcc52ec2ca65dd5008a59f3a9a42b2365e78c`\n- `feat/library-page-ui-kit` deleted on remote + local\n- Task #71 status `completed`\n- See my 05:48 SendMessage for full details (commit SHA, gates, scratchpad note, etc.)\n\nStanding by — proceed with #60 closure ceremony when ready.",
-    "summary": "Task #71 already complete — dispatch crossed in flight",
-    "timestamp": "2026-05-24T05:49:30.149Z",
-    "color": "yellow",
+    "text": "[2026-05-24 10:42] **Surface-and-stop — Task 1 probe surfaced a significant data-model divergence from the plan's `EntuPersonResponse` contract.**\n\nPlan + URL fix landed cleanly; auth path is API_KEY → JWT exchange via `GET https://api.entu.app/auth?db=polyphony` Bearer API_KEY (returns 48h JWT, IP-bound to my caller IP). All probe queries below ran with that JWT.\n\n**Margus IDs are reversed in the plan**: `6a12036e4ff8277cd4306b9a` is a **member entity** (org-membership link), NOT the person entity. The actual Margus Roos person is `6a12036d4ff8277cd4306b93`. Pérotin's IDs sent me to the membership rows; I worked back to the person.\n\n**Plan's `EntuPersonResponse` contract is WRONG. The actual model**:\n- `person` entity has: `{_id, _type, name: [{string}]}` — **no `members[]` property on person**. The plan assumes person hangs members under itself; it does not.\n- To resolve a user's org memberships, you must search **member entities WHERE `person.reference = <personId>`**, not fetch person + read `members[]`.\n- Each `member` entity has `_parent: [...]` containing BOTH org AND section parent refs, distinguishable by `entity_type` (`\"organization\"` vs `\"section\"`).\n- **Bonus**: when you `props=_parent` on the member search, each parent ref ALREADY includes inline `string` (the parent's name) AND `entity_type`. So the plan's planned 8-concurrent-org-fetches (or `?expand=members._parent` batching) is **structurally unnecessary** — one search call to `/polyphony/entity?_type.string=member&person.reference=<id>&props=_parent` returns everything in one round-trip.\n\nConcrete probe evidence for Margus:\n```\nGET /polyphony/entity?_type.string=member&person.reference=6a12036d4ff8277cd4306b93&props=_parent\n\n{ count: 1,\n  entities: [{\n    _id: \"6a12036e4ff8277cd4306b9a\",\n    _parent: [\n      { reference: \"69c7f8718489bfcb0e81b065\", string: \"Eesti Filharmoonia Kammerkoor\", entity_type: \"organization\" },\n      { reference: \"69c7f8768489bfcb0e81b163\", string: \"Bass\", entity_type: \"section\" }\n    ]\n  }] }\n```\n\n**Three downstream impacts**:\n\n1. **`EntuPersonResponse` type is wrong as defined** — it has `members: Array<{_id, _parent[]}>` as if person inlines its members. Should be split into:\n   ```ts\n   export type EntuPersonResponse = {\n     _id: string;\n     name?: Array<{ string: string }>;\n   };\n   export type EntuMemberSearchResponse = {\n     count: number;\n     entities: Array<{\n       _id: string;\n       _parent?: Array<{ reference: string; string: string; entity_type: string }>;\n     }>;\n   };\n   ```\n   The TSDoc on `EntuMemberSearchResponse` documents the search-by-`person.reference` query shape.\n\n2. **Task 3 userStore impl reshapes**: instead of `fetch person → for each member, fetch org`, the flow is `decode JWT.sub → fetch person /entity/{sub}?props=name → search /entity?_type.string=member&person.reference={sub}&props=_parent → filter _parent[] by entity_type==='organization' → map to Org[]`. Two fetches total (person + member search), NOT N+1. The orgs already arrive with their display names inline.\n\n3. **Plan's `?expand=members._parent` optimization speculation is moot** — that's solving a problem that doesn't exist under the actual model.\n\n4. **JWT decode for `sub`**: the JWT my probe used had `{accounts: {polyphony: \"69bcfd8e9c031ab8e6ce8079\"}, iat, exp, aud}` — NO `sub` field. The person ID lives at `accounts.<db>` (here: `accounts.polyphony`). So Task 3's `claims.sub` assumption needs reshape too — extract via `claims.accounts[dbName]` not `claims.sub`.\n\n5. **JWT is IP-bound** (`aud: \"<my IP>\"`) — known from session-15 + project_entu_jwt_ip_bound memory. Browser-direct Path C handles this correctly; just flagging for completeness.\n\n**Recommendation**: I'll update `src/lib/auth/types.ts` to:\n- Drop `members[]` from `EntuPersonResponse`\n- Add new `EntuMemberSearchResponse` type\n- TSDoc the two-fetch flow (person + member search) with the actual wire shape\n- Note inline-parent-name finding (no per-org fetch needed)\n- Note JWT shape (`accounts.<db>`, not `sub`)\n\nThis expands Task 1's file beyond the plan, but it's still types-only — no impl. Task 3 will then be simpler than planned (one fewer round-trip per org). Want me to proceed, or do you prefer team to revise the plan first?\n\nFiles unchanged so far. Branch `chore/navbar-auth-wiring` exists, types.ts is the in-tree (un-fixed) version from earlier. Standing by.",
+    "summary": "DATA MODEL surface: contract is inverted",
+    "timestamp": "2026-05-24T10:40:12.891Z",
+    "color": "pink",
     "type": "message",
     "read": true
   },
   {
     "from": "josquin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-24T05:49:38.489Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T05:49:38.489Z",
-    "color": "yellow",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-24T10:40:17.704Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T10:40:17.704Z",
+    "color": "pink",
     "type": "message",
     "read": true
   },
   {
     "from": "josquin",
-    "text": "[2026-05-24 05:52] CHORE-60 deploy — Pages deploy SUCCEEDED, but mvox.eu wiring is BROKEN. Task #72 NOT marked complete.\n\n**Per-build URL:** `https://5cd51fd7.multivox.pages.dev`\n\n**Wrangler output highlights:**\n- Build: 2 CSS optimization warnings (`@import` rules placement — pre-existing, not new) + 1 `[WARNING]` from wrangler about uncommitted changes (scratchpad files, expected)\n- Upload: `Uploaded 24 files (7 already uploaded) (0.97 sec)` — clean\n- Final: `✨ Deployment complete! Take a peek over at https://5cd51fd7.multivox.pages.dev`\n\n**Endpoint verification (all 4 + 3 cross-checks):**\n\n| URL | Status | Evidence |\n|---|---|---|\n| `mvox.eu/` | **200** | `last-modified: Tue, 30 Dec 2025 10:09:07 GMT` ← STALE, months-old build |\n| `multivox.pages.dev/` | 200 | preload refs new chunk `0.IbWz0Ef4.css` — fresh |\n| `mvox.eu/library` | **404** | `last-modified: Mon, 06 Nov 2023 23:06:18 GMT` ← static fallback |\n| `mvox.eu/auth/login` | **404** | same 2023 last-modified |\n| `multivox.pages.dev/library` | 200 | new chunks, `cf-ray: a00a0955db9c9744-FRA` |\n| `multivox.pages.dev/auth/login` | 200 | new chunks, fresh |\n| `5cd51fd7.multivox.pages.dev/library` | 200 | per-build URL serves correctly |\n\n**cf-ray for `mvox.eu/library`:** `a00a09042f0cd352-FRA` (but this is on a 404, not a 200 — does NOT prove new build at custom domain; the 404 itself proves the OPPOSITE)\n\n**Diagnosis:** The Pages deploy itself is fine — fresh build is live on `multivox.pages.dev` AND on the per-build `5cd51fd7.multivox.pages.dev` URL. The PROBLEM is that `mvox.eu` is NOT pointing at the `multivox` Pages project:\n- `mvox.eu/` returns 200 but with a `last-modified` of Dec 30 2025 — that's not from any build in this CHORE\n- `mvox.eu/library` and `/auth/login` return 404 with `last-modified: Nov 6 2023` — that smells like a default Cloudflare static-origin / placeholder content, NOT a SvelteKit app\n- If `mvox.eu` were correctly wired to `multivox` Pages, `/library` and `/auth/login` would both return 200 (they do on `multivox.pages.dev`)\n\nThis is the [[wrangler-deploy-auth]] / `mvox.eu` custom-domain wiring needing a separate look. Possibilities:\n1. `mvox.eu` is wired to a DIFFERENT Pages project (not `multivox`) — check CF dashboard → Pages → which project owns the `mvox.eu` custom domain\n2. `mvox.eu` is wired to a Worker route / static-asset origin that's unrelated to the Pages deploy\n3. DNS for `mvox.eu` is pointing somewhere outside CF entirely (unlikely given `server: cloudflare` headers)\n4. The custom-domain binding exists but is on a different branch/production target\n\n**Did NOT touch:** git, custom-domain config, DNS, the CF dashboard. Following the dispatch's \"credential fail → STOP and report\" pattern, but extending it to \"wiring fail → STOP and report\" since fixing this is also a PO + ops call.\n\nTask #72 left as in_progress (blocked on mvox.eu wiring, not on the deploy itself). Need PO direction on whether (a) you'd like me to spawn Finn/Pérotin to probe the CF account for the `multivox` Pages project custom-domain config, or (b) this is something PO will fix in the dashboard directly.",
-    "summary": "Deploy landed on pages.dev — mvox.eu NOT wired",
-    "timestamp": "2026-05-24T05:53:31.925Z",
-    "color": "yellow",
+    "text": "[2026-05-24 10:46] Quick addendum to the 10:42 surface-and-stop — probed the PO person (`69bcfd8e9c031ab8e6ce8079`) per Pérotin's suggestion to stress-test multi-org:\n\n```\nGET /polyphony/entity?_type.string=member&person.reference=69bcfd8e9c031ab8e6ce8079&props=_parent\n→ { count: 0, entities: [] }\n```\n\nPO has **no member entities** despite being `_owner` of all 4 collectives. So `_owner`-as-org-affiliation doesn't manifest as a `member` row — the membership-discovery query I described in the 10:42 report only surfaces orgs where person has an explicit `member` record (consistent with v4E intent: `member` represents joined-by-invitation, not founder-by-ownership).\n\n**Two implications for CHORE-66**:\n\n1. The userStore flow (`person + member search`) is **correct for typical user-facing case** (singers/conductors who joined via invitation). Margus's single-org case validates the shape.\n\n2. There's a corner: a user who founded an org but has no `member` row will see **0 orgs in their picker** even though they own the org. PO would hit this in dev — `localStorage.entu_token` for PO → MvoxNav placeholder mode instead of EFK / Sireen / Rahvusmeeskoor / TAM. May or may not be desired; depends on whether mvox's nav represents \"orgs I'm a member of\" or \"orgs I have any rights over.\"\n\nThe 10:42 EntuPersonResponse + EntuMemberSearchResponse contract change still stands; this is just flagging a UX corner that the plan doesn't address. Easy fix-later if needed (alternative query: search org entities where `_owner.reference = <personId>`, union with the member-derived set). Not blocking Task 1.\n\nStill standing by for your call on:\n- (a) proceed with updated types.ts on this branch + revised TSDoc inline, or\n- (b) pause for plan revision first.\n\nQuick context: file gates are clean from the morning; only the wrong-shape file content needs updating (~15 lines diff).",
+    "summary": "Multi-org PO probe — 0 members",
+    "timestamp": "2026-05-24T10:41:14.685Z",
+    "color": "pink",
     "type": "message",
     "read": true
   },
   {
     "from": "josquin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-24T05:53:36.362Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T05:53:36.362Z",
-    "color": "yellow",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-24T10:41:22.854Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T10:41:22.854Z",
+    "color": "pink",
     "type": "message",
     "read": true
   },
   {
     "from": "josquin",
-    "text": "[2026-05-24 05:53] Re: task_assignment #72 just received (assignment ts 05:51:47Z) — this crossed my blocked-status report in flight (my 05:52 SendMessage).\n\n**Not re-running the deploy** — that would just produce another per-build URL with the same `mvox.eu` wiring problem.\n\n**Quick recap of current state** (full evidence in my 05:52 message):\n- Deploy SUCCEEDED → per-build URL `https://5cd51fd7.multivox.pages.dev`\n- `multivox.pages.dev/library` + `/auth/login` both 200 with fresh chunks (e.g., `0.IbWz0Ef4.css` from today's build)\n- `mvox.eu/library` → 404, `mvox.eu/auth/login` → 404 (both with `last-modified: Nov 6 2023` — stale static fallback, NOT the SvelteKit app)\n- `mvox.eu/` → 200 but `last-modified: Dec 30 2025` — also not from today's build\n\n**Diagnosis:** `mvox.eu` custom-domain wiring is pointing at a different origin than the `multivox` Pages project. Pages deploy itself is fine; the binding is the problem.\n\nTask #72 left `in_progress`. Awaiting PO direction on:\n(a) spawn Finn/Pérotin to probe CF account via API for `multivox` custom-domain config, OR\n(b) PO fixes in CF dashboard directly, OR\n(c) re-scope #72 to \"deploy lands on multivox.pages.dev\" (which IS verified green) and file a separate issue for the mvox.eu wiring",
-    "summary": "Dispatch crossed — see 05:52 blocked report",
-    "timestamp": "2026-05-24T05:54:03.491Z",
-    "color": "yellow",
+    "text": "[2026-05-24 10:54] **Task 1 complete.**\n\n**SHA:** `e12522a` on `chore/navbar-auth-wiring` (pushed to origin)\n**File:** `src/lib/auth/types.ts` (1 file / +143 / -0)\n**Gates:** check + lint + build all GREEN\n**Trailer:** `Co-authored-by: Mihkel Putrinš <mihkel.putrinsh@gmail.com>` present (no in-body Co-authored-by, hook ran clean)\n\n**Types exported** (diverge from plan per 10:42 + 10:46 surface-and-stops):\n- `Org` — unchanged from plan\n- `UserState` — unchanged\n- `EntuJwtClaims` — NEW. JWT carries `accounts[<dbName>]: personId`, NO `sub` claim. Plus `iat`, `exp`, `aud` (caller IP at mint).\n- `EntuPersonResponse` — changed from plan: `{ entity: { _id, name?: [{string}] } }`. Note the `entity` wrapper envelope. Members removed entirely (the plan's `members: Array<...>` field doesn't exist on person entities).\n- `EntuMemberSearchResponse` — NEW. Wire shape `{ count, limit, skip, entities: [{ _id, _parent?: [{ reference, string, entity_type }] }] }`. The `_parent` is denormalized (carries the parent's name inline as `string`) so org-list resolution is a single round-trip, not N+1.\n- `deriveInitials` — unchanged from plan\n\n**TSDoc on `EntuMemberSearchResponse`** documents the empirical filter (`entity_type === 'organization'`), the founder-only-orgs scope carve-out, and a pointer to the alternative `?_owner.reference={id}` union if the picker ever needs to surface founder-only orgs.\n\n**TSDoc on `EntuJwtClaims`** points at `project_entu_jwt_ip_bound` memory and explains why browser-direct Path C is intentionally compatible with the IP binding.\n\n**Impact for Task 3 (Byrd + Tallis):**\n- Two fetches instead of N+1:\n  1. `GET ${ENTU_API_BASE}/{db}/entity/{personId}?props=name` → unwrap `.entity.name[0].string`\n  2. `GET ${ENTU_API_BASE}/{db}/entity?_type.string=member&person.reference={personId}&props=_parent` → flat-map filter by `entity_type === 'organization'`\n- JWT decode: `claims.accounts[dbName]`, NOT `claims.sub`\n- Both calls need `Authorization: Bearer <JWT from localStorage>`\n\n**Probe target for Byrd's userStore.spec mocks**: use the Margus shape (1 org via member entity). Tests can mock both endpoints' wire shapes directly from the TSDoc examples on the response types.\n\nHand off to Comenius (Task 2 — paraglide keys). I'm idle.",
+    "summary": "Task 1 done @ e12522a — types diverge from plan",
+    "timestamp": "2026-05-24T10:44:37.208Z",
+    "color": "pink",
     "type": "message",
     "read": true
   },
   {
     "from": "josquin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-24T05:54:06.184Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T05:54:06.184Z",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-24T10:44:41.180Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T10:44:41.180Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-24T10:51:30.728Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T10:51:30.729Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "perotin",
+    "text": "[2026-05-24 10:54] Correction noted and scratchpad updated. The DATA STATE entry now carries both person and member IDs explicitly for Margus and Henn, with a [GOTCHA] tag on the person≠member distinction. Also logged the `_parent` inline denormalization finding from Josquin's probe — useful for future seed catalog lookups.\n\nStanding by.",
+    "summary": "Scratchpad corrected — person vs member ID distinction",
+    "timestamp": "2026-05-24T10:54:16.255Z",
+    "color": "cyan",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "perotin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"perotin\",\"timestamp\":\"2026-05-24T10:54:18.693Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T10:54:18.693Z",
+    "color": "cyan",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "comenius",
+    "text": "[2026-05-24 10:54] Task #12 complete.\n\n**SHA:** `1c9e5da` on `chore/navbar-auth-wiring`.\n**Trailer verified:** `Co-authored-by: Mihkel Putrinš <mihkel.putrinsh@gmail.com>` — hook landed cleanly.\n\n**Gates:** `pnpm check` 0 errors · `pnpm test:unit` 436/436 · `pnpm lint` clean · `pnpm build` clean.\n\n**Keys added** (2 × 4 locales = 8 entries):\n- `nav_org_picker_placeholder` — en: \"No organizations\" / et: \"Organisatsioone pole\" / lv: \"Nav organizāciju\" / uk: \"Немає організацій\"\n- `nav_org_picker_switch_to` — en: \"Switch to {orgName}\" / et: \"Lülitu: {orgName}\" / lv: \"Pārslēgt uz {orgName}\" / uk: \"Перейти до {orgName}\"\n\n**Translation notes logged to `i18n-conventions.md`:**\n- Placeholder: all 3 non-en locales use the natural negative-existence construction (genitive plural with `pole`/`nav`/`немає`).\n- Switch-to: et uses imperative + colon (shorter/natural for aria-label); lv/uk use infinitive + preposition (standard UI pattern in those locales).\n\nReady for Byrd + Tallis (Task 3 — userStore + spec atomic).",
+    "summary": "Task 12 done — 2 org picker keys committed",
+    "timestamp": "2026-05-24T10:55:09.342Z",
     "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "comenius",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"comenius\",\"timestamp\":\"2026-05-24T10:55:14.355Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T10:55:14.355Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "comenius",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"comenius\",\"timestamp\":\"2026-05-24T10:55:19.847Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T10:55:19.847Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "[2026-05-24 09:43] Task 3 in progress. `userStore.ts` written and type-checks clean (0 errors).\n\nFound 3 divergences between the plan's spec example and canonical `types.ts`:\n1. Token key: `'token'` via `getToken()` from storage.ts — plan had `'mvox.entu_token'`\n2. JWT claim: person ID at `claims.accounts['polyphony']` — plan had `claims.sub`\n3. Person response: `{ entity: { _id, name? } }` — plan had flat shape\n\nSent Tallis the corrected spec with all three fixes applied. Waiting for his \"spec passes\" confirmation before the atomic commit.\n\nRelevant files so far: `/home/michelek/workspace/src/lib/auth/userStore.ts`",
+    "summary": "Task 3 progress — userStore.ts written, spec sent to Tallis",
+    "timestamp": "2026-05-24T10:58:51.085Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-24T10:58:55.476Z\",\"idleReason\":\"available\",\"summary\":\"[to tallis] Corrected userStore.spec.ts — 3 plan divergences fixed\"}",
+    "timestamp": "2026-05-24T10:58:55.476Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-24T10:58:59.610Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T10:58:59.610Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-24T11:00:01.948Z\",\"idleReason\":\"available\",\"summary\":\"[to byrd] userStore.spec.ts ready — 20/20 pass, full gate GREEN, stage both\"}",
+    "timestamp": "2026-05-24T11:00:01.948Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "[2026-05-24 11:01] Task 3 complete. Atomic commit `bcdeb00` pushed to `chore/navbar-auth-wiring`.\n\n**Gate counts:** `pnpm check` 0 errors / `pnpm test:unit` 456/456 (+20 new) / `pnpm lint:fix` no fixes / `pnpm build` clean. PO trailer confirmed.\n\n**3 plan divergences fixed** (compared spec to canonical `types.ts`):\n1. Token read via `getToken()` from `storage.ts` (key `'token'`, not `'mvox.entu_token'`)\n2. JWT person ID at `claims.accounts['polyphony']`, not `claims.sub`\n3. Person response has `entity` wrapper: `person.entity.name?.[0]?.string`\n\n**Files:**\n- `src/lib/auth/userStore.ts` — `userStore` + `selectedOrgStore` + `pickerModeStore` + `hydrateUserStore()` + `selectOrg()`\n- `src/lib/auth/userStore.spec.ts` — 20 tests (Tallis)\n\nReady for Task 4 dispatch (OrgPicker.svelte + spec).",
+    "summary": "Task 3 GREEN — commit bcdeb00 pushed",
+    "timestamp": "2026-05-24T11:01:32.473Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-24T11:01:35.487Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T11:01:35.487Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-24T11:02:51.999Z\",\"idleReason\":\"available\",\"summary\":\"[to byrd] spec passes — file saved, ready for atomic commit\"}",
+    "timestamp": "2026-05-24T11:02:51.999Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-24T11:03:01.501Z\",\"idleReason\":\"available\",\"summary\":\"[to tallis] Already committed — bcdeb00 pushed, we're good\"}",
+    "timestamp": "2026-05-24T11:03:01.501Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-24T11:03:07.744Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T11:03:07.744Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "[2026-05-24 11:17] Discarded the local refactor (helper extractions were experimental; Byrd's `bcdeb00` version is the truth). `git restore src/lib/auth/userStore.spec.ts` done — spec file matches committed version. Working tree clean on that file. Only `teams/mvox-dev/memory/i18n-conventions.md` and `teams/mvox-dev/memory/perotin.md` remain dirty (not mine to commit). Ready for Task 4 brief.",
+    "summary": "Discarded refactor — working tree clean for spec file",
+    "timestamp": "2026-05-24T11:17:17.390Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-24T11:17:19.508Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T11:17:19.508Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "perotin",
+    "text": "[2026-05-24 11:17] Done. Committed `c623835` on `chore/navbar-auth-wiring`, pushed. Working tree clean (i18n-conventions.md left unstaged — not mine to touch).",
+    "summary": "Scratchpad committed and pushed — c623835",
+    "timestamp": "2026-05-24T11:17:27.918Z",
+    "color": "cyan",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "perotin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"perotin\",\"timestamp\":\"2026-05-24T11:17:30.093Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T11:17:30.093Z",
+    "color": "cyan",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-24T11:19:13.215Z\",\"idleReason\":\"available\",\"summary\":\"[to byrd] OrgPicker.spec.ts ready — RED, lint clean, awaiting your svelte\"}",
+    "timestamp": "2026-05-24T11:19:13.215Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-24T11:32:37.639Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T11:32:37.639Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd-2",
+    "text": "[2026-05-24 11:55] Byrd ready (respawn). Read common-prompt, byrd.md, architecture-decisions. Up to speed on: URL-override-persisted-state rule, per-commit GREEN rule, Path C browser-direct architecture. Ready for Task 4 dispatch.",
+    "summary": "Byrd ready (respawn) — 2026-05-24 11:55",
+    "timestamp": "2026-05-24T11:55:36.822Z",
+    "color": "red",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd-2",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd-2\",\"timestamp\":\"2026-05-24T11:55:38.818Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T11:55:38.818Z",
+    "color": "red",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd-2",
+    "text": "[2026-05-24 12:02] Task 4 GREEN. Commit 7c455be on chore/navbar-auth-wiring.\n\n## Story Handoff\n- **Story:** #66 — navbar auth wiring\n- **Branch:** chore/navbar-auth-wiring\n- **From:** Byrd (phase: GREEN Task 4)\n- **To:** team-lead (for Task 5 dispatch)\n- **Status:** TESTS_PASSING (460/460)\n\n### What was done\n- Wrote `src/lib/components/OrgPicker.svelte` — reads userStore/selectedOrgStore/pickerModeStore directly; calls selectOrg on click; Escape closes via window keydown listener in onMount\n- Fixed `src/tests/setup.ts` — added explicit `afterEach(() => cleanup())` to register @testing-library/svelte cleanup under Vitest globals:false; without this, open/close tests pollute each other's DOM\n- Full GREEN gate: pnpm check (0 errors), pnpm test:unit (460/460), pnpm lint:fix (no fixes), pnpm build (clean)\n\n### Gotcha (logged to byrd.md)\n`@testing-library/svelte` auto-cleanup silently skips when Vitest globals are off — this will affect any future spec with open/close or mount/unmount tests. The setup.ts fix covers all specs globally.\n\n### Files to start with\n- `src/lib/components/OrgPicker.svelte` — the implementation\n- `src/lib/components/OrgPicker.spec.ts` — Tallis's spec (open/close/select/escape)\n- `src/tests/setup.ts` — cleanup fix",
+    "summary": "Task 4 GREEN — OrgPicker.svelte committed",
+    "timestamp": "2026-05-24T12:02:26.106Z",
+    "color": "red",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd-2",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd-2\",\"timestamp\":\"2026-05-24T12:02:30.606Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T12:02:30.606Z",
+    "color": "red",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd-2",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd-2\",\"timestamp\":\"2026-05-24T12:02:35.653Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T12:02:35.653Z",
+    "color": "red",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "[2026-05-24 11:04] Task 4 blocked. The combined `git fetch && git checkout && git pull && echo marker` command was denied by the PO (\"and stop\"). Awaiting instruction on how to proceed — whether to retry as separate steps, or hold until further notice.",
+    "summary": "Task 4 blocked — git+marker command denied, awaiting instruction",
+    "timestamp": "2026-05-24T12:51:27.088Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-24T12:51:31.794Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T12:51:31.794Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "comenius",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"comenius\",\"timestamp\":\"2026-05-24T12:51:38.045Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T12:51:38.046Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "comenius",
+    "text": "[2026-05-24 12:51] Done. `be4594c` on `chore/navbar-auth-wiring`. Trailer verified. Workspace clean.",
+    "summary": "i18n-conventions committed, workspace clean",
+    "timestamp": "2026-05-24T12:51:53.879Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "comenius",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"comenius\",\"timestamp\":\"2026-05-24T12:51:55.566Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T12:51:55.566Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779622944753@byrd\",\"from\":\"byrd\",\"timestamp\":\"2026-05-24T12:51:56.450Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-24T12:51:56.450Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-24T12:58:30.576Z\",\"idleReason\":\"available\",\"summary\":\"[to byrd] MvoxNav.spec.ts ready — 6/6 pass, full gate GREEN\"}",
+    "timestamp": "2026-05-24T12:58:30.576Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd-2",
+    "text": "[2026-05-24 12:58] Task 5 GREEN. Commit f83decd pushed to chore/navbar-auth-wiring.\n\n## Story Handoff\n- **Story:** #66 — navbar auth wiring\n- **Branch:** chore/navbar-auth-wiring\n- **From:** Byrd (phase: GREEN Task 5)\n- **To:** team-lead (for Task 6 dispatch)\n- **Status:** TESTS_PASSING (463/463)\n\n### What was done\n- Updated MvoxNav.svelte: added `orgPickerMode` prop (OrgPickerMode type); made `signedIn` + `currentTab` optional with defaults; replaced hardcoded org chip with 3-branch conditional (placeholder/static/dropdown); dropdown branch mounts `<OrgPicker />` which reads stores internally; all CHORE-62 tab row, LIBRARIAN chip, user pill, sign-in link preserved\n- Updated MvoxNav.spec.ts: added 3 new mode-rendering tests (placeholder/static/dropdown); the spec hook added vi.mock + beforeEach cleanup automatically; existing 3 assertions unchanged\n- Full GREEN gate: pnpm check (0 errors), pnpm test:unit (463/463), pnpm lint:fix (no fixes), pnpm build (clean)\n- PO co-author trailer verified present\n\n### Files changed\n- `src/lib/components/MvoxNav.svelte`\n- `src/lib/components/MvoxNav.spec.ts`",
+    "summary": "Task 5 GREEN — MvoxNav committed f83decd",
+    "timestamp": "2026-05-24T12:58:37.724Z",
+    "color": "red",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd-2",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd-2\",\"timestamp\":\"2026-05-24T12:58:42.631Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T12:58:42.631Z",
+    "color": "red",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd-2",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd-2\",\"timestamp\":\"2026-05-24T12:58:46.948Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T12:58:46.948Z",
+    "color": "red",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd-2",
+    "text": "[2026-05-24 13:01] Task 6 GREEN. Commit 7f593ae pushed to chore/navbar-auth-wiring.\n\n## Story Handoff\n- **Story:** #66 — navbar auth wiring\n- **Branch:** chore/navbar-auth-wiring\n- **From:** Byrd (phase: GREEN Task 6)\n- **To:** team-lead (for Task 7 / Bentham review dispatch)\n- **Status:** TESTS_PASSING (463/463)\n\n### What was done\n- Replaced hardcoded MvoxNav props in +layout.svelte with store-derived values: signedIn ($userStore.status === 'ready'), userName, userInitial, orgLabel, orgInitials, orgPickerMode\n- Calls hydrateUserStore() on mount; storage listener re-hydrates on token key change (sign-in/sign-out from other tabs)\n- Removed the old getToken() signedIn check and the manual refreshSignedIn() pattern — userStore owns auth state now\n- Preserved: mounted guard, currentTab derivation from $page.url, CSS import, children render\n- Full GREEN gate: pnpm check (0 errors), pnpm test:unit (463/463), pnpm lint:fix (no fixes), pnpm build (clean)\n- PO co-author trailer verified present\n\n### One structural note (not a surface-and-stop)\nThe old layout watched for `e.key === 'token'` in the storage listener. The storage.ts KEYS.token is `'token'` (entu/webapp compat), which is what userStore's getToken() reads. I kept the same key in the listener and wired it to hydrateUserStore() instead of refreshSignedIn() — correct behavior preserved.\n\n### Files changed\n- `src/routes/+layout.svelte`",
+    "summary": "Task 6 GREEN — +layout wiring committed 7f593ae",
+    "timestamp": "2026-05-24T13:01:16.863Z",
+    "color": "red",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd-2",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd-2\",\"timestamp\":\"2026-05-24T13:01:22.015Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T13:01:22.015Z",
+    "color": "red",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd-2",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd-2\",\"timestamp\":\"2026-05-24T13:01:26.794Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T13:01:26.794Z",
+    "color": "red",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "[2026-05-24 11:32] **Branch review verdict: RED** — `chore/navbar-auth-wiring` @ `7f593ae`. One blocker (workspace-wide safety regression), substance is otherwise GREEN with 2 YELLOWs.\n\n## RED-1 — `.githooks/pre-commit` deletion on squash-merge\n\nThe branch is **2 commits behind main** that the merge commit `4eeedda` did NOT absorb:\n\n```\n8a42302  chore: swap pre-commit hook from .git/EXPECTED_BRANCH file to env var\nef78aa3  chore: add pre-commit branch-intent verifier (.git/EXPECTED_BRANCH marker)\n```\n\nBranch base is `3d0ef30` (pre-hook). `4eeedda`'s \"merge main\" only pulled `3d0ef30` (second parent), not the hook commits. Effect: `git diff main..chore/navbar-auth-wiring` shows `.githooks/pre-commit | 72 ---` — squash-merging will **DELETE the hook from main**. The hook is the branch-intent verifier (shared-tree defense for mvox-dev) that landed exactly this session pair; clobbering it via the squash is the worst-of-both-worlds — silent regression of a freshly-ratified workspace safety mechanism without trace in the squash subject.\n\n**Fix path (any of these works; pick one)**:\n1. **Rebase** the chore branch onto current main (`git rebase main`). Cleanest; brings both hook commits in, drops the merge commit, the branch becomes 8 implementer commits + 3 supporting commits all linearised.\n2. **Merge main into the chore branch** properly (`git merge main` from the branch tip). Adds a real merge commit that picks up both `ef78aa3` and `8a42302`. The squash will then see no `.githooks/pre-commit` deletion.\n3. **Squash + manually restore** the hook in the squash commit. Possible but error-prone, and the audit trail loses the \"we noticed and added it back\" reasoning.\n\nI recommend option 2 — least disruptive given the branch's existing merge-commit history; team-lead and Josquin already coordinated this kind of mid-flight merge once (`4eeedda`). After the merge, re-verify `git diff --name-only main..chore/navbar-auth-wiring` excludes `.githooks/pre-commit`, then squash.\n\n**Re-review after fix**: I only need to re-verify the diff shape; the substance review below stands.\n\n## YELLOW-66.1 — `$app/stores` legacy import on a fresh write\n\n`src/routes/+layout.svelte:3` uses `import { page } from '$app/stores'`. The rest of the file is full runes (`$state`, `$derived`, `$props`, `onMount` lifecycle). My session-13 YELLOW-35.3 calibration: `$app/state` is the SvelteKit 2 / runes-compatible convention on fresh surfaces. Mechanical 1-line swap: `import { page } from '$app/state';` — `$page.url.pathname` becomes `page.url.pathname` (drop the `$` dereference; `$app/state` exports a rune-reactive object, not a store).\n\nNot a blocker because the legacy store form works correctly. Fold into the RED-1 rebase if Byrd is touching the file anyway; else carry forward.\n\n## YELLOW-66.2 — `ENTU_DB = 'polyphony'` hardcoded in userStore.ts:17\n\nImplementer pre-flagged: `// Dev db; derive from env when prod is wired`. Aligned with Path C arch-decision which uses `PUBLIC_ENTU_DB` via `$env/static/public` everywhere else. CHORE-66 is dev-only against polyphony, so not a current blocker — but a hardcoded dev db at the top of a fresh module is exactly the kind of thing that silently rides into mvox prod three CHOREs later. Route to a follow-up issue (\"lift ENTU_DB to env\"); should land before any prod deployment touches userStore.ts.\n\n## Substance review — GREEN\n\n- **TDD discipline**: Atomic bundles confirmed. `bcdeb00` (Task 3) ships userStore.ts + userStore.spec.ts in one commit (~20 spec cases covering JWT decode + fetch + ready + selectedOrgStore fallback chain + selectOrg + pickerModeStore). `7c455be` (Task 4) ships OrgPicker.svelte + spec + tests/setup.ts cleanup fix. `f83decd` (Task 5) ships MvoxNav.svelte + spec. All test-co-with-impl.\n- **URL-overrides-persisted rule (3a37e42)**: Honored across all surfaces. `selectedOrgStore` reads URL → localStorage → first-org (correct order); on URL ↔ localStorage divergence, URL wins AND backfills the store (the two-write symmetry sub-rule I lifted at decision time) — directly tested at `userStore.spec.ts:224-231`. `selectOrg` writes URL via `goto` (with `keepFocus: true, noScroll: true` — correct SvelteKit pattern for noisy soft-nav) and localStorage in the correct order.\n- **Path C invariants**: No new `+server.ts` files. All Entu calls in `userStore.ts` use the canonical `ENTU_API_BASE` constant. JWT read exclusively via `storage.getToken()` helper (single source of truth honored). No code path writes `user`/`accounts` after `setToken`.\n- **Svelte 5 runes**: All new components + +layout.svelte use `$state`/`$derived`/`$effect`/`$props`. Zero `export let` / `$:` / `on:click=` syntax in the diff.\n- **L101 hardcoded-English heuristic**: OrgPicker.svelte uses `m.nav_org_picker_placeholder()` + `m.nav_org_picker_switch_to({ orgName })` (parameterised — correct paraglide form); MvoxNav.svelte uses `m.nav_org_picker_placeholder()` for its inline placeholder path. Zero hardcoded English.\n- **Locale parity for 2 new keys × 4 locales**: et/lv/uk renderings reasonable; ICU param `{orgName}` preserved in all four. Comenius's i18n-conventions.md scratchpad commit (`be4594c`) captures the translation choices.\n- **Storage listener re-wire**: `+layout.svelte:15-17` swap from `refreshSignedIn` → `hydrateUserStore` is correct under Path C — the store now owns auth state derivation, so token-key change → re-hydrate is the right contract. Cross-tab sign-in/sign-out works because hydration walks the same code path as initial mount.\n- **OrgPicker UX**: chip click toggles, Escape closes, click outside doesn't (acceptable for chip-style picker; full menu close-on-outside is follow-up scope), `aria-label` on each menu item via paraglide ICU.\n- **tests/setup.ts cleanup fix**: `afterEach(() => cleanup())` is correct under `globals: false`. No regressions for existing specs because they each render fresh in their own `it` blocks.\n\n## Per-commit-GREEN structural spot-check\n\n- `e12522a` (types-only) — pure additive .ts file, no consumer change. Structurally GREEN.\n- `1c9e5da` (keys-only) — additive JSON. No consumer change at this commit. Structurally GREEN.\n- `bcdeb00` (Task 3 atomic) — userStore.ts + userStore.spec.ts ride together; no other module imports yet. Structurally GREEN.\n- `7c455be` (Task 4 atomic) — OrgPicker.svelte + spec + tests/setup.ts; OrgPicker imports userStore (which exists since `bcdeb00`). Spec invariants depend on the cleanup fix in this same commit. Structurally GREEN.\n\nI'm not running gates directly per scope (read-only role), and the implementer's reported `pnpm check 0 / 463/463 / lint clean / build clean` at branch tip is consistent with these layerings.\n\n## Squash subject body should mention\n\nAfter RED-1 fix:\n1. `#66` navbar auth wiring — closes\n2. Atomic per-task commits preserved in squash body for audit trail (Task 1 types, Task 2 keys, Task 3 userStore, Task 4 OrgPicker, Task 5 MvoxNav, Task 6 +layout)\n3. Carry-forward YELLOW-66.1 (`$app/stores` → `$app/state` lift) — fold into a follow-up CHORE or close in this branch's RED-fix rebase\n4. Carry-forward YELLOW-66.2 (`ENTU_DB` env-lift before prod)\n\n## Verdict\n\n**RED.** Hook deletion is the only blocker. Substance is GREEN; fix RED-1 (one of three paths above), I re-verify the diff shape, then GREEN.",
+    "summary": "CHORE-66 branch review: RED on hook regression + 2 YELLOWs",
+    "timestamp": "2026-05-24T13:05:12.396Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-24T13:05:17.779Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T13:05:17.779Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-24T13:05:27.494Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T13:05:27.494Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd-2",
+    "text": "[2026-05-24 13:07] RED-1 + YELLOW-66.1 both fixed. Two commits pushed to chore/navbar-auth-wiring.\n\n**Step A — RED-1 (hook gap):** Merge commit `5dd8461`\n- `git merge main --no-ff` picked up `ef78aa3` + `8a42302` (hook v1 + v2)\n- Verified: `git diff --name-only main..HEAD | grep -i githooks` → empty (no output)\n\n**Step B — YELLOW-66.1 ($app/state):** Commit `0a5a68e`\n- `import { page } from '$app/stores'` → `import { page } from '$app/state'`\n- All four `$page.url.pathname` references → `page.url.pathname` (drop `$`)\n- pnpm check: 0 errors; pnpm test:unit: 463/463; lint: no fixes; build: clean\n- PO trailer verified present\n\nBranch tip is now `0a5a68e`. Ready for Bentham re-verify.",
+    "summary": "RED-1 + YELLOW-66.1 fixed, two commits pushed",
+    "timestamp": "2026-05-24T13:08:06.340Z",
+    "color": "red",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd-2",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd-2\",\"timestamp\":\"2026-05-24T13:08:11.118Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T13:08:11.118Z",
+    "color": "red",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "[2026-05-24 11:43] **Re-verify verdict: GREEN** — `chore/navbar-auth-wiring` @ `0a5a68e`.\n\nDiff-shape verification:\n- `.githooks/pre-commit` no longer in chore-vs-main diff. `git diff --name-only main..chore/navbar-auth-wiring | grep -i githook` returns empty. The 15 changed files are all expected scope (messages × 4, src/lib/auth × 3, src/lib/components × 4, src/routes/+layout.svelte, src/tests/setup.ts, teams/mvox-dev/memory × 2).\n- `$app/stores` residue scan clean. `grep -rn \"app/stores\" src/` returns nothing. `src/routes/+layout.svelte:3` now reads `import { page } from '$app/state';` — runes-compatible convention applied.\n\nYELLOW-66.2 (`ENTU_DB` env-lift) confirmed deferred to post-merge follow-up CHORE.\n\n**GREEN.** Cleared for Palestrina approval → Josquin squash-merge → close #66.",
+    "summary": "CHORE-66 re-verify: GREEN",
+    "timestamp": "2026-05-24T13:08:52.109Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-24T13:08:55.254Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T13:08:55.254Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "[2026-05-24 11:48] **Task 8 complete — CHORE-66 shipped to main.**\n\n**Squash SHA:** `9266e2e` on `main`\n**Pushed:** `8a42302..9266e2e main -> main`\n**Diff:** 15 files / +852 / -33\n**Branch deleted:** local + remote `chore/navbar-auth-wiring` (was `0a5a68e`)\n**Stash dance:** Byrd's `byrd.md` scratchpad stashed pre-checkout, restored post-push, clean.\n**Trailer verified:** `Co-authored-by: Mihkel Putrinš <mihkel.putrinsh@gmail.com>` present (no in-body `Co-authored-by:` lines — the rule I codified at `7d078f7` held).\n**GH #66 auto-closed:** state `CLOSED`, `closedAt: 2026-05-24T13:11:38Z`.\n\nFiles squashed:\n- NEW: `src/lib/auth/types.ts` (+143), `src/lib/auth/userStore.ts` (+139), `src/lib/auth/userStore.spec.ts` (+286), `src/lib/components/OrgPicker.svelte` (+85), `src/lib/components/OrgPicker.spec.ts` (+65)\n- UPDATE: `src/lib/components/MvoxNav.{svelte,spec.ts}`, `src/routes/+layout.svelte`, `src/tests/setup.ts`, 4× `messages/*.json`\n- Scratchpad: `i18n-conventions.md`, `perotin.md` (folded in via squash)\n\nBoth YELLOWs noted in the commit body (66.1 folded; 66.2 deferred). `MVOX_EXPECTED_BRANCH=main` was set on the commit per dispatch — assuming that's a pre-commit hook gate; it didn't surface anything to me, so I take it as a clean pass.\n\nGoing idle. Over to you for #66 closure comment + 66.2 follow-up CHORE file + tracker mark.",
+    "summary": "Squash @ 9266e2e — #66 CLOSED",
+    "timestamp": "2026-05-24T13:12:02.184Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-24T13:12:04.876Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T13:12:04.876Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "[2026-05-24 13:11] Stale task_assignment for #18 — already completed at `9266e2e` (reported 11:48); #66 closed at 13:11:38Z per `gh issue view`. Idle.",
+    "summary": "Stale task_assignment #18 ack",
+    "timestamp": "2026-05-24T13:12:14.256Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-24T13:12:17.038Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-24T13:12:17.038Z",
+    "color": "pink",
     "type": "message",
     "read": true
   },
   {
     "from": "finn",
-    "text": "[2026-05-24 05:56] **Task #73 — mvox.eu wiring diagnosis**\n\n---\n\n## Account-level Pages projects\n\n| Project | Custom Domains | Last Modified |\n|---|---|---|\n| **multivox** | `multivox.pages.dev` only | 3 minutes ago |\n| entuphony | `entuphony.pages.dev` | 5 days ago |\n| polyphony-registry | `polyphony-registry.pages.dev`, `polyphony.uk` | 1 month ago |\n| polyphony-vault | `polyphony-vault.pages.dev`, 7x `*.polyphony.uk` | 1 month ago |\n| esl-review | `esl-review.pages.dev` | 2 months ago |\n| evr-mail-mock | `evr-mail-mock.pages.dev` | 4 months ago |\n\n**Key finding:** `multivox` project shows only `multivox.pages.dev` in wrangler's domain list. `mvox.eu` does NOT appear as an attached domain on any Pages project in the wrangler output.\n\n---\n\n## mvox.eu binding in multivox Pages project (CF API)\n\nThe CF Pages API (`/accounts/{id}/pages/projects/multivox/domains`) does show `mvox.eu` as a registered domain on the `multivox` project, but with **status: `pending`**:\n\n```json\n{\n  \"name\": \"mvox.eu\",\n  \"status\": \"pending\",\n  \"verification_data\": {\n    \"status\": \"pending\",\n    \"error_message\": \"CNAME record not set\"\n  },\n  \"validation_data\": {\n    \"status\": \"pending\",\n    \"method\": \"http\"\n  },\n  \"created_on\": \"2026-05-23T22:58:15.356825Z\"\n}\n```\n\n**The Pages custom domain binding was added on 2026-05-23 22:58 UTC but was never activated because the required CNAME DNS record was never set.**\n\n---\n\n## DNS resolution for mvox.eu\n\n```\nA:     188.114.97.3, 188.114.96.3\nAAAA:  2a06:98c1:3120::3, 2a06:98c1:3121::3\nCNAME: (none — apex record, proxied A/AAAA via CF)\nNS:    tess.ns.cloudflare.com, aaron.ns.cloudflare.com\n```\n\nThe A/AAAA records `188.114.97.3` / `188.114.96.3` / `2a06:98c1:3120::3` / `2a06:98c1:3121::3` are **Cloudflare's generic anycast IPs** — these mean the zone is active in CF but the records point to some non-Pages origin (not to `multivox.pages.dev`). For Pages to serve a custom domain, you need a CNAME pointing at `multivox.pages.dev` (or CF's special `CNAME flattening` at the apex). That CNAME is absent.\n\n---\n\n## Zone state for mvox.eu\n\n```json\n{\n  \"id\": \"8c9bc3d0f03502efe6429878cdfb8160\",\n  \"status\": \"active\",\n  \"name_servers\": [\"aaron.ns.cloudflare.com\", \"tess.ns.cloudflare.com\"],\n  \"paused\": false\n}\n```\n\nZone is active, unpaused, on CF nameservers. DNS is fully CF-controlled — the CNAME could be added directly in the CF dashboard or via the zone API.\n\n---\n\n## Possible interceptors (Workers routes, Page rules)\n\n**API token scope limitation:** The CLOUDFLARE_API_TOKEN has account-level Pages rights but lacks Zone DNS/Workers read rights — queries to `/zones/{id}/dns_records`, `/zones/{id}/workers/routes`, and `/zones/{id}/pagerules` all return `{\"code\":10000,\"message\":\"Authentication error\"}`.\n\nEvidence from HTTP response headers however is conclusive:\n\n- `https://mvox.eu/` → HTTP 200, `last-modified: Tue, 30 Dec 2025 10:09:07 GMT`, **no `x-sveltekit-page` header, no CF Pages headers** (`cf-edge-cache`, etc.)\n- `https://mvox.eu/library` → HTTP 404, `last-modified: Mon, 06 Nov 2023 23:06:18 GMT` — this is the **CF default 404 page** (the Nov 2023 date is CF's internal 404 HTML asset, not a user-served page)\n\nThe root path (/) returns a months-old static HTML file, not the SvelteKit app. Sub-paths 404 with CF's generic page, confirming no SvelteKit routing is active.\n\n---\n\n## Diagnosis\n\n**Root cause: The CNAME binding for `mvox.eu` → `multivox.pages.dev` was never created in the CF zone DNS records.**\n\nThe sequence of events:\n1. **2026-05-23 22:58 UTC:** The domain `mvox.eu` was registered as a custom domain on the `multivox` Pages project (likely via `wrangler pages domain add` or the dashboard).\n2. **Never completed:** CF Pages requires a CNAME record in the zone pointing `mvox.eu` → `multivox.pages.dev` (using CNAME flattening at the apex) to activate the binding. This step was skipped or failed silently.\n3. **Current state:** The zone has plain A/AAAA records pointing to CF anycast IPs — these route to *something else* (likely a static HTML file previously hosted, possibly from an older CF Pages project, Workers site, or a CF static asset). The Pages domain binding stays `pending` with `\"CNAME record not set\"`.\n\n**What mvox.eu is actually serving:** A static HTML file with a Dec 2025 last-modified date — consistent with a CF Workers site, an old CF Pages deployment on a different project, or a CF static redirect that was set up before the multivox project existed. Since the token can't read zone DNS records directly, the exact prior origin is not visible from here — would need zone DNS read permission or dashboard access.\n\n**Fix required (NOT doing it — read-only):** In the mvox.eu CF zone, replace the existing A/AAAA records with a CNAME record pointing `mvox.eu` → `multivox.pages.dev`. CF's CNAME flattening handles the apex domain case. After that, the Pages domain binding (already registered, status `pending`) should activate automatically and serve the current `multivox` deployment.\n\n(*MVOX:Finn*)",
-    "summary": "mvox.eu wiring diagnosis — CNAME binding never completed",
-    "timestamp": "2026-05-24T05:57:18.994Z",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779631459980@finn\",\"from\":\"finn\",\"timestamp\":\"2026-05-24T14:04:26.139Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-24T14:04:26.139Z",
     "color": "blue",
     "type": "message",
     "read": true
   },
   {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-24T05:57:23.453Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T05:57:23.453Z",
-    "color": "blue",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-24T05:57:31.844Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T05:57:31.844Z",
-    "color": "blue",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "[2026-05-24 05:58] Task #74 BLOCKED — DNS API auth error on Step 1, stopping per dispatch instruction.\n\n**Exact failure:**\n```\nGET /zones/8c9bc3d0f03502efe6429878cdfb8160/dns_records?per_page=100\nAuthorization: Bearer $CLOUDFLARE_API_TOKEN\n\nResponse:\n{\n  \"success\": false,\n  \"errors\": [\n    {\n      \"code\": 10000,\n      \"message\": \"Authentication error\"\n    }\n  ]\n}\n```\n\nConfirms Finn's probe finding from Task #73: CLOUDFLARE_API_TOKEN has account-level Pages rights but lacks Zone DNS read scope.\n\n**What I did NOT do** (following dispatch's \"don't try to work around it\"):\n- No DELETE attempts\n- No CNAME CREATE\n- No retry with different params\n- No record state captured (the GET failed before producing any record list)\n- Credentials env sourced successfully; the token is present and valid for SOMETHING, just not zone DNS\n\n**Did NOT touch:** any DNS record. mvox.eu zone state is exactly as it was before this dispatch.\n\nTask #74 left `in_progress` — blocked on token scope. Per dispatch: \"PO will fall back to dashboard fix.\" Standing by for PO action.\n\n(Note: if PO would like a token with Zone:DNS:Edit scope minted for future automation, I can stand by to retry once the new token lands in `/home/michelek/.config/mvox/credentials.env`.)",
-    "summary": "DNS API auth error — token scope insufficient, STOP per dispatch",
-    "timestamp": "2026-05-24T06:00:11.085Z",
-    "color": "yellow",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-24T06:00:17.782Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T06:00:17.783Z",
-    "color": "yellow",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "[2026-05-24 06:00] Re: task_assignment #74 just received (ts 05:59:33Z) — crossed my blocked-status report in flight (my 05:58 SendMessage).\n\n**Not re-probing** — the token scope is unchanged in the past ~90 seconds, would just return the same `Authentication error` (code 10000) on the `dns_records` GET.\n\n**Current state (per 05:58 message, full evidence there):**\n- Step 1 DNS list GET → `{\"success\": false, \"errors\": [{\"code\": 10000, \"message\": \"Authentication error\"}]}`\n- Confirms Finn's #73 finding: token has account-level Pages rights, lacks Zone DNS scope\n- Per dispatch instruction \"If your first DNS API call returns auth error, STOP and report — don't try to work around it\" — STOPPED\n- No DELETE, no CREATE, no DNS mutations of any kind\n- Task #74 left `in_progress`\n\n**Awaiting one of:**\n(a) PO fixes wiring via CF dashboard (per dispatch fallback path)\n(b) PO mints a new token with `Zone:DNS:Edit` scope and adds it to `/home/michelek/.config/mvox/credentials.env` — then re-dispatch me\n\nStanding by.",
-    "summary": "Dispatch crossed — see 05:58 auth-error report",
-    "timestamp": "2026-05-24T06:00:31.175Z",
-    "color": "yellow",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-24T06:00:34.468Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T06:00:34.468Z",
+    "from": "comenius",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779631466289@comenius\",\"from\":\"comenius\",\"timestamp\":\"2026-05-24T14:05:00.745Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-24T14:05:00.745Z",
     "color": "yellow",
     "type": "message",
     "read": true
   },
   {
     "from": "tallis",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779603117638@tallis\",\"from\":\"tallis\",\"timestamp\":\"2026-05-24T06:12:02.761Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-24T06:12:02.761Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779603116596@josquin\",\"from\":\"josquin\",\"timestamp\":\"2026-05-24T06:12:08.876Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-24T06:12:08.876Z",
-    "color": "yellow",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779603115031@finn\",\"from\":\"finn\",\"timestamp\":\"2026-05-24T06:12:16.109Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-24T06:12:16.109Z",
-    "color": "blue",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "[2026-05-24 06:13] Session-21 close.\n\n- **[LEARNED]** Post-merge spot-check confirms YELLOW-A landed pre-merge (28 `m.*()` calls + paraglide import in `src/routes/library/+page.svelte` on main). Calibration ratified: \"small fix where the keys already exist + implementer's own intent points to it = fold-in pre-merge\" is the right default. Same pattern as YELLOW-B.1 in session 17.\n- **[DEFERRED]** YELLOW-C still open on main — `src/tests/snippet-helpers.ts` `textSnippet` helper still has the bare-text `() => text` form, so the `[svelte] invalid_raw_snippet_render` warning fires on every spec call (16 calls per test run across the 4 amended specs). One-line fix: wrap output in `<span>`. Worth a follow-up GH issue or quick post-merge hotfix in session 22; not a blocker.\n- **[WARNING]** None. Branch landed clean, my own architecture verdict's sub-spec error (YELLOW-C) is the only loose end.\n\nStewardship ledger entering session 22: 1 open (YELLOW-C), 3 long-carry (case study #16, Brilliant entry #17, entu docs RFC #18 — all still parked appropriately). Ready for shutdown approval.",
-    "summary": "Session-21 close — clean ledger + 1 deferred",
-    "timestamp": "2026-05-24T06:12:49.222Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "comenius",
-    "text": "[LEARNED] Svelte 5 `{@const}` cannot be placed inside plain HTML elements — only inside block tags or components. Move string splits/derives to `<script>` block.\n[LEARNED] When colored `<span>` wrappers must survive i18n, split parameterized key into a *_unit label key; leave the parameterized key in place (unused but parity-compliant).\n[LEARNED] library_overdue_marginalia has 1 TODO per non-en locale — needs PO date-specific copy before branch is production-ready for those locales.",
-    "summary": "Comenius closing — session 21 notes saved",
-    "timestamp": "2026-05-24T06:12:49.668Z",
-    "color": "pink",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "comenius",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779603118929@comenius\",\"from\":\"comenius\",\"timestamp\":\"2026-05-24T06:12:53.979Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-24T06:12:53.979Z",
-    "color": "pink",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779603116074@bentham\",\"from\":\"bentham\",\"timestamp\":\"2026-05-24T06:13:05.840Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-24T06:13:05.840Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779603118131@byrd\",\"from\":\"byrd\",\"timestamp\":\"2026-05-24T06:14:22.804Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-24T06:14:22.804Z",
+    "text": "[2026-05-24 14:04] Scratchpad updated with session-22 checkpoint (spec-refactor-discard discipline, atomic bundle workflow, `$app/navigation` mock pattern for OrgPicker consumers). Ready to shut down.\n\n[LEARNED] Byrd's committed file is always the truth in atomic bundles — discard local divergence, never follow up.\n[LEARNED] `vi.mock('$app/navigation', ...)` needed in any spec that mounts OrgPicker, even indirectly.\n[DEFERRED] Task 5 MvoxNav.spec.ts pending Byrd-2 atomic commit — spec is ready on disk.",
+    "summary": "Scratchpad saved, approving shutdown",
+    "timestamp": "2026-05-24T14:05:01.453Z",
     "color": "orange",
     "type": "message",
     "read": true
   },
   {
-    "from": "josquin",
-    "text": "[2026-05-24 06:23] Josquin online — picking up Task #75 (DNS rebind retry with expanded token scope). Starting Step 1 probe now.",
-    "summary": "Josquin online — Task 75",
-    "timestamp": "2026-05-24T06:23:30.112Z",
-    "color": "yellow",
+    "from": "byrd-2",
+    "text": "[2026-05-24 13:08] Byrd-2 shutdown ready. Scratchpad saved to teams/mvox-dev/memory/byrd.md.\n\n[LEARNED] $app/state vs $app/stores — SvelteKit 2 Runes convention; page.url.pathname not $page.url.pathname.\n[LEARNED] Branch hook gap pattern — git merge main --no-ff when pre-commit hook landed after branch cut.\n[DEFERRED] YELLOW-66.2 — ENTU_DB hardcode in userStore.ts:17, filed for follow-up CHORE.",
+    "summary": "Byrd-2 shutdown ready, scratchpad saved",
+    "timestamp": "2026-05-24T14:05:04.043Z",
+    "color": "red",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779631469427@tallis\",\"from\":\"tallis\",\"timestamp\":\"2026-05-24T14:05:04.229Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-24T14:05:04.229Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd-2",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779631476762@byrd-2\",\"from\":\"byrd-2\",\"timestamp\":\"2026-05-24T14:05:07.426Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-24T14:05:07.426Z",
+    "color": "red",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "perotin",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779631480282@perotin\",\"from\":\"perotin\",\"timestamp\":\"2026-05-24T14:05:10.275Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-24T14:05:10.275Z",
+    "color": "cyan",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "[2026-05-24 14:08] Scratchpad updated with 2 new session-22 calibrations:\n\n- **[CALIBRATION-MERGE-SHAPE]** — for any branch with a merge commit in its history, verify the squash-merge diff doesn't undo recent main commits. CHORE-66 RED-1 case study encoded. New standing check: run `git log --oneline branch..main` on every branch review; non-empty result → diff-shape will include negative deltas for any file added on main during the gap.\n- **[CALIBRATION-STEWARDSHIP-IN-FLIGHT]** — when a CHORE spec cites a forthcoming arch-decision, ship the lift FIRST so the spec can resolve its citation by SHA. CHORE-66 sequencing (lift `3a37e42` → spec resolve `1a1bd85` → implementation can cite stable SHA) is the canonical exemplar.\n- **[DEFERRED]** YELLOW-66.2 (`ENTU_DB` env-lift) flagged for next-session check.\n- **[PRUNED]** Session-21 CHORE-60 entries dropped (closed by session-22 reviews).\n\nApproving shutdown.",
+    "summary": "Shutdown ack — scratchpad saved, approving",
+    "timestamp": "2026-05-24T14:05:22.349Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779631463112@bentham\",\"from\":\"bentham\",\"timestamp\":\"2026-05-24T14:05:22.954Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-24T14:05:22.954Z",
+    "color": "green",
     "type": "message",
     "read": true
   },
   {
     "from": "josquin",
-    "text": "[2026-05-24 06:23] Step 1 probe SUCCESS — token now scoped correctly (success: true, 7 records returned).\n\nDNS state has CHANGED since the brief was written:\n- Brief expected: 2× apex A (188.114.97.3, 188.114.96.3) + 2× apex AAAA (2a06:98c1:3120::3, 2a06:98c1:3121::3)\n- Actual found: 1× apex A only — `185.31.240.240` proxied (id: d2897984ef87fb6f5b0fa20c87663629), NO AAAAs\n\nOther records (KEEP, not touching):\n- CNAME www.mvox.eu → mvox.eu (proxied)\n- 3× MX route{1,2,3}.mx.cloudflare.net\n- TXT cf2024-1._domainkey (DKIM)\n- TXT mvox.eu SPF\n\n185.31.240.240 looks like zone.eu (parking IP). Likely PO or CF cleaned up the multiple A/AAAA between Task #74 and now. The intent is unchanged — replace whatever apex routing exists with CNAME → multivox.pages.dev. Proceeding with Step 3 (delete the 1 A record) + Step 4 (create CNAME).",
-    "summary": "DNS state changed since brief — proceeding",
-    "timestamp": "2026-05-24T06:24:10.301Z",
-    "color": "yellow",
+    "text": "[2026-05-24 14:05] Shutdown ack, approving below.\n\n[LEARNED] **Surface-and-stop pays even more on stacked plan errors.** CHORE-66 Task 1 had two independent plan defects (URL form + data model inversion). Sent two separate surface-and-stops; total round-trip ~30 min × 2 saved hours of mid-Task-3 rewrite. Dispatch's \"keep surfacing\" wording was authorization, not budget — used it.\n\n[LEARNED] **Dogfooded the trailer rule cleanly.** After codifying `7d078f7`, every commit this session passed `git log -1 --format='%(trailers)'` with PO trailer present. Self-dogfooding before propagating is the right cadence for arch-decisions like this.\n\n[DEFERRED] **YELLOW-66.2** — `ENTU_DB` hardcode in `src/lib/auth/userStore.ts` defaults to `'polyphony'`; env-lift via `PUBLIC_ENTU_DB` from `$env/static/public` before prod cut. Filed CHORE TBD per dispatch.\n\n[WARNING] **Pérotin's seed-table convention sent member IDs labeled \"person + member\" pairs.** If I'd read the plan literally and probed `<PERSON_ID>` with the member ID, I'd have hit a different entity type and possibly misdiagnosed. Worth pinning a label-or-ordering convention on future Pérotin seed deliveries (person ID first, OR explicit `Type:` column).\n\nCheckpoint written to `teams/mvox-dev/memory/josquin.md`. Ready for shutdown.",
+    "summary": "Session 22 close — 3 takeaways",
+    "timestamp": "2026-05-24T14:06:01.736Z",
+    "color": "pink",
     "type": "message",
     "read": true
   },
   {
     "from": "josquin",
-    "text": "[2026-05-24 06:27] Task #75 COMPLETE — mvox.eu serving mvox build.\n\n## Step 1 — DNS probe (token scope verified)\n`success: true`, 7 records returned. Token edit applied correctly.\n\n## Step 2 — Apex records to remove (state had drifted from brief)\nBrief expected 2× A + 2× AAAA. Actual: ONE proxied apex A only.\n- `d2897984ef87fb6f5b0fa20c87663629` — A `mvox.eu` → `185.31.240.240` proxied (zone.eu parking IP)\n\nNo apex AAAAs present. Brief's 4 records were apparently cleaned up earlier.\n\n## Step 3 — Deleted apex A\n```\nDELETE /dns_records/d2897984ef87fb6f5b0fa20c87663629\n→ {\"result\":{\"id\":\"d2897984ef87fb6f5b0fa20c87663629\"},\"success\":true}\n```\n\n## Step 4 — Created apex CNAME\n```\nPOST /dns_records {\"type\":\"CNAME\",\"name\":\"mvox.eu\",\"content\":\"multivox.pages.dev\",\"proxied\":true,\"ttl\":1}\n→ id: 542ba32d1c94525b990f55e7f653401e, success:true, created_on: 2026-05-24T06:24:32Z\n```\n\n## Step 5 — Pages binding + endpoint verification\n\nBinding `verification_data.status` transitions:\n- poll 1 (06:25:09, ~37s after CNAME): pending — \"CNAME record not set\"\n- poll 2 (06:25:25): pending — \"CNAME record not set\"\n- poll 3 (06:25:41, ~69s after CNAME): **active** — verification cleared\n- polls 4-6: verification stable at `active`\n\nNOTE: top-level `status` remains `pending` because `validation_data.status: pending` (HTTP-method SSL validation, runs after DNS verify). That's a CF background task — serving is already live.\n\nEndpoint smoke (post-binding-active):\n- `https://mvox.eu/library` → **HTTP/2 200**, `content-type: text/html`, SvelteKit preload chunks present\n- `https://mvox.eu/auth/login` → **HTTP/2 200**, `x-sveltekit-page: true`, `server: cloudflare`, `cf-ray: a00a3b540a2e360b-FRA`\n- `https://mvox.eu/` → **HTTP/2 200**, `x-sveltekit-page: true`\n\nAll three serve the mvox CHORE-60 build (matching preload hashes: `start.y624_gjC.js`, `app.Bpbjc7CB.js`, asset `0.IbWz0Ef4.css`).\n\n## Records preserved (untouched)\n- CNAME `www.mvox.eu` → `mvox.eu`\n- 3× MX `route{1,2,3}.mx.cloudflare.net`\n- TXT `cf2024-1._domainkey` (DKIM)\n- TXT `mvox.eu` (SPF)\n\nNo commits, no git operations. Task #75 marked completed. Ready for next assignment.",
-    "summary": "Task #75 COMPLETE — mvox.eu live, 200 OK",
-    "timestamp": "2026-05-24T06:27:25.587Z",
-    "color": "yellow",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-24T06:27:30.125Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T06:27:30.125Z",
-    "color": "yellow",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-24T06:27:36.038Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-24T06:27:36.038Z",
-    "color": "yellow",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "[2026-05-24 06:28] Josquin shutdown closing.\n\n- [LEARNED] CF Pages domain binding has TWO inner status fields (`verification_data` + `validation_data`); top-level `status` only flips when both clear. Serving starts at `verification_data: active`, NOT at top-level `status: active`. Future binding-poll tasks should gate on inner status + endpoint smoke, not top-level. Saved to scratchpad.\n- [LEARNED] Always re-probe live DNS state before executing brief-supplied record IDs — they drift. Task #75 brief expected 4 records, actual was 1; surface-the-diff before mutating. Saved to scratchpad.\n- [WARNING] none. mvox.eu serving GREEN on all 3 endpoint smokes. validation_data SSL flip still pending in background but doesn't block serving.\n\nApproving shutdown.",
-    "summary": "Josquin shutdown closing",
-    "timestamp": "2026-05-24T06:29:22.976Z",
-    "color": "yellow",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779604084949@josquin\",\"from\":\"josquin\",\"timestamp\":\"2026-05-24T06:29:26.972Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-24T06:29:26.972Z",
-    "color": "yellow",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779631473089@josquin\",\"from\":\"josquin\",\"timestamp\":\"2026-05-24T14:06:04.670Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-24T14:06:04.670Z",
+    "color": "pink",
     "type": "message",
     "read": true
   }

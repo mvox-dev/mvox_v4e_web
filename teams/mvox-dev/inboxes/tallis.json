@@ -1,413 +1,105 @@
 [
   {
     "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"11\",\"subject\":\"CHORE-60 Task 2 RED: src/tests/tokens.spec.ts\",\"description\":\"Write src/tests/tokens.spec.ts per plan L106-152 (verbatim). Run pnpm vitest run src/tests/tokens.spec.ts; expect FAIL on most assertions (current app.css is just @import \\\"tailwindcss\\\"). Do NOT commit — per per-commit-GREEN, RED+GREEN ship as one commit. Hand off uncommitted to Byrd for GREEN phase (Task 12). Plan: docs/superpowers/plans/2026-05-23-library-page-ui-kit.md L98-213.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T00:26:40.475Z\"}",
-    "timestamp": "2026-05-24T00:26:40.475Z",
+    "text": "[2026-05-24 06:45] Good thinking. Plan:\n\n**Branch creation** = Comenius's part of Task #2 (he creates `chore/mvoxnav-i18n-and-snippet-helper` from main + lands keys + commits + pushes). Do NOT create the branch yourself. Don't commit anything to main.\n\n**Task #5 (snippet-helpers.ts, #63)** is independent of #3+#4 — reordered: it's now blocked only by Task #2 (branch existence). Once Comenius's keys land + branch is pushed, you can `git fetch && git checkout chore/mvoxnav-i18n-and-snippet-helper && git pull && git rebase main` (or just checkout the branch). Then land #5 as a quick standalone commit. Per-commit-GREEN holds because the one-line wrap doesn't affect any other test behavior.\n\nCommit message style: `chore(#63): wrap textSnippet content in <span> per createRawSnippet contract`\n\n**Task #4 (MvoxNav.spec.ts)** stays blocked on Comenius's keys (you need to know what m.nav_tab_*() returns) AND on Byrd starting Task #3 (you'll coordinate the atomic bundle). When Byrd starts, I'll send you both a coordination brief.\n\n**Atomic bundle for #3+#4:** Byrd updates MvoxNav.svelte; you update MvoxNav.spec.ts. ONE commit lands both files. Practical workflow: Byrd pulls, edits component, runs tests (they'll fail — that's expected RED), shells you the snapshot, you write the new spec assertions, one of you `git add` both files + commits with both names co-attributed. Coordinate locally — don't push the broken intermediate.\n\nI'll ping you when Comenius reports done.\n",
+    "summary": "Plan ack — wait for Comenius's branch + keys",
+    "timestamp": "2026-05-24T06:45:41.068Z",
     "type": "message",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "[2026-05-24 00:32] CHORE-60 Task 3 RED — Team Task #13.\n\n### Pre-flight\n\n```bash\npwd                                  # expect /home/michelek/workspace\ngit rev-parse --abbrev-ref HEAD      # expect feat/library-page-ui-kit\ngit status --porcelain               # expect EMPTY (Byrd's commit landed clean)\ngit log --oneline -1                 # expect 8306550 feat(library): add design tokens...\n```\n\nIf any pre-flight fails, STOP and report.\n\n### Your RED scope\n\nPer CHORE-60 plan L217-273:\n\n1. **Create `src/lib/types/library.spec.ts`** with this EXACT content (43 lines, ASCII-only):\n\n```typescript\nimport { describe, expect, it, expectTypeOf } from 'vitest';\nimport type { Work, Edition, Copy, Loan, Member, Choir, Task, Voice } from './library';\n\ndescribe('library types', () => {\n  it('Voice is a literal-union of valid voice parts', () => {\n    expectTypeOf<Voice>().toEqualTypeOf<'S1' | 'S2' | 'A' | 'T1' | 'T2' | 'B1' | 'B2'>();\n  });\n\n  it('Member has id, name, voice', () => {\n    const m: Member = { id: 'x', name: 'Test Member', voice: 'S1' };\n    expect(m.id).toBe('x');\n  });\n\n  it('Edition has total/on_loan/overdue numerics + optional limitless', () => {\n    const e: Edition = {\n      id: 'e1', label: 'L', voicing: 'SATB', publisher: 'P', year: 2020,\n      total: 12, on_loan: 0, overdue: 0, returned_today: 0,\n    };\n    expect(e.total).toBe(12);\n    const limitless: Edition = { ...e, total: 0, limitless: true };\n    expect(limitless.limitless).toBe(true);\n  });\n\n  it('Work has nested editions', () => {\n    const w: Work = {\n      id: 'w1', composer: 'C', title: 'T', year: 2020, lang: 'Latin',\n      period: 'Contemporary', tags: [], editions: [],\n    };\n    expect(w.editions).toEqual([]);\n  });\n\n  it('Loan has copy/member/since/days_overdue', () => {\n    const l: Loan = { copy: '#1', member: 'x', since: '2025-01-01', days_overdue: 30 };\n    expect(l.days_overdue).toBe(30);\n  });\n\n  it('Task has rank, kind, title, summary', () => {\n    const t: Task = { id: 'x', rank: 1, kind: 'returns', title: 'T', summary: 'S' };\n    expect(t.kind).toBe('returns');\n  });\n\n  it('Choir has slug, initials, rehearsal_size', () => {\n    const c: Choir = { name: 'N', short: 'S', slug: 's', initials: 'SS', rehearsal_size: 48 };\n    expect(c.rehearsal_size).toBe(48);\n  });\n});\n```\n\nNote: the spec imports `Copy` even though the test body doesn't use it — keep that import; it forces the type to be exported by `./library` once Byrd implements.\n\n2. **Run + verify FAIL:**\n   ```bash\n   pnpm vitest run src/lib/types/library.spec.ts\n   ```\n   Expected: FAIL — module `./library` does not exist. All tests fail with import error.\n\n3. **DO NOT COMMIT.** Per per-commit-GREEN, the RED+GREEN ship as one commit. Byrd will commit both files together in Task #14.\n\n4. **Leave `src/lib/types/library.spec.ts` uncommitted.** `git status` should show `?? src/lib/types/library.spec.ts`.\n\n### Report to team-lead\n\nSendMessage with:\n- File path + line count\n- FAIL output from vitest (which test/which error)\n- `git status --porcelain` output\n- Anything unexpected\n\nTimestamp prefix `[YYYY-MM-DD HH:MM]`.\n\n### Mark task\n\nAfter report: `TaskUpdate(taskId=13, status=completed)`.\n\nSame constraints as Task #11 — shared main checkout, no worktree, ASCII-only, no commit/push/branch-switch.\n\nProceed.\n",
-    "summary": "CHORE-60 Task 3 RED — library types spec",
-    "timestamp": "2026-05-24T00:33:38.912Z",
+    "text": "[2026-05-24 06:48] Comenius committed `a439228` on `chore/mvoxnav-i18n-and-snippet-helper` and pushed. Branch is live.\n\n**Dispatch Task #5 (GH #63) — snippet-helpers.ts wrap fix.** Go now; this is independent of the #62 bundle and can land in parallel with Byrd starting Task #3.\n\nWorkflow:\n```bash\ngit fetch && git checkout chore/mvoxnav-i18n-and-snippet-helper && git pull\n# edit src/tests/snippet-helpers.ts: wrap `${text}` in `<span>${text}</span>`\npnpm check    # expect 0 errors\npnpm test:unit  # expect 436/436 — and the invalid_raw_snippet_render warning gone\npnpm lint     # clean\ngit add src/tests/snippet-helpers.ts\ngit commit -m \"chore(#63): wrap textSnippet content in <span> per createRawSnippet contract\"\ngit push\n```\n\nVerify the warning is actually gone in stderr output — that's the whole point.\n\nReport SHA + verified-no-warning when done.\n\n**Then immediately turn to Task #4 coordination with Byrd.** I'm dispatching Byrd on Task #3 in parallel; he'll DM you when his component changes are ready and you can write the new spec assertions for an atomic bundle commit.\n",
+    "summary": "Dispatch Task #5 — snippet helper fix",
+    "timestamp": "2026-05-24T06:48:13.615Z",
     "type": "message",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"13\",\"subject\":\"CHORE-60 Task 3 RED: src/lib/types/library.spec.ts\",\"description\":\"Write src/lib/types/library.spec.ts per plan L227-273 (verbatim). Run pnpm vitest run src/lib/types/library.spec.ts; expect FAIL (file ./library doesn't exist yet). Do NOT commit — RED+GREEN ship as one commit. Hand off uncommitted to Byrd for Task 14 (GREEN: write types). Plan: docs/superpowers/plans/2026-05-23-library-page-ui-kit.md L217-373.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T00:33:39.431Z\"}",
-    "timestamp": "2026-05-24T00:33:39.431Z",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"5\",\"subject\":\"Tallis: fix snippet-helpers.ts single-element render contract\",\"description\":\"src/tests/snippet-helpers.ts wrap text in &lt;span&gt;${text}&lt;/span&gt; per Svelte 5 createRawSnippet contract. Eliminates invalid_raw_snippet_render warning on every test run. textContent assertions still pass. One-line fix. Commit + push to chore/mvoxnav-i18n-and-snippet-helper. GH #63. Lands on same branch as #62 so they squash together; independent of #3+#4 so can land before, between, or after.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T06:48:14.882Z\"}",
+    "timestamp": "2026-05-24T06:48:14.887Z",
     "type": "message",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "[2026-05-24 00:36] Quick spec amendment on `src/lib/types/library.spec.ts` (still uncommitted, your file).\n\n**Issue:** Plan imports `Copy` at L229 of the plan + your spec's line 2, but `Copy` is never defined anywhere in the plan's Task 3 impl block (L283-360) and never used in the test body. Grepped the full plan — no `interface Copy` / `type Copy` anywhere; CopyChip (Task 15) takes ad-hoc `{n, checked}` props rather than a `Copy` entity. Plan oversight.\n\n**Fix:** drop `Copy` from the import line in your spec. Change line 2 from:\n\n```typescript\nimport type { Work, Edition, Copy, Loan, Member, Choir, Task, Voice } from './library';\n```\n\nto:\n\n```typescript\nimport type { Work, Edition, Loan, Member, Choir, Task, Voice } from './library';\n```\n\nThen re-run `pnpm vitest run src/lib/types/library.spec.ts` — should still pass at runtime (type-only erasure). After: `git status --porcelain` should still show `?? src/lib/types/library.spec.ts` (un-tracked, amended).\n\nReply with confirmation + final line count of the spec, then I'll dispatch Byrd for GREEN. Keep task #13 in_progress until amendment lands.\n\nIf you disagree (think Copy should be a stub interface anyway), push back and I'll route to Byrd to define it instead.\n",
-    "summary": "Amend spec — drop Copy import",
-    "timestamp": "2026-05-24T00:36:18.988Z",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"4\",\"subject\":\"Tallis: update MvoxNav.spec.ts to assert m.*() output\",\"description\":\"Update src/lib/components/MvoxNav.spec.ts assertions from raw English literals ('agenda', 'LIBRARIAN', etc) to localized paraglide output. MUST land in SAME COMMIT as Byrd's component change (task #3) — per-commit-GREEN forbids transient red intermediate. Coordinate locally with Byrd; one of you stages both files + commits with co-attribution. GH #62 part 3.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T06:48:43.702Z\"}",
+    "timestamp": "2026-05-24T06:48:43.702Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "[2026-05-24 06:50] Tallis — MvoxNav.svelte is wired to paraglide. Here's the spec snapshot for Task #4.\n\n**Full rendered textContent** (with `currentTab: 'library'`, signed in):\n```\nm mvox / EP Estonian Philharmonic Chamber Choir ▾ Agenda Library LIBRARIANRoster Notices Settings  · M Maire L.\n```\n\n**What failed:**\n- `MvoxNav.spec.ts:19` — `toContain('agenda')` → rendered text is `'Agenda'` (capitalized)\n- `MvoxNav.spec.ts:20` — `toContain('library')` → rendered text is `'Library'` (capitalized)\n\n**What still passes (no change needed):**\n- `toContain('LIBRARIAN')` ✓ — `m.nav_chip_librarian()` returns `'LIBRARIAN'` in en\n- `not.toContain('Maire')` ✓ — sign-out path unchanged\n\n**Fix needed in MvoxNav.spec.ts:**\nLine 19: `'agenda'` → `'Agenda'`\nLine 20: `'library'` → `'Library'`\n\nOnce you've made those two edits locally, send me the updated file content (or just confirm \"done, file saved at `src/lib/components/MvoxNav.spec.ts`\") and I'll stage both files and commit atomically. Do NOT push yet — I'll do the combined commit.",
+    "summary": "MvoxNav spec snapshot — 1 assertion to update",
+    "timestamp": "2026-05-24T06:50:13.017Z",
+    "color": "purple",
     "type": "message",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "[2026-05-24 00:40] CHORE-60 Task 4 RED — Team Task #15.\n\n### Process note (carry into all future specs)\n\nByrd flagged that your last two specs used 2-space indentation, and `pnpm lint` (biome) wants tabs. Result: Byrd ran `biome format --write` before each commit. Small friction. **From now on, write `.spec.ts` files with TABS for indentation** to match biome config. Verify with `pnpm lint src/path/to/your.spec.ts` before reporting. Worth adding to your scratchpad as `[PATTERN] biome enforces tabs in TS files; write tabs not spaces`.\n\n### Pre-flight\n\n```bash\npwd                                  # /home/michelek/workspace\ngit rev-parse --abbrev-ref HEAD      # feat/library-page-ui-kit\ngit status --porcelain               # EMPTY\ngit log --oneline -1                 # 29e49cd feat(library): add library entity types\n```\n\nIf pre-flight fails, STOP and report.\n\n### Your RED scope\n\nPer CHORE-60 plan L388-437. Create `src/lib/library/derive.spec.ts` with this content (tabs for indent):\n\n```typescript\nimport { describe, expect, it } from 'vitest';\nimport { CHOIR, MEMBERS, WORKS } from '../fixtures/library-mock';\nimport { libStats, workStats, byMemberId, workById, editionById } from './derive';\n\ndescribe('library derive helpers', () => {\n\tit('libStats sums totals across all works', () => {\n\t\tconst s = libStats(WORKS);\n\t\texpect(s.works).toBe(13);\n\t\texpect(s.copies).toBeGreaterThan(500);\n\t\texpect(s.on_loan).toBeGreaterThanOrEqual(4);\n\t\texpect(s.overdue).toBe(4);\n\t});\n\n\tit('workStats excludes limitless editions from total', () => {\n\t\tconst part = WORKS.find(w => w.id === 'part-magnificat')!;\n\t\tconst s = workStats(part);\n\t\texpect(s.total).toBe(54);\n\t\texpect(s.overdue).toBe(4);\n\t\texpect(s.has_limitless).toBe(true);\n\t});\n\n\tit('byMemberId returns the member for a known id', () => {\n\t\tconst m = byMemberId(MEMBERS, 'hk');\n\t\texpect(m?.name).toBe('Henn Kuusik');\n\t\texpect(m?.voice).toBe('B2');\n\t});\n\n\tit('byMemberId returns undefined for unknown id', () => {\n\t\texpect(byMemberId(MEMBERS, 'xx')).toBeUndefined();\n\t});\n\n\tit('workById + editionById round-trip', () => {\n\t\tconst w = workById(WORKS, 'tallis-spem');\n\t\texpect(w?.composer).toBe('Thomas Tallis');\n\t\tconst e = editionById(w, 'tallis-40');\n\t\texpect(e?.publisher).toBe('Chester Novello');\n\t});\n\n\tit('CHOIR matches expected slug + rehearsal size', () => {\n\t\texpect(CHOIR.slug).toBe('epcc');\n\t\texpect(CHOIR.rehearsal_size).toBe(48);\n\t});\n\n\tit('MEMBERS has 8 entries with valid voices', () => {\n\t\texpect(MEMBERS.length).toBe(8);\n\t\texpect(MEMBERS.every(m => m.voice.length <= 2)).toBe(true);\n\t});\n});\n```\n\n### Verify FAIL\n\n```bash\npnpm vitest run src/lib/library/derive.spec.ts\npnpm lint src/lib/library/derive.spec.ts\n```\n\nExpected vitest: FAIL — modules `../fixtures/library-mock` and `./derive` don't exist (Cannot find module errors at import resolution time, NOT type-only this time — these are runtime value imports).\n\nExpected lint: clean (tabs throughout).\n\n### Don't commit, don't push\n\nPer per-commit-GREEN: Byrd commits library-mock.ts + derive.ts + your spec together in Task 16.\n\n### Report + mark\n\nSendMessage team-lead: file path + line count, vitest FAIL output, lint result, `git status --porcelain`. Then `TaskUpdate(taskId=15, status=completed)`.\n\nProceed.\n",
-    "summary": "CHORE-60 Task 4 RED — derive spec + indent note",
-    "timestamp": "2026-05-24T00:40:04.103Z",
+    "text": "[2026-05-24 09:28] Task #13 / CHORE-66 Task 3 — coordination brief (Byrd has the matching dispatch).\n\n**You write** `src/lib/auth/userStore.spec.ts` in atomic bundle with Byrd's `src/lib/auth/userStore.ts`. Both land in ONE commit (per-commit-GREEN).\n\n**Branch:** `chore/navbar-auth-wiring` (tip `1c9e5da`).\n\n**Plan section:** Task 3 in the plan has a ~14-case spec example you can lift from. Key elements:\n- `@vitest-environment happy-dom` directive at top\n- `vi.mock('$app/navigation', () => ({ goto: vi.fn(async (url) => window.history.pushState({}, '', url)) }))` — critical mock for `selectOrg`\n- `vi.resetModules()` + `localStorage.clear()` + reset URL in beforeEach\n- Stub `globalThis.fetch = vi.fn()` per test\n- Cover: initial loading state, JWT decode (happy + missing + malformed), hydrate (success + error + empty orgs), fallback chain (URL → localStorage → first-org → null), URL param wins + backfills localStorage (two-write symmetry), `selectOrg()` two-write, picker mode derivation (0/1/multi)\n\n**CRITICAL — Contract is `src/lib/auth/types.ts` (Josquin's `e12522a`), NOT the plan's example.** The plan's spec mock-response shapes may not match the actual types. Specifically:\n- Person response has `entity` wrapper: `{ entity: { _id, name: [{string}] } }` — your mocked fetch return for the person endpoint must return this shape.\n- Member-search response: `{ count, limit, skip, entities: [{ _id, _parent: [{reference, string, entity_type}] }] }` — note the `string` (inline org name) + `entity_type` ('organization' | 'section') on each parent ref.\n- JWT shape: `{ accounts: { polyphony: '<personId>' }, iat, exp, aud }` — no `sub`.\n\nRead `types.ts` TSDoc for `EntuPersonResponse`, `EntuMemberSearchResponse`, `EntuJwtClaims` to confirm shapes before writing the spec.\n\n**Workflow:**\n1. Pull the branch.\n2. Write the spec (using types as truth, plan as outline).\n3. Coordinate with Byrd locally — when his userStore.ts is ready, run `pnpm test:unit src/lib/auth/userStore.spec.ts` together. All cases pass = bundle ready.\n4. Verify full gates. Byrd stages both files + commits (or you do; coordinate). NO `Co-authored-by:` in body. Mention the other author via `Contributors:` sentinel or body prose.\n5. Push, verify trailer.\n\n**Surface-and-stop:** if mocks behave unexpectedly OR you spot another wire-shape divergence, stop + DM team-lead. Don't push half-green.\n\nReport when bundle commit is up.\n",
+    "summary": "Task 3 coordination — userStore.spec.ts atomic with Byrd",
+    "timestamp": "2026-05-24T10:56:21.077Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "[2026-05-24 09:42] Tallis — `userStore.ts` is written and type-checks clean. Here's the corrected spec for Task 3. The plan's example had 3 divergences from canonical `types.ts` — I've fixed all three below. Use this as the actual spec, not the plan's version.\n\n## 3 corrections vs plan example\n\n1. **Token key**: `getToken()` from `storage.ts` reads key `'token'` — NOT `'mvox.entu_token'`. Tests must set `localStorage.setItem('token', ...)`.\n2. **JWT claim**: person ID is at `claims.accounts['polyphony']` — NOT `claims.sub`. The `makeJwt` payload needs `{ accounts: { polyphony: 'person-1' } }`.\n3. **Person response shape**: `{ entity: { _id, name? } }` with `entity` wrapper — NOT flat `{ _id, name? }`. Mock must return `{ entity: { _id: 'person-1', name: [{ string: 'Test Librarian' }] } }`.\n\n## Corrected `src/lib/auth/userStore.spec.ts`\n\n```ts\n/**\n * @vitest-environment happy-dom\n */\nimport { describe, it, expect, beforeEach, vi } from 'vitest';\nimport { get } from 'svelte/store';\n\nvi.mock('$app/navigation', () => ({\n\tgoto: vi.fn(async (url: string) => {\n\t\twindow.history.pushState({}, '', url);\n\t}),\n}));\n\nlet userStore: typeof import('./userStore');\n\nconst FAKE_JWT_HEADER = btoa(JSON.stringify({ alg: 'none', typ: 'JWT' }));\nconst makeJwt = (payload: Record<string, unknown>) =>\n\t`${FAKE_JWT_HEADER}.${btoa(JSON.stringify(payload))}.`;\n\nbeforeEach(async () => {\n\tvi.resetModules();\n\tlocalStorage.clear();\n\twindow.history.replaceState({}, '', '/');\n\tglobalThis.fetch = vi.fn();\n\tuserStore = await import('./userStore');\n});\n\ndescribe('userStore — initial state', () => {\n\tit('starts in loading state', () => {\n\t\texpect(get(userStore.userStore).status).toBe('loading');\n\t});\n});\n\ndescribe('hydrateUserStore — JWT decode', () => {\n\tit('moves to signed-out when no JWT in localStorage', async () => {\n\t\tawait userStore.hydrateUserStore();\n\t\texpect(get(userStore.userStore).status).toBe('signed-out');\n\t});\n\n\tit('moves to signed-out when JWT is malformed', async () => {\n\t\tlocalStorage.setItem('token', 'not-a-jwt');\n\t\tawait userStore.hydrateUserStore();\n\t\texpect(get(userStore.userStore).status).toBe('signed-out');\n\t});\n\n\tit('moves to signed-out when JWT has no accounts claim', async () => {\n\t\tlocalStorage.setItem('token', makeJwt({ iat: 0, exp: 9999999999, aud: '1.2.3.4' }));\n\t\tawait userStore.hydrateUserStore();\n\t\texpect(get(userStore.userStore).status).toBe('signed-out');\n\t});\n});\n\ndescribe('hydrateUserStore — fetch + ready state', () => {\n\tit('moves to ready with name + orgs after successful fetch', async () => {\n\t\tlocalStorage.setItem(\n\t\t\t'token',\n\t\t\tmakeJwt({ accounts: { polyphony: 'person-1' }, iat: 0, exp: 9999999999, aud: '1.2.3.4' }),\n\t\t);\n\t\t(globalThis.fetch as ReturnType<typeof vi.fn>).mockImplementation((url: string) => {\n\t\t\tif (url.includes('/entity/person-1')) {\n\t\t\t\treturn Promise.resolve({\n\t\t\t\t\tok: true,\n\t\t\t\t\tjson: () =>\n\t\t\t\t\t\tPromise.resolve({\n\t\t\t\t\t\t\tentity: { _id: 'person-1', name: [{ string: 'Test Librarian' }] },\n\t\t\t\t\t\t}),\n\t\t\t\t});\n\t\t\t}\n\t\t\t// member search\n\t\t\treturn Promise.resolve({\n\t\t\t\tok: true,\n\t\t\t\tjson: () =>\n\t\t\t\t\tPromise.resolve({\n\t\t\t\t\t\tcount: 1,\n\t\t\t\t\t\tlimit: 100,\n\t\t\t\t\t\tskip: 0,\n\t\t\t\t\t\tentities: [\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\t_id: 'm-1',\n\t\t\t\t\t\t\t\t_parent: [\n\t\t\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\t\t\treference: 'org-efk',\n\t\t\t\t\t\t\t\t\t\tstring: 'EFK Library',\n\t\t\t\t\t\t\t\t\t\tentity_type: 'organization',\n\t\t\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\t\t\treference: 'sec-bass',\n\t\t\t\t\t\t\t\t\t\tstring: 'Bass',\n\t\t\t\t\t\t\t\t\t\tentity_type: 'section',\n\t\t\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t\t],\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t],\n\t\t\t\t\t}),\n\t\t\t});\n\t\t});\n\n\t\tawait userStore.hydrateUserStore();\n\t\tconst state = get(userStore.userStore);\n\t\texpect(state.status).toBe('ready');\n\t\tif (state.status === 'ready') {\n\t\t\texpect(state.name).toBe('Test Librarian');\n\t\t\texpect(state.initial).toBe('T');\n\t\t\texpect(state.orgs).toHaveLength(1);\n\t\t\texpect(state.orgs[0]).toEqual({\n\t\t\t\tid: 'org-efk',\n\t\t\t\tlabel: 'EFK Library',\n\t\t\t\tinitials: 'EL',\n\t\t\t\trole: undefined,\n\t\t\t});\n\t\t}\n\t});\n\n\tit('moves to error on fetch failure', async () => {\n\t\tlocalStorage.setItem(\n\t\t\t'token',\n\t\t\tmakeJwt({ accounts: { polyphony: 'person-1' }, iat: 0, exp: 9999999999, aud: '1.2.3.4' }),\n\t\t);\n\t\t(globalThis.fetch as ReturnType<typeof vi.fn>).mockRejectedValue(new Error('network'));\n\t\tawait userStore.hydrateUserStore();\n\t\texpect(get(userStore.userStore).status).toBe('error');\n\t});\n\n\tit('moves to ready with empty orgs[] for person with no member rows', async () => {\n\t\tlocalStorage.setItem(\n\t\t\t'token',\n\t\t\tmakeJwt({ accounts: { polyphony: 'person-1' }, iat: 0, exp: 9999999999, aud: '1.2.3.4' }),\n\t\t);\n\t\t(globalThis.fetch as ReturnType<typeof vi.fn>).mockImplementation((url: string) => {\n\t\t\tif (url.includes('/entity/person-1')) {\n\t\t\t\treturn Promise.resolve({\n\t\t\t\t\tok: true,\n\t\t\t\t\tjson: () =>\n\t\t\t\t\t\tPromise.resolve({ entity: { _id: 'person-1', name: [{ string: 'Solo' }] } }),\n\t\t\t\t});\n\t\t\t}\n\t\t\treturn Promise.resolve({\n\t\t\t\tok: true,\n\t\t\t\tjson: () =>\n\t\t\t\t\tPromise.resolve({ count: 0, limit: 100, skip: 0, entities: [] }),\n\t\t\t});\n\t\t});\n\t\tawait userStore.hydrateUserStore();\n\t\tconst state = get(userStore.userStore);\n\t\texpect(state.status).toBe('ready');\n\t\tif (state.status === 'ready') {\n\t\t\texpect(state.orgs).toEqual([]);\n\t\t}\n\t});\n\n\tit('filters section parents from _parent[], only org parents become Org', async () => {\n\t\tlocalStorage.setItem(\n\t\t\t'token',\n\t\t\tmakeJwt({ accounts: { polyphony: 'person-1' }, iat: 0, exp: 9999999999, aud: '1.2.3.4' }),\n\t\t);\n\t\t(globalThis.fetch as ReturnType<typeof vi.fn>).mockImplementation((url: string) => {\n\t\t\tif (url.includes('/entity/person-1')) {\n\t\t\t\treturn Promise.resolve({\n\t\t\t\t\tok: true,\n\t\t\t\t\tjson: () =>\n\t\t\t\t\t\tPromise.resolve({ entity: { _id: 'person-1', name: [{ string: 'N' }] } }),\n\t\t\t\t});\n\t\t\t}\n\t\t\treturn Promise.resolve({\n\t\t\t\tok: true,\n\t\t\t\tjson: () =>\n\t\t\t\t\tPromise.resolve({\n\t\t\t\t\t\tcount: 1,\n\t\t\t\t\t\tlimit: 100,\n\t\t\t\t\t\tskip: 0,\n\t\t\t\t\t\tentities: [\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\t_id: 'm-1',\n\t\t\t\t\t\t\t\t_parent: [\n\t\t\t\t\t\t\t\t\t{ reference: 'org-1', string: 'Org One', entity_type: 'organization' },\n\t\t\t\t\t\t\t\t\t{ reference: 'sec-1', string: 'Soprano', entity_type: 'section' },\n\t\t\t\t\t\t\t\t],\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t],\n\t\t\t\t\t}),\n\t\t\t});\n\t\t});\n\t\tawait userStore.hydrateUserStore();\n\t\tconst state = get(userStore.userStore);\n\t\tif (state.status === 'ready') {\n\t\t\texpect(state.orgs).toHaveLength(1);\n\t\t\texpect(state.orgs[0].id).toBe('org-1');\n\t\t}\n\t});\n});\n\ndescribe('selectedOrgStore — fallback chain', () => {\n\tconst setReadyState = () => {\n\t\tuserStore.userStore.set({\n\t\t\tstatus: 'ready',\n\t\t\tname: 'T',\n\t\t\tinitial: 'T',\n\t\t\torgs: [\n\t\t\t\t{ id: 'org-1', label: 'One', initials: 'O' },\n\t\t\t\t{ id: 'org-2', label: 'Two', initials: 'T' },\n\t\t\t],\n\t\t});\n\t};\n\n\tit('returns null when user is signed-out', () => {\n\t\tuserStore.userStore.set({ status: 'signed-out' });\n\t\texpect(get(userStore.selectedOrgStore)).toBeNull();\n\t});\n\n\tit('returns null when ready but orgs is empty', () => {\n\t\tuserStore.userStore.set({ status: 'ready', name: 'T', initial: 'T', orgs: [] });\n\t\texpect(get(userStore.selectedOrgStore)).toBeNull();\n\t});\n\n\tit('URL param wins when present and valid', () => {\n\t\tsetReadyState();\n\t\twindow.history.replaceState({}, '', '/?org=org-2');\n\t\texpect(get(userStore.selectedOrgStore)?.id).toBe('org-2');\n\t});\n\n\tit('localStorage fallback when URL absent', () => {\n\t\tsetReadyState();\n\t\tlocalStorage.setItem('mvox.selectedOrgId', 'org-2');\n\t\texpect(get(userStore.selectedOrgStore)?.id).toBe('org-2');\n\t});\n\n\tit('first-org default when URL + localStorage both absent', () => {\n\t\tsetReadyState();\n\t\texpect(get(userStore.selectedOrgStore)?.id).toBe('org-1');\n\t});\n\n\tit('first-org default when URL param does not match any org id', () => {\n\t\tsetReadyState();\n\t\twindow.history.replaceState({}, '', '/?org=bogus');\n\t\texpect(get(userStore.selectedOrgStore)?.id).toBe('org-1');\n\t});\n\n\tit('two-write symmetry: URL wins AND backfills localStorage', () => {\n\t\tsetReadyState();\n\t\tlocalStorage.setItem('mvox.selectedOrgId', 'org-1');\n\t\twindow.history.replaceState({}, '', '/?org=org-2');\n\t\tconst resolved = get(userStore.selectedOrgStore);\n\t\texpect(resolved?.id).toBe('org-2');\n\t\texpect(localStorage.getItem('mvox.selectedOrgId')).toBe('org-2');\n\t});\n});\n\ndescribe('selectOrg — two-write on user change', () => {\n\tit('writes localStorage and updates URL', async () => {\n\t\tuserStore.userStore.set({\n\t\t\tstatus: 'ready',\n\t\t\tname: 'T',\n\t\t\tinitial: 'T',\n\t\t\torgs: [\n\t\t\t\t{ id: 'org-1', label: 'One', initials: 'O' },\n\t\t\t\t{ id: 'org-2', label: 'Two', initials: 'T' },\n\t\t\t],\n\t\t});\n\n\t\tawait userStore.selectOrg('org-2');\n\n\t\texpect(localStorage.getItem('mvox.selectedOrgId')).toBe('org-2');\n\t\texpect(new URL(window.location.href).searchParams.get('org')).toBe('org-2');\n\t\texpect(get(userStore.selectedOrgStore)?.id).toBe('org-2');\n\t});\n});\n\ndescribe('pickerMode — derived from orgs.length', () => {\n\tit('placeholder when 0 orgs', () => {\n\t\tuserStore.userStore.set({ status: 'ready', name: 'T', initial: 'T', orgs: [] });\n\t\texpect(get(userStore.pickerModeStore)).toBe('placeholder');\n\t});\n\n\tit('static when 1 org', () => {\n\t\tuserStore.userStore.set({\n\t\t\tstatus: 'ready',\n\t\t\tname: 'T',\n\t\t\tinitial: 'T',\n\t\t\torgs: [{ id: 'a', label: 'A', initials: 'A' }],\n\t\t});\n\t\texpect(get(userStore.pickerModeStore)).toBe('static');\n\t});\n\n\tit('dropdown when multi-org', () => {\n\t\tuserStore.userStore.set({\n\t\t\tstatus: 'ready',\n\t\t\tname: 'T',\n\t\t\tinitial: 'T',\n\t\t\torgs: [\n\t\t\t\t{ id: 'a', label: 'A', initials: 'A' },\n\t\t\t\t{ id: 'b', label: 'B', initials: 'B' },\n\t\t\t],\n\t\t});\n\t\texpect(get(userStore.pickerModeStore)).toBe('dropdown');\n\t});\n});\n```\n\nWrite this to `src/lib/auth/userStore.spec.ts`, run `pnpm test:unit src/lib/auth/userStore.spec.ts` locally until all pass, then confirm \"spec passes — file saved\". I'll then run the full gate and commit both files atomically.",
+    "summary": "Corrected userStore.spec.ts — 3 plan divergences fixed",
+    "timestamp": "2026-05-24T10:58:41.072Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "[2026-05-24 11:03] Already committed and pushed as `bcdeb00` — Task 3 is done. The file on disk is the committed version. No further action needed on your end for Task 3. Stand by for Task 4 dispatch from team-lead.",
+    "summary": "Already committed — bcdeb00 pushed, we're good",
+    "timestamp": "2026-05-24T11:02:59.027Z",
+    "color": "purple",
     "type": "message",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"15\",\"subject\":\"CHORE-60 Task 4 RED: derive.spec.ts\",\"description\":\"Write src/lib/library/derive.spec.ts per plan L388-437. 7 tests covering libStats/workStats/byMemberId/workById/editionById/CHOIR/MEMBERS. Use TABS (biome convention) to avoid Byrd's reformat step. Run vitest; expect FAIL (fixtures + derive don't exist). Do NOT commit. Hand off to Byrd for Task 16 GREEN. Plan L377-618.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T00:40:04.491Z\"}",
-    "timestamp": "2026-05-24T00:40:04.491Z",
+    "text": "[2026-05-24 09:48] Quick housekeeping before Task 4. Your `userStore.spec.ts` has ~200 lines of uncommitted refactor in the working tree that wasn't included in Byrd's `bcdeb00` atomic commit (looks like helper extractions: `makePersonResponse`, `makeMemberSearchResponse`, consistent JWT constants).\n\nPlease commit your refactor as a small follow-up on the chore branch BEFORE we start Task 4 (so it doesn't accidentally get mixed into the OrgPicker bundle).\n\n**Marker discipline (new this session — see ef78aa3 on main).** Before your commit chain, write the branch-intent marker:\n\n```bash\necho \"chore/navbar-auth-wiring\" > .git/EXPECTED_BRANCH\ngit add src/lib/auth/userStore.spec.ts\ngit commit -m \"refactor(#66): extract spec helpers + constants for readability\"\ngit push\n```\n\nThe new pre-commit hook reads `.git/EXPECTED_BRANCH` and rejects commits where HEAD doesn't match. If your branch is already chore (likely), the hook is happy. The marker auto-clears after a successful commit.\n\nIf you'd rather DISCARD the refactor (i.e., it was experimental and Byrd's committed version is the truth), say so and I'll have you restore the file. No work lost either way; just need to clear the working tree before Task 4.\n\nVerify gates pass after commit: `pnpm check && pnpm test:unit` (should stay 456/456).\n\nOnce your refactor is in (or discarded), Task 4 brief follows.\n",
+    "summary": "Commit your spec refactor before Task 4",
+    "timestamp": "2026-05-24T11:16:57.094Z",
     "type": "message",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "[2026-05-24 00:45] CHORE-60 Task 5 RED — Team Task #17.\n\n### Pre-flight\n- branch: feat/library-page-ui-kit\n- log -1: ac42258 feat(library): mock fixtures + derive helpers...\n- status: empty\n\n### Scope\n\nPlan file: `docs/superpowers/plans/2026-05-23-library-page-ui-kit.md`, Task 5 at L642-705. **Read it directly.** Your write: `src/lib/components/Voice.spec.ts` per L650-667 (2 tests, happy-dom env, @testing-library/svelte render).\n\n### Apply the standing rules (from prior tasks)\n- Tabs for indent\n- Single-arg arrows with parens: `(el) => ...`\n- ASCII-only in commit message (you don't commit; just write the spec)\n- Don't modify or commit anything else; leave the spec untracked for Byrd\n\n### Verify\n\n```bash\npnpm vitest run src/lib/components/Voice.spec.ts\npnpm lint src/lib/components/Voice.spec.ts\n```\n\nExpect vitest: FAIL — `./Voice.svelte` doesn't exist. Expect lint: clean.\n\n### Report + mark\nSendMessage team-lead: file/line count, FAIL output summary, lint result, `git status --porcelain`. Then `TaskUpdate(taskId=17, status=completed)`.\n\nProceed.\n",
-    "summary": "CHORE-60 Task 5 RED — Voice.spec.ts",
-    "timestamp": "2026-05-24T00:45:50.310Z",
+    "text": "[2026-05-24 09:52] Task #14 / CHORE-66 Task 4 — coordination brief (Byrd has the matching dispatch).\n\n**You write** `src/lib/components/OrgPicker.spec.ts` in atomic bundle with Byrd's `src/lib/components/OrgPicker.svelte`. ONE commit on chore.\n\n**Marker discipline (new this session):** before the atomic commit, write `echo \"chore/navbar-auth-wiring\" > .git/EXPECTED_BRANCH`. The pre-commit hook installed at `ef78aa3` on main checks this and rejects commits where HEAD doesn't match. Marker auto-clears on success.\n\n**Plan section:** Task 4 in the plan has a spec example. Cover:\n- `@vitest-environment happy-dom`\n- `vi.mock('$app/navigation', () => ({ goto: vi.fn(...) }))`\n- beforeEach: clear localStorage + reset URL + set userStore to ready+multi-org with at least 2 orgs (e.g., `[{id:'org-1',label:'EFK Library',initials:'EL'}, {id:'org-2',label:'Other Org',initials:'OO'}]`)\n- Tests: chip renders closed; click opens menu; Escape closes; click org → URL `?org=org-2` + `localStorage.mvox.selectedOrgId='org-2'` + menu closes\n\n**Coordination:** lift from plan example; Byrd implements OrgPicker.svelte in parallel. When both files are ready, run `pnpm test:unit src/lib/components/OrgPicker.spec.ts`. Full gates: `pnpm check && pnpm test:unit && pnpm lint && pnpm build`. Atomic stage + commit `feat(#66): OrgPicker dropdown component`. **NO `Co-authored-by:` in body** — Contributors-sentinel for co-author note.\n\nSurface-and-stop if anything diverges.\n",
+    "summary": "Task 4 coordination — OrgPicker.spec.ts atomic with Byrd",
+    "timestamp": "2026-05-24T11:18:15.138Z",
     "type": "message",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"17\",\"subject\":\"CHORE-60 Task 5 RED: Voice.spec.ts\",\"description\":\"Write src/lib/components/Voice.spec.ts per plan L650-667 (2 tests: renders label, applies voice-family class). Use happy-dom env + @testing-library/svelte render. Tabs + parens-on-single-arg-arrows. Vitest expect FAIL (no Voice.svelte yet). Don't commit. Plan L642-705.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T00:45:50.605Z\"}",
-    "timestamp": "2026-05-24T00:45:50.611Z",
+    "text": "[2026-05-24 09:58] Mid-flight update — pre-commit hook swapped to env var. Use this for Task 4 commit (or any future commit):\n\n```bash\nMVOX_EXPECTED_BRANCH=chore/navbar-auth-wiring git commit -m \"...\"\n```\n\nNo more `.git/EXPECTED_BRANCH` file writes (the file approach hit silent tool-permission blocks for some agents). Hook source on main is `8a42302`; active in `.git/hooks/pre-commit` already.\n\nCarry on with the bundle. Same atomic workflow with Byrd; just swap the marker mechanism in your commit command.\n",
+    "summary": "Hook swap: env var, not marker file",
+    "timestamp": "2026-05-24T11:32:32.692Z",
     "type": "message",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "[2026-05-24 00:51] CHORE-60 Task 6 RED — Team Task #19.\n\nPlan Task 6 at L709+. Write `src/lib/components/PencilCheckbox.spec.ts` per plan (3 tests, happy-dom, vi.fn for onclick). Standing rules apply (tabs, parens-on-arrows, don't commit). Verify FAIL + lint clean. Report + `TaskUpdate(taskId=19, status=completed)`.\n\nPre-flight: branch feat/library-page-ui-kit @ 480067f, status: `M teams/mvox-dev/memory/tallis.md` from prior task (your scratchpad, leave it).\n\nProceed.\n",
-    "summary": "CHORE-60 Task 6 RED — PencilCheckbox.spec.ts",
-    "timestamp": "2026-05-24T00:51:10.783Z",
+    "text": "[2026-05-24 11:09] Task #15 / CHORE-66 Task 5 — coordination brief (Byrd-2 has the matching dispatch).\n\n**You update** `src/lib/components/MvoxNav.spec.ts` to add 3 new test cases. Byrd-2 updates `MvoxNav.svelte` adding `orgPickerMode` prop + conditional OrgPicker mount. ONE atomic commit.\n\n**Branch:** `chore/navbar-auth-wiring` (tip `be4594c`).\n\n**3 new test cases to add (existing ones stay):**\n1. **placeholder mode**: render MvoxNav with `orgPickerMode: 'placeholder'` + empty `orgLabel`/`orgInitials` — assert `container.textContent` contains the localized placeholder copy AND `queryByTestId('org-picker-chip')` is null.\n2. **static mode**: render with `orgPickerMode: 'static'` + non-empty `orgLabel: 'EFK Library'` + `orgInitials: 'EL'` — assert container.textContent contains 'EFK Library' AND `queryByTestId('org-picker-chip')` is null (no OrgPicker — chip is static).\n3. **dropdown mode**: pre-set `userStore` to ready+multi-org (e.g., 2 orgs) THEN render with `orgPickerMode: 'dropdown'` — assert `getByTestId('org-picker-chip')` is found (OrgPicker is mounted).\n\nUse the same `vi.mock('$app/navigation', ...)` setup as the userStore + OrgPicker specs. Pre-set `userStore` in beforeEach for the dropdown case.\n\n**Marker discipline:** before commit, `MVOX_EXPECTED_BRANCH=chore/navbar-auth-wiring`. Pre-commit hook rejects mismatched commits.\n\n**Atomic bundle workflow:** coordinate locally with Byrd-2. When both files are ready, run `pnpm test:unit src/lib/components/MvoxNav.spec.ts` — all pass (existing + 3 new). Full gates. Byrd-2 stages both + commits with marker env var. NO `Co-authored-by:` in body.\n\nReport when bundle commit lands.\n",
+    "summary": "Task 5 — MvoxNav spec update (atomic with Byrd-2)",
+    "timestamp": "2026-05-24T12:56:11.568Z",
     "type": "message",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"19\",\"subject\":\"CHORE-60 Task 6 RED: PencilCheckbox.spec.ts\",\"description\":\"Write src/lib/components/PencilCheckbox.spec.ts per plan L717-743 (3 tests: unchecked default, checked when prop true, onclick fires). happy-dom + @testing-library/svelte + vi.fn. Plan L709-...\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T00:51:11.075Z\"}",
-    "timestamp": "2026-05-24T00:51:11.075Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 00:55] CHORE-60 Task 7 RED — Team Task #21.\n\nPlan Task 7 at L804+. Write `src/lib/components/Rank.spec.ts` per plan. Standing rules. Pre-flight: branch feat/library-page-ui-kit @ ac42c07.\n\nReport + `TaskUpdate(taskId=21, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 7 RED — Rank.spec.ts",
-    "timestamp": "2026-05-24T00:55:01.160Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"21\",\"subject\":\"CHORE-60 Task 7 RED: Rank.spec.ts\",\"description\":\"Write src/lib/components/Rank.spec.ts per plan Task 7 (L804+). Standing rules apply.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T00:55:01.580Z\"}",
-    "timestamp": "2026-05-24T00:55:01.581Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 00:58] CHORE-60 Task 8 RED — Team Task #23. Plan Task 8 at L884+. Branch feat/library-page-ui-kit @ b99c5dd. Standing rules. Report + `TaskUpdate(taskId=23, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 8 RED — Stamp.spec.ts",
-    "timestamp": "2026-05-24T00:57:42.588Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"23\",\"subject\":\"CHORE-60 Task 8 RED: Stamp.spec.ts\",\"description\":\"Plan Task 8 at L884+. Standing rules.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T00:57:42.851Z\"}",
-    "timestamp": "2026-05-24T00:57:42.851Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 01:01] CHORE-60 Task 9 RED — Team Task #25. Plan Task 9 at L957+. Branch feat/library-page-ui-kit @ 95d5218. Standing rules. Report + `TaskUpdate(taskId=25, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 9 RED — Tally.spec.ts",
-    "timestamp": "2026-05-24T01:00:27.773Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"25\",\"subject\":\"CHORE-60 Task 9 RED: Tally.spec.ts\",\"description\":\"Plan Task 9 at L957+. Standing rules.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T01:00:28.598Z\"}",
-    "timestamp": "2026-05-24T01:00:28.598Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 01:03] CHORE-60 Task 10 RED — Team Task #27. Plan Task 10 at L1029+. Branch feat/library-page-ui-kit @ cdfcb74. Standing rules. Report + `TaskUpdate(taskId=27, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 10 RED — WorkTitle.spec.ts",
-    "timestamp": "2026-05-24T01:03:16.148Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"27\",\"subject\":\"CHORE-60 Task 10 RED: WorkTitle.spec.ts\",\"description\":\"Plan Task 10 at L1029+. Standing rules.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T01:03:16.620Z\"}",
-    "timestamp": "2026-05-24T01:03:16.621Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 01:06] CHORE-60 Task 11 RED — Team Task #29. Plan Task 11 at L1119+. Branch feat/library-page-ui-kit @ 5d18359. Standing rules. Report + `TaskUpdate(taskId=29, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 11 RED — Margin.spec.ts",
-    "timestamp": "2026-05-24T01:06:08.312Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"29\",\"subject\":\"CHORE-60 Task 11 RED: Margin.spec.ts\",\"description\":\"Plan Task 11 at L1119+. Standing rules.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T01:06:08.588Z\"}",
-    "timestamp": "2026-05-24T01:06:08.588Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 01:10] CHORE-60 Task 12 RED — Team Task #31. Plan Task 12 at L1190+. Branch feat/library-page-ui-kit @ 003a9ef. Standing rules. \n\n**Heads-up:** if the plan uses `Snippet` + `{@render children()}` for children, and your spec passes a string-returning function, those don't match (Margin task hit this). For this task: if you're tempted to pass `children: () => 'foo'`, instead write it as the spec's function returning a string AND we'll align the impl side accordingly. Just write the spec naturally; flag any test that needs a snippet-shaped value in your report so Byrd knows what to type.\n\nReport + `TaskUpdate(taskId=31, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 12 RED — KeyHint.spec.ts",
-    "timestamp": "2026-05-24T01:10:34.656Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"31\",\"subject\":\"CHORE-60 Task 12 RED: KeyHint.spec.ts\",\"description\":\"Plan Task 12 at L1190+. Standing rules.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T01:10:34.953Z\"}",
-    "timestamp": "2026-05-24T01:10:34.953Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 01:13] CHORE-60 Task 13 RED — Team Task #33. Plan Task 13 at L1250+. Branch feat/library-page-ui-kit @ 58c35fa. Standing rules. Report + `TaskUpdate(taskId=33, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 13 RED — BrandMark.spec.ts",
-    "timestamp": "2026-05-24T01:13:31.584Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"33\",\"subject\":\"CHORE-60 Task 13 RED: BrandMark.spec.ts\",\"description\":\"Plan Task 13 at L1250+. Standing rules.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T01:13:32.219Z\"}",
-    "timestamp": "2026-05-24T01:13:32.219Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 01:19] CHORE-60 Task 14 RED — Team Task #35. Plan Task 14 at L1318+. Branch feat/library-page-ui-kit @ 22c41ee. Composite component (uses Voice + Tally). Standing rules. Report + `TaskUpdate(taskId=35, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 14 RED — VoiceTally.spec.ts",
-    "timestamp": "2026-05-24T01:19:11.380Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"35\",\"subject\":\"CHORE-60 Task 14 RED: VoiceTally.spec.ts\",\"description\":\"Plan Task 14 at L1318+. Composite component (uses Voice + Tally). Standing rules.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T01:19:11.739Z\"}",
-    "timestamp": "2026-05-24T01:19:11.739Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 01:22] CHORE-60 Task 15 RED — Team Task #37. Plan Task 15 at L1386+. Branch feat/library-page-ui-kit @ f3894e3. Standing rules. Report + `TaskUpdate(taskId=37, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 15 RED — CopyChip.spec.ts",
-    "timestamp": "2026-05-24T01:21:57.433Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"37\",\"subject\":\"CHORE-60 Task 15 RED: CopyChip.spec.ts\",\"description\":\"Plan Task 15 at L1386+. Standing rules.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T01:21:57.918Z\"}",
-    "timestamp": "2026-05-24T01:21:57.918Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 01:25] CHORE-60 Task 16 RED — Team Task #39. Plan Task 16 at L1451+. Branch feat/library-page-ui-kit @ 91469c3. Standing rules. Report + `TaskUpdate(taskId=39, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 16 RED — PencilSearch.spec.ts",
-    "timestamp": "2026-05-24T01:24:40.590Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"39\",\"subject\":\"CHORE-60 Task 16 RED: PencilSearch.spec.ts\",\"description\":\"Plan Task 16 at L1451+. Standing rules.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T01:24:40.891Z\"}",
-    "timestamp": "2026-05-24T01:24:40.891Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 01:28] CHORE-60 Task 17 RED — Team Task #41. Plan Task 17 at L1524+. Branch feat/library-page-ui-kit @ eb1e754. Standing rules. Report + `TaskUpdate(taskId=41, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 17 RED — PaperStack.spec.ts",
-    "timestamp": "2026-05-24T01:27:32.748Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"41\",\"subject\":\"CHORE-60 Task 17 RED: PaperStack.spec.ts\",\"description\":\"Plan Task 17 at L1524+. Standing rules.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T01:27:33.253Z\"}",
-    "timestamp": "2026-05-24T01:27:33.253Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 01:30] CHORE-60 Task 18 RED — Team Task #43. Plan Task 18 at L1625+. Branch feat/library-page-ui-kit @ ece7054. Standing rules. Report + `TaskUpdate(taskId=43, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 18 RED — StackHeader.spec.ts",
-    "timestamp": "2026-05-24T01:30:21.734Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"43\",\"subject\":\"CHORE-60 Task 18 RED: StackHeader.spec.ts\",\"description\":\"Plan Task 18 at L1625+. Standing rules.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T01:30:22.041Z\"}",
-    "timestamp": "2026-05-24T01:30:22.041Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 01:35] CHORE-60 Task 19 RED — Team Task #45. Plan Task 19 at L1699+. Single-sheet variant for auth. Branch feat/library-page-ui-kit @ a461938. Standing rules. Report + `TaskUpdate(taskId=45, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 19 RED — PaperCard.spec.ts",
-    "timestamp": "2026-05-24T01:35:29.264Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"45\",\"subject\":\"CHORE-60 Task 19 RED: PaperCard.spec.ts\",\"description\":\"Plan Task 19 at L1699+. Single-sheet variant for auth. Standing rules.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T01:35:29.913Z\"}",
-    "timestamp": "2026-05-24T01:35:29.913Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 01:38] CHORE-60 Task 20 RED — Team Task #47. Plan Task 20 at L1780+. Branch feat/library-page-ui-kit @ caf7ab7. Standing rules. Report + `TaskUpdate(taskId=47, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 20 RED — BorrowerCard.spec.ts",
-    "timestamp": "2026-05-24T01:38:06.572Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"47\",\"subject\":\"CHORE-60 Task 20 RED: BorrowerCard.spec.ts\",\"description\":\"Plan Task 20 at L1780+. Standing rules.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T01:38:07.220Z\"}",
-    "timestamp": "2026-05-24T01:38:07.220Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 01:41] CHORE-60 Task 21 RED — Team Task #49. Plan Task 21 at L1861+. Branch feat/library-page-ui-kit @ 8cab60c. Standing rules. Report + `TaskUpdate(taskId=49, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 21 RED — PullItemCard.spec.ts",
-    "timestamp": "2026-05-24T01:41:09.679Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"49\",\"subject\":\"CHORE-60 Task 21 RED: PullItemCard.spec.ts\",\"description\":\"Plan Task 21 at L1861+. Standing rules.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T01:41:10.031Z\"}",
-    "timestamp": "2026-05-24T01:41:10.031Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 01:44] CHORE-60 Task 22 RED — Team Task #51. Plan Task 22 at L1966+. Branch feat/library-page-ui-kit @ b678d65. Standing rules. Report + `TaskUpdate(taskId=51, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 22 RED — MiniWorkCard.spec.ts",
-    "timestamp": "2026-05-24T01:43:55.650Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"51\",\"subject\":\"CHORE-60 Task 22 RED: MiniWorkCard.spec.ts\",\"description\":\"Plan Task 22 at L1966+. Standing rules.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T01:43:56.351Z\"}",
-    "timestamp": "2026-05-24T01:43:56.351Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 01:47] CHORE-60 Task 23 RED — Team Task #53. Plan Task 23 at L2051+. Chrome (wood-grain desk background). Branch feat/library-page-ui-kit @ 3d1e0fe. Standing rules. Report + `TaskUpdate(taskId=53, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 23 RED — DeskSurface.spec.ts",
-    "timestamp": "2026-05-24T01:46:53.350Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"53\",\"subject\":\"CHORE-60 Task 23 RED: DeskSurface.spec.ts\",\"description\":\"Plan Task 23 at L2051+. Chrome (wood-grain desk background). Standing rules.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T01:46:54.108Z\"}",
-    "timestamp": "2026-05-24T01:46:54.108Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 01:50] CHORE-60 Task 24 RED — Team Task #55. Plan Task 24 at L2123+. Branch feat/library-page-ui-kit @ b193555. New component only (Task 26 will wire it into the layout). Standing rules. Report + `TaskUpdate(taskId=55, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 24 RED — MvoxNav.spec.ts",
-    "timestamp": "2026-05-24T01:50:12.259Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"55\",\"subject\":\"CHORE-60 Task 24 RED: MvoxNav.spec.ts\",\"description\":\"Plan Task 24 at L2123+. New component MvoxNav.svelte (NOT yet wired into layout — that's Task 26). Standing rules.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T01:50:12.535Z\"}",
-    "timestamp": "2026-05-24T01:50:12.535Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 01:53] CHORE-60 Task 25 RED — Team Task #57. Plan Task 25 at L2237+. Branch feat/library-page-ui-kit @ c7696af. Auth-side component for /auth/login. Standing rules. Report + `TaskUpdate(taskId=57, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 25 RED — ProviderButton.spec.ts",
-    "timestamp": "2026-05-24T01:53:08.805Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"57\",\"subject\":\"CHORE-60 Task 25 RED: ProviderButton.spec.ts\",\"description\":\"Plan Task 25 at L2237+. Auth-side component (for /auth/login redesign). Standing rules.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T01:53:09.222Z\"}",
-    "timestamp": "2026-05-24T01:53:09.222Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 02:00] CHORE-60 Task 27 RED — Team Task #60. Plan Task 27 at L2429+. Branch feat/library-page-ui-kit @ 6ad59cf. Page composition test — write `src/routes/library/page.spec.ts` per plan L2439-2475 (4 tests). Standing rules. Report + `TaskUpdate(taskId=60, status=completed)`. Proceed.\n",
-    "summary": "CHORE-60 Task 27 RED — /library page",
-    "timestamp": "2026-05-24T01:59:13.593Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"60\",\"subject\":\"CHORE-60 Task 27 RED: /library/page.spec.ts\",\"description\":\"Plan Task 27 at L2429+. 4 tests: 3 stacks (Returns/Overdue/Pull) + top strip + catalog strip + fixture content (Tallis/Pärt/Tormis). Standing rules.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T01:59:13.880Z\"}",
-    "timestamp": "2026-05-24T01:59:13.880Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 04:22] **Typing-fix RED — Team Task #62.** Bentham issued architectural verdict on the Snippet conflict: tag `[ARCH-VERDICT 2026-05-24 CHORE-60]` in his scratchpad. Option 1 GREEN — `createRawSnippet` is canonical. **Scope is 4 specs, not 3** — Bentham caught PaperCard had the same bug.\n\n### Your scope: amend 4 specs + create helper\n\n**Step 1 — Create `src/tests/snippet-helpers.ts`** with the textSnippet helper:\n\n```typescript\nimport { createRawSnippet, type Snippet } from 'svelte';\n\nexport const textSnippet = (text: string): Snippet =>\n\tcreateRawSnippet(() => ({ render: () => text }));\n```\n\n(Tabs, parens-on-arrows already applied. Verify with `pnpm lint src/tests/snippet-helpers.ts`.)\n\n**Step 2 — Amend 4 specs** to import + use `textSnippet`:\n\n- `src/lib/components/Margin.spec.ts`\n- `src/lib/components/PaperStack.spec.ts`\n- `src/lib/components/DeskSurface.spec.ts`\n- `src/lib/components/PaperCard.spec.ts`\n\nFor each: replace any `children: () => 'some text'` with `children: textSnippet('some text')`. Import from `'../../tests/snippet-helpers'` (verify the relative path works from `src/lib/components/`).\n\n**Bentham's rule (RED if violated):** uniform across all 4 — if one spec uses the helper and others don't, that's RED. Either all 4 use the helper (recommended) or none do (you'd need 4 copies of the raw `createRawSnippet` call, which Bentham specifically called out as worse).\n\n### Step 3 — Verify FAIL state\n\n```bash\npnpm vitest run src/lib/components/Margin.spec.ts src/lib/components/PaperStack.spec.ts src/lib/components/DeskSurface.spec.ts src/lib/components/PaperCard.spec.ts\n```\n\nExpected: all 4 specs FAIL at runtime — `TypeError: Cannot read properties of undefined (reading 'before')` when the component tries to call the Snippet as a plain function. This is the fresh RED state for Byrd to flip to GREEN by changing component typing.\n\nAlso verify lint clean: `pnpm lint src/lib/components/{Margin,PaperStack,DeskSurface,PaperCard}.spec.ts src/tests/snippet-helpers.ts`.\n\n### Don't commit\n\nPer Bentham's per-commit-GREEN mapping: Byrd commits all 9 files atomically in Task #63 (4 specs + 4 components + 1 helper). Your work stays uncommitted.\n\n### Pre-flight\n\n```bash\npwd                                  # /home/michelek/workspace\ngit rev-parse --abbrev-ref HEAD      # feat/library-page-ui-kit\ngit status --porcelain               # expect Byrd's uncommitted /library/+page.svelte (don't touch it)\ngit log --oneline -1                 # 6ad59cf\n```\n\n### Report + mark\n\nSendMessage with: 5 file paths + line counts, vitest output showing all 4 FAILs with TypeError, lint result, `git status --porcelain`. Then `TaskUpdate(taskId=62, status=completed)`.\n\nTag your report `[ARCH-FIX 2026-05-24 CHORE-60]` so it threads with Bentham's verdict for future readers.\n\nProceed.\n",
-    "summary": "Typing-fix RED — 4 specs + helper",
-    "timestamp": "2026-05-24T04:21:24.952Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"62\",\"subject\":\"CHORE-60 Typing-fix RED: snippet-helpers + amend 4 specs\",\"description\":\"Per Bentham [ARCH-VERDICT 2026-05-24 CHORE-60]. Create src/tests/snippet-helpers.ts with textSnippet helper using createRawSnippet. Amend Margin.spec.ts, PaperStack.spec.ts, DeskSurface.spec.ts, PaperCard.spec.ts to pass children via textSnippet() not bare () => 'text'. Verify all 4 specs now FAIL at runtime (TypeError on .before — Snippet call vs plain function mismatch). Don't commit. Hand off uncommitted to Byrd for Task 63 GREEN.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T04:21:25.621Z\"}",
-    "timestamp": "2026-05-24T04:21:25.621Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 04:44] CHORE-60 Task 31 — Team Task #67. Final verification + visual smoke. Plan Task 31 at L2982-2994. Branch feat/library-page-ui-kit @ a3e4124.\n\n### Scope (no file changes)\n\n1. **Full gate:**\n   ```bash\n   pnpm check && pnpm test:unit && pnpm lint && pnpm build\n   ```\n   Expected: 0 type errors, 436+ unit tests pass, 0 lint, clean build.\n\n2. **Playwright (allowance for pre-existing):**\n   ```bash\n   pnpm test:e2e\n   ```\n   Expected: 11 pre-existing failures (session 17 baseline — frontend-scaffolding + tailwind/OKLCH). Anything BEYOND those 11 is a NEW regression introduced by CHORE-60 — report it specifically.\n\n3. **Branch summary:**\n   ```bash\n   git log --oneline main..feat/library-page-ui-kit\n   git diff --stat main..feat/library-page-ui-kit\n   ```\n   Capture for the report.\n\n### Report\n\nSendMessage team-lead with:\n- All gate results (specific numbers)\n- Playwright pre-existing vs new failure split\n- Commit list of the branch (the squash-merge preview)\n- Total +/- lines on the branch\n- Anything noteworthy (e.g., test-gaps you noticed during this CHORE that should hit test-gaps.md)\n\nIf the gate is RED on anything: surface-and-stop with detail; don't try to fix anything.\n\nIf GREEN: tag the report `[CHORE-60 VERIFIED]` so I can hand it directly to Bentham for branch-level review.\n\n`TaskUpdate(taskId=67, status=completed)` after report.\n\nProceed.\n",
-    "summary": "CHORE-60 Task 31 — final verification",
-    "timestamp": "2026-05-24T04:44:16.299Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"67\",\"subject\":\"CHORE-60 Task 31: Final verification + visual smoke\",\"description\":\"Plan Task 31 at L2982-2994. Run full gate (pnpm check + test:unit + lint + build). Run pnpm test:e2e — pre-existing 11 Playwright failures from session 17 baseline are allowed; verify no NEW failures introduced by CHORE-60. Report git log of the branch (commits since main) + final test counts. No file changes — just verification. After clean: branch ready for Bentham branch-level review.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T04:44:16.702Z\"}",
-    "timestamp": "2026-05-24T04:44:16.702Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779603117638@tallis\",\"from\":\"team-lead\",\"reason\":\"session-21 close after CHORE-60 ship\",\"timestamp\":\"2026-05-24T06:11:57.638Z\"}",
-    "timestamp": "2026-05-24T06:11:57.638Z",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779631469427@tallis\",\"from\":\"team-lead\",\"reason\":\"Session 22 wrap. Clean RED specs for CHORE-62 + CHORE-66 Tasks 3/4/5. The spec-refactor-discard discipline was the right call. Save scratchpad if any new test-design lesson worth keeping.\",\"timestamp\":\"2026-05-24T14:04:29.427Z\"}",
+    "timestamp": "2026-05-24T14:04:29.427Z",
     "type": "message",
     "read": true
   }

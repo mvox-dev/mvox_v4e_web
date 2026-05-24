@@ -7,6 +7,25 @@ metadata:
 
 # Bentham scratchpad
 
+## 2026-05-24 — Session 22 close: 2 new calibrations from CHORE-66 review
+
+[CALIBRATION-MERGE-SHAPE 2026-05-24] **For any branch with a merge commit in its history, verify the squash-merge diff doesn't undo recent main commits.** CHORE-66 RED-1 was a stale-branch hygiene issue: branch base was `3d0ef30`; main advanced with `ef78aa3` + `8a42302` (the pre-commit branch-intent hook + env-var swap); the branch's existing merge commit `4eeedda` only pulled `3d0ef30` as its second parent, NOT the later hook commits. Net effect: `git diff main..branch` showed `.githooks/pre-commit | 72 ---`. The squash would have silently deleted a freshly-ratified workspace safety mechanism without trace in the squash subject. **Encode as standing review check**: on every branch review, run `git log --oneline branch..main` — if the result is non-empty, the branch is behind main and the diff-shape WILL include negative deltas for any file added on main during the gap. RED unless the implementer can show those deltas are intentional (rare). Particularly important for branches that have ANY merge commit in their history, because the merge gives a false sense of "I've already caught up." The branch had `4eeedda` merge-from-main but it was BEFORE the hook commits landed, so the merge didn't help. Fix path: option 2 (merge main into chore again) is least-disruptive when the branch already has prior merge history; option 1 (rebase) for linear branches.
+
+[CALIBRATION-STEWARDSHIP-IN-FLIGHT 2026-05-24] **Same-session arch-decision stewardship can land synchronously when the consuming CHORE depends on the lift.** CHORE-66's spec cited URL-overrides-persisted as "forthcoming" at brainstorm time; team-lead dispatched stewardship as a discrete task (10) before CHORE-66 implementation started; I shipped 3a37e42 within ~10 minutes of dispatch. The CHORE-66 spec then resolved its forthcoming-citation in `1a1bd85` (which became reachable from main via `ed7f7b8` → `3d0ef30` → main). Pattern: when a CHORE's spec cites a forthcoming arch-decision, the cleanest sequencing is `lift-decision → commit-to-main → spec-resolve-citation → CHORE-implementation-can-cite-by-SHA`. Holding the lift until the consuming CHORE lands creates a dangling citation; shipping the lift first creates a clean reference chain. Encode for stewardship pacing: a stewardship task with a downstream CHORE consumer is HIGH priority within its session — don't park to end-of-session.
+
+[CHECKPOINT] **Session-22 review log (all closed clean):**
+- **Branch `chore/mvoxnav-i18n-and-snippet-helper`** (`19a0610`): GREEN with 1 carry-forward YELLOW-62.1 (chip-width on long locale renderings — deferred, desktop-first MVP layout-touch). Closed both YELLOW-A (#62) + YELLOW-C (#63) from session-21.
+- **Arch-decision lift** (`3a37e42`): URL-overrides-persisted shipped doc-only, PO trailer verified. Added "two-write symmetry on read-time divergence" as natural extension of PO dispatch — team-lead implicitly approved by dispatching CHORE-66 implementation against it.
+- **Branch `chore/navbar-auth-wiring`** (`7f593ae` → `0a5a68e`): RED-1 (hook regression) caught at first pass, YELLOW-66.1 ($app/stores legacy) caught same pass. Both fixed in `5dd8461` (merge main) + `0a5a68e` ($app/state swap). Re-verify GREEN. YELLOW-66.2 (`ENTU_DB` env-lift) deferred to post-merge CHORE.
+
+[DEFERRED → next session start] **YELLOW-66.2 needs an issue filed** before any prod-deployment-related CHORE touches `userStore.ts:17`. Implementer pre-flagged with `// Dev db; derive from env when prod is wired`. If next-session-Bentham reviews any CHORE that exercises Path C against mvox prod and ENTU_DB is still hardcoded, RED unless lifted in the same PR. Cross-reference: architecture-decisions.md Path C section uses `PUBLIC_ENTU_DB` via `$env/static/public` everywhere else.
+
+[PRUNED 2026-05-24] Session-21 CHORE-60 entries dropped — closed by the session-22 follow-up reviews above. Session-13 through session-17 entries retained below for historical calibration; consider pruning at next steward pass if the carryforward review patterns section continues covering the load-bearing rules.
+
+(*MVOX:Bentham*)
+
+---
+
 ## 2026-05-24 — Session 21: CHORE-60 BRANCH-REVIEW verdict
 
 [CHORE-60 BRANCH-REVIEW 2026-05-24] **Branch `feat/library-page-ui-kit` @ `a3e4124` — YELLOW.** Three YELLOWs, no REDs. Squash-merge eligible after PO weighs YELLOW-A; YELLOW-B + YELLOW-C are fold-in-or-defer.

@@ -256,4 +256,20 @@ Updated: `src/tests/routes/auth/oauth/cookie-server.spec.ts` (5 new tests — as
 
 [PATTERN] biome enforces tabs in TS files; write tabs not spaces. Also requires parens around single arrow-function params (`w => ...` must be `(w) => ...`). Verify with `pnpm lint <file>` before reporting. 2026-05-24.
 
+## [CHECKPOINT] 2026-05-24 — Session 22: CHORE-62 + CHORE-66 Tasks 3/4/5
+
+[DECISION] CHORE-62: MvoxNav spec updated (lines 19+20 `'agenda'`→`'Agenda'`, `'library'`→`'Library'`) to match capitalized paraglide output. Atomic bundle with Byrd (chore/mvoxnav-i18n-and-snippet-helper). snippet-helpers.ts fix (SHA e8eeb11): wrap bare text in `<span>${text}</span>` per Svelte 5 createRawSnippet contract.
+
+[DECISION] CHORE-66 Task 3: userStore.spec.ts — 19 tests. Token at `localStorage.getItem('token')` (storage.ts key), JWT shape `accounts[db]` not `sub`, person response `{ entity: { _id, name } }` with wrapper, two parallel fetches (person + member-search), section parents filtered. SHA bcdeb00.
+
+[DECISION] CHORE-66 Task 4: OrgPicker.spec.ts — 5 tests. Contract pins: `data-testid="org-picker-chip"`, `role="menu"`, `findByText` for org label. Escape closes, click writes both `mvox.selectedOrgId` localStorage + URL `?org=`. SHA 7c455be.
+
+[DECISION] CHORE-66 Task 5: MvoxNav.spec.ts — added `vi.mock('$app/navigation', ...)` + `beforeEach` cleanup to existing spec; 3 new orgPickerMode tests (placeholder/static/dropdown). 463/463 passing. Byrd-2 had already pre-implemented component by the time I wrote mock setup.
+
+[GOTCHA] Spec-refactor-discard discipline: when Byrd commits the atomic bundle, his file is the truth. Any local refactor (helper extractions etc.) that diverges from the committed file must be discarded via `git restore`, not committed as follow-up. The committed version is the spec.
+
+[PATTERN] Atomic bundle workflow: write spec → confirm RED → notify Byrd → Byrd implements + confirms → run `pnpm test:unit <spec>` + full gate → notify Byrd "ready for commit" → Byrd stages both files + commits. Never commit spec independently when plan says atomic.
+
+[PATTERN] `vi.mock('$app/navigation', ...)` required in any component spec that mounts OrgPicker (even indirectly). Add to MvoxNav.spec.ts when orgPickerMode='dropdown' test is included.
+
 (*MVOX:Tallis*)

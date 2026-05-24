@@ -4,6 +4,53 @@ Personal notes. Only Josquin writes here.
 
 ---
 
+## [CHECKPOINT] 2026-05-24 session 22 — Two squashes + trailer-collision arch entry + twin surface-and-stops on CHORE-66
+
+Session shipped two merges + one doc-only commit:
+- `9637eee` — CHORE-62 + CHORE-63 squash (MvoxNav i18n wiring + textSnippet fix). PO trailer dropped here because dispatch template had a malformed `Co-authored-by: Comenius, Tallis, Byrd, Bentham (review)` line that short-circuited the hook.
+- `7d078f7` — architecture-decisions entry codifying "dispatch-message `Co-authored-by:` trailers short-circuit prepare-commit-msg hook." Self-dogfooded — kept my OWN commit body free of `Co-authored-by:` so the hook would append the PO trailer cleanly. Verified.
+- `9266e2e` — CHORE-66 squash (navbar auth wiring: userStore + OrgPicker + +layout integration). 15 files / +852 / -33. Trailer hook ran clean per the new rule. GH #66 auto-closed at 13:11:38Z.
+
+### Durables worth keeping
+
+[GOTCHA] **`git interpret-trailers --if-exists doNothing` dedupes on KEY, not on full value.** If a commit body already carries `Co-authored-by: <anything>`, the prepare-commit-msg hook's `interpret-trailers` call silently DOESN'T append the PO trailer. Failure mode is silent — no warning surfaces at commit time; you only spot it by running `git log -1 --format='%(trailers)'` after push and noticing the PO line is missing. Codified in arch-decisions `7d078f7`. Three permissible alternatives in dispatch templates: `Contributors:`, `Reviewed-by:`, `Helped-by:`. Body prose attribution is fine. The genuine multi-author co-authorship form (`Co-authored-by: Name <email>` one per line, properly formatted) survives the hook because the hook dedupes on FULL VALUE — so distinct properly-formatted lines all coexist. Malformed group-form (`Co-authored-by: A, B, C (review)`) is the trap.
+
+[PATTERN] **Surface-and-stop pays even more when the plan is wrong on TWO axes at once.** CHORE-66 Task 1 had two stacked plan errors:
+1. URL form (plan: `https://{db}.entu.app/api/...`; production: `https://api.entu.app/{db}/...`) — caught at 08:38 via DNS probe, before commit
+2. Data model (plan: `person.members[]` inline; reality: separate `member` entity with `person.reference` back to person) — caught at 10:42 via authenticated probe
+
+I sent two separate surface-and-stops rather than batching. Team-lead processed them sequentially: Path 1 approved + plan fixed at `ed7f7b8`; data-model finding incorporated into Task 3 plan code at `3d0ef30`. The 10:46 PO-multi-org probe addendum surfaced a third corner (founder-only orgs don't have member rows) which got logged as out-of-scope in the final commit body and a future-CHORE pointer. **Total cost: ~30 min round-trip × 2; total saved: would have been ~hours of Task 3 rewrite mid-stream when Byrd hit the empty `members[]` field.**
+
+The dispatch said "if MORE schema differences, surface-and-stop again — we'll adjust before locking the contract." That's a pre-authorization to KEEP surfacing, not a budget. Use it. Two surface-and-stops in one task is cheaper than one half-corrected commit.
+
+[GOTCHA] **Pérotin's "person + member ID" seed-table sent member IDs first, person IDs second** — for Margus: `6a12036e4ff8277cd4306b9a` (member) vs `6a12036d4ff8277cd4306b93` (person). Reading the plan literally ("probe `<PERSON_ID>`"), I would have hit the member entity and seen no name/members and possibly misdiagnosed as a rights filter or a missing-prop. The actual person entity sits one step "back" via `member.person.reference`. Future seed-target deliveries from Pérotin should label which ID is which OR put the person ID first by convention; flagged to team-lead at session end so the convention can be pinned.
+
+[CONTRACT] **API_KEY → JWT exchange wire shape (verified 2026-05-24)**: `GET https://api.entu.app/auth?db=<db>` with `Authorization: Bearer <API_KEY>` returns `{accounts: [{...}], user: {...}, token: <jwt>}`. The JWT is IP-bound (`aud=<callerIP>`), 48h lifetime, no refresh. Per `project_entu_jwt_ip_bound` + `project_entu_api_key_mechanics`. Crucially, the API key DOES NOT work as a Bearer directly against data API — that returns 401 `jwt malformed`. The exchange step is mandatory. Same wire shape applies whether the source bearer is an API key OR an OAuth session token (per session-15 [CONTRACT]). Stash a JWT after exchange and reuse for the rest of the session.
+
+[CONTRACT] **v4E person-with-orgs query shape (verified 2026-05-24 on polyphony)**:
+- **Person entity** (display name): `GET /entity/{personId}?props=name` → envelope `{entity: {_id, name: [{string}]}}`. NOTE the `.entity` wrapper — easy to miss; unwrap to access fields.
+- **Person's org memberships**: `GET /entity?_type.string=member&person.reference={personId}&props=_parent` → flat `{count, limit, skip, entities: [...]}`. Each member's `_parent` is multi-valued with both org AND section parents inline, distinguishable by `entity_type === 'organization' | 'section'`. `_parent[].string` is the parent's name denormalized — **no per-org name fetch needed**. Member entity is the join table; person does NOT inline `members[]`.
+- **JWT claims shape**: `{accounts: {<dbName>: '<personId>'}, iat, exp, aud}`. NO `sub` claim. Extract person ID via `claims.accounts[<dbName>]`.
+- **Founder-only edge case**: a user who is `_owner` of an organization but has no `member` row WILL NOT appear in the member-search. PO confirmed this empirically (owns 4 orgs, 0 members). If a future feature needs to surface founder-as-affiliation, union with `?_type.string=organization&_owner.reference={personId}`.
+
+Documented in `src/lib/auth/types.ts` (commit `e12522a`, squashed into `9266e2e`). The `EntuPersonResponse` + `EntuMemberSearchResponse` + `EntuJwtClaims` types carry the contract in TSDoc on the type definitions themselves — Byrd's Task 3 mock setup pulled directly from those examples.
+
+[PATTERN] **Probe-then-implement, even when the plan is detailed.** Plan had specific URL + JSON shape + property names. Reality differed on URL form, envelope shape, member-direction. ~3 curl probes (5 minutes) caught all of it before any consumer code wrote against the wrong contract. The cost of probing is trivial compared to the cost of "Task 3 was tested against a mock matching the plan, all greens; production hits empty results because the wire shape doesn't exist." Especially for FIRST consumer of a wire surface — every subsequent consumer can trust the now-tested contract, but the first probes.
+
+[PATTERN] **Self-dogfooded the trailer rule.** After codifying "no `Co-authored-by:` in dispatch templates" in arch-decisions, my OWN doc commit body (`7d078f7`) and ALL subsequent commits this session kept the body free of `Co-authored-by:`. PO trailer appeared on every one. Pattern: when you author a rule, the FIRST commits AFTER are the test bed — verify the rule with your own discipline before propagating it as a team norm. The new feedback memory [No urgency language] applies here too: codify quietly + dogfood, don't announce.
+
+### Open items at session-22 close
+
+- **YELLOW-66.2** — `ENTU_DB` hardcoded in `userStore.ts` (defaults to `'polyphony'`). Needs env-lift via `PUBLIC_ENTU_DB` from `$env/static/public` before prod. Palestrina will file as a follow-up CHORE post-merge.
+- **Founder-as-org-affiliation corner** (CHORE-66 out-of-scope) — surface someday if PO or org founders complain about empty pickers despite owning orgs. Not blocking.
+- **CHORE-67** — `/library` data wiring (the natural next step now that auth/org context is in place). Plan stub TBD.
+- **Role-derived chip text** (CONDUCTOR/ADMIN/MEMBER per selected org's rights) — out-of-scope CHORE-66, deferred. Will need a `member._owner`/`_editor` + section-leader + conductor introspection — pattern: `_rights[]` array on the org entity for the user. Worth a Finn-research pass before implementing.
+- **0-org onboarding flow** — out-of-scope CHORE-66. UX question first.
+
+(*MVOX:Josquin*)
+
+---
+
 ## [LEARNED] 2026-05-24 session 21 — CF Pages custom-domain binding has two-stage `_data` state machine
 
 Task #75 (mvox.eu DNS rebind). After creating the apex CNAME `mvox.eu` → `multivox.pages.dev`, the Pages domains API returns THREE status fields, not one:

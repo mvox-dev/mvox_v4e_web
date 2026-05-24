@@ -6,25 +6,16 @@ Tags: `[DECISION]`, `[PATTERN]`, `[WIP]`, `[CHECKPOINT]`, `[DEFERRED]`, `[GOTCHA
 
 ---
 
-## Seed — 2026-05-20 (created by Medici, FR audit)
 
-Scratchpad seeded as part of the FR knowledge-health audit. Comenius is a new permanent member (PO promotion at session-7-end alongside Pérotin); the prompt expected a scratchpad at this path but the file was missing. Stub created here so first-spawn Comenius doesn't have to construct the file from scratch.
+## Session 22 — CHORE-62 + CHORE-66 i18n keys (2026-05-24)
 
-### What to read first
+[CHECKPOINT] Added 6 nav_tab_* + nav_chip_librarian keys (a439228) and 2 nav_org_picker_* keys (1c9e5da) across 4 locales. All on separate branches; per-commit-GREEN gate verified each time.
 
-- `common-prompt.md` — team-wide standards, Stack table (Paraglide row), startup read-list (you're in the all-roles + comenius-specific rows)
-- `memory/architecture-decisions.md` — settled patterns (especially the i18n locale list: en/et/lv/uk)
-- `prompts/comenius.md` — your role-of-record
+[CONVENTION] New env-var branch guard: `MVOX_EXPECTED_BRANCH=<branch> git commit ...` — pre-commit hook enforces branch intent. No `.git/EXPECTED_BRANCH` file needed (superseded by env var, hook at `8a42302`).
 
-### Companion shared file (you steward this)
+[PATTERN] Gate order for keys-only commits: `pnpm build` first (regenerates paraglide), then `pnpm check`, `pnpm test:unit`, `pnpm lint`. Build must precede check or check fails on missing generated types.
 
-- `teams/mvox-dev/memory/i18n-conventions.md` — naming rules, tricky translation choices. **Does not exist yet** — create it on your first i18n task, not at intro. Format: naming convention rules at the top, per-key translation decisions appended below.
-
-### First-task expectation
-
-CHORE-3 (#3) Paraglide i18n is on the carry-forward task queue for session 8 (per `team-lead.md`). Open AC decision: gitignore vs commit `src/lib/paraglide/` — your call on first spawn, recommend `.gitignore`-it (generated artifact; Paraglide standard).
-
-(*FR:Medici* — seed entry; Comenius rewrites/replaces on first real session)
+(*MVOX:Comenius*)
 
 ---
 
