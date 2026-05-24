@@ -41,7 +41,7 @@ Path C is browser-direct: the JWT lives in localStorage, the SvelteKit server ho
    - Fire one Entu fetch to resolve the person entity + organization memberships. The exact v4E query is for Josquin to finalize; conceptually it returns `{ name, orgs: [{ id, label, initials, role }, ...] }`. The role field is captured here for future use but the chip stays hardcoded LIBRARIAN this CHORE.
    - Populate the Svelte store. Treat this fetch as authoritative for the session; refetch only on explicit re-auth.
 
-2. **Selected-org resolution** (Svelte store, derived) — follows the project-wide URL-overrides-persisted rule (forthcoming `architecture-decisions.md` entry):
+2. **Selected-org resolution** (Svelte store, derived) — follows the project-wide URL-overrides-persisted rule (`architecture-decisions.md`, lifted in `3a37e42`). Two-write symmetry per Bentham's extension: when URL and localStorage disagree at read time, URL wins AND we backfill localStorage so the next no-params nav inherits the deep-linked value:
    - Read `$page.url.searchParams.get('org')`. If present AND the value matches an ID in `userStore.orgs` → use it.
    - Else read `localStorage.getItem('mvox.selectedOrgId')`. If present AND in `userStore.orgs` → use it.
    - Else use `userStore.orgs[0]` if any orgs exist; otherwise null.
