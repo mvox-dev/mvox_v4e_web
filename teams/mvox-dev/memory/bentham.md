@@ -7,6 +7,72 @@ metadata:
 
 # Bentham scratchpad
 
+## 2026-05-24 — Session 21: CHORE-60 BRANCH-REVIEW verdict
+
+[CHORE-60 BRANCH-REVIEW 2026-05-24] **Branch `feat/library-page-ui-kit` @ `a3e4124` — YELLOW.** Three YELLOWs, no REDs. Squash-merge eligible after PO weighs YELLOW-A; YELLOW-B + YELLOW-C are fold-in-or-defer.
+
+**Verification on review machine:**
+- `pnpm check` → 0 errors, 0 warnings (1050 files).
+- `pnpm test:unit` → 436/436 PASS, 62/62 files. (Emits a new console warning per textSnippet call — see YELLOW-C.)
+- `pnpm lint` → 137 files, biome + eslint clean.
+- All 31 commits carry `Co-authored-by: Mihkel Putrinš` trailer.
+- Snippet fix `1be3b39` verified line-by-line.
+
+[GOTCHA YELLOW-A] **`/library/+page.svelte` ships with hardcoded English literals despite 60 paraglide keys existing.** All keys land in `f6247af` (en/et/lv/uk), but the page imports zero paraglide and uses zero `m.*()` calls. ~25 substitutions needed: "Library · librarian's desk", "On the desk today", "Returns", "Overdue", "Pull for tonight", "Catalog · 13 works", "Open full catalog ↗", "Confirm ✓", "Nudge both ✉", "owe rental library / if not back by 31 May", "Folder · Bass section", etc. Auth login + logout DID wire `m.*()` correctly — proof the wiring works on this branch. The library page just shipped before the wiring pass. YELLOW because: keys exist in all 4 locales, fix is mechanical, page renders English-everywhere today which matches main's locale-state. Fix path: Comenius i18n pass on this one file, ~15 minutes.
+
+**Calibration carry-forward** (extending the session-13 #35 calibration): broader rule — any new `.svelte` file with more than 2 English noun-phrases that aren't passed as props gets a discretionary YELLOW asking "where's the paraglide import?". Auth pages would pass; library page would have been caught.
+
+[GOTCHA YELLOW-B] **MvoxNav tab labels + "LIBRARIAN" chip + "Sign in" link are hardcoded English.** `src/lib/components/MvoxNav.svelte:4` declares `TABS = ['agenda', 'library', 'roster', 'notices', 'settings']` and renders the array elements directly. Keys don't exist (distinct from YELLOW-A where keys exist but aren't wired). Spec asserts the English literals, so the i18n fix is coordinated (component + spec + new keys). YELLOW because: MvoxNav is the ONLY nav, gap is real but bounded. Fix path: add `nav_tab_*` (5 keys) + `nav_chip_librarian` (1 key) + `nav_sign_in` (already exists on main); replace literals; update spec to use presence-of-localized-strings or test through the paraglide compile output. ~30 minutes Comenius + Tallis spec touch-up.
+
+[GOTCHA YELLOW-C] **`textSnippet` helper emits `[svelte] invalid_raw_snippet_render` warning at every call.** Tests pass, but Svelte 5's `createRawSnippet` contract requires `render` to return HTML for a SINGLE element, not bare text. My session-21 verdict prescribed `() => text` (bare text) — the warning fires. Fix is one wrapping element:
+
+```typescript
+export const textSnippet = (text: string): Snippet =>
+  createRawSnippet(() => ({ render: () => `<span>${text}</span>` }));
+```
+
+textContent assertions still pass (wrapper's content includes the text). Self-found Bentham-on-Bentham bug. YELLOW because: cosmetic, fix is one line; but warning will accumulate noise in every test run. Lift after merge; not a blocker.
+
+[PATTERN] **vitest.config.ts `mergeConfig(viteConfig) + resolve.conditions=['browser']` is the right shape.** Real infra change but the commit subject `480067f` is "Voice badge component" — squash-merge mitigates entirely (squash subject can cite the infra change in body). Mention only if the team wants a "test infra changes get their own commit" rule going forward.
+
+[PATTERN] **Layout SvelteKit-2 idiom resolved.** Root `+layout.svelte` consumes `$page` via `$state`/`$effect` plumbing; auth login uses `$app/state`. Both avoid legacy `$app/stores`. Closes session-13 YELLOW-35.3 in passing.
+
+[CHECKPOINT] **Squash-merge recommended.** Commit body should mention: (1) Snippet typing correction with verdict cross-ref; (2) vitest mergeConfig + browser-conditions infra change; (3) carry-forward YELLOWs A/B/C; (4) Playwright `login-cta` test stale post-redesign (now `provider-google` test-id — Tallis pre-flagged).
+
+[CHECKPOINT] **Cosmetic sub-YELLOW, don't act.** `1be3b39` mixes two valid TS import styles for `Snippet`: PaperCard + PaperStack use inline `import('svelte').Snippet`, Margin + DeskSurface use `import type { Snippet } from 'svelte'`. Both type-check, biome clean. Unification can wait.
+
+(*MVOX:Bentham*)
+
+---
+
+## 2026-05-24 — Session 21: CHORE-60 Task 27 Snippet typing verdict
+
+[ARCH-VERDICT 2026-05-24 CHORE-60] **Option 1 (createRawSnippet in specs) — GREEN. Options 2 and 3 — RED.** The bad-typing surface is **four** components (Margin, PaperStack, DeskSurface, PaperCard), not three — PaperCard has the same `() => string` precedent at `PaperCard.svelte:6`; its 3 spec assertions follow the same shape. Don't ship a partial fix that leaves PaperCard wrong. **Spec wrapper-file pattern (`.test.svelte` composition wrapper)** is acceptable as a stylistic alternative per testing-library docs, but `createRawSnippet` keeps the spec single-file + matches the existing one-spec-per-component layout in this branch — prefer it unless a per-component `.test.svelte` is clearly more readable for a given spec.
+
+[PATTERN] **Snippet vs `() => string` is settled, not a judgment call.** `{children()}` (plain call) treats children as a value-returning function. `{@render children()}` is the Svelte 5 compiler's snippet-render expression and is the ONLY mechanism that consumes the Snippet internals correctly. Once a parent passes children via slot syntax (`<PaperStack>...</PaperStack>`), Svelte 5 implicitly wraps the content as a Snippet — there is no opt-out, the wrap is in the compiler. The `() => string` typing was viable only because the unit specs hand-crafted a value that satisfied the type AND happened to be safely-stringifiable in a context where the renderer's snippet path wasn't exercised. The moment a real `<Wrapper>...</Wrapper>` site lands, the typing is exposed as a lie.
+
+[PATTERN] **`children: Snippet` + `{@render children()}` is canonical for both real composition AND unit tests.** Existing canonical sites in this branch already use it: `src/routes/+layout.svelte:56` and `src/routes/library/+layout.svelte:5`. There is no good-faith reason to maintain two children-prop dialects in the same codebase — the layout files are the load-bearing precedent, not the 4 primitives that shipped earlier this session under the Margin-precedent error.
+
+[PATTERN] **Test-helper for snippet construction belongs colocated, not in each spec.** Once 4 specs need `createRawSnippet(() => ({ render: () => 'string body' }))` boilerplate, lift to `src/tests/snippet-helpers.ts` exporting `textSnippet(text: string): Snippet` (one-line wrapper around `createRawSnippet`). Three call sites is the bar (CLAUDE.md "three similar lines"); four spec files importing the same 4-line dance crosses it. Implementer's call to make at landing time — YELLOW (not RED) if not factored out in the same commit, because the duplication is cheap to fix later. RED if the helper is invented inside one spec and the others continue copy-pasting (one-direction inconsistency is worse than uniform duplication).
+
+[GOTCHA] **`createRawSnippet`'s `render` returns an HTML STRING.** Per testing-library docs: `createRawSnippet(() => ({ render: () => '<span data-testid="x">body</span>' }))`. The outer arg is a function returning `{ render: () => htmlString }`. For specs that only assert `container.textContent.toContain(...)`, the simplest form is `createRawSnippet(() => ({ render: () => 'plain text' }))` — no wrapping element, plain-text body. Don't conflate with the older pre-v5 API where snippets were called as plain functions; that was the preview shape.
+
+[GOTCHA] **Option 2 (drop children-render tests) is the RED choice, not just suboptimal.** The "renders slot content" assertions across Margin / PaperStack / DeskSurface / PaperCard are LOAD-BEARING — they pin that each primitive actually surfaces its children, the ONE thing every wrapper component must do. Removing them leaves the primitives untested on their core contract and shifts the safety net entirely onto `/library/+page.spec.ts`. That single page spec WILL catch composition errors but cannot pinpoint which primitive is broken when a regression lands. Bisect viability + per-commit-GREEN discipline (the lift I stewarded in session 17/19) both depend on each primitive's spec being load-bearing AT THAT COMMIT. Dropping the assertions also violates the lift's intent: "every commit on a feature branch must be independently GREEN" assumes each commit's specs CONSTRAIN the change. Empty specs satisfy the gate vacuously.
+
+[GOTCHA] **Option 3 (functional-prop composition in `/library/+page.svelte`) is RED for a different reason.** It forces every consumer call site of the 4 primitives to construct child trees as TypeScript value-returning functions instead of Svelte template fragments. That defeats Svelte's own composition model + reads as fighting the framework + breaks any future component that uses these primitives unless it ALSO uses the same anti-idiom. The plan-as-written (L2484-2630) uses slot syntax everywhere because slot syntax IS the canonical composition mechanism. Locking ourselves out of slot syntax for foundational wrappers is far worse architectural debt than amending 4 specs.
+
+[CHECKPOINT] **Per-commit-GREEN mapping for the fix.** This is ONE coordinated change. The cleanest commit shape:
+1. **Single commit on the branch**: Tallis updates 4 specs (`Margin.spec.ts`, `PaperStack.spec.ts`, `DeskSurface.spec.ts`, `PaperCard.spec.ts`) to use `createRawSnippet`-constructed children — optionally factoring `src/tests/snippet-helpers.ts` (preferred) in the same commit. Byrd flips the 4 components' types from `() => string` to `Snippet` and render calls from `{children()}` to `{@render children()}`. All specs MUST stay GREEN after the commit lands — that's the per-commit invariant. Verify locally: `pnpm test:unit` continues to be 432/432 + the 4 amended specs preserve their original intent (text presence + style/class presence).
+2. **Then the Task 27 commit**: `/library/+page.svelte` lands using canonical slot syntax. `/library/page.spec.ts` covers end-to-end composition.
+
+Splitting (1) into "specs amend" + "components flip" would leave a transient broken state between commits — per-commit-GREEN forbids that. Amend + flip belong in one atomic commit. Tallis-then-Byrd serialized INSIDE a single commit, not across two.
+
+[CHECKPOINT] **Margin-precedent retrospective.** The four `() => string` typings entered the branch as a session-21 convention error. Future-Bentham: when reviewing the FIRST primitive that introduces a children-prop pattern in a new design system, the typing decision deserves explicit RED/GREEN review — even when specs pass. The "Margin precedent" was set without a Bentham review pass on the typing choice itself; subsequent primitives copy-pasted. Calibration: any new children-prop typing that ISN'T `Snippet` (or `Snippet<[arg]>` for parameterised snippets) gets a discretionary YELLOW asking "why not Snippet?" before the next primitive lands.
+
+(*MVOX:Bentham*)
+
+---
+
 ## 2026-05-23 — Session 17 CLOSE: CHORE-B shipped on production
 
 [CHECKPOINT] **Path C is live.** CHORE-B merged + deployed; 4 hotfixes landed in the same session (next= URL shape mirror, YELLOW-B.1 fold-in, layout-nav reactive to localStorage, pre-merge dev-scaffold drop + auth-UI hydration gate). My initial branch GREEN was correct on its scope but the integration cycle surfaced 4 follow-up issues that only PO live-test could find — appropriate split: my static review caught the YELLOW set; integration caught the dynamic cases.

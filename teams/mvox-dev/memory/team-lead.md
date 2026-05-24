@@ -1,6 +1,87 @@
 # Palestrina — Team Lead Scratchpad
 
-### [NEXT SESSION] 2026-05-24 end-of-session-20 — session-20 → session-21
+### [NEXT SESSION] 2026-05-24 end-of-session-21 — session-21 → session-22
+
+**Headline: CHORE-60 (/library page + 21-component UI kit) shipped end-to-end. Squash `ab6dcc5` on main, live at `multivox.pages.dev`. mvox.eu still stale pending PO CF-dashboard fix (#64).**
+
+**Session 21 outcome:**
+
+| Outcome | Artifact / SHA | What landed |
+|---|---|---|
+| ✅ CHORE-60 shipped | squash `ab6dcc5` on main (was 33 commits on feat/library-page-ui-kit, branch deleted) | /library page + 21-component UI kit + design tokens + Caveat/Inter/Mono fonts + 64 paraglide keys + /auth/login + /auth/logout redesigns. 63 files, +2690/-80, 436/436 unit tests (was 361 baseline; +75). Closes GH #60. |
+| ✅ Architecture correction mid-branch | `1be3b39` | Margin/PaperStack/DeskSurface/PaperCard children flipped from `() => string` to canonical `Snippet` + `{@render}` per `[ARCH-VERDICT 2026-05-24 CHORE-60]`. Bentham caught at /library page composition; scope correction (3→4 components) from his review. |
+| ✅ Production deploy to multivox.pages.dev | per-build URL `5cd51fd7.multivox.pages.dev` | Wrangler pages deploy clean. Live: `https://multivox.pages.dev/library` returns 200 with `x-sveltekit-page: true`. |
+| ❌ mvox.eu wiring | tracked at GH #64 | mvox.eu/library returns 404 (CF default page). Finn's CF API probe: Pages binding `mvox.eu` on multivox project is `status: pending` since 2026-05-23 22:58 UTC because apex CNAME → `multivox.pages.dev` was never created. Apex A/AAAA records route to some unknown origin (Workers/old-Pages/static — token scope can't read DNS to identify). PO dashboard fix needed (5-step recipe in #64); takes ~30s + ~60s for binding to activate. |
+| ✅ Carry-forward YELLOWs filed | GH #62, #63 | #62 = MvoxNav i18n keys missing (6 keys + spec touch-up, ~30 min). #63 = textSnippet helper Svelte warning (`invalid_raw_snippet_render` — 1-line fix). |
+
+**Live state at session-21 close:**
+- main: `ab6dcc5` (origin matches)
+- Production: `multivox.pages.dev` 200 on `/`, `/library`, `/auth/login`. `mvox.eu/` 200 but stale (Dec 2025 build); `/library` + `/auth/login` → 404. NOT shipping live as `mvox.eu` URL until #64 lands.
+- Tests: 436/436 unit; check 0; lint clean; build clean. 12 pre-existing Playwright failures (no new regressions — verified identical on main).
+- Polyphony Entu db: unchanged from session 20 (607 librarian-bundle entities under EFK Library `6a12036c4ff8277cd4306b26`).
+- Brilliant KB: 270 entries (unchanged this session — session-21 lessons L96-L103 are deferred).
+- Agents at shutdown: finn + bentham + josquin + tallis + byrd + comenius all spawned this session; shutting down now.
+- Stale local branches (housekeeping candidates, unchanged): `chore/per-commit-green-arch-decision`, `chore/seed-librarian-bundle`, `feat/phase-b-live-wiring`.
+- Stale remote branches: `origin/feat/phase-a-migration`, `origin/fix/phase-a-partial-failure-recovery`.
+- Scheduled routine: `trig_014xDo7ZTuzNLpBUuWdtEs32` next_run_at 2026-05-30T09:00:00Z (unchanged).
+
+**Carry-forward queue for session 22 (priority order):**
+
+1. **GH #64 — mvox.eu DNS fix (PO action).** 5 dashboard steps: delete apex A `188.114.97.3` + `188.114.96.3` + apex AAAA `2a06:98c1:3120::3` + `2a06:98c1:3121::3`, create proxied CNAME `@` → `multivox.pages.dev`. Pages binding auto-activates within ~60s. Unblocks shipping `mvox.eu` as the live customer URL. Full recipe + diagnosis in issue body.
+2. **GH #62 — MvoxNav i18n keys.** Coordinated chain: Comenius adds 6 keys × 4 locales (`nav_tab_*` + `nav_chip_librarian`) → Byrd wires `m.*()` calls → Tallis updates MvoxNav.spec.ts assertions. ~30 min.
+3. **GH #63 — textSnippet helper Svelte warning.** One-line fix in `src/tests/snippet-helpers.ts`: wrap text in `<span>${text}</span>` per Svelte 5 createRawSnippet contract.
+4. **3 TODO et/lv/uk markers** for `library_overdue_marginalia` — PO copy decision (or confirm English passthrough is fine).
+5. **CHORE-C test infra** — plan at `docs/superpowers/plans/2026-05-23-chore-53-c-test-infra.md` (791 lines, 9 tasks). MSW + Playwright bootstrap. Closes #36, #39, #33 + the 11 pre-existing Playwright failures. Tallis-heavy.
+6. **Brilliant KB updates (deferred — session-21 lessons L96-L103).** See list below.
+7. **Stale branch housekeeping** (local + remote).
+8. **#54 client-side error capture (deferred).** Fires before mvox opens to real users.
+9. **#44 CF Pages Git-connected migration.**
+10. **#49 Biome lint enable (5 sub-cycles).**
+11. **#6 CHORE-6 Email Resend** — still blocked on PO SPF/DKIM DNS.
+12. **Routine fires 2026-05-30T09:00:00Z** → emails PO with GH #59 deferred-providers checklist.
+
+**Expected first action session 22:**
+1. Read this seed; verify production health: `curl -sI https://multivox.pages.dev/` (expect 200) and `curl -sI https://mvox.eu/library` (still 404 unless PO did #64 between sessions).
+2. Spawn finn + bentham (always-on, read/review only — no isolation per L96).
+3. Confirm with PO: priority among #62 / #63 / CHORE-C / KB-batch / housekeeping. Recommend #62 + #63 fold-ins first (small, complete the CHORE-60 polish arc) before kicking off CHORE-C heavy work.
+
+**Process lessons from session 21 (L96-L103) — Brilliant KB updates deferred:**
+
+- **L96 — `isolation: "worktree"` parameter doesn't combine with `team_name` on Agent.** Spawning Josquin with `team_name: "mvox-dev"` + `isolation: "worktree"` silently dropped the isolation; he landed in the shared `/home/michelek/workspace` checkout. The harness pins team-spawned agents to the team workspace cwd; isolation parameter is ignored. Implication: [[spawn-agents-with-worktree-isolation]] pattern from session 20 needs a different vehicle for team-spawned agents — either pre-create worktree via Bash + dispatch with cwd-verify, OR drop team-spawning for code-committing dispatches. PO directive for session 21: "forget worktree for now. proceed as always." That stance held cleanly through 31 commits with no shared-tree branch-flip bugs.
+
+- **L97 — Convention errors propagate fast in a chain.** The `() => string` Margin typing was a session-21 shortcut to make Tallis's first spec pass. It then propagated unchanged to PaperStack, DeskSurface, PaperCard (3 more primitives) before /library/+page.svelte revealed the Snippet conflict at composition. Bentham caught the architectural error at branch review with a scope correction (4 components affected, not 3 — he read the branch independently). Implication: any new children-prop typing that isn't `Snippet` (or `Snippet<[arg]>`) should get a discretionary Bentham YELLOW asking "why not Snippet?" before the next primitive lands. Codifying this in his calibration.
+
+- **L98 — `createRawSnippet` requires single-element HTML render output, not bare text.** Bentham's own architectural verdict prescribed a helper that returned bare text — Svelte 5 emits `invalid_raw_snippet_render` warning on every call. Bentham-on-Bentham finding, filed as GH #63 (1-line fix: wrap in `<span>${text}</span>`). Implication: helper authoring should test for warnings, not just functional pass.
+
+- **L99 — Tallis indent + biome arrow-paren style.** Biome enforces tabs + parens on single-arg arrows. Tallis defaulted to 2-space indent + bare arrows; Byrd had to `biome format --write` before every commit. Codified via process note to Tallis at Task #15 (Task 4 RED); held cleanly for the rest of the session. Pattern: codify formatting conventions in the prompts (or in `architecture-decisions.md`) so they don't surface per-commit.
+
+- **L100 — i18n key tasks must precede consuming-page tasks within a feature branch.** Plan ordered Tasks 28+29 (auth redesigns) BEFORE Task 30 (i18n keys), but both 28+29 reference `m.auth_login_*` keys that 30 introduces. Per-commit-GREEN forbids landing those before the keys exist. Reordered 30→28→29 mid-execution. Pattern: when writing plans, sequence i18n setup before any UI work that references those keys.
+
+- **L101 — Hardcoded English in newly-created .svelte file when matching i18n keys exist gets Bentham YELLOW.** Caught at /library/+page.svelte branch review: 60 paraglide keys for the page existed (committed in `f6247af`) but the page itself shipped with hardcoded English. Pre-merge fold-in path (Comenius wired the substitutions in `615a7e0`) is acceptable. Bentham extending session-13 #35 calibration (suffix-to-data-value) with "where's the paraglide import?" heuristic for any new .svelte with >2 English noun-phrases.
+
+- **L102 — Pages custom-domain binding can sit `status: pending` indefinitely if the apex CNAME never gets created.** Session-19 [NEXT SESSION] seed claimed mvox.eu was "serving 200 (cert via Google in ~60s)" but Finn's session-21 probe found the binding has been pending since 2026-05-23 22:58 UTC — site was serving 200 from a DIFFERENT origin all along. Implication: verify Pages binding `status: active` (via API or dashboard) before declaring a custom domain DONE, not just "200 from the apex." Symbol-level wiring (`wrangler pages domain add`) is not enough; the apex CNAME has to actually resolve and Pages has to actually validate it.
+
+- **L103 — Token-scope mismatch is a real workflow blocker.** `CLOUDFLARE_API_TOKEN` in `~/.config/mvox/credentials.env` has account-level Pages scope but lacks Zone:DNS:Edit. Both Finn (read DNS) and Josquin (write DNS) hit `Authentication error` on first call. Implication: for any DNS automation, either (a) mint a broader-scoped token + add to credentials.env, OR (b) fall back to dashboard. Current credentials don't cover ops work beyond Pages. Worth a future token refresh that includes Zone:DNS:Edit + Zone:Email Routing:Edit + Zone:Workers Routes:Edit for the mvox zone(s).
+
+**Brilliant KB updates (deferred — accumulating since session 19):**
+- New: `Patterns/isolation-worktree-doesnt-combine-with-team-name` — codify L96 with session-21 CHORE-60 dispatch as exemplar
+- New: `Patterns/convention-errors-propagate-fast-in-a-chain` — codify L97 with the Margin precedent → 4-component-fix sequence
+- New: `Patterns/create-raw-snippet-single-element-contract` — codify L98 with the Bentham-on-Bentham finding
+- New: `Patterns/biome-tabs-and-arrow-parens` — codify L99 (subset of Tallis prompt convention)
+- New: `Patterns/i18n-key-tasks-precede-consuming-page-tasks` — codify L100 with the 28/29/30 reordering exemplar
+- New: `Patterns/paraglide-yellow-when-hardcoded-english-in-new-svelte` — codify L101 with Bentham's calibration
+- New: `Patterns/pages-binding-status-active-not-symbol-level` — codify L102 with the mvox.eu wiring retrospective
+- New: `Patterns/token-scope-mismatch-as-workflow-blocker` — codify L103
+- Update: `Patterns/worktree-isolation-for-coding-agents` — note that the `isolation` param doesn't compose with `team_name` (cross-ref L96)
+- Update: `Projects/mvox` — note CHORE-60 shipped, live on multivox.pages.dev, mvox.eu pending PO DNS fix
+- Update: `Decisions/mvox/ui-aesthetic-hybrid-inter-caveat` — note the design system is now realized in code (21-component UI kit on main)
+- All session-20 deferred-KB entries (Patterns/codifying-a-pattern-doesnt-mean-applying-it, etc.) STILL pending from session-20 seed
+
+(*MVOX:Palestrina*)
+
+---
+
+### [PROCESSED 2026-05-24 end-of-session-21] session-20 → session-21
 
 **Headline: Brilliant KB backlog cleared (sessions 16-19 lessons codified = 24 entries + 10 cross-links; KB went 246 → 270). CHORE-60 first execution attempt was chaotic and rolled back at PO's call. Pre-existing main lint debt from session-19 seed scripts cleaned up as a side-effect.**
 

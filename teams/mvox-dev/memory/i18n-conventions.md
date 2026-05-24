@@ -105,5 +105,24 @@ Append entries here when a non-obvious translation choice is made. Format: key, 
 | `landing_members_per_section` | et | `{count} liiget häälerühmas` | `liiget` = members (partitive, works for all numeric values incl. decimals); `häälerühmas` = in the voice group — choral term for section. No pluralization variants: count can be a decimal average. |
 | `landing_members_per_section` | lv | `{count} locekļi katrā sekcijā` | `locekļi` = members (nom. pl.); `katrā sekcijā` = in each section. Nominative plural works for display counts. |
 | `landing_members_per_section` | uk | `{count} учасників на секцію` | `учасників` = participants/members (gen. pl., standard with numeric count); `на секцію` = per section. |
+| `auth_login_heading` | en | `Welcome back` | Updated from "Sign in to mvox" for redesigned login page. Friendlier re-entry tone; eyebrow carries the functional "Sign in" label. |
+| `auth_login_heading` | et | `Tere tulemast tagasi` | Literal "Welcome back"; standard warm-return greeting in Estonian UI. |
+| `auth_login_heading` | lv | `Laipni atpakaļ` | `Laipni` = graciously/welcome; `atpakaļ` = back. Standard Latvian welcome-back phrase. |
+| `auth_login_heading` | uk | `З поверненням` | "With return" — standard Ukrainian welcome-back phrase. |
+| `auth_logout_stamp` | et | `Välja logitud` | Past passive; mirrors `auth_callback_success` stamp pattern. |
+| `auth_logout_stamp` | lv | `Atteicies` | Reflexive past; "has logged out" — standard Latvian session-end state label. |
+| `auth_logout_stamp` | uk | `Вихід виконано` | "Exit performed" — past passive, matches tone of `auth_callback_success`. |
+| `auth_provider_email_sub` | et | `maagiline link` | `maagiline` = magical; direct translation of "magic link". |
+| `auth_provider_email_sub` | lv | `maģiskā saite` | `maģiskā` = magical (adj.); `saite` = link. Natural Latvian compound. |
+| `auth_provider_email_sub` | uk | `магічне посилання` | `магічне` = magical; `посилання` = link. Standard Ukrainian tech phrasing. |
+| `library_overdue_marginalia` | et/lv/uk | `TODO` markers | Free-text marginalia with a specific date ("31 May") — deferred for PO to supply locale-specific copy or confirm en passthrough. |
+
+### New key group: `library_*` (added session 21)
+
+Covers: `library_top_*`, `library_rehearsal_*`, `library_search_*`, `library_returns_*`, `library_overdue_*`, `library_pull_*`, `library_catalog_*`.
+
+**Stamp keys** (`library_returns_stamp`, `library_overdue_stamp`, `library_pull_stamp`): uppercase in en; translated uppercase in et/lv/uk where natural ("SAABUNUD", "TAHTAEG ULETATUD", "SHANTTOPTEN" etc.) for visual stamp presentation.
+
+**Parameterized keys in this group:** `library_rehearsal_in` ({time}, {countdown}), `library_returns_counted` ({n}), `library_returns_confirm` ({n}), `library_overdue_borrower_days` ({n}), `library_pull_pull_n` ({n}), `library_pull_request_line` ({date}), `library_catalog_works` ({n}), `library_catalog_owned` ({n}), `library_catalog_available` ({n}), `library_catalog_on_loan` ({n}), `library_catalog_overdue` ({n}).
 
 (*MVOX:Comenius*)

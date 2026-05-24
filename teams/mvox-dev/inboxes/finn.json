@@ -1,8 +1,23 @@
 [
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779581641008@finn\",\"from\":\"team-lead\",\"reason\":\"End of session 20. No dispatches this session — clean exit.\",\"timestamp\":\"2026-05-24T00:14:01.008Z\"}",
-    "timestamp": "2026-05-24T00:14:01.008Z",
+    "text": "[2026-05-24 05:55] **Research request — Team Task #73.** Diagnose mvox.eu custom-domain wiring regression.\n\n### Context\n\nCHORE-60 just merged to main as squash `ab6dcc5` and deployed cleanly to the `multivox` Cloudflare Pages project. Live URLs verified:\n- `https://multivox.pages.dev/` → 200, serves the new build, `/library` + `/auth/login` both return 200 with `x-sveltekit-page: true`\n- `https://5cd51fd7.multivox.pages.dev/` → per-build URL, also 200\n\nBut `mvox.eu` is broken:\n- `https://mvox.eu/` → 200 but `last-modified: Tue, 30 Dec 2025 10:09:07 GMT` (months-old build, NOT the new one)\n- `https://mvox.eu/library` → **404** with `last-modified: Mon, 06 Nov 2023 23:06:18 GMT` (CF default 404 page)\n- `https://mvox.eu/auth/login` → **404** with same Nov 2023 last-modified\n\nThe session-19 seed claimed mvox.eu was wired to multivox Pages on 2026-05-23, but it's clearly pointing elsewhere now.\n\n### What to find out (READ ONLY — no mutations)\n\n1. **All CF Pages projects on the account.** Source CLOUDFLARE_API_TOKEN from `/home/michelek/.config/mvox/credentials.env` first:\n   ```bash\n   set -a\n   source /home/michelek/.config/mvox/credentials.env\n   set +a\n   pnpm dlx wrangler pages project list\n   ```\n   List names + which has mvox.eu attached.\n\n2. **Custom domains attached to the `multivox` project.** Either via wrangler:\n   ```bash\n   pnpm dlx wrangler pages project list --json   # or similar\n   ```\n   Or via CF API:\n   ```bash\n   curl -sH \"Authorization: Bearer $CLOUDFLARE_API_TOKEN\" \\\n     \"https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID:-/* may need to grep */}/pages/projects/multivox/domains\"\n   ```\n   (You may need to grep the ACCOUNT_ID from `credentials.env` if it's there, or from `wrangler whoami`.)\n\n3. **Which project (if any) owns mvox.eu as a custom domain.** If `multivox` doesn't, find out who does.\n\n4. **DNS resolution for mvox.eu:**\n   ```bash\n   dig +short mvox.eu\n   dig +short A mvox.eu\n   dig +short AAAA mvox.eu\n   dig +short CNAME mvox.eu\n   dig +short NS mvox.eu\n   ```\n\n5. **CF zone state for mvox.eu** (if accessible):\n   ```bash\n   curl -sH \"Authorization: Bearer $CLOUDFLARE_API_TOKEN\" \\\n     \"https://api.cloudflare.com/client/v4/zones?name=mvox.eu\" | jq '.result[0] | {id, status, name_servers, paused}'\n   ```\n\n6. **Page rules / Workers routes / static-origin** on mvox.eu (if any) that might be intercepting traffic before it reaches Pages.\n\n### Format\n\nStructured markdown report:\n\n- **Account-level Pages projects** (table: name, latest deploy, custom domains)\n- **mvox.eu binding** (which project, if any)\n- **DNS resolution** (A/AAAA/CNAME/NS records)\n- **Zone state** (CF zone ID, status, NS records, paused flag)\n- **Possible interceptors** (Workers routes, Page rules)\n- **Diagnosis** — your best guess at WHY mvox.eu serves stale + 404s. Don't fix; just diagnose.\n\n### Constraints\n\n- READ ONLY. No `wrangler pages deploy`, no `wrangler pages domain add`, no DNS changes, no zone edits.\n- If wrangler asks for confirmation on anything write-ish, abort and report.\n- Don't touch git, don't commit.\n\n### Report\n\nSendMessage team-lead with the structured markdown report. `TaskUpdate(taskId=73, status=completed)`.\n\nProceed immediately.\n",
+    "summary": "Probe mvox.eu CF wiring",
+    "timestamp": "2026-05-24T05:55:32.989Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"73\",\"subject\":\"mvox.eu wiring probe via wrangler/CF API\",\"description\":\"Read-only probe to diagnose why mvox.eu serves stale Dec 30 2025 build + 404s on /library + /auth/login while multivox.pages.dev serves the fresh CHORE-60 build. List CF Pages projects, list custom domains per project, check which project owns mvox.eu, check DNS resolution for mvox.eu. Source CLOUDFLARE_API_TOKEN from /home/michelek/.config/mvox/credentials.env. Report findings as structured markdown. NO mutations.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T05:55:33.537Z\"}",
+    "timestamp": "2026-05-24T05:55:33.537Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779603115031@finn\",\"from\":\"team-lead\",\"reason\":\"session-21 close after CHORE-60 ship\",\"timestamp\":\"2026-05-24T06:11:55.031Z\"}",
+    "timestamp": "2026-05-24T06:11:55.031Z",
     "type": "message",
     "read": true
   }

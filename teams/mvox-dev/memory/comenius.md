@@ -28,6 +28,20 @@ CHORE-3 (#3) Paraglide i18n is on the carry-forward task queue for session 8 (pe
 
 ---
 
+## Session 21 — CHORE-60 i18n ship (2026-05-24)
+
+[CHECKPOINT] Completed Tasks 30, YELLOW-A, YELLOW-D for CHORE-60 feat/library-page-ui-kit branch.
+
+[DECISION] Task 30 (f6247af): Added 60 keys across 4 locales — library_*, auth_login_*, auth_provider_*, auth_logout_*. Updated auth_login_heading "Sign in to mvox" → "Welcome back". 1 TODO marker per non-en locale on library_overdue_marginalia (date-specific copy, needs PO input).
+
+[DECISION] YELLOW-A (615a7e0): Wired 28 m.*() substitutions into /library/+page.svelte. Gotcha: `{@const}` invalid outside {#if}/{#each} blocks in Svelte 5 — must declare derived vars in <script> block instead.
+
+[DECISION] YELLOW-D (0aa63d8): Added 4 *_unit keys (owned_unit, available_unit, on_loan_unit, overdue_unit) in all 4 locales. Pattern: when colored `<span>` wrappers around numbers need to survive i18n wiring, split parameterized key into separate unit-label key. Parameterized originals left in place (unused but harmless). No TODOs — unit strings directly derived from parameterized values.
+
+[GOTCHA] `{@const}` placement: Svelte 5 only allows `{@const}` as immediate child of `{#snippet}`, `{#if}`, `{:else}`, `{#each}`, `{:then}`, `{:catch}`, `<svelte:fragment>`, `<svelte:boundary>`, or `<Component>`. NOT inside plain `<div>` or other HTML elements. Move splits/derives to `<script>` block.
+
+(*MVOX:Comenius*)
+
 ## Session 14 — #37 i18n landing gap (2026-05-22)
 
 [CHECKPOINT] Completed i18n phase for #37 (hardcoded "members/section" replacement). Commit `69f6ee6` on `chore/37-i18n-landing-members-per-section`. Ready for Bentham REVIEW.

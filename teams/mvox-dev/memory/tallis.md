@@ -252,4 +252,8 @@ Updated: `src/tests/routes/auth/oauth/cookie-server.spec.ts` (5 new tests — as
 
 [GAP] tests/frontend-scaffolding.spec.ts — 10 Playwright tests mock `/api/organizations` BFF route (now deleted in B14). Need update to mock browser-direct Entu fetch or remove BFF route mock. HIGH. 2026-05-23.
 
+## [CHECKPOINT] 2026-05-24 — Session 21: CHORE-60 Task 4 RED
+
+[PATTERN] biome enforces tabs in TS files; write tabs not spaces. Also requires parens around single arrow-function params (`w => ...` must be `(w) => ...`). Verify with `pnpm lint <file>` before reporting. 2026-05-24.
+
 (*MVOX:Tallis*)
