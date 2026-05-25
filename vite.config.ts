@@ -12,6 +12,6 @@ export default defineConfig({
 	server: {
 		// `true` should allow all hosts but Vite 8 was still rejecting the tailnet hostname;
 		// explicit list works reliably. Add hostnames here when serving over new networks.
-		allowedHosts: ['localhost', '127.0.0.1', 'srv1368259', 'srv1368259.tailccff13.ts.net', '.ts.net'],
+		allowedHosts: ['localhost', '127.0.0.1', 'mvox-team', 'mvox-team.tailccff13.ts.net', '.ts.net', 'ai.mvox.eu'],
 	},
 });
