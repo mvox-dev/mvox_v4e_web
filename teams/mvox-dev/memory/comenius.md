@@ -7,6 +7,34 @@ Tags: `[DECISION]`, `[PATTERN]`, `[WIP]`, `[CHECKPOINT]`, `[DEFERRED]`, `[GOTCHA
 ---
 
 
+## Session 24 — CHORE-67 plural fix (2026-05-24)
+
+[GOTCHA] `@inlang/plugin-message-format@2.2.0` does NOT support ICU plural syntax. Any `{n, plural, one {...} other {...}}` block is compiled as a literal param name — produces `params['n, plural, one {1 work']` in output. README says "Plurals... currently not supported, but planned." Use plain `{n}` templates until the plugin adds plural support. Commit `7cfb7b3`.
+
+[DEFERRED] True grammatical plurals for `library_master_count` (et "1 teos / 3 teost", lv "1 darbs / 3 darbi", uk "1 твір / 3 твори / 5 творів"). Blocked on plugin support. Accept "{n} works/teost/darbi/творів" for all n until fixed. Filed in `i18n-conventions.md`.
+
+(*MVOX:Comenius*)
+
+---
+
+## Session 24 — CHORE-67 Task 3 i18n keys (2026-05-24)
+
+[CHECKPOINT] Added 11 new library_* keys (master-detail catalog UI) across 4 locales. Commit `c02063b` on `chore/library-real-data`. 65 unit test files pass, 474 tests pass. Playwright E2E failures are pre-existing (no test server), not caused by i18n changes.
+
+[DECISION] `library_master_count` Ukrainian uses three-way plural rule (one/few/other) → `{n, plural, one {1 твір} few {{n} твори} other {{n} творів}}`. Estonian uses standard SvelteKit/Paraglide two-way (one/other) → `{n, plural, one {1 teos} other {{n} teost}}`.
+
+[TRANSLATION] New field-level keys:
+- `library_field_voicing`: et `Häälestus` / lv `Balsu sadalījums` / uk `Голосовий склад`
+- `library_field_language`: et `Keel` / lv `Valoda` / uk `Мова`
+- `library_work_eyebrow_in_view`: et `vaates` / lv `skatā` / uk `у перегляді`
+- `library_work_eyebrow_metadata`: et `Andmed` / lv `Metadati` / uk `Метадані`
+
+[DECISION] `library_empty_marginalia` — full translation (no TODO marker). Simple noun-phrase structure in all locales; no date-specific copy unlike `library_overdue_marginalia`. Pattern confirmed: TODO markers only for strings with literal dates/contact details needing PO input.
+
+(*MVOX:Comenius*)
+
+---
+
 ## Session 22 — CHORE-62 + CHORE-66 i18n keys (2026-05-24)
 
 [CHECKPOINT] Added 6 nav_tab_* + nav_chip_librarian keys (a439228) and 2 nav_org_picker_* keys (1c9e5da) across 4 locales. All on separate branches; per-commit-GREEN gate verified each time.

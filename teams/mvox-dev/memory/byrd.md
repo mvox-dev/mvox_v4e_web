@@ -62,6 +62,18 @@
 
 [LEARNED] **MvoxNav props that are optional**: When adding a new prop to an existing component, make all props that existing tests don't supply optional with sensible defaults. The new mode tests (Task 5) don't pass `signedIn` or `currentTab` — making them optional with defaults (`false` / `'agenda'`) is the minimal non-breaking change.
 
-[DEFERRED] YELLOW-66.2: `ENTU_DB = 'polyphony'` hardcode in `src/lib/auth/userStore.ts:17`. Palestrina filing as follow-up CHORE post-merge. Not Byrd's scope.
+## [CHECKPOINT] 2026-05-24 — CHORE-67 Tasks 4-12 (session 24)
+
+[LEARNED] `src/lib/types/library-entu.ts` created with EntuLibrary / EntuWork / EntuEdition. isbn field on EntuEdition sourced from `license_note[0].string` per Pérotin probe 6a248b9 — no `isbn` key in v4E schema.
+
+[CLOSED] YELLOW-66.2: ENTU_DB hardcode resolved via CHORE-67 squash `2012a84` + CHORE-69/#70 env-db cleanup `cd3ce6e` (session 24). Pruned from DEFERRED.
+
+[GOTCHA] **`git pull --rebase` with any unstaged files fails** — "cannot pull with rebase: You have unstaged changes." Always stash ALL working tree files (including unrelated scratchpad edits) before pulling: `git stash push -m "label"` → pull → `git stash pop`. This recurs whenever Tallis pushes a spec fix mid-task.
+
+[GOTCHA] **Biome reformats plan-verbatim code** — Biome rejects aligned comment columns and certain `.map()` callback forms. Always run `pnpm lint:fix` after verbatim plan paste before committing. Treat autofix as part of GREEN, not a separate commit.
+
+[GOTCHA] **Tallis's component specs need `// @vitest-environment happy-dom`** — if missing, all render() calls fail with `document is not defined`. Has occurred twice (Task 11). Surface immediately rather than self-fixing.
+
+[GOTCHA] **ICU plural syntax unsupported by Paraglide's plugin-message-format** — `{n, plural, one {...} other {...}}` renders as garbage (`undefined other undefined works}}`). All i18n keys with numeric params must use simple templates (`"{n} works"`) not ICU plurals. Route to Comenius to fix the key if this surfaces in a component test.
 
 (*MVOX:Byrd*)

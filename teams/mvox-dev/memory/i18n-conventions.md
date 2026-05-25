@@ -6,6 +6,43 @@ Canonical locale list: `en` (source), `et`, `lv`, `uk`. All 4 must stay in sync 
 
 ---
 
+## Plural Rule (IMPORTANT)
+
+`@inlang/plugin-message-format` does NOT support ICU plural syntax (`{n, plural, one {...} other {...}}`). Plugin README explicitly states: "Advanced formatting such as Plurals... are currently not supported, but they are planned." Using ICU syntax produces broken compiled output — the whole block becomes a literal param name.
+
+**Current rule: use plain `{n}` templates for all count-dependent strings.** Accept the grammatical imperfection at n=1 as a known limitation. When the plugin gains plural support, revisit.
+
+For grammatically correct form across all n, prefer the form that degrades least at n=1:
+- **et**: partitive plural (`teost`, `eksemplari`) — works correctly for all numeric values including 1
+- **lv**: nominative plural (`darbi`, `eksemplāri`) — minor imperfection at n=1 ("1 darbi"), acceptable
+- **uk**: genitive plural (`творів`, `учасників`) — standard with numeric count; grammatically expected with numbers
+
+Example: `library_master_count` — `"{n} works"` / `"{n} teost"` / `"{n} darbi"` / `"{n} творів"` (commit `7cfb7b3`)
+
+[DEFERRED] True per-locale plural variants (one/few/other) — blocked until plugin adds support.
+
+(*MVOX:Comenius*)
+
+---
+
+## Eyebrow Label Pattern
+
+Single-word noun-phrase eyebrow labels (collapsed/inactive state) use nominative singular — the simplest, most neutral noun form in each locale. No article, no case inflection beyond the base form.
+
+Pattern: `library_*_eyebrow_inactive` (and similar single-concept state labels)
+- **en**: nominative → `"Work"`
+- **et**: nominative sg → `"Teos"` (not partitive `"Teost"` — that's for counted nouns)
+- **lv**: nominative sg → `"Darbs"` (not gen.pl.)
+- **uk**: nominative sg → `"Твір"` (not gen.pl. `"Творів"`)
+
+Example: `library_work_eyebrow_inactive` (commit `89ff708`, YELLOW-67.2)
+
+Contrast with `library_work_eyebrow_in_view` (active state) — contextual phrase, not a noun label.
+
+(*MVOX:Comenius*)
+
+---
+
 ## Naming Conventions
 
 Keys are flat strings in `messages/{locale}.json`. No nesting.
@@ -124,6 +161,26 @@ Covers: `library_top_*`, `library_rehearsal_*`, `library_search_*`, `library_ret
 **Stamp keys** (`library_returns_stamp`, `library_overdue_stamp`, `library_pull_stamp`): uppercase in en; translated uppercase in et/lv/uk where natural ("SAABUNUD", "TAHTAEG ULETATUD", "SHANTTOPTEN" etc.) for visual stamp presentation.
 
 **Parameterized keys in this group:** `library_rehearsal_in` ({time}, {countdown}), `library_returns_counted` ({n}), `library_returns_confirm` ({n}), `library_overdue_borrower_days` ({n}), `library_pull_pull_n` ({n}), `library_pull_request_line` ({date}), `library_catalog_works` ({n}), `library_catalog_owned` ({n}), `library_catalog_available` ({n}), `library_catalog_on_loan` ({n}), `library_catalog_overdue` ({n}).
+
+### New key group: `library_master_*`, `library_field_*`, `library_work_*` (added session 24)
+
+Master-detail catalog UI for `/library`. 11 keys across 4 locales. Commit `c02063b` on `chore/library-real-data`.
+
+| Key | Locale | Value | Rationale |
+|---|---|---|---|
+| `library_field_voicing` | et | `Häälestus` | `häälestus` = voice/vocal setting; standard Estonian choral term for SATB etc. |
+| `library_field_voicing` | lv | `Balsu sadalījums` | "voice distribution" — more descriptive than `vokalizācija`; natural Latvian choral terminology. |
+| `library_field_voicing` | uk | `Голосовий склад` | "voice composition" — standard Ukrainian choral term. |
+| `library_field_language` | et | `Keel` | Standard label for language field. |
+| `library_field_language` | lv | `Valoda` | Standard Latvian for language. |
+| `library_field_language` | uk | `Мова` | Standard Ukrainian for language. |
+| `library_work_eyebrow_in_view` | et | `vaates` | Inessive case — "in the view"; concise secondary tag. |
+| `library_work_eyebrow_in_view` | lv | `skatā` | Locative — "in view"; standard Latvian locative for visual-context labels. |
+| `library_work_eyebrow_in_view` | uk | `у перегляді` | "in the review/view" — standard Ukrainian prepositional phrase. |
+| `library_work_eyebrow_metadata` | et | `Andmed` | "Data" — concise; `Metaandmed` would be technically correct but too long for an eyebrow. |
+| `library_work_eyebrow_metadata` | lv | `Metadati` | Direct loanword; natural in Latvian technical UI. |
+| `library_work_eyebrow_metadata` | uk | `Метадані` | Standard Ukrainian technical term. |
+| `library_master_count` | uk | three-way plural | `one {1 твір} few {{n} твори} other {{n} творів}` — Ukrainian requires one/few/other for accurate noun agreement. |
 
 ### New key group: `nav_tab_*` + `nav_chip_*` (added session 22)
 

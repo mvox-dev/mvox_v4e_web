@@ -272,4 +272,6 @@ Updated: `src/tests/routes/auth/oauth/cookie-server.spec.ts` (5 new tests — as
 
 [PATTERN] `vi.mock('$app/navigation', ...)` required in any component spec that mounts OrgPicker (even indirectly). Add to MvoxNav.spec.ts when orgPickerMode='dropdown' test is included.
 
+[GOTCHA] CHORE-67 plan code blocks for Svelte component specs (Tasks 11-17) are missing `// @vitest-environment happy-dom` on line 1. Without it: `ReferenceError: document is not defined`. ALWAYS prepend this directive to every new `.spec.ts` that uses `@testing-library/svelte` — do not wait for surface-and-stop from Byrd. 2026-05-24.
+
 (*MVOX:Tallis*)
