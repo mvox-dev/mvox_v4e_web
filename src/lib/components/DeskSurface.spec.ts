@@ -10,11 +10,11 @@ describe('DeskSurface', () => {
 		expect(container.textContent).toContain('desk content');
 	});
 
-	it('inlines the repeating-linear-gradient wood-grain', () => {
+	it('applies the wood-bg class to the data-desk element', () => {
 		const { container } = render(DeskSurface, { props: { children: textSnippet('x') } });
 		const el = container.querySelector('[data-desk]');
-		const style = el?.getAttribute('style') || '';
-		expect(style).toContain('repeating-linear-gradient');
-		expect(style).toContain('110deg');
+		expect(el).not.toBeNull();
+		// Svelte scopes class names; check the unscoped substring is present
+		expect(el?.className).toContain('wood-bg');
 	});
 });

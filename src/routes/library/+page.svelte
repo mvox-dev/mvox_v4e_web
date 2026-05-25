@@ -12,7 +12,14 @@
 	import PullItemCard from '$lib/components/PullItemCard.svelte';
 	import VoiceTally from '$lib/components/VoiceTally.svelte';
 	import Margin from '$lib/components/Margin.svelte';
-	import MiniWorkCard from '$lib/components/MiniWorkCard.svelte';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
+	import { selectedOrgStore, userStore, decodeJwt } from '$lib/auth/userStore';
+	import { getToken } from '$lib/auth/storage';
+	import { PUBLIC_ENTU_DB } from '$env/static/public';
+	import { librarySectionStore, hydrateLibrarySection } from '$lib/library/libraryStore';
+	import LibraryMasterDetail from '$lib/components/library/LibraryMasterDetail.svelte';
+	import LibraryEmptyState from '$lib/components/library/LibraryEmptyState.svelte';
 
 	const returnsTask = TASKS.find((t) => t.id === 'returns')!;
 	const overdueTask = TASKS.find((t) => t.id === 'overdue')!;
@@ -31,6 +38,27 @@
 
 	const stats = libStats(WORKS);
 	const marginaliaLines = m.library_overdue_marginalia().split('\n');
+
+	let initialWorkId = $derived(page.url.searchParams.get('work'));
+
+	$effect(() => {
+		const org = $selectedOrgStore;
+		const user = $userStore;
+		if (!org || user.status !== 'ready') return;
+		const token = getToken();
+		if (!token) return;
+		const claims = decodeJwt(token);
+		const personId = claims?.accounts?.[PUBLIC_ENTU_DB];
+		if (!personId) return;
+		hydrateLibrarySection({ orgId: org.id, personId });
+	});
+
+	$effect(() => {
+		const state = $librarySectionStore;
+		if (state.status === 'no-rights') {
+			goto('/');
+		}
+	});
 </script>
 
 <DeskSurface>
@@ -182,30 +210,22 @@
 				</div>
 			</PaperStack>
 		</div>
+
+		<div class="px-6 pb-8">
+			{#if $librarySectionStore.status === 'loading'}
+				<div class="library-loading">…loading library…</div>
+			{:else if $librarySectionStore.status === 'empty'}
+				<LibraryEmptyState />
+			{:else if $librarySectionStore.status === 'ready'}
+				<LibraryMasterDetail
+					library={$librarySectionStore.library}
+					works={$librarySectionStore.works}
+					editionsByWork={$librarySectionStore.editionsByWork}
+					{initialWorkId}
+				/>
+			{:else if $librarySectionStore.status === 'error'}
+				<div class="library-error">Something went wrong loading the library.</div>
+			{/if}
+		</div>
 	</div>
 </DeskSurface>
-
-<!-- Ambient catalog strip -->
-<div class="border-t-[1.5px] border-ink-2 bg-paper-2 px-6 py-3">
-	<div class="flex justify-between items-center mb-2 font-sans">
-		<div class="flex items-baseline gap-3">
-			<span class="text-[10px] tracking-[0.14em] uppercase text-ink-3 font-semibold"
-				>{m.library_catalog_works({ n: String(stats.works) })}</span
-			>
-			<span class="text-[11px] text-ink-3">
-				<span class="text-ink font-semibold">{stats.copies}</span> {m.library_catalog_owned_unit()} ·
-				<span class="text-green font-semibold">{stats.available}</span> {m.library_catalog_available_unit()} ·
-				<span class="text-amber font-semibold">{stats.on_loan}</span> {m.library_catalog_on_loan_unit()} ·
-				<span class="text-red font-semibold">{stats.overdue}</span> {m.library_catalog_overdue_unit()}
-			</span>
-		</div>
-		<a href="/library/catalog" class="text-[11px] text-ink underline font-medium"
-			>{m.library_catalog_open_full()}</a
-		>
-	</div>
-	<div class="grid grid-cols-6 gap-1.5">
-		{#each WORKS.slice(0, 6) as w (w.id)}
-			<MiniWorkCard work={w} pinnedTone={w.id === 'part-magnificat' ? 'overdue' : undefined} />
-		{/each}
-	</div>
-</div>

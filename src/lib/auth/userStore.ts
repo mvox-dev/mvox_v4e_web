@@ -18,7 +18,7 @@ const ORG_URL_PARAM = 'org';
 
 export const userStore: Writable<UserState> = writable({ status: 'loading' });
 
-function decodeJwt(token: string): EntuJwtClaims | null {
+export function decodeJwt(token: string): EntuJwtClaims | null {
 	try {
 		const parts = token.split('.');
 		if (parts.length < 2 || !parts[1]) return null;
