@@ -9,4 +9,9 @@ export default defineConfig({
 		paraglide({ project: './project.inlang', outdir: './src/lib/paraglide' }),
 		sveltekit(),
 	],
+	server: {
+		// `true` should allow all hosts but Vite 8 was still rejecting the tailnet hostname;
+		// explicit list works reliably. Add hostnames here when serving over new networks.
+		allowedHosts: ['localhost', '127.0.0.1', 'srv1368259', 'srv1368259.tailccff13.ts.net', '.ts.net'],
+	},
 });
