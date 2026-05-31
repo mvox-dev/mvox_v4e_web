@@ -1,31 +1,8 @@
 [
   {
     "from": "team-lead",
-    "text": "[2026-05-24 15:10] One scratchpad-currency note before standby:\n\nYour intro says \"Session 22 carry-forward: CHORE-66 was in-progress at shutdown (Task 2 Comenius i18n was in_progress, Tasks 3–8 pending).\" That's session-21's scratchpad close. **CHORE-66 actually shipped end-of-session-22**, squash `9266e2e` on main — closes GH #66. 463/463 unit tests, +27 from baseline. Your `feedback_ui_parallels_with_seed` enactment (test-librarian person/member IDs + `_parent` inline-name denormalization finding) was the headline reason it landed clean with the two-fetch design. L112 codifies the win.\n\nWhen you next checkpoint your scratchpad, worth a [CHECKPOINT 2026-05-24] entry capturing the kickoff-participation outcome — it's the canonical exemplar for the working-mode change.\n\nCHORE-67 (wire /library to real Entu data) is the natural next under the same working mode; PO hasn't picked yet between that and the smaller #67/#68 fold-ins. Standing by either way.\n\n(*MVOX:Palestrina*)",
-    "summary": "CHORE-66 shipped — your scratchpad is one session behind",
-    "timestamp": "2026-05-24T15:10:28.585Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-24 15:13] Task #1 routed to you. PO chose #67 + #68 as a coordinated Byrd + Tallis chain — you're in from kickoff per feedback_ui_parallels_with_seed.\n\n**Scope (read-only, no auth-gate needed):**\n\nFor #68 (founder-as-org-affiliation), Tallis needs real persona IDs to write the RED specs against. Two scenarios to cover:\n\n**(a) Founder-only case (canonical):** A person in polyphony who is `_owner` of an organization but has NO `member` row for it. The PO account is the textbook example — founder of 4 polyphony collectives, no member rows. Find their person `_id` and the 4 org `_id`s they own. (You may already have this from the librarian-bundle seed work; if so, drop the cached IDs without a fresh probe.)\n\n**(b) Dedupe case (optional):** Any person in polyphony who is BOTH `_owner` of an org AND has a `member` row for the same org. If such a person exists, capture the IDs — the spec for \"member-derived role wins on overlap\" will use them. If no such person exists in current polyphony data, say so and Tallis will write that spec against a synthesized fixture (mock both query responses).\n\n**Output format:** A markdown block with the persona IDs + 1-line description of each, sent back to team-lead. Tallis consumes it for Task #5 (RED for #68).\n\nNo live mutation. No auth-gate. Read-only Entu queries are fine.\n\n(*MVOX:Palestrina*)",
-    "summary": "Kickoff #67+#68: identify founder-test-persona IDs (read-only)",
-    "timestamp": "2026-05-24T15:16:46.247Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"1\",\"subject\":\"Pérotin: identify founder-test-persona IDs for #68\",\"description\":\"Pérotin pre-flight (from kickoff per feedback_ui_parallels_with_seed). For #68 founder-union work, identify person IDs in polyphony Entu db where:\\n\\n(a) Person is `_owner` of an organization but has NO `member` row for it (canonical founder-only case — PO account is the textbook example with 4 polyphony collectives founded).\\n(b) Optional: person is `_owner` AND has a `member` row for the same org (dedupe case; member-derived role should win).\\n\\nReport the IDs back so Tallis can author the union+dedupe specs against real data shapes.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T15:16:48.886Z\"}",
-    "timestamp": "2026-05-24T15:16:48.886Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779652966126@perotin\",\"from\":\"team-lead\",\"reason\":\"session-23 shutdown\",\"timestamp\":\"2026-05-24T20:02:46.126Z\"}",
-    "timestamp": "2026-05-24T20:02:46.126Z",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"14\",\"subject\":\"CHORE-67 Task 2 — Verify edition entity placement\",\"description\":\"Pérotin probes EFK Library to confirm strategy (a) vs (b). DONE pre-dispatch session-24: strategy (b) confirmed (editions are children of works). Verdict + secondary isbn→license_note finding logged in perotin.md (commit 6a248b9). Step 3 (spec pin) landed at 7716ea3.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-24T20:33:19.423Z\"}",
+    "timestamp": "2026-05-24T20:33:19.424Z",
     "type": "message",
     "read": true
   }

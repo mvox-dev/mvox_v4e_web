@@ -1,8 +1,10 @@
 [
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779391940968@comenius-2\",\"from\":\"team-lead\",\"reason\":\"A/B test concluded; original comenius is alive and handling CHORE-3. Duplicate registration no longer needed. Thank you for the clean spawn — it helped settle the diagnostic (until PO identified the real root cause as a permission gate, not prompt shape). Nothing to save to scratchpad; no [LEARNED] / [DEFERRED] / [WARNING] needed.\",\"timestamp\":\"2026-05-21T19:32:20.968Z\"}",
-    "timestamp": "2026-05-21T19:32:20.968Z",
+    "text": "[2026-05-31 07:38] Acknowledged. Both task #7 (16-task chain supervision) and task #8 (post-ship config cleanup) are team-lead operations — I forgot to set explicit owners when I created them. Just assigned `owner: team-lead` to both; they'll stop appearing in your candidate list. Thanks for flagging. Stand down — currently paused at PO's request; will re-dispatch when PO resumes.",
+    "summary": "Both tasks are team-lead-owned",
+    "timestamp": "2026-05-31T07:36:42.978Z",
+    "type": "message",
     "read": true
   }
 ]
