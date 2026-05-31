@@ -132,7 +132,7 @@ if [ -f "$TEST_FILE" ]; then
 fi
 
 # ── Build output ──────────────────────────────────────────────────────────────
-OUT="${BG_GREEN}${WHITE_BOLD} ${ENV_ID} ${RESET}${MODEL_BADGE} ${CTX_COLOR}${BAR}${RESET} ${GRAY}${USABLE}%${RESET} ${DIM}·${RESET} ${GOLD}${DIR}${RESET}"
+OUT="${BG_GREEN}${WHITE_BOLD} 𝄞 ${ENV_ID} ${RESET}${MODEL_BADGE} ${CTX_COLOR}${BAR}${RESET} ${GRAY}${USABLE}%${RESET} ${DIM}·${RESET} ${GOLD}${DIR}${RESET}"
 if [ -n "$BRANCH" ]; then
   OUT="${OUT} ${GRAY}(${BRANCH})${RESET}"
 fi
