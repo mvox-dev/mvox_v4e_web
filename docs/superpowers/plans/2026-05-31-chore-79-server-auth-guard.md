@@ -76,9 +76,9 @@ describe('session-cookie helpers', () => {
   });
 
   it('isSessionValid: present + unexpired = true; expired/absent = false', () => {
-    const now = 2_000_000_000_000; // ms
-    expect(isSessionValid(jwtWithExp(2_000_001), now)).toBe(true);  // exp after now
-    expect(isSessionValid(jwtWithExp(1_999_999), now)).toBe(false); // exp before now
+    const now = 2_000_000_000; // ms. NOTE: sample exps below are in SECONDS; decodeJwtExpMs multiplies by 1000, so exp 2_000_001s → 2_000_001_000ms must straddle `now`. `now` must be 2_000_000_000ms (== exp 2_000_000s), NOT 2_000_000_000_000.
+    expect(isSessionValid(jwtWithExp(2_000_001), now)).toBe(true);  // exp*1000 = 2_000_001_000ms > now
+    expect(isSessionValid(jwtWithExp(1_999_999), now)).toBe(false); // exp*1000 = 1_999_999_000ms < now
     expect(isSessionValid(undefined, now)).toBe(false);
     expect(isSessionValid('garbage', now)).toBe(false);
   });

@@ -321,4 +321,17 @@ Updated: `src/tests/routes/auth/oauth/cookie-server.spec.ts` (5 new tests — as
 
 [DECISION] CHORE-78 testable seams (all three matched Byrd's GREEN): (a) row-select = `<a href="?work=<id>">` anchor; (b) scroll-spy gate = `window.matchMedia('(min-width: 640px)').matches` in onMount/$effect; (c) mobile view mode = derived from existing `initialWorkId` prop.
 
+## [CHECKPOINT] 2026-05-31 — Session 27: CHORE-79 RED phase
+
+[DECISION] 10 tests written across 2 files on `chore/auth-guard`. 7 RED, 3 pass. SHA `4e4401e`.
+- `src/lib/server/auth/session-cookie.spec.ts` (6 tests) — 5 RED on 'not implemented', 1 passes (SESSION_COOKIE constant)
+- `src/hooks.server.spec.ts` (4 tests) — 2 RED (AC1 unauthenticated redirect, AC3 expired redirect), 2 pass (AC2 public paths, AC4 valid cookie). Old passthrough tests replaced.
+- `src/lib/server/auth/session-cookie.ts` — minimal stub with inline return type (no `cookie` package import — transitive dep only, not directly importable)
+
+[GOTCHA] `cookie` package (`CookieSerializeOptions`) is NOT directly importable in this project — it's a transitive dep of SvelteKit only. Use an inline object type in stubs and implementations. The package IS present at `node_modules/.pnpm/cookie@*/` for reference.
+
+[GOTCHA] CHORE-79 RED arithmetic bug (from plan doc): `const now = 2_000_000_000_000` (ms) was 1000× too large for the sample exp values. `decodeJwtExpMs(jwtWithExp(2_000_001))` returns `2_000_001_000` ms, which is far below `2_000_000_000_000` — so "valid" case would fail. Correct `now` is `2_000_000_000` (drop 3 zeros). Bug came from plan doc sample code, not spec design. Josquin fixed in-place with team-lead authorization. Going forward: for synthetic ms/seconds timestamps, always verify that sample values actually straddle `now` — write a quick mental check: `jwtWithExp(X)` decodes to `X * 1000` ms; `now` must be between the "expired" and "valid" X*1000 values.
+
+[PATTERN] Redirect assertion shape for SvelteKit `redirect()`: `.rejects.toMatchObject({ status: 302, location: '...' })`. SvelteKit throws an object with `status` (number) and `location` (string) — no try/catch needed; `toMatchObject` on the rejected value works cleanly.
+
 (*MVOX:Tallis*)

@@ -6,6 +6,41 @@ Format per entry: short title, decision, rationale, date. Most recent at the top
 
 ---
 
+## Responsive-layout review — structural class-presence tests can't catch broken computed layout (2026-05-31, session 26→27)
+
+**Decision**: Responsive show/hide and overflow contracts have a computed-layout outcome that jsdom/happy-dom cannot evaluate — they have no layout engine, so a spec can assert "class X is present" but never "the element actually renders the intended display/visibility." Two RED triggers close the gap. Both are mandatory at review; both have a paired spec-strengthening requirement so the test layer constrains the real outcome, not just the markup.
+
+### Trigger 1 — Single-axis overflow clip on a dropdown/popover host = RED
+
+`overflow-x: hidden` (or `overflow-y: hidden`) on a box whose other axis is `visible` forces that other axis to compute to `auto` (CSS Overflow Module Level 3 §3.2). The box becomes a clip container and cuts any `position: absolute` / `position: fixed` descendant that intentionally paints outside it — dropdown menus, tooltips, popovers, `top-full` panels.
+
+- **RED**: any single-axis overflow clip (`overflow-x-hidden` / `overflow-y-hidden`) on an element that hosts (is an ancestor of) an `absolute`/`fixed` descendant meant to paint outside the box.
+- **Correct horizontal-overflow control for a flex row**: `min-w-0` + `truncate` on flexible children, `flex-shrink-0` on fixed children. Never a parent clip.
+- **Standing audit**: `grep -rn "overflow-x-hidden\|overflow-y-hidden\|overflow-hidden" src/ --include="*.svelte"` on any component that hosts a dropdown/popover.
+- **Spec strengthening**: a spec must not pin the clip mechanism itself as the desired state (CHORE-76 AC7 originally asserted the header *carried* `overflow-x-hidden` — the assertion encoded the bug). When the bug is the pinned mechanism, the spec moves with the fix (assert the clip is *absent* + truncation does the work). The companion viewport/paint-order check belongs in Playwright (see test-gaps.md CHORE-76/77).
+
+### Trigger 2 — A `sm:`/`md:`/`lg:` display utility with no paired base `hidden` (or correct default) = RED
+
+A lone responsive-show class (`sm:grid` / `sm:block` / `sm:flex`) only flips `display` *at and above* the breakpoint. Below it, the element renders in its tag's default `display` (block for a `<div>`) — so a "desktop-only" element with no base `hidden` is visible on mobile, in the wrong display mode.
+
+- **RED**: any element with a `sm:`/`md:`/`lg:` display class that is meant to be hidden below the breakpoint but carries no base `hidden` (or other correct default). The canonical correct pattern is `hidden sm:block` (as on `library-master`); the anti-pattern is a bare `sm:grid` (as on `library-md-grid` before the fix).
+- **Standing audit**: for every `data-testid` element with a `sm:`/`md:`/`lg:` display class, grep its className for a paired `hidden` — or confirm the element's default display IS the intended mobile state.
+- **Spec strengthening**: when a component has a "hidden below breakpoint / shown above" contract, the spec must assert BOTH halves — the responsive-show class AND the base-hide class. Asserting only the `sm:*` half passes on markup that renders block-flow on mobile. Tallis has adopted this BOTH-halves assertion as a standing RED-phase sweep.
+
+### Root cause (shared)
+
+jsdom/happy-dom have no layout engine. A structural class-presence assertion (`className.contains('sm:grid')`, `className.contains('overflow-x-hidden')`) runs green while the COMPUTED display/visibility outcome is broken. Two consecutive CHOREs shipped this exact failure mode (CHORE-76 overflow → CHORE-78 grid-not-hidden). The fix is threefold: (a) the review triggers above catch the markup; (b) the paired spec-strengthening makes the test assert the full contract, not the partial one; (c) the genuinely computed-layout cases (does the element occupy zero box on mobile? is the panel within the viewport? does scroll-spy stay off below sm?) go to Playwright, where a real layout engine exists.
+
+### Sources
+
+- **Trigger 1**: CHORE-76 RED-76.1 regression (header `overflow-x-hidden` clipped AvatarMenu + nav-tab-menu dropdowns) → CHORE-77 fix (`overflow-x-hidden` → `relative z-30` on `MvoxNav.svelte`, branch `chore/nav-stacking-fix` @ `316ff02`). My own CHORE-76 GREEN review missed the CSS side-effect — encoded as `GOTCHA-OVERFLOW-FORCES-AUTO`.
+- **Trigger 2**: CHORE-78 RED-78.1 (`library-md-grid` was `sm:grid` with no base `hidden` → desktop detail column bled into mobile below sm; fix `hidden sm:grid` on `LibraryMasterDetail.svelte`). Encoded as `CALIBRATION-STRUCTURAL-TEST-BLINDSPOT`.
+- Sibling to the per-commit-GREEN and vertical-skin-neutrality decisions — the responsive-review complement. Lift proposed at session-26 shutdown, ratified + authored session 27.
+
+(*MVOX:Bentham*)
+
+---
+
 ## URL parameters override persisted state — project-wide resolution rule for UI state (2026-05-24, session 22)
 
 **Decision**: For any UI state that has BOTH a URL representation AND a persisted representation (localStorage, IndexedDB, Svelte stores), resolution follows a fixed order.
