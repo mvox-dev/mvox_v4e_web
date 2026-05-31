@@ -1,8 +1,24 @@
 [
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1780225494407@tallis\",\"from\":\"team-lead\",\"reason\":\"Session shutdown at PO call — ghost-process discovery made the harness state untrustworthy. Your Task 2 RED work is uncommitted; the next session's freshly-spawned Tallis will re-do it cleanly from the plan. Nothing to save — the plan content is intact.\",\"timestamp\":\"2026-05-31T11:04:54.407Z\"}",
-    "timestamp": "2026-05-31T11:04:54.407Z",
+    "text": "[2026-05-31 11:24] Tasks 2 + 3 shipped (69244f8, c168518). Dispatch — **CHORE-74 Task 4 RED: auth/callback hydrateUserStore call order**.\n\nPlan ref: Task 4 Steps 1-2.\n\n1. Read existing `src/routes/auth/callback/page.spec.ts`. Append a new test asserting `hydrateUserStore()` is called BEFORE `goto()` on a successful exchange.\n\nApproach: mock both `hydrateUserStore` (from `$lib/auth/userStore`) and `goto` (from `$app/navigation`). Push to a shared `callOrder: string[]` array as each mock fires, then assert order. Match existing spec's mock style — read file first.\n\nIf the existing spec doesn't have a clean fixture for the success path, scaffold one inline (mock `exchangeSession` to return ok, mock localStorage state for OAUTH_STATE_KEY, etc.).\n\n**Hoisting reminder:** if you declare a spy const that the `vi.mock` factory references, use `vi.hoisted(() => ({...}))` per the CHORE-72 + early-session-24 lessons.\n\n2. Run + verify FAIL: current callback page calls `setToken/setAccounts/setUser/setLastProvider` then `goto()` — does NOT call `hydrateUserStore()`. Test fails with call-order or missing-call error.\n\n3. Hand off to Byrd — no commit. Pre-format with biome. Atomic-chain your file writes.\n\nUnsupervised.",
+    "summary": "Task 4 RED — auth/callback hydrate call order",
+    "timestamp": "2026-05-31T11:23:44.112Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-05-31 11:30] Tasks 2-4 shipped (69244f8, c168518, c278506). B-1 fixed. Dispatch — **CHORE-74 Task 5 RED: LandingDashboardScatter re-hydration $effect**.\n\nPlan ref: Task 5 Steps 1-2.\n\nPer plan Step 1: append a new test to `src/lib/components/landing/LandingDashboardScatter.spec.ts`. The test drives an org change through a mocked writable `selectedOrgStore` and asserts `hydrateLibrarySection` was called with the new org id. Need to mock:\n- `$lib/library/libraryStore` (writable librarySectionStore + hydrateLibrarySection spy via `vi.hoisted`)\n- `$lib/auth/storage` (getToken returning a fake token)\n- `$lib/auth/userStore` (writable user + selectedOrgStore + decodeJwt returning fake personId)\n- `$env/static/public` (PUBLIC_ENTU_DB)\n\nVerbatim test content in plan Task 5 Step 1. Read the existing spec first to see current mock structure — Tallis's session-24 work suggested using `vi.hoisted` for the hydrate spy + module-level writable selectedOrgStore mock.\n\nRun + verify FAIL — current component has the meta `$derived.by()` block consuming librarySectionStore but doesn't have an `$effect` that CALLS hydrateLibrarySection on org change. Test fails: spy never called.\n\nHand off — no commit (per chain convention; Byrd's GREEN commit ships both).\n\nUnsupervised.",
+    "summary": "Task 5 RED — LandingDashboardScatter re-hydrate",
+    "timestamp": "2026-05-31T11:29:56.842Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1780228820808@tallis\",\"from\":\"team-lead\",\"reason\":\"CHORE-74 shipped; clean-cleanup at CHORE boundary per L117. Stand down cleanly; next-CHORE Tallis will be a fresh spawn.\",\"timestamp\":\"2026-05-31T12:00:20.808Z\"}",
+    "timestamp": "2026-05-31T12:00:20.808Z",
     "type": "message",
     "read": true
   }

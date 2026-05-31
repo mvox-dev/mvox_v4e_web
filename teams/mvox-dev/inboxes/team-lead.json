@@ -1,266 +1,5 @@
 [
   {
-    "from": "josquin-2",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin-2\",\"timestamp\":\"2026-05-30T16:41:39.195Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-30T16:41:39.195Z",
-    "color": "red",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin-2",
-    "text": "[2026-05-30] Task #4 — clarifying question #1 (one at a time, per brainstorming discipline).\n\n**Q1 — Who is `/` for, primarily?**\n\nThe current `/` collapses two very different audiences into one route. Which is its job?\n\n**A. First-time visitor (never seen mvox before).** They arrived from a link / search / word-of-mouth and need to learn what mvox IS before they sign in. Job-to-be-done: explain choir music sharing, build enough trust to click \"Sign in.\" Signed-in state is a fallback — they'll be redirected elsewhere after auth completes.\n\n**B. Returning user (signed-in).** They've signed in and `/` is their everyday entry — the dashboard, the choir-picker, the \"where do I go now\" surface. First-time visitors are a special case at the top of the same page (the sign-in prompt).\n\n**C. Both, with equal weight.** Split-personality on purpose — `/` does the marketing-front-door job AND the dashboard job, and the design has to handle both with no compromise on either.\n\n**D. Other** — describe.\n\nWhy this matters before anything else: the choice between **A**, **B**, **C** controls almost every downstream decision (hero presence, density, whether the org grid stays, whether `/` ever becomes a \"dashboard\" or stays a \"doorway\"). Pinning this avoids us drifting between visions mid-design.\n\nMy instinct from reading the kit + the architecture-decisions notes: **B** with a thoughtful signed-out top section. Reasoning: mvox lives on `mvox.eu` (a custom-domain product surface, not a marketing site), the kit was built for operating not introducing, and PO mentioned PO + multi-org founder context (4 orgs, 0 members) suggesting the returning-user case is the load-bearing one. But the spec doesn't exist for that reason yet — your call.\n\nHolding for answer; will follow with Q2 (purpose / what the page must convey) once locked.\n\n(*MVOX:Josquin*)",
-    "summary": "Clarifying Q1: who is the audience?",
-    "timestamp": "2026-05-30T16:42:08.135Z",
-    "color": "red",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin-2",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin-2\",\"timestamp\":\"2026-05-30T16:42:14.517Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-30T16:42:14.517Z",
-    "color": "red",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin-2",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin-2\",\"timestamp\":\"2026-05-30T16:42:46.618Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-30T16:42:46.618Z",
-    "color": "red",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin-2",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1780159361049@josquin-2\",\"from\":\"josquin-2\",\"timestamp\":\"2026-05-30T16:43:01.857Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-30T16:43:01.857Z",
-    "color": "red",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "comenius-2",
-    "text": "[2026-05-31 07:27] Comenius online — executing Task 2 (CHORE-72 i18n keys) on chore/landing-redesign. 7 deprecated keys to remove, 41 new keys to add × 4 locales. Starting now.",
-    "summary": "Comenius Task 2 start",
-    "timestamp": "2026-05-31T07:27:09.695Z",
-    "color": "red",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "comenius-2",
-    "text": "[2026-05-31 07:35] Task 2 complete. SHA: 0e1a4bf on chore/landing-redesign.\n\n**Key count delta:** -7 deprecated scaffold keys, +41 new landing keys. Net 34 new keys across all 4 locales. All 4 locales in sync.\n\n**Gates:** pnpm build ✓ · pnpm check 0 errors ✓ · pnpm test:unit 72 files / 504 tests ✓ · pnpm lint clean ✓\n\n**Notable handling:**\n- `landing_invites_body_1_html` — `<strong>` preserved in et/lv/uk. Documented as project's first `_html`-suffix key in i18n-conventions.md.\n- `landing_dashboard_library_meta_ready` — static plural suffixes in all locales per no-ICU-plural rule. uk uses invariant `прострочено` (short passive) — grammatically clean with any count. et/lv use partitive/nom.pl. per established convention.\n- Old `+page.svelte` scaffold used all 7 removed keys → `pnpm check` would have failed. Applied surgical inline-literal replacement (5 edits, no restructuring) so the check gate stays green until Byrd rewrites the page in Task 15.\n- \"Back office\" brand phrase localized idiomatically: et `tagakontor`, lv `aizmugures birojs`, uk `офіс`. Not word-for-word.\n\n**Translator notes:** appended to `teams/mvox-dev/memory/i18n-conventions.md` (new section `landing_*` with full table + special-case docs).\n\nReady for Tallis to begin RED chain at Task 3.",
-    "summary": "Task 2 complete — i18n keys for CHORE-72",
-    "timestamp": "2026-05-31T07:35:50.387Z",
-    "color": "red",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "comenius-2",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"comenius-2\",\"timestamp\":\"2026-05-31T07:35:58.111Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T07:35:58.112Z",
-    "color": "red",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "comenius-2",
-    "text": "[2026-05-31 07:36] Received a task-list message referencing \"task #8: Post-CHORE-72 TeamDelete + TeamCreate cleanup\". TaskList shows no tasks exist in this session's store. Also: TeamDelete/TeamCreate is a team-lead operation, outside Comenius scope. Flagging for your awareness — no action taken. Comenius is idle and ready for next dispatch.",
-    "summary": "Stale task-list message — task #8 not actionable by Comenius",
-    "timestamp": "2026-05-31T07:36:21.381Z",
-    "color": "red",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "comenius-2",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"comenius-2\",\"timestamp\":\"2026-05-31T07:36:24.092Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T07:36:24.092Z",
-    "color": "red",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "comenius-2",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"comenius-2\",\"timestamp\":\"2026-05-31T07:36:48.483Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T07:36:48.483Z",
-    "color": "red",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"1\",\"subject\":\"CHORE-72 — landing page redesign (16-task chain)\",\"description\":\"Driving CHORE-72 plan. Strictly sequential per the SEQUENCING DISCIPLINE block. Task 1 (branch) + Task 2 (i18n keys at SHA 0e1a4bf) complete; next dispatch is Task 3 Tallis RED for LandingPillarCard. PAUSED at PO request. Plan: docs/superpowers/plans/2026-05-31-landing-page-plan.md. Resumption state: teams/mvox-dev/memory/chore-72-state.md.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-31T07:45:17.746Z\"}",
-    "timestamp": "2026-05-31T07:45:17.746Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "[2026-05-31 07:49] Task 3 RED complete — LandingPillarCard.\n\nSpec file exists at `src/lib/components/landing/LandingPillarCard.spec.ts` (5 tests, no commit).\n\nVerbatim error from RED run:\n`Error: Failed to resolve import \"./LandingPillarCard.svelte\" from \"src/lib/components/landing/LandingPillarCard.spec.ts\". Does the file exist?`\n\nReady for Byrd GREEN.",
-    "summary": "Task 3 RED complete — LandingPillarCard spec ready for Byrd",
-    "timestamp": "2026-05-31T07:49:22.723Z",
-    "color": "blue",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-31T07:49:26.126Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T07:49:26.126Z",
-    "color": "blue",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "[2026-05-31 07:50] Byrd online — on chore/landing-redesign, spec confirmed on working tree, writing LandingPillarCard GREEN now.",
-    "summary": "Byrd online — Task 3 GREEN starting",
-    "timestamp": "2026-05-31T07:50:28.968Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "[2026-05-31 07:52] Task 3 GREEN complete.\n\nCommit SHA: `221400a` on `chore/landing-redesign`.\n\nGate results:\n- `pnpm test` (unit): 5/5 spec pass; 509 total tests pass, 0 failures\n- `pnpm check`: 0 errors, 0 warnings (1073 files checked)\n- `pnpm lint`: clean (biome + eslint, 153 files)\n\nRED spec + GREEN impl committed together per per-commit-GREEN convention. Byrd idle — ready for Task 4 dispatch.",
-    "summary": "Task 3 GREEN complete — LandingPillarCard committed 221400a",
-    "timestamp": "2026-05-31T07:52:29.786Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-31T07:52:32.525Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T07:52:32.525Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "[2026-05-31 07:54] Task 4 RED complete — DashboardPillarCard.\n\nSpec file exists at `src/lib/components/landing/DashboardPillarCard.spec.ts` (5 tests, no commit).\n\nVerbatim error from RED run:\n`Error: Failed to resolve import \"./DashboardPillarCard.svelte\" from \"src/lib/components/landing/DashboardPillarCard.spec.ts\". Does the file exist?`\n\nReady for Byrd GREEN.",
-    "summary": "Task 4 RED complete — DashboardPillarCard spec ready for Byrd",
-    "timestamp": "2026-05-31T07:54:50.642Z",
-    "color": "blue",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-31T07:54:53.792Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T07:54:53.792Z",
-    "color": "blue",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "[2026-05-31 07:56] Task 4 GREEN complete.\n\nCommit SHA: `85ab28e` on `chore/landing-redesign`.\n\nGate results:\n- `pnpm test` (unit): 5/5 spec pass; 514 total tests pass, 0 failures\n- `pnpm check`: 0 errors, 0 warnings (1075 files checked)\n- `pnpm lint`: clean (biome + eslint, 154 files)\n\nRED spec + GREEN impl committed together. Byrd idle — ready for Task 5 dispatch.",
-    "summary": "Task 4 GREEN complete — DashboardPillarCard committed 85ab28e",
-    "timestamp": "2026-05-31T07:57:03.536Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-31T07:57:05.741Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T07:57:05.741Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "[2026-05-31 07:58] Task 5 RED complete — LandingHero.\n\nSpec file exists at `src/lib/components/landing/LandingHero.spec.ts` (4 tests, no commit).\n\nVerbatim error from RED run:\n`Error: Failed to resolve import \"./LandingHero.svelte\" from \"src/lib/components/landing/LandingHero.spec.ts\". Does the file exist?`\n\nReady for Byrd GREEN.",
-    "summary": "Task 5 RED complete — LandingHero spec ready for Byrd",
-    "timestamp": "2026-05-31T07:58:49.032Z",
-    "color": "blue",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-31T07:58:51.783Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T07:58:51.783Z",
-    "color": "blue",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "[2026-05-31 08:01] Task 5 GREEN complete.\n\nCommit SHA: `26dd5ad` on `chore/landing-redesign`.\n\nGate results:\n- `pnpm test` (unit): 4/4 spec pass; 518 total tests pass, 0 failures\n- `pnpm check`: 0 errors, 0 warnings (1077 files checked)\n- `pnpm lint`: clean after `pnpm lint:fix` reformatted one long line in Tallis's spec (known Biome gotcha — line-length wrap on the mailto href assertion)\n\nRED spec + GREEN impl committed together. Byrd idle — ready for Task 6 dispatch.",
-    "summary": "Task 5 GREEN complete — LandingHero committed 26dd5ad",
-    "timestamp": "2026-05-31T08:01:29.327Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-31T08:01:32.431Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T08:01:32.431Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "[2026-05-31 08:02] Task 6 RED complete — LandingPillarsSection.\n\nSpec file exists at `src/lib/components/landing/LandingPillarsSection.spec.ts` (3 tests, no commit).\n\nVerbatim error from RED run:\n`Error: Failed to resolve import \"./LandingPillarsSection.svelte\" from \"src/lib/components/landing/LandingPillarsSection.spec.ts\". Does the file exist?`\n\nReady for Byrd GREEN.",
-    "summary": "Task 6 RED complete — LandingPillarsSection spec ready for Byrd",
-    "timestamp": "2026-05-31T08:03:02.575Z",
-    "color": "blue",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-31T08:03:05.960Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T08:03:05.960Z",
-    "color": "blue",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "[2026-05-31 08:04] Task 6 GREEN complete.\n\nCommit SHA: `7b31daa` on `chore/landing-redesign`.\n\nGate results:\n- `pnpm test` (unit): 3/3 spec pass; 521 total tests pass, 0 failures\n- `pnpm check`: 0 errors, 0 warnings (1079 files checked)\n- `pnpm lint`: clean (155 files, no fixes needed)\n\nRED spec + GREEN impl committed together. Byrd idle — ready for Task 7 dispatch.",
-    "summary": "Task 6 GREEN complete — LandingPillarsSection committed 7b31daa",
-    "timestamp": "2026-05-31T08:05:03.771Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-31T08:05:06.137Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T08:05:06.137Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "[2026-05-31 08:06] Task 7 RED complete — LandingInvitesSection.\n\nSpec file exists at `src/lib/components/landing/LandingInvitesSection.spec.ts` (4 tests, no commit).\n\nVerbatim error from RED run:\n`Error: Failed to resolve import \"./LandingInvitesSection.svelte\" from \"src/lib/components/landing/LandingInvitesSection.spec.ts\". Does the file exist?`\n\nReady for Byrd GREEN.",
-    "summary": "Task 7 RED complete — LandingInvitesSection spec ready for Byrd",
-    "timestamp": "2026-05-31T08:06:25.232Z",
-    "color": "blue",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-31T08:06:28.007Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T08:06:28.007Z",
-    "color": "blue",
-    "type": "message",
-    "read": true
-  },
-  {
     "from": "byrd",
     "text": "[2026-05-31 08:09] Task 7 GREEN complete.\n\nCommit SHA: `de3b4d7` on `chore/landing-redesign`.\n\nGate results:\n- `pnpm test` (unit): 4/4 spec pass; 525 total tests pass, 0 failures\n- `pnpm check`: 0 errors, 0 warnings (1081 files checked)\n- `pnpm lint`: clean (157 files, no fixes needed)\n\nOne plan-divergence to note: plan had `INVITE<br>ONLY` in the wax-seal stamp, but `<br>` produces no space in `textContent`, causing the \"INVITE ONLY\" assertion to fail. Fixed by using `INVITE ONLY` with a space — CSS wraps naturally inside the circular stamp. Visual result identical.\n\nRED spec + GREEN impl committed together. Byrd idle — ready for Task 8 dispatch.",
     "summary": "Task 7 GREEN complete — LandingInvitesSection committed de3b4d7",
@@ -835,6 +574,268 @@
     "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1780225494407@tallis\",\"from\":\"tallis\",\"timestamp\":\"2026-05-31T11:05:03.600Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
     "timestamp": "2026-05-31T11:05:03.600Z",
     "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"1\",\"subject\":\"CHORE-74 — state propagation chain (clean resume from main 33ab456)\",\"description\":\"CHORE-74 resumed at session-25 from clean main 33ab456. Branch chore/state-propagation freshly created. 7-task chain per plan: docs/superpowers/plans/2026-05-31-chore-74-state-propagation-plan.md. Strictly sequential dispatch per SEQUENCING DISCIPLINE. Apply L117: send shutdown_request to all live agents before any TeamDelete at CHORE end.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-31T11:13:24.893Z\"}",
+    "timestamp": "2026-05-31T11:13:24.893Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "[2026-05-31 11:13] Tallis session 25 online — on `chore/state-propagation`, executing CHORE-74 Task 2 RED.",
+    "summary": "Tallis session 25 ready, CHORE-74 Task 2 RED starting",
+    "timestamp": "2026-05-31T11:14:05.034Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "[2026-05-31 11:15] CHORE-74 Task 2 RED complete.\n\nVerbatim error line:\n`TypeError: Cannot read properties of undefined (reading 'set')`\n\n8 new tests fail — `selectedOrgIdStore` + `urlOrgIdStore` not exported from `src/lib/auth/userStore.ts` yet. 545 existing tests still pass.\n\nFile: `src/lib/auth/userStore.spec.ts` — test block appended, biome-formatted. NOT committed per plan.\n\nReady for Byrd GREEN.",
+    "summary": "CHORE-74 Task 2 RED complete — ready for Byrd GREEN",
+    "timestamp": "2026-05-31T11:15:55.180Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-31T11:15:58.121Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T11:15:58.121Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "[2026-05-31 11:20] Byrd reporting — CHORE-74 Task 2 GREEN complete.\n\n**Commit:** `69244f8` on `chore/state-propagation` (pushed)\n\n**Gate output (verbatim):**\n- `pnpm test src/lib/auth/userStore.spec.ts -- --run`: 553 tests pass, 0 failures. All 8 new CHORE-74 tests GREEN.\n- `pnpm check`: 0 errors, 0 warnings (1094 files).\n- `pnpm lint`: Checked 164 files in 128ms. No fixes applied.\n\n**What was done:**\n- Added `selectedOrgIdStore` (Writable<string | null>, localStorage-initialized) and `urlOrgIdStore` (Writable<string | null>, default null) below `userStore`\n- Exported `ORG_URL_PARAM_NAME` constant\n- Deleted `readOrgParam()` helper\n- Replaced single-store `selectedOrgStore` derive with multi-store derive over `[userStore, urlOrgIdStore, selectedOrgIdStore]` — resolution order URL > pick > first-org, with write-through to localStorage when URL wins\n- Replaced `selectOrg` with three-write version (selectedOrgIdStore + localStorage + goto)\n\n**Mechanical test updates flagged (per dispatch brief allowance):** The existing `selectedOrgStore — fallback chain` and `selectOrg — two-write` describe blocks used `window.history.replaceState` to simulate URL params (previously read by the now-deleted `readOrgParam()`). These 5 tests were updated to drive `urlOrgIdStore` directly — the store that layout's `$effect` populates in production. Asserted behaviour is identical; driver changed. Added `beforeEach` store-reset blocks to both describe groups. All changes documented in commit message body.\n\nReady for Task 3 dispatch (layout $effect wiring).",
+    "summary": "CHORE-74 Task 2 GREEN complete — SHA 69244f8",
+    "timestamp": "2026-05-31T11:21:03.775Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-31T11:21:08.192Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T11:21:08.192Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "[2026-05-31 11:23] Byrd reporting — CHORE-74 Task 3 GREEN complete.\n\n**Commit:** `c168518` on `chore/state-propagation` (pushed)\n\n**Gate output (verbatim):**\n- `pnpm check`: 0 errors, 0 warnings (1094 files).\n- `pnpm test:unit`: 553 tests pass, 0 failures (84 test files).\n- `pnpm lint`: Checked 164 files in 144ms. No fixes applied.\n\n**What was done:**\n- Updated `+layout.svelte` import line to include `urlOrgIdStore`, `selectedOrgIdStore`, `ORG_URL_PARAM_NAME` from `$lib/auth/userStore`\n- Added two `$effect` blocks after `onMount(...)`, before `$derived` declarations: one pushes `page.url.searchParams.get('org')` to `urlOrgIdStore`; one write-through to `selectedOrgIdStore` when URL param is present (two-write symmetry per URL-overrides-persisted rule)\n- Used `ORG_URL_PARAM_NAME` constant throughout — no hardcoded `'org'` string\n\nReady for Task 4 dispatch (Tallis RED on auth/callback).",
+    "summary": "CHORE-74 Task 3 GREEN complete — SHA c168518",
+    "timestamp": "2026-05-31T11:23:24.492Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-31T11:23:27.524Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T11:23:27.524Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "[2026-05-31 11:25] CHORE-74 Task 4 RED complete.\n\nVerbatim error line:\n`AssertionError: expected \"spy\" to be called once, but got 0 times`\n\n1 new test fails — `hydrateUserStore` is never called by the current `+page.svelte` (it calls `setToken/setAccounts/setUser/setLastProvider/goto` with no hydrate call). 553 existing tests pass.\n\nFile: `src/routes/auth/callback/page.spec.ts` — added `// @vitest-environment happy-dom`, `vi.hoisted` spies for `hydrateMock` + `gotoMock` + `callOrder`, full mocks for all component imports, new describe block asserting `callOrder.log === ['hydrate', 'goto']`. Biome-clean. NOT committed.\n\nReady for Byrd GREEN: add `import { hydrateUserStore } from '$lib/auth/userStore'` + `await hydrateUserStore()` before `exchangeState = 'success'` in `runExchange()`.",
+    "summary": "CHORE-74 Task 4 RED complete — ready for Byrd GREEN",
+    "timestamp": "2026-05-31T11:26:02.531Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-31T11:26:05.945Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T11:26:05.946Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "[2026-05-31 11:29] Byrd reporting — CHORE-74 Task 4 GREEN complete.\n\n**Commit:** `c278506` on `chore/state-propagation` (pushed)\n\n**Gate output (verbatim):**\n- `pnpm test src/routes/auth/callback/page.spec.ts -- --run`: 554 tests pass, 0 failures. New CHORE-74 call-order test GREEN; all 6 existing callback tests still pass.\n- `pnpm check`: 0 errors, 0 warnings (1094 files).\n- `pnpm lint`: Checked 164 files in 120ms. No fixes applied.\n\n**What was done:**\n- Added `import { hydrateUserStore } from '$lib/auth/userStore'` to `+page.svelte`\n- Inserted `await hydrateUserStore()` between `setLastProvider(decoded.provider)` and `exchangeState = 'success'` in `runExchange()`\n- The spec was already on the branch (Tallis's RED commit); only `+page.svelte` was modified\n\nReady for Task 5 dispatch (Tallis RED on LandingDashboardScatter).",
+    "summary": "CHORE-74 Task 4 GREEN complete — SHA c278506",
+    "timestamp": "2026-05-31T11:29:23.203Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-31T11:29:33.492Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T11:29:33.492Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "[2026-05-31 11:31] CHORE-74 Task 5 RED complete.\n\nVerbatim error line:\n`AssertionError: expected \"spy\" to be called with arguments: [ { orgId: 'org-a', …(1) } ] — Number of calls: 0`\n\n1 new test fails — `hydrateLibrarySectionSpy` never called because the component has no `$effect` wired to `selectedOrgStore`. 554 existing tests pass (5 existing scatter tests unaffected).\n\nFile: `src/lib/components/landing/LandingDashboardScatter.spec.ts` — restructured existing `vi.mock('$lib/library/libraryStore', ...)` to also export `hydrateLibrarySection: hydrateLibrarySectionSpy` (via `vi.hoisted`); added mocks for `$lib/auth/storage`, `$lib/auth/userStore` (writable `selectedOrgStore` + `decodeJwt`), `$env/static/public`; appended CHORE-74 describe block. Biome-clean. NOT committed.\n\nReady for Byrd GREEN: add `$effect` to `LandingDashboardScatter.svelte` watching `$selectedOrgStore` + calling `hydrateLibrarySection({ orgId, personId })` per plan Task 5 Step 3.",
+    "summary": "CHORE-74 Task 5 RED complete — ready for Byrd GREEN",
+    "timestamp": "2026-05-31T11:31:59.863Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-31T11:32:02.525Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T11:32:02.525Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "[2026-05-31 11:38] Byrd reporting — CHORE-74 Task 5 GREEN complete.\n\n**Commit:** `89ab645` on `chore/state-propagation` (pushed)\n\n**Gate output (verbatim):**\n- `pnpm test:unit`: 555 tests pass, 0 failures (84 test files). Scatter spec RED→GREEN; all existing dashboard tests still pass.\n- `pnpm check`: 0 errors, 0 warnings (1094 files).\n- `pnpm lint`: Checked 164 files in 160ms. No fixes applied.\n\n**What was done:**\n- Added imports to `LandingDashboardScatter.svelte`: `hydrateLibrarySection` from libraryStore, `getToken` from storage, `PUBLIC_ENTU_DB` from env, `userStore`/`selectedOrgStore`/`decodeJwt` from userStore\n- Added `$effect` block that fires `hydrateLibrarySection({ orgId, personId })` whenever `selectedOrgStore` or `userStore` changes (guards: org present, user ready, token present, personId resolvable)\n\n**One fix required beyond plan:** `pnpm check` caught 2 type errors in the spec — the vi.mock replaces `selectedOrgStore` with a `writable` at runtime, but TypeScript sees the declared `Readable<Org | null>` type from the real module, which has no `.set()`. Fixed by casting the import as `Writable<Org | null>` in the spec. Documented in commit message body.\n\nByrd's GREEN work is complete across all 4 tasks (2, 3, 4, 5). Ready for Task 6 (Bentham review).",
+    "summary": "CHORE-74 Task 5 GREEN complete — SHA 89ab645",
+    "timestamp": "2026-05-31T11:38:26.705Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-31T11:38:32.846Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T11:38:32.846Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "[2026-05-31 11:42] Task 5 was complete before your ping — report crossed in transit. SHA 89ab645 pushed at 11:38. All 4 Byrd tasks done; waiting for Bentham review dispatch.",
+    "summary": "Task 5 already done — SHA 89ab645 at 11:38",
+    "timestamp": "2026-05-31T11:38:41.589Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-31T11:38:43.808Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T11:38:43.808Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "[2026-05-31 11:39] Bentham online (session 25). Starting CHORE-74 Task 6 branch review on `chore/state-propagation` @ 89ab645 — `git log --oneline HEAD..main` empty so no merge-shape risk. Running CALIBRATION-PNPM-CHECK-FRESH-RUN gates next as discrete bash calls.",
+    "summary": "Bentham online — CHORE-74 Task 6 review starting",
+    "timestamp": "2026-05-31T11:39:20.390Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "[2026-05-31 11:47] **CHORE-74 Task 6 verdict: GREEN.** Branch `chore/state-propagation` @ `89ab645` is clean and ready for Josquin's Task 7 merge.\n\n## Gate output (CALIBRATION-PNPM-CHECK-FRESH-RUN — discrete bash calls, verbatim)\n\n- `pnpm check` → `COMPLETED 1094 FILES 0 ERRORS 0 WARNINGS 0 FILES_WITH_PROBLEMS`\n- `pnpm test:unit` → `Test Files 84 passed (84) | Tests 555 passed (555)` (Duration 55.41s)\n- `pnpm lint` → `Checked 164 files in 125ms. No fixes applied.`\n- `pnpm build` → `✓ built in 4.17s` + `Using @sveltejs/adapter-cloudflare ✔ done`\n\n## Per-commit-GREEN audit\n\nEach commit verified independently (discrete `pnpm check` + `pnpm test:unit` runs per commit):\n- `69244f8` Task 2 — 1094/0 errors, 553/553 tests\n- `c168518` Task 3 — 1094/0 errors, 553/553 tests\n- `c278506` Task 4 — 1094/0 errors, 554/554 tests (+1 callback call-order spec)\n- `89ab645` Task 5 — 1094/0 errors, 555/555 tests (+1 dashboard re-hydrate spec)\n\n## Per-AC results\n\n- **AC1** GREEN — `auth/callback/+page.svelte:53` `await hydrateUserStore()` lands AFTER setToken/setAccounts/setUser, BEFORE `goto(decoded.return_to || '/')`. Spec `page.spec.ts:100-121` pins call order via hoisted log array — both mocks fire, `callOrder.log === ['hydrate', 'goto']`.\n- **AC2** GREEN — `selectedOrgStore` rewritten as multi-store derive `derived([userStore, urlOrgIdStore, selectedOrgIdStore], ...)`; `selectOrg()` writes all three channels (`selectedOrgIdStore.set(orgId)` + localStorage + `goto`). Spec covers `prefers explicit pick over default` at userStore.spec.ts:568-581.\n- **AC3** GREEN — `LandingDashboardScatter.svelte:13-23` `$effect` reads `$selectedOrgStore` + `$userStore`, calls `hydrateLibrarySection({orgId, personId})`. Spec covers org-change re-fire at LandingDashboardScatter.spec.ts:90-113 — switching mocked store value re-fires the spy with new orgId.\n- **AC4** GREEN — `+layout.svelte:30-41` two `$effect` blocks: first writes `urlOrgIdStore.set(page.url.searchParams.get(ORG_URL_PARAM_NAME))`, second writes through to `selectedOrgIdStore` when URL present. `page` from `$app/state` is reactive, so effect re-fires on URL changes. Derive lists `urlOrgIdStore` in `[stores]` so URL changes propagate.\n- **AC5** GREEN — 545 baseline + 10 new = 555 passing on tip; no regressions.\n- **AC6** GREEN — new unit specs: post-login auto-hydration (callback page.spec.ts:100), selectOrg-three-write (userStore.spec.ts:612), URL-precedence (userStore.spec.ts:583), org-change dashboard re-fire (LandingDashboardScatter.spec.ts:90).\n- **AC7** GREEN — quoted above.\n- **AC8** GREEN — this verdict.\n\n## URL-overrides-persisted compliance\n\nCode-enforceable now: (a) URL wins in derive precedence (userStore.ts:117-138 lists urlOrgIdStore first); (b) URL changes trigger re-derivation (layout.svelte:31-34 effect populates urlOrgIdStore reactively via `page.url.searchParams.get`); (c) two-write symmetry on URL change (layout.svelte:37-41 second effect writes through to selectedOrgIdStore + derive backfills localStorage at userStore.ts:124-127). The rule lifted to settled patterns at session 22 is now testable at unit-spec level.\n\n## Vocabulary-neutrality grep\n\n`git diff main...HEAD --name-only | xargs grep -E \"choir|orchestra|sing\\b\" | grep -v messages/` returns one match: `userStore.spec.ts:363` comment \"real persona IDs from Pérotin probe (CHORE-68)\" — proper-noun teammate name, not vocabulary leak. Confirmed clean.\n\n## Merge-shape\n\n`git log --oneline HEAD..main` empty. Branch created from current main `33ab456` as planned. Zero negative-delta risk on squash. No CALIBRATION-MERGE-SHAPE issue.\n\n## Byrd's mechanical test updates — adjudicated GREEN\n\n5 tests in `selectedOrgStore — fallback chain` + `selectOrg — two-write` moved from `window.history.replaceState` driving to `urlOrgIdStore.set()`/`selectedOrgIdStore.set()` direct driving. Intent preserved on all 5 — pinned behavior (URL precedence; localStorage fallback; first-org default; two-write symmetry) unchanged. The `'localStorage fallback when URL absent'` rewrite is REQUIRED because the new `selectedOrgIdStore` snapshots localStorage at module-import time (via `vi.resetModules` + `await import`); setting localStorage AFTER import doesn't propagate, so the test must drive the store directly to faithfully simulate the production \"user picked org last session\" state. Byrd documented the pattern alignment in the commit body. **Adjudicated GREEN under the CHORE-72 Task-15 rule** (pattern alignment with new architectural shape, documented reason, intent unchanged).\n\n## YELLOWs/RED ledger\n\nNone. Zero carry-forwards from CHORE-74.\n\n## Recommendation\n\nGREEN — Josquin clear to execute Task 7 squash-merge per common-prompt merge procedure. Squash commit body should mention: (a) Closes #74; (b) the 4 task chain; (c) URL-overrides-persisted now code-enforceable; (d) per-commit-GREEN held across all 4 commits.\n\nScratchpad updated with CHORE-74 session-25 entry + URL-overrides-persisted \"lifted to code-enforceable\" pattern. Standing by for next dispatch.",
+    "summary": "CHORE-74 review: GREEN — clean, ready for Josquin merge",
+    "timestamp": "2026-05-31T11:46:55.679Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-31T11:47:03.419Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T11:47:03.419Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "[2026-05-31 11:47] Josquin online. Starting CHORE-74 Task 7: re-verify gates → squash → push → deploy → close #74 → delete branch. Surfacing only on failure.",
+    "summary": "Josquin online — CHORE-74 Task 7",
+    "timestamp": "2026-05-31T11:47:53.385Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "[2026-05-31 11:51] CHORE-74 Task 7 COMPLETE. All steps clean.\n\n**Gates (chore tip 89ab645):**\n- `pnpm check`: COMPLETED 1094 FILES 0 ERRORS 0 WARNINGS 0 FILES_WITH_PROBLEMS\n- `pnpm test:unit`: Test Files 84 passed (84) / Tests 555 passed (555)\n- `pnpm lint`: Checked 164 files in 128ms. No fixes applied.\n- `pnpm build`: ✓ built in 3.98s\n\n**Squash:** `cb3aec0` on main — fix(#74): state propagation — login + org-change auto-update UI. 7 files / +326 / -32. PO co-author trailer landed clean (verified via `git log -1 --format='%(trailers)'`). Body free of `Co-authored-by:` per session-22 GOTCHA — hook appended cleanly.\n\n**Push:** `33ab456..cb3aec0 main -> main` — clean.\n\n**Deploy:** `https://d9cdad61.multivox.pages.dev` (per-build URL). Build: ✓ 3.90s. Upload: 18 new files, 15 cached. Worker bundle uploaded.\n\n**Probes:** all HTTP 200 + `x-sveltekit-page: true`\n- `https://mvox.eu/` → 200\n- `https://multivox.pages.dev/` → 200\n- `https://d9cdad61.multivox.pages.dev/` → 200\n\n**New chunk hashes:**\n- `app.CiRjDSx0.js` (was `app.CRTEVY57.js` from CHORE-72)\n- `start.BkgjBlNh.js` (was `start.Jl8jEoV1.js` from CHORE-72)\n\n**GH #74:** closed at 10:43:31Z (auto-closed by `Closes #74` in squash body). Completion comment posted: https://github.com/mvox-dev/mvox_v4e_web/issues/74#issuecomment-4586600111\n\n**Branch:** `chore/state-propagation` deleted local + remote (was at 89ab645).\n\n**Housekeeping:** Stashed Bentham's unstaged scratchpad pre-merge, popped clean post-branch-delete. End state: main @ cb3aec0, Bentham scratchpad back in dirty/unstaged per session norm.\n\nPO manual-test pending: login auto-redirect to dashboard + OrgPicker org switch should now work without manual refresh.",
+    "summary": "CHORE-74 Task 7 COMPLETE — shipped",
+    "timestamp": "2026-05-31T11:51:15.576Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-31T11:51:20.047Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T11:51:20.047Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-31T11:51:42.885Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T11:51:42.885Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1780228820808@tallis\",\"from\":\"tallis\",\"timestamp\":\"2026-05-31T12:00:28.078Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-31T12:00:28.078Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "[2026-05-31 12:00] Bentham closing. CHORE-74 verdict GREEN delivered; zero in-progress work, scratchpad already updated this session.\n\n- **[LEARNED]** URL-overrides-persisted rule lifted from doc-only (session 22) to code-enforceable on CHORE-74 land — the reactive-shadow-store pattern (urlOrgIdStore in derive `[stores]` + layout `$effect` populator) is the testable shape. Encoded in scratchpad as a standing review check: any URL-derived state without a reactive Writable shadow = YELLOW (latent-reactivity-gap).\n- **[LEARNED]** CHORE-72 Task-15 rule (Byrd may improve a spec to match project conventions during GREEN if pattern alignment is the documented reason + intent unchanged) consumed cleanly on first post-encoding use — adjudicated GREEN on 5 mechanical test rewrites in userStore.spec.ts. Rule shape confirmed durable.\n- **[DEFERRED]** None — zero carry-forwards from CHORE-74. Stewardship ledger clean entering next-CHORE.\n\nApproving shutdown next.",
+    "summary": "Bentham closing — CHORE-74 GREEN delivered",
+    "timestamp": "2026-05-31T12:00:42.586Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "[2026-05-31 12:00] Standing down clean. Nothing new for scratchpad — Task 7 invoked only documented patterns (stash dance, `set -a` creds, trailer hook verify, `Closes #N` auto-close, atomic chained git ops); all already in prior CHECKPOINTs.\n\n[LEARNED] None.\n[DEFERRED] None.\n[WARNING] None.\n\nEnd state: main @ cb3aec0, deploy live at d9cdad61.multivox.pages.dev, GH #74 closed, branch deleted. Bentham scratchpad still in dirty/unstaged on disk per session norm. Approving shutdown next.",
+    "summary": "Closing — no carry-forward",
+    "timestamp": "2026-05-31T12:00:43.045Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1780228826302@josquin\",\"from\":\"josquin\",\"timestamp\":\"2026-05-31T12:00:45.689Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-31T12:00:45.689Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1780228824786@bentham\",\"from\":\"bentham\",\"timestamp\":\"2026-05-31T12:00:46.492Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-31T12:00:46.492Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1780228822757@byrd\",\"from\":\"byrd\",\"timestamp\":\"2026-05-31T12:00:55.296Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-31T12:00:55.296Z",
+    "color": "green",
     "type": "message",
     "read": true
   }

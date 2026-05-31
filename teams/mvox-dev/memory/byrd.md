@@ -76,4 +76,12 @@
 
 [GOTCHA] **ICU plural syntax unsupported by Paraglide's plugin-message-format** — `{n, plural, one {...} other {...}}` renders as garbage (`undefined other undefined works}}`). All i18n keys with numeric params must use simple templates (`"{n} works"`) not ICU plurals. Route to Comenius to fix the key if this surfaces in a component test.
 
+## [CHECKPOINT] 2026-05-31 — CHORE-74 GREEN complete (session 25)
+
+[LEARNED] **Mechanical test updates when removing a helper that tests drove indirectly:** `readOrgParam()` was removed in CHORE-74; existing `selectedOrgStore — fallback chain` tests had been using `window.history.replaceState` to simulate URL params for it. Those 5 tests were updated to drive `urlOrgIdStore` directly — the store that the layout's `$effect` populates in production. Pattern: when refactoring removes an internal helper, update existing tests to drive the new public surface, document the change in the commit message body, and add `beforeEach` store-reset blocks.
+
+[LEARNED] **`vi.mock` runtime writable vs TypeScript Readable type mismatch:** When a vi.mock replaces a `Readable` store with a `writable` (so tests can call `.set()`), `pnpm check` will error on `.set()` calls because TypeScript sees the declared type from the real module. Fix pattern: cast the import as `Writable<T>` in the spec — `import { store as _store } from '...'; const store = _store as unknown as Writable<T>`. Document in commit body.
+
+[LEARNED] **CHORE-74 store architecture:** `selectedOrgIdStore` (Writable, localStorage-initialized) + `urlOrgIdStore` (Writable, null default) + `selectedOrgStore` (derived over all three, URL > pick > first-org). Layout `$effect` wires `page.url` → `urlOrgIdStore`. `selectOrg` writes all three channels. Auth/callback `await hydrateUserStore()` before `goto()` fixes post-login stale state.
+
 (*MVOX:Byrd*)
