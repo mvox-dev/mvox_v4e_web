@@ -6,6 +6,45 @@ Format per entry: short title, decision, rationale, date. Most recent at the top
 
 ---
 
+## Verify load-bearing identifiers against ground truth before asserting (2026-05-31, session 27→28)
+
+**Decision**: Before any teammate asserts, acts on, or reports a load-bearing identifier — a commit SHA, a gate/test count, a file set, a deploy/prod status, a hash — they MUST verify it against ground truth (their own `git` / `curl` / file read) and gate the claim on a completed tool result read **in the same turn**. Never assert before the tool result returns. If you have not read the result this turn, you have no value to report.
+
+**The discipline, in order of force:**
+
+1. **Same-turn read gates every claim.** A number, SHA, or status that isn't quoted from a tool result completed this turn is a fabrication risk — do not write it. Expectation, memory of a prior run, or a teammate's report are not substitutes for reading the artifact yourself this turn.
+2. **Blob-level proof settles disputes.** When two parties disagree about file contents (or a channel is unreliable), the arbiter is content-addressed: `git rev-parse <ref>:<path>` for the blob SHA, `git cat-file -p <blob>` (or `git hash-object <file>`) for the bytes. Rendered file text can be stale, duplicated, or dropped by a flaky channel; content hashes cannot. Prefer them for ground truth and never bend your own clean evidence to agree with authority — present the raw conflict plus a deterministic cross-check and let the hash arbitrate.
+3. **Surface-and-stop beats shipping a confident fiction.** If your read and an assertion (yours, a teammate's, or a prior turn's) disagree, the artifact wins and the assertion is wrong. Say so and stop; don't paper over it to be agreeable or to look done.
+4. **Staged-set gate before every commit.** Show `git diff --cached --name-only`, confirm the exact file set is intended, THEN commit. Catches stray scratchpad/doc/memory files sneaking into feature squashes and sweep-mutation over-reach.
+
+**Rationale**: Session 27 ran on a badly flaky tool-channel — Bash/Read output was dropped, garbled, duplicated, and stale-buffered for nearly every agent and team-lead. Under that noise, load-bearing identifiers got fabricated: a full review verdict twice (Bentham), SHAs ~4× (Josquin), "verified" messages sent before the verify returned (team-lead). The four disciplines above are what held the line — and they are correct discipline regardless of channel health, so they are promoted from flaky-session survival tactics to standing team norms. The failure mode they prevent (asserting an unread identifier) is silent and high-blast-radius: a wrong SHA routes a review at the wrong commit; a fabricated gate count greenlights a broken branch.
+
+**Review enforcement (Bentham)**: A verdict, handoff, or merge claim that quotes a SHA / gate count / file set / prod status NOT demonstrably read in the same turn is itself the defect — RED on a review verdict (the verdict is unsound), YELLOW elsewhere (trailer/handoff hygiene). My own session-27 fabrications (`CALIBRATION-FABRICATION-TWICE`, `BLOB-PROOF + AUTHORITY-CAVING LESSON` in `bentham.md`) are the calibrating exemplars: I caved my clean `2e12` blob read to team-lead's `2e9` report, then recovered via `git rev-parse <sha>:<path>` + `git cat-file -p`. The blob SHA was right; the social correction was wrong.
+
+**Cross-links**: Sibling to `feedback_atomic_git_chaining` (chain `checkout && commit && push` in one Bash call to defend against shared-tree harness flips — same defend-against-a-lying-channel posture, at the write side) and the per-commit-GREEN decision below (the staged-set gate is the per-commit discipline's commit-time guard). The blob-proof technique also underwrites the merge-shape check (`git log --oneline branch..main`) — both rely on `git` plumbing as the immutable arbiter.
+
+**Source**: Session 27 [NEXT SESSION] seed L121 (team-lead.md), the dominant lesson of a flaky-channel session. Lift requested by team-lead at session-28 dispatch; authored by Bentham as steward.
+
+(*MVOX:Bentham*)
+
+---
+
+## Freeze the spec before dispatching a TDD chain (2026-05-31, session 27→28)
+
+**Decision**: The RED spec is frozen at the moment the TDD chain is dispatched. Team-lead does NOT change the spec — structure, headings, acceptance criteria, i18n key set, or assertion shape — after RED is handed off. If a spec change becomes unavoidable mid-chain (PO redirect, discovered defect in the spec itself), team-lead PAUSES the chain, re-syncs every downstream agent who has not yet committed, and only then resumes. The spec update must not chase a moving branch.
+
+**Rationale**: CHORE-72 (a static `/about` placeholder) churned roughly 3× more than its complexity warranted because the spec structure was changed (PO's 4-section pick) AFTER RED was dispatched. On a flaky channel the chain raced through the OLD structure first, producing: duplicate i18n keys (last-wins silently masking the correct values), a page and spec pinned to the wrong headings, plus a dedupe-correction commit and an alignment commit to recover. None of that work was wrong when authored — it was correct against a spec that had already moved. The cost is the re-sync that didn't happen, multiplied by every downstream agent racing the stale spec in parallel.
+
+This is the spec-side complement to `feedback_no_parallel_branches` (only one feature branch active across the team at a time): that rule serializes branches so two chains don't collide; this rule freezes the contract within a single chain so the one active chain isn't racing a contract that's still being edited. Both target the same root failure — concurrent mutation of state the chain depends on.
+
+**Review enforcement (Bentham)**: When a branch review shows churn that traces to a mid-chain spec edit — duplicate/last-wins i18n keys, page/spec heading mismatches mid-history, a dedupe or realign commit cleaning up a contract change — the tip can still be GREEN (the recovery commits did their job), but flag the process drift: the chain should have paused and re-synced rather than chased. Distinct from the legitimate mid-chain spec revisions I already adjudicate GREEN: the RED author correcting a spec that encoded the very bug the issue exists to fix (CHORE-77 `CALIBRATION-AC7-INTENT-CORRECTION`), and a GREEN agent improving a spec to match project conventions with intent preserved and disclosed in the commit body (CHORE-72 Task-15 rule, CHORE-75 / CHORE-74 adjudications). Those are same-intent refinements WITHIN the frozen contract; this decision bars CHANGING the contract (new structure, new AC, new key set) once the chain is live.
+
+**Source**: Session 27 [NEXT SESSION] seed L122 (team-lead.md), self-inflicted on CHORE-72. Lift requested by team-lead at session-28 dispatch; authored by Bentham as steward.
+
+(*MVOX:Bentham*)
+
+---
+
 ## Responsive-layout review — structural class-presence tests can't catch broken computed layout (2026-05-31, session 26→27)
 
 **Decision**: Responsive show/hide and overflow contracts have a computed-layout outcome that jsdom/happy-dom cannot evaluate — they have no layout engine, so a spec can assert "class X is present" but never "the element actually renders the intended display/visibility." Two RED triggers close the gap. Both are mandatory at review; both have a paired spec-strengthening requirement so the test layer constrains the real outcome, not just the markup.
