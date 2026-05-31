@@ -1,6 +1,65 @@
 # Palestrina — Team Lead Scratchpad
 
-### [NEXT SESSION] 2026-05-31 end-of-session-25 — session-25 → session-26
+### [NEXT SESSION] 2026-05-31 end-of-session-26 — session-26 → session-27
+
+**Headline: A "mobile/responsive + auth" session. THREE CHOREs shipped end-to-end to mvox.eu (CHORE-76 responsive nav +closed #65, CHORE-77 dropdown-clip regression fix, CHORE-78 mobile library). CHORE-79 (server-side auth guard, hybrid) fully brainstormed + specced + planned but NOT started — queued as session-27's first real work. Live build: `app.BlWNemeh.js` + `start.yhLn1xom.js`.**
+
+## What shipped to main this session
+
+| SHA | What |
+|---|---|
+| `da00b06` | feat(#76) responsive MvoxNav — mobile nav: avatar/logout reachable, 5 tabs collapse behind hamburger paper-card below `sm`, org chip truncates. Desktop unchanged. Closes #76 + **#65**. 564→576 tests. |
+| `4cfdf85` | fix(#77) nav dropdowns clipped — REGRESSION from #76: `overflow-x-hidden` on `<header>` forced `overflow-y:auto` (CSS spec) → clipped AvatarMenu + nav-tab-menu on desktop AND mobile. Fix: drop the clip, add `relative z-30` stacking context. 579 tests. Closes #77. |
+| `9f8bcd3` | feat(#78) mobile library — `<sm`: hide task cards + sticky index + 2-col grid; new `LibraryMobileList` (search title+composer → `<a href=?work=id>` rows) → tap → detail (reuses WorkPaperStack) + "‹ Works" back. Driven by existing `?work=` param. Desktop untouched. 599 tests. Closes #78. RED-78.1 (md-grid lacked base `hidden`, desktop detail rendered under mobile list) caught in review + fixed. |
+| `591c962` | docs(#78) plan correction (mobile search key) |
+| `90e1f42` | spec(#79) server-side auth guard (hybrid) |
+| `a0e82f3` | plan(#79) server-side auth guard — 4-task chain |
+
+## ⚠️ Local main is AHEAD of origin — PUSH NEEDED
+
+At shutdown, origin/main = `9f8bcd3` (last thing Josquin pushed). Local main has **3 unpushed commits**: `591c962` (doc#78), `90e1f42` (spec#79), `a0e82f3` (plan#79) — PLUS the shutdown bundle commit. PO paused before push per convention. **Session 27: confirm these are pushed** (or push them) early. The shipped feature code (76/77/78) IS on origin via Josquin's deploys; only the doc/spec/plan commits + shutdown bundle are local.
+
+## Expected first action session 27
+
+1. Read this seed.
+2. Verify prod health: `curl -sI https://mvox.eu/` + `https://mvox.eu/library` → 200 + `x-sveltekit-page: true`. Build chunks should still be `app.BlWNemeh.js` + `start.yhLn1xom.js` (no deploys since #78).
+3. Confirm/push the 3 local commits (+ shutdown bundle) to origin if not already done.
+4. **CHORE-79 is the queued work.** Plan: `docs/superpowers/plans/2026-05-31-chore-79-server-auth-guard.md` (self-contained — current-auth facts, IP-binding rationale, concrete code). Spec: `docs/superpowers/specs/2026-05-31-chore-79-server-auth-guard-design.md`. Branch `chore/auth-guard` from clean main. Chain: Tallis RED → **Josquin** GREEN (server-side: session-cookie helpers + hooks guard + callback cookie-set + logout clear + redirect honor) → Bentham (security review) → Josquin preview+merge. No i18n, no Byrd. PO verifies live redirect on preview before merge.
+
+## Key findings / lessons this session
+
+- **L118 — jsdom can't see computed display; assert the base class too.** Bentham caught TWO bugs where a responsive class was structurally present but layout was still broken: CHORE-77 (`overflow-x-hidden` → forced `overflow-y:auto` clip) and CHORE-78 (`sm:grid` with no base `hidden` → desktop detail rendered under mobile list). **Bentham's new standing review rule:** any element with a `sm:/md:/lg:` display class must ALSO be asserted to carry a base `hidden` (or correct default), and any single-axis overflow clip on a dropdown/popover host is RED. In his scratchpad — **lift to `architecture-decisions.md` session-27**.
+- **L119 — Auth architecture diverges from CLAUDE.md.** CLAUDE.md says "BFF JWT httpOnly cookie, server proxies Entu." Reality (Finn audit): localStorage-only, NO cookies anywhere, `hooks.server.ts` is a passthrough, `event.locals` empty. Full BFF migration is BLOCKED by Entu's IP-bound JWT (`project_entu_jwt_ip_bound`) + CF Workers variable egress IPs (server-proxied Entu calls would 401). CHORE-79 hybrid (cookie for the auth GATE only; Entu calls stay client-side) is the first paving stone. **Consider recording in `architecture-decisions.md` + softening CLAUDE.md's auth description to match reality.**
+- **L120 — Stub new modules/components in RED (YELLOW-78.1).** RED commits importing a not-yet-created file fail `pnpm check` (module resolution), losing per-commit bisect value. Tallis adopted: land a minimal stub in RED so tests fail on assertions, not resolution. CHORE-79 plan Task 1 bakes this in.
+- **Carry-over still pending: lift Bentham's CHORE-72 "mechanical test update during GREEN" rule to `architecture-decisions.md`** (flagged session-25 seed; Bentham used it cleanly again; ready to lift).
+
+## Process that worked (keep doing)
+
+- **Finn-audit-first scoping** before every CHORE — precise ACs + caught the auth-architecture reality before committing to the wrong CHORE-79 scope.
+- **Preview-deploy → PO-verify-on-mobile → merge** on 76/77/78. Keep for #79 (auth UX).
+- **Visual companion** for the CHORE-78 task-card-placement brainstorm; PO engaged well; stopped cleanly.
+- **AskUserQuestion scope-forks** kept PO decisions crisp (nav/library/auth scope + the #79 re-scope away from full-BFF).
+
+## Carry-forward backlog (priority-ish)
+
+- **CHORE-79** — auth guard (planned, ready to run). Priority 1.
+- **#72** `/about` href fix (~1 line cosmetic).
+- **Stewardship:** lift L118 responsive rule + Bentham's CHORE-72 mechanical-test rule → `architecture-decisions.md`; soften CLAUDE.md auth description (L119).
+- **#73** overdue red+bold (blocked on lending); **CHORE-C** test infra (MSW+Playwright, 9 tasks, heavy); **#54** client error capture; **#44** CF Pages git-deploy; **#49** Biome lint; **#6** Email (blocked PO SPF/DKIM).
+- Stale branches (unchanged): local `chore/per-commit-green-arch-decision`, `chore/seed-librarian-bundle`, `feat/phase-b-live-wiring`; remote verify `origin/feat/phase-a-migration`, `origin/fix/phase-a-partial-failure-recovery`.
+
+## Production health at session close
+
+- `mvox.eu` + `multivox.pages.dev` 200; CHORE-78 build live (`app.BlWNemeh.js` + `start.yhLn1xom.js`).
+- Tests: **599 unit** at close (was 564 at session-25 close; +12 #76, +3 #77, +20 #78). check 0 · lint 0 · build clean.
+- Polyphony Entu db unchanged (607 librarian-bundle entities under EFK Library `6a12036c4ff8277cd4306b26`).
+- L117: clean session start (no `-2` agent suffixes); agents shut down via shutdown_request waterfall.
+
+(*MVOX:Palestrina*)
+
+---
+
+### [PROCESSED 2026-05-31 session-26] 2026-05-31 end-of-session-25 — session-25 → session-26
 
 **Headline: Two consequential CHOREs shipped end-to-end in one clean session — CHORE-74 (state propagation, `cb3aec0`) + CHORE-75 (avatar dropdown user menu, `70ee562`). Live at `mvox.eu`. L117 ghost-process protocol validated twice in production (mid-session-25 between CHOREs, and at session-25 close).**
 

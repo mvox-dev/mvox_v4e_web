@@ -393,3 +393,46 @@ All hotfixes subsumed into the `fc99291` CHORE-B squash. Individual interim SHAs
 **S3 orphan:** `polyphony/6a11dc804ff8277cd4306b1e/6a11dc804ff8277cd4306b24` (70 bytes, harmless, pending Argo ask task #60).
 
 (*MVOX:Finn*)
+
+---
+
+## 2026-05-31 — Session 26 findings
+
+### [LEARNED] MvoxNav layout — pre-CHORE-76 and post-CHORE-76
+
+**Pre-CHORE-76 (session 25 audit):** `<header>` was `flex items-center justify-between py-2 px-6 border-b-[1.5px] border-ink-2 bg-paper` — no position, no z-index, no responsive handling. Avatar/hamburger entirely off-screen on mobile because the whole right group (5 tabs + avatar) pushed past viewport edge.
+
+**Post-CHORE-76 (CHORE-77 bug):** `overflow-x-hidden` was added to `<header>`. Per CSS overflow spec §3.2, this forces `overflow-y: auto` — clips `absolute top-full` dropdown panels below the header box. Both AvatarMenu and nav-tab-menu panels disappeared. Fix: remove `overflow-x-hidden` from `<header>`, add `position: relative; z-index: <N>` instead (creates stacking context so z-50 panels paint above page siblings).
+
+**DeskSurface:** `animation` on `.wood-bg` may create GPU compositor layer on some browsers — `position: relative; z-index` on header guards against this regardless.
+
+### [LEARNED] /library — layout structure + responsive state (post-CHORE-78)
+
+- **Three-card task grid:** `style="grid-template-columns: 1fr 1fr 1.15fr"` — inline style. CHORE-78 added `class="hidden sm:grid"` to hide on mobile.
+- **LibraryMasterDetail:** scoped CSS `.md-wrap { grid-template-columns: 240px 1fr; }` — no `@media`. Hard 240px master column.
+- **LibraryMaster:** `.master-col { position: sticky; top: 24px }`, `.master-paper { max-height: calc(100vh - 80px); overflow-y: auto }`. Right-fade gradient — designed for side-by-side.
+- **IntersectionObserver scroll-spy** keeps `selectedWorkId` + URL in sync as detail scrolls. Works in single-column reflow. `handleSelect` → `scrollIntoView({ behavior: 'smooth', block: 'start' })`.
+- **DeskSurface:** `w-full`, fluid, no min-width — not the constraint.
+
+### [LEARNED] /library filter dimension readiness
+
+Key facts (from hydrateLibrary.ts + schema.ts + library-entu.ts):
+- **Ready now:** title search, composer, edition.year, edition.publisher
+- **Fetched but name-mismatch risk:** voicing (`work.voicing` fetched, schema field is `original_voicing`), language (`work.language` fetched, schema field is `original_language`) — may silently return empty from v4E db; probe needed
+- **Schema yes, not fetched (trivial to add):** genre (list), edition_type (required!), arranger, license
+- **Availability:** needs copy count + open lending count per edition — two extra query tiers, not currently fetched
+- **Work year is dead code:** v4E `work` has no `year` property (only `original_duration` in minutes); `w.year?.[0]?.number` returns nothing from v4E-compliant db
+
+### [LEARNED] /library auth behavior (pre-CHORE-79)
+
+- **Unauthenticated:** page fully renders, catalog stays `{ status: 'loading' }` forever — no redirect, no error.
+- **Non-librarian:** `goto('/')` fires after Entu returns `no-rights`.
+- **No server-side guard:** `src/routes/library/` has no `+page.server.ts`, no `+layout.server.ts`. `hooks.server.ts` is bare passthrough.
+
+### [LEARNED] Session JWT is localStorage-only — server is completely blind
+
+Auth storage keys (all `localStorage`): `token`, `accounts`, `user`, `mvox.token_version`, `mvox.last_provider`. Zero cookies in codebase — confirmed grep. `hooks.server.ts` never populates `event.locals`.
+
+**CHORE-79 design gate:** true no-flash server-side guard requires a new session cookie. Minimal path: after OAuth exchange, call a server endpoint that sets an httpOnly cookie; `hooks.server.ts` reads it to gate protected routes. Full JWT stays in localStorage for Entu API calls.
+
+(*MVOX:Finn*)

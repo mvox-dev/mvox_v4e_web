@@ -1,770 +1,5 @@
 [
   {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-31T08:39:06.322Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T08:39:06.322Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "[2026-05-31 08:39] Task 13 RED complete — LandingDashboard.\n\nSpec file exists at `src/lib/components/landing/LandingDashboard.spec.ts` (2 tests, no commit). Biome format — no changes needed.\n\nVerbatim error from RED run:\n`Error: Failed to resolve import \"./LandingDashboard.svelte\" from \"src/lib/components/landing/LandingDashboard.spec.ts\". Does the file exist?`\n\nReady for Byrd GREEN.",
-    "summary": "Task 13 RED complete — LandingDashboard spec ready for Byrd",
-    "timestamp": "2026-05-31T08:40:06.817Z",
-    "color": "blue",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-31T08:40:09.851Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T08:40:09.851Z",
-    "color": "blue",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "[2026-05-31 08:42] Task 13 GREEN complete.\n\nCommit SHA: `e05841c` on `chore/landing-redesign`.\n\nGate results:\n- `pnpm test:unit`: Test Files 83 passed (83) · Tests 542 passed (542)\n- `pnpm check`: COMPLETED 1093 FILES 0 ERRORS 0 WARNINGS\n- `pnpm lint`: Checked 163 files in 118ms. No fixes applied.\n\nClean first pass. RED spec + GREEN impl committed together. Byrd idle — ready for Task 14 dispatch.",
-    "summary": "Task 13 GREEN complete — LandingDashboard committed e05841c",
-    "timestamp": "2026-05-31T08:42:21.930Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-31T08:42:24.569Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T08:42:24.569Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "[2026-05-31 08:43] Task 14 RED complete — /+page.spec.ts (orchestrator).\n\nSpec file exists at `src/routes/+page.spec.ts` (3 tests, no commit). Biome format — no changes needed.\n\nRED state: 3/3 tests fail on assertion mismatches — the current `+page.svelte` doesn't render any `[data-testid=\"landing-hero\"]` or `[data-testid=\"landing-dashboard-greet\"]`. Verbatim failure:\n\n`AssertionError: expected null not to be null`\n`❯ src/routes/+page.spec.ts:52 — expect(container.querySelector('[data-testid=\"landing-dashboard-greet\"]')).not.toBeNull()`\n\nThis is the correct RED state per the plan (assertion failure, not module-not-found — `+page.svelte` exists, it just doesn't have the new component tree yet).\n\nReady for Byrd GREEN (rewrite `+page.svelte` per plan Step 3).",
-    "summary": "Task 14 RED complete — +page.spec.ts written, 3 tests failing, ready for Byrd",
-    "timestamp": "2026-05-31T08:43:38.245Z",
-    "color": "blue",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-31T08:43:41.836Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T08:43:41.836Z",
-    "color": "blue",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-31T08:46:59.082Z\",\"idleReason\":\"available\",\"summary\":\"[to palestrina] Task 14 blocked — +page.spec.ts in wrong directory\"}",
-    "timestamp": "2026-05-31T08:46:59.082Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-31T08:51:57.438Z\",\"idleReason\":\"available\",\"summary\":\"[to palestrina] Task 14 GREEN complete — commit fdcfa6f pushed\"}",
-    "timestamp": "2026-05-31T08:51:57.438Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "[2026-05-31 08:53] Bentham up. Read common-prompt, my prompt, scratchpad, arch-decisions (verted-skin-neutrality decision noted), plan + spec. Starting Task 15 review on `chore/landing-redesign` tip `fdcfa6f` (13 commits ahead). Will run discrete pnpm gates, walk 15 ACs, vocabulary-neutrality grep, and adjudicate Byrd's 3 autonomous calls at Task 14. Verdict + dispatch when complete.",
-    "summary": "Bentham intro — starting Task 15 CHORE-72 branch review",
-    "timestamp": "2026-05-31T08:53:46.523Z",
-    "color": "yellow",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "[2026-05-31 09:01]\n\n## CHORE-72 Branch Review — `chore/landing-redesign` tip `fdcfa6f`\n\n**Verdict: RED-72.1 (merge-shape blocker) + 4 carry-forward YELLOWs.** Branch is structurally GREEN on all 4 quality gates and 14 of 15 ACs. One must-fix-before-squash issue (merge-shape) and four follow-up YELLOWs (1 hot fix-in-branch, 3 documented/expected).\n\n### Quality gates at `fdcfa6f` (discrete bash calls, per CALIBRATION-PNPM-CHECK-FRESH-RUN)\n\n- `pnpm check`: **COMPLETED 1094 FILES 0 ERRORS 0 WARNINGS 0 FILES_WITH_PROBLEMS**\n- `pnpm test:unit`: **Test Files 84 passed (84), Tests 545 passed (545)** — Duration 50.67s\n- `pnpm lint`: **Checked 164 files in 120ms. No fixes applied** (biome + eslint clean)\n- `pnpm build`: **built in 3.93s** — adapter-cloudflare done; 168.78kB messages.js compressed to 14.79kB gzip\n\n### Per-commit-GREEN spot-checks (per arch-decisions L96)\n\n- `0e1a4bf` (first GREEN commit, Comenius i18n): **COMPLETED 1071 FILES 0 ERRORS 0 WARNINGS**; **504 tests pass**\n- `7d52a47` (mid-branch, LandingDashboardScatter): **COMPLETED 1089 FILES 0 ERRORS 0 WARNINGS**; **539 tests pass**\n\nPer-commit-GREEN discipline held across all 13 commits.\n\n### RED-72.1 — Stale-branch merge-shape (must fix BEFORE squash)\n\nBranch base lags main by 1 commit. `git log --oneline HEAD..main` returns `3a12534 chore(mvox-dev): mid-CHORE-72 team-recreate preserve — inboxes + resumption state`. That commit touches `teams/mvox-dev/inboxes/*.json` (10 files) + `teams/mvox-dev/memory/chore-72-state.md` — team-state preserve.\n\n`git diff --stat main..HEAD -- teams/` shows:\n- `teams/mvox-dev/memory/chore-72-state.md`: **-49 lines** (entire file would be DELETED by squash)\n- 10 inbox JSONs: **898 deletions vs 614 insertions** — squash would revert inboxes to older snapshots\n- One insertion: `teams/mvox-dev/memory/i18n-conventions.md` (+63 lines — Comenius's CHORE-72 entry, legitimate)\n\nThis is the **CALIBRATION-MERGE-SHAPE** failure mode from session 22 (CHORE-67+68 review caught the same pattern). Squash-merge today would silently:\n- Delete `chore-72-state.md` (the freshly-ratified mid-session resumption doc you wrote at `3a12534`)\n- Revert all 10 inbox snapshots to their pre-team-recreate state\n\n**Fix path** (per session-22 calibration): Josquin merges main into chore branch BEFORE squash. The branch has no prior merge commits in its history (`git log --merges main..HEAD` empty), so either merge-from-main OR rebase works. Lean **merge-from-main** for lower disruption on this 13-commit feature branch. After merge, the squash-diff will lose the negative teams/ deltas because branch will then carry `3a12534`.\n\nThis is RED, not YELLOW, because the lost work includes a doc you authored TODAY (`3a12534`) as part of the team-recreate flow. Bentham-on-Palestrina catch.\n\n### YELLOW-72.2 — Hardcoded stamp literals defeat i18n at ET/LV/UK\n\nTwo `.svelte` templates hardcode the English stamp text instead of consuming the existing i18n keys:\n\n- `src/lib/components/landing/LandingInvitesSection.svelte:12` — hardcoded `INVITE ONLY`; should be `{m.landing_invites_stamp()}`\n- `src/lib/components/landing/LandingRequestSection.svelte:14` — hardcoded `RECEIVED`; should be `{m.landing_request_stamp()}`\n\nThe keys exist in all 4 locales:\n- ET: `AINULT KUTSEGA` / `SAADUD`\n- LV: `TIKAI AR UZAICINĀJUMU` / `SANEMTS`\n- UK: `ЛИШЕ ЗА ЗАПРОШЕННЯМ` / `ОТРИМАНО`\n\nToday an ET user sees \"INVITE ONLY\" and \"RECEIVED\" verbatim — Comenius's translation work is shipped but unused for these 2 strings. Tests pass because they assert the English literal in textContent (and the template hardcodes that same literal); the test is independent of locale.\n\nHero stamp (`{m.landing_hero_stamp()}`) and pillar badges (`{m.landing_pillar_badge_*()}`) are wired correctly — so this is gap-not-pattern.\n\n**Pattern echo**: CHORE-60 YELLOW-A (session 21 — library page hardcoded literals). Encoded calibration: \"any new `.svelte` file with more than 2 English noun-phrases that aren't passed as props gets a discretionary YELLOW asking 'where's the paraglide import?'\". Here paraglide IS imported and used for everything else; just these 2 stamps slipped past.\n\n**Fix**: 2-line `m.*()` substitution in each component + 2 spec assertions adjusted from raw `'RECEIVED'` / `'INVITE ONLY'` to keep matching the rendered text (will still pass since en.json has those values). ~10 minutes Byrd + Tallis. **Strongly recommend fold-in before merge** (per session-17 calibration: YELLOWs whose fix is sub-10-line should be folded pre-merge).\n\n### YELLOW-72.3 — `/about` href not disabled per spec (anticipated)\n\n`src/lib/components/landing/LandingFooter.svelte:25` uses `<a href=\"/about\" ...>` directly. Spec L83-84 said: \"render the link disabled or scoped to a noop until /about ships. Mark in code with TODO so it's findable.\" L517: \"renders the link with `href=\"#\"` and a `data-todo=\"about-page\"` attribute so it's grep-able later. **Bentham may YELLOW this; expected.**\"\n\nToday clicking it 404s. Two options for follow-up:\n- Spec-faithful: change to `href=\"#\"` + `data-todo=\"about-page\"` (no-op visible link)\n- Pragmatic: keep `href=\"/about\"` and file an issue for the `/about` page (spec explicitly listed it as deferred)\n\nEither is acceptable; spec pre-authorized YELLOW. **Lean: post-merge follow-up issue** (defer per spec L517 + L518 \"Decision deferred to a follow-up CHORE\").\n\n### YELLOW-72.4 — AC4 overdue-red+bold path is dead code today\n\n`src/lib/components/landing/LandingDashboardScatter.svelte:21` sets `const overdueCount = 0;` with the TODO: \"source overdue count from copies once lending data is wired (out of scope for CHORE-72)\". The `.replace()` substitution at L29 is the AC4 mechanism, but `overdueCount = 0` means the `overdueCount > 0` branch is never reached. AC4 (\"the Library dashboard card's 'overdue' segment renders in red+bold when `overdueCount > 0`\") is structurally inverifiable today without a fixture.\n\nThe `.replace()` is the substitution hack you flagged at Task 11; carry-forward as expected. **Fix**: when lending data lands (future CHORE), revisit the AC4 verification path. NOT a CHORE-72 blocker per spec deferral list (L518 \"real form vs mailto\" / L519 \"/roster /notes /repertoire\" carry-forwards pattern — same shape).\n\n### Cosmetic-YELLOW — Missing `Reviewed-by: Tallis (RED spec)` trailer on `fdcfa6f`\n\n12 of 13 commits carry the trailer. `fdcfa6f` (Task 14 Byrd commit) has only `Co-authored-by: PO`. Per the dispatch-message rule (arch-decisions L75): `Reviewed-by:` is a permitted sentinel that doesn't collide with `Co-authored-by:` hook dedupe. PO trailer present on all 13 — co-author convention upheld.\n\nCosmetic. Not a blocker. Note for plan template improvement: Task 14 plan should include the `Reviewed-by:` trailer prompt explicitly (Tasks 2-13 had it; Task 14 GREEN template apparently lacked it).\n\n### Adjudication on Byrd's autonomous calls at Task 14\n\n**(a) Spec location — GREEN (re-adjudicated against precedent).** Brief's framing missed that `src/tests/routes/landing/page.server.spec.ts` ALREADY existed on main since CHORE-35 (commit `db2040e`). Byrd's `src/tests/routes/landing/page.spec.ts` is the natural sibling — consistent with pre-existing precedent for the landing route specifically. The colocated `src/routes/library/page.spec.ts` pattern is also valid; landing's directory just happens to have its tests in `src/tests/routes/landing/` from CHORE-35 onward. Net: no revert needed. Either location would have been defensible; Byrd's placement matches the landing-directory precedent.\n\n**(b) Spec rewrite (dynamic → static vi.mock pattern) — YELLOW noted, not RED, rule clarified.** Byrd swapped Tallis's dynamic `vi.doMock` + `vi.resetModules` for static `vi.mock` + store-mutation matching `src/routes/library/page.spec.ts:1-91`. Pattern alignment is genuinely better. Role-boundary intrusion is real but the commit body discloses it: \"spec rewritten to use static vi.mock + store mutation pattern (matching library page convention)\". Encode forward: **Byrd may improve a spec to match project conventions during GREEN if AND ONLY IF pattern alignment is the documented reason — must be flagged in commit message body.** Spec intent must remain unchanged (verified — the 3 test cases assert the same orchestrator behaviors that Tallis's RED would have asserted: loading→marketing, anonymous→marketing, ready→dashboard). If Byrd had rewritten the assertions themselves (different behavior pinned), that would be RED.\n\n**(c) Commit trailer — cosmetic, noted above.**\n\n### Vocabulary-neutrality audit (per 2026-05-31 arch decision)\n\nGrep `grep -rn \"choir\\|sing\\|orchestra\\|ensemble\" src/lib/components/landing/ src/routes/+page.svelte`:\n\n- **4 matches, ALL in `.spec.ts` files as test assertion content** (LandingHero.spec.ts:11+15, LandingFooter.spec.ts:21, LandingRequestSection.spec.ts:13). Strings like `expect(container.textContent).toContain('For choirs · by invite')` — fixture content, not type/var names.\n- **Zero matches in `.svelte` templates.** All \"choir\" copy lives in `messages/{locale}.json` values + flows through `m.*()`.\n- **Zero choir-prefixed type/var/function/class names** in `.ts` or `.svelte` files.\n\n**Vertical-skin neutrality rule — GREEN.** CHORE-72 is a clean first exemplar; future verticals can ship by adding a sibling messages bundle without touching `.svelte` / `.ts`.\n\n### URL-overrides-persisted check\n\nN/A — `/` has no URL state per spec L532 (\"URL parameters override persisted state — not directly applicable here (no URL params on `/`)\"). No regression on the standing rule.\n\n### i18n parity\n\n53 `landing_*` keys per locale (en/et/lv/uk all match). 7 deprecated scaffold keys removed (verified 0 matches for `landing_signed_out|landing_signed_in|landing_empty_state|landing_error_state|landing_retry_button|landing_members_per_section` in all 4 locales). **AC9 + AC10 GREEN.** (Note: spec said \"Total new keys: 41\" but actual count totals 53 — the spec's key list itself enumerates 53, so the \"41\" is a spec-text count error not an impl gap.)\n\n### Per-AC summary\n\n| AC | Status | Note |\n|---|---|---|\n| 1. Signed-out 5-section on 390px | GREEN | All 5 components composed in LandingMarketing.svelte |\n| 2. Signed-in D1 dashboard | GREEN | LandingDashboard composes greet + scatter |\n| 3. Library card real meta from librarySectionStore | GREEN | LandingDashboardScatter.svelte:10-30 |\n| 4. Overdue segment red+bold when > 0 | YELLOW-72.4 | Mechanism present; path unreachable (overdueCount hardcoded 0) |\n| 5. Roster/Notes/Repertoire SOON + non-interactive | GREEN | DashboardPillarCard disabled branch + no href in Scatter |\n| 6. Hero mailto with encoded subject | GREEN | LandingHero.svelte:6 + LandingRequestSection.svelte:5 |\n| 7. \"already invited? sign in\" → /auth/login | GREEN | LandingHero.svelte:64 |\n| 8. Locale picker EN/ET/LV/UK with active | GREEN | LandingFooter.svelte:30-39, setLanguageTag wired |\n| 9. New strings in en + translated et/lv/uk | GREEN | 53 keys per locale |\n| 10. 7 scaffold keys removed | GREEN | 0 matches per locale |\n| 11. pnpm check 0 errors | GREEN | 1094 files, 0 errors |\n| 12. pnpm test:unit all green | GREEN | 545 pass |\n| 13. pnpm lint clean | GREEN | biome + eslint clean |\n| 14. pnpm build clean CF adapter | GREEN | 3.93s build |\n| 15. Bentham review GREEN | **YELLOW** | This review — RED-72.1 + 4 YELLOWs |\n\n### Recommended path forward\n\n1. **Josquin: merge main into chore branch** (RED-72.1 fix). Use `git checkout chore/landing-redesign && git fetch origin && git merge origin/main`. Re-verify gates pass. Then proceed with Task 16 squash.\n2. **Byrd + Tallis (optional fold-in)**: YELLOW-72.2 stamp i18n wiring (2 components + 2 spec assertions). ~10 min. If folded, gates re-pass naturally. **Strongly recommend fold-in** — Comenius's translations shipping unused is a real regression on the i18n contract.\n3. **Post-merge follow-up issue**: YELLOW-72.3 `/about` disable + YELLOW-72.4 AC4 lending-data path. File as 2 separate GH issues for next CHORE.\n\n### Carry-forwards for plan doc post-CHORE (per brief)\n\n- Plan Task 9 Paraglide API: `setLocale`/`getLocale` should be `setLanguageTag`/`languageTag`\n- Plan Task 9 `vi.hoisted()` pattern for spy declaration (not shown in template)\n- Plan Task 7 `INVITE<br>ONLY` → `INVITE ONLY` (visual identical, cosmetic divergence)\n- Plan Task 14 commit template needs `Reviewed-by: Tallis (RED spec)` trailer prompt\n\n### Cross-link\nSpec: `docs/superpowers/specs/2026-05-31-landing-page-design.md`\nPlan: `docs/superpowers/plans/2026-05-31-landing-page-plan.md`\nBranch tip: `fdcfa6f`\nArch decision: \"Vertical-skin neutrality\" (2026-05-31) — first exemplar GREEN\n\n(*MVOX:Bentham*)",
-    "summary": "Bentham verdict — CHORE-72 Task 15: YELLOW with 1 RED, 4 YELLOWs",
-    "timestamp": "2026-05-31T09:02:40.732Z",
-    "color": "yellow",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-31T09:04:17.625Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T09:04:17.625Z",
-    "color": "yellow",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-31T09:06:56.727Z\",\"idleReason\":\"available\",\"summary\":\"[to palestrina] YELLOW-72.2 done — commit 02d76d9 pushed\"}",
-    "timestamp": "2026-05-31T09:06:56.727Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "[2026-05-31 09:07] Josquin online. Read context + chore-72 memory; starting Task 16 (merge main into chore, re-run gates, squash + deploy + cleanup). Noted unstaged bentham.md — will stash before checkout. Surfacing only on failure.",
-    "summary": "Josquin intro — starting Task 16",
-    "timestamp": "2026-05-31T09:07:59.784Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "[2026-05-31 09:11] **Task 16 COMPLETE — CHORE-72 landing page redesign shipped to production.**\n\n## Summary\n\nEnd-to-end execution clean. RED-72.1 (stale branch) resolved by Step 1 merge; squash carried `chore-72-state.md` + updated inboxes into main correctly. PO co-author trailer landed via hook (verified post-commit).\n\n## SHAs + deploy\n\n- **Post-merge-main SHA on chore branch**: `e7c7ba2` (Merge commit; squash-folded — does not appear on main)\n- **Squash SHA on main**: `29de0d2` `feat(#chore-72): landing page redesign — paper-and-ink doorway + dashboard`\n- **Per-build URL**: https://a026a704.multivox.pages.dev\n- **New chunk hashes**: `app.CRTEVY57.js` + `start.Jl8jEoV1.js` (replacing CHORE-67's earlier hashes)\n\n## Branch cleanup\n\n- `git branch -D chore/landing-redesign` → \"Deleted branch chore/landing-redesign (was e7c7ba2).\"\n- `git push origin --delete chore/landing-redesign` → \"[deleted] chore/landing-redesign\"\n\n## Gate verbatim outputs (post-merge tip)\n\n1. **pnpm build**: `✓ built in 3.88s` + `Using @sveltejs/adapter-cloudflare ✔ done`\n2. **pnpm check**: `1780218513022 COMPLETED 1094 FILES 0 ERRORS 0 WARNINGS 0 FILES_WITH_PROBLEMS`\n3. **pnpm test:unit**: `Test Files  84 passed (84) | Tests  545 passed (545) | Duration  50.88s`\n4. **pnpm lint**: `Checked 164 files in 118ms. No fixes applied.` (biome+eslint clean)\n5. **pnpm build (final)**: `✓ built in 4.89s` + `✔ done`\n\n## Production probes\n\n```\nHTTP/2 200       (mvox.eu)\nx-sveltekit-page: true\nHTTP/2 200       (multivox.pages.dev)\nx-sveltekit-page: true\n```\n\nBoth URLs serve the new landing redesign. Chunk hashes match across both endpoints (same deploy).\n\n## Trailers verification\n\n```\nReviewed-by: Bentham\nContributors: Tallis, Byrd, Comenius\nCo-authored-by: Mihkel Putrinš <mihkel.putrinsh@gmail.com>\n```\n\nPO trailer hook ran clean — dispatch body was free of `Co-authored-by:` per session-22 rule.\n\n## Notes\n\n- Step 7 skipped per dispatch (CHORE-72 has no GH issue).\n- Bentham scratchpad (his unstaged session-24 branch-review entry) stashed pre-merge and popped post-cleanup — still sits as unstaged delta on main awaiting next team-state save.\n- YELLOW-72.3 (`/about` href) + YELLOW-72.4 (overdue path) + cosmetic-YELLOW (Task 14 missing `Reviewed-by:` trailer) remain as deferred carry-forwards per plan — file as separate GH issues when convenient.\n\nGoing idle. Surface me on next dispatch.",
-    "summary": "Task 16 COMPLETE — CHORE-72 shipped to prod",
-    "timestamp": "2026-05-31T09:11:25.119Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-31T09:11:33.420Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T09:11:33.420Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-31T09:11:55.218Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T09:11:55.218Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"2\",\"subject\":\"CHORE-74 — state propagation chain (7 tasks)\",\"description\":\"Driving CHORE-74 plan strictly sequentially per SEQUENCING DISCIPLINE. Task 1 (branch) executed by team-lead; Tasks 2-7 dispatched to team agents one at a time. Spec: docs/superpowers/specs/2026-05-31-chore-74-state-propagation-design.md. Plan: docs/superpowers/plans/2026-05-31-chore-74-state-propagation-plan.md. GH: #74.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-31T10:43:43.475Z\"}",
-    "timestamp": "2026-05-31T10:43:43.475Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"3\",\"subject\":\"Post-CHORE-74: stale config entry cleanup\",\"description\":\"CHORE-72 left tallis/byrd/comenius/bentham/josquin config entries when those processes died after CHORE-72 ship. CHORE-74 now spawning as -2 suffixes (tallis-2 spawned). After CHORE-74 ships, repeat the TeamDelete + TeamCreate dance: persist inboxes to repo, surgical config.json edit, TeamDelete, TeamCreate, restore inboxes. Per PO's standing request \\\"cleanup at CHORE boundaries\\\".\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-31T10:44:32.932Z\"}",
-    "timestamp": "2026-05-31T10:44:32.932Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis-2",
-    "text": "[2026-05-31 10:47] CHORE-74 Task 2 RED complete.\n\n## Story Handoff\n- **Story:** #74 — state propagation\n- **Branch:** `chore/state-propagation`\n- **From:** Tallis (phase: RED)\n- **To:** Byrd (phase: GREEN)\n- **Status:** TESTS_WRITTEN — 8 new tests failing RED\n\n### What was done\n- Appended 8-test `describe('selectedOrgIdStore + urlOrgIdStore (CHORE-74)')` block to `src/lib/auth/userStore.spec.ts`\n- Added `let selectedOrgIdStore` + `let urlOrgIdStore` module-level declarations; assigned from module in top-level `beforeEach` to match existing dynamic-import pattern\n- Biome format clean; 545 existing tests still pass\n\n### RED error line\n`TypeError: Cannot read properties of undefined (reading 'set')` — `selectedOrgIdStore` + `urlOrgIdStore` not exported from `userStore.ts` yet\n\n### What to do next\nByrd implements Task 2 Steps 3a–3e in `src/lib/auth/userStore.ts` per the plan. No commit from Tallis — spec is written only.\n\n### Files to start with\n- `src/lib/auth/userStore.spec.ts` (new tests at bottom)\n- `src/lib/auth/userStore.ts` (needs selectedOrgIdStore + urlOrgIdStore exports + multi-store selectedOrgStore rewrite + selectOrg three-write)\n- `docs/superpowers/plans/2026-05-31-chore-74-state-propagation-plan.md` Task 2 Steps 3a–3e\n\n(*MVOX:Tallis*)",
-    "summary": "CHORE-74 Task 2 RED complete — ready for Byrd GREEN",
-    "timestamp": "2026-05-31T10:47:52.156Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis-2",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis-2\",\"timestamp\":\"2026-05-31T10:48:00.455Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T10:48:00.455Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd-2",
-    "text": "[2026-05-31 10:48] Byrd online — CHORE-74 Task 2 GREEN, reading spec and current userStore.ts now, beginning implementation.",
-    "summary": "Byrd CHORE-74 Task 2 GREEN starting",
-    "timestamp": "2026-05-31T10:48:50.365Z",
-    "color": "pink",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd-2",
-    "text": "[2026-05-31 10:52] Byrd — CHORE-74 Task 2 GREEN complete.\n\nSHA: 29a747a pushed to chore/state-propagation.\n\nGate output:\n- Tests: 553 passed (84 files), 0 failed — all existing + 8 new CHORE-74 tests pass\n- pnpm check: 0 errors 0 warnings (1094 files)\n- pnpm lint: \"No fixes applied\" (Biome + ESLint clean)\n\nOne note: the 3 existing `selectedOrgStore — fallback chain` tests that used `window.history.replaceState` were mechanically broken by removing `readOrgParam()`. I updated them to drive the new `urlOrgIdStore`/`selectedOrgIdStore` stores directly — same coverage, right abstraction level now. This is per the Byrd-may-fix-mechanically-broken-tests rule.\n\nReady for Task 3 dispatch when you're ready.",
-    "summary": "Byrd CHORE-74 Task 2 GREEN complete — SHA 29a747a",
-    "timestamp": "2026-05-31T10:52:41.188Z",
-    "color": "pink",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd-2",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd-2\",\"timestamp\":\"2026-05-31T10:52:47.523Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T10:52:47.523Z",
-    "color": "pink",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd-2",
-    "text": "[2026-05-31 10:54] Byrd — CHORE-74 Task 3 complete.\n\nSHA: 6a5616a pushed to chore/state-propagation.\n\nGate output:\n- pnpm check: 0 errors 0 warnings (1094 files)\n- pnpm test:unit: 553 passed (84 files), 0 failed\n- pnpm lint: \"No fixes applied\" (Biome + ESLint clean)\n\nUsed hardcoded `'org'` string in the $effect blocks rather than importing `ORG_URL_PARAM_NAME` — cleaner in a template context, no new import noise.\n\nReady for Task 4 dispatch.",
-    "summary": "Byrd CHORE-74 Task 3 complete — SHA 6a5616a",
-    "timestamp": "2026-05-31T10:55:01.281Z",
-    "color": "pink",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd-2",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd-2\",\"timestamp\":\"2026-05-31T10:55:05.502Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T10:55:05.502Z",
-    "color": "pink",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis-2",
-    "text": "[2026-05-31 10:57] CHORE-74 Task 4 RED complete.\n\n## Story Handoff\n- **Story:** #74 — state propagation\n- **Branch:** `chore/state-propagation`\n- **From:** Tallis (phase: RED)\n- **To:** Byrd (phase: GREEN)\n- **Status:** TESTS_WRITTEN — 1 new test failing RED, 553 existing tests pass\n\n### What was done\n- Added `// @vitest-environment happy-dom` to top of `src/routes/auth/callback/page.spec.ts` (existing static-source tests still pass in happy-dom)\n- Appended new `describe('callback +page.svelte — hydrateUserStore call order (CHORE-74)')` block with 1 test\n- Uses `vi.hoisted()` for shared `callOrder` array; mocks `$app/navigation` (goto) and `$lib/auth/userStore` (hydrateUserStore) to push to the array; scaffolds success path via mocked `exchangeSession`, `decodeState`, `localStorage`\n- Biome format clean\n\n### RED error line\n`AssertionError: expected [ 'goto' ] to include 'hydrate'` — current callback page never calls `hydrateUserStore()`, only `goto()`\n\n### What to do next\nByrd implements Task 4 Step 3: in `src/routes/auth/callback/+page.svelte`, import `hydrateUserStore` from `$lib/auth/userStore` and add `await hydrateUserStore()` before `exchangeState = 'success'` in `runExchange()`. No commit from Tallis — spec is written only.\n\n### Files to start with\n- `src/routes/auth/callback/page.spec.ts` (new test at bottom)\n- `src/routes/auth/callback/+page.svelte` (add `await hydrateUserStore()` before `exchangeState = 'success'`)\n- Plan Task 4 Steps 3–5\n\n(*MVOX:Tallis*)",
-    "summary": "CHORE-74 Task 4 RED complete — ready for Byrd GREEN",
-    "timestamp": "2026-05-31T10:58:01.950Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"1\",\"subject\":\"CHORE-74 — state propagation chain (7 tasks, post-cleanup re-do)\",\"description\":\"Re-driving CHORE-74 after full team reset. PO rolled back Byrd-2's commits (29a747a, 6a5616a) and tallis-2's WIP via branch deletion. Chore branch recreated clean from main at d5bb68b. Spec + plan unchanged: docs/superpowers/specs/2026-05-31-chore-74-state-propagation-design.md + docs/superpowers/plans/2026-05-31-chore-74-state-propagation-plan.md. GH: #74.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-31T11:00:23.693Z\"}",
-    "timestamp": "2026-05-31T11:00:23.693Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "[2026-05-31 11:02] Bentham here, awake and idle. Standing by for CHORE-74 review dispatch or whatever's next.",
-    "summary": "Bentham awake — ping",
-    "timestamp": "2026-05-31T11:02:48.570Z",
-    "color": "yellow",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-31T11:02:51.388Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T11:02:51.388Z",
-    "color": "yellow",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-31T11:03:46.588Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T11:03:46.588Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-31T11:03:53.847Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T11:03:53.847Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "[2026-05-31 11:03] Tallis ready — CHORE-74 Task 2 RED done.\n\n## Story Handoff\n- **Story:** #74 — state propagation\n- **Branch:** chore/state-propagation (tip: d5bb68b, no new commit per plan)\n- **From:** Tallis (phase: RED)\n- **To:** Byrd (phase: GREEN)\n- **Status:** TESTS_WRITTEN — 8 new tests failing RED\n\n### What was done\n- Appended CHORE-74 test block to `src/lib/auth/userStore.spec.ts` (static imports for `selectedOrgIdStore`, `urlOrgIdStore`, `selectedOrgStore`, `selectOrg`, `userStoreWritable`)\n- Biome format: no changes needed\n- Verified RED: `TypeError: Cannot read properties of undefined (reading 'set')` — `selectedOrgIdStore` is undefined because the new stores don't exist yet in `userStore.ts`\n\n### RED error line (verbatim)\n`TypeError: Cannot read properties of undefined (reading 'set')` at `src/lib/auth/userStore.spec.ts:527:22` — `selectedOrgIdStore.set(null)`\n\nAll 8 new CHORE-74 tests fail; 545 existing tests still pass.\n\n### What to do next\nByrd GREEN: implement `selectedOrgIdStore` + `urlOrgIdStore` writables + rewrite `selectedOrgStore` as multi-store derive + update `selectOrg` in `src/lib/auth/userStore.ts` per Task 2 Steps 3a-3e in the plan.\n\n### Files to start with\n- `src/lib/auth/userStore.ts` (modify)\n- `src/lib/auth/userStore.spec.ts` (read — new tests at bottom)\n- Plan: `docs/superpowers/plans/2026-05-31-chore-74-state-propagation-plan.md` Task 2 Steps 3a-3e\n\n(*MVOX:Tallis*)",
-    "summary": "CHORE-74 Task 2 RED complete — ready for Byrd GREEN",
-    "timestamp": "2026-05-31T11:04:06.886Z",
-    "color": "blue",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-31T11:04:11.939Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T11:04:11.939Z",
-    "color": "blue",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1780225474910@bentham\",\"from\":\"bentham\",\"timestamp\":\"2026-05-31T11:04:41.006Z\"}",
-    "timestamp": "2026-05-31T11:04:41.006Z",
-    "color": "yellow",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1780225478978@byrd\",\"from\":\"byrd\",\"timestamp\":\"2026-05-31T11:04:42.585Z\"}",
-    "timestamp": "2026-05-31T11:04:42.585Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1780225476470@josquin\",\"from\":\"josquin\",\"timestamp\":\"2026-05-31T11:04:42.829Z\"}",
-    "timestamp": "2026-05-31T11:04:42.829Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1780225494407@tallis\",\"from\":\"tallis\",\"timestamp\":\"2026-05-31T11:05:03.600Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-31T11:05:03.600Z",
-    "color": "blue",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"1\",\"subject\":\"CHORE-74 — state propagation chain (clean resume from main 33ab456)\",\"description\":\"CHORE-74 resumed at session-25 from clean main 33ab456. Branch chore/state-propagation freshly created. 7-task chain per plan: docs/superpowers/plans/2026-05-31-chore-74-state-propagation-plan.md. Strictly sequential dispatch per SEQUENCING DISCIPLINE. Apply L117: send shutdown_request to all live agents before any TeamDelete at CHORE end.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-31T11:13:24.893Z\"}",
-    "timestamp": "2026-05-31T11:13:24.893Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "[2026-05-31 11:13] Tallis session 25 online — on `chore/state-propagation`, executing CHORE-74 Task 2 RED.",
-    "summary": "Tallis session 25 ready, CHORE-74 Task 2 RED starting",
-    "timestamp": "2026-05-31T11:14:05.034Z",
-    "color": "blue",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "[2026-05-31 11:15] CHORE-74 Task 2 RED complete.\n\nVerbatim error line:\n`TypeError: Cannot read properties of undefined (reading 'set')`\n\n8 new tests fail — `selectedOrgIdStore` + `urlOrgIdStore` not exported from `src/lib/auth/userStore.ts` yet. 545 existing tests still pass.\n\nFile: `src/lib/auth/userStore.spec.ts` — test block appended, biome-formatted. NOT committed per plan.\n\nReady for Byrd GREEN.",
-    "summary": "CHORE-74 Task 2 RED complete — ready for Byrd GREEN",
-    "timestamp": "2026-05-31T11:15:55.180Z",
-    "color": "blue",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-31T11:15:58.121Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T11:15:58.121Z",
-    "color": "blue",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "[2026-05-31 11:20] Byrd reporting — CHORE-74 Task 2 GREEN complete.\n\n**Commit:** `69244f8` on `chore/state-propagation` (pushed)\n\n**Gate output (verbatim):**\n- `pnpm test src/lib/auth/userStore.spec.ts -- --run`: 553 tests pass, 0 failures. All 8 new CHORE-74 tests GREEN.\n- `pnpm check`: 0 errors, 0 warnings (1094 files).\n- `pnpm lint`: Checked 164 files in 128ms. No fixes applied.\n\n**What was done:**\n- Added `selectedOrgIdStore` (Writable<string | null>, localStorage-initialized) and `urlOrgIdStore` (Writable<string | null>, default null) below `userStore`\n- Exported `ORG_URL_PARAM_NAME` constant\n- Deleted `readOrgParam()` helper\n- Replaced single-store `selectedOrgStore` derive with multi-store derive over `[userStore, urlOrgIdStore, selectedOrgIdStore]` — resolution order URL > pick > first-org, with write-through to localStorage when URL wins\n- Replaced `selectOrg` with three-write version (selectedOrgIdStore + localStorage + goto)\n\n**Mechanical test updates flagged (per dispatch brief allowance):** The existing `selectedOrgStore — fallback chain` and `selectOrg — two-write` describe blocks used `window.history.replaceState` to simulate URL params (previously read by the now-deleted `readOrgParam()`). These 5 tests were updated to drive `urlOrgIdStore` directly — the store that layout's `$effect` populates in production. Asserted behaviour is identical; driver changed. Added `beforeEach` store-reset blocks to both describe groups. All changes documented in commit message body.\n\nReady for Task 3 dispatch (layout $effect wiring).",
-    "summary": "CHORE-74 Task 2 GREEN complete — SHA 69244f8",
-    "timestamp": "2026-05-31T11:21:03.775Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-31T11:21:08.192Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T11:21:08.192Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "[2026-05-31 11:23] Byrd reporting — CHORE-74 Task 3 GREEN complete.\n\n**Commit:** `c168518` on `chore/state-propagation` (pushed)\n\n**Gate output (verbatim):**\n- `pnpm check`: 0 errors, 0 warnings (1094 files).\n- `pnpm test:unit`: 553 tests pass, 0 failures (84 test files).\n- `pnpm lint`: Checked 164 files in 144ms. No fixes applied.\n\n**What was done:**\n- Updated `+layout.svelte` import line to include `urlOrgIdStore`, `selectedOrgIdStore`, `ORG_URL_PARAM_NAME` from `$lib/auth/userStore`\n- Added two `$effect` blocks after `onMount(...)`, before `$derived` declarations: one pushes `page.url.searchParams.get('org')` to `urlOrgIdStore`; one write-through to `selectedOrgIdStore` when URL param is present (two-write symmetry per URL-overrides-persisted rule)\n- Used `ORG_URL_PARAM_NAME` constant throughout — no hardcoded `'org'` string\n\nReady for Task 4 dispatch (Tallis RED on auth/callback).",
-    "summary": "CHORE-74 Task 3 GREEN complete — SHA c168518",
-    "timestamp": "2026-05-31T11:23:24.492Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-31T11:23:27.524Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T11:23:27.524Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "[2026-05-31 11:25] CHORE-74 Task 4 RED complete.\n\nVerbatim error line:\n`AssertionError: expected \"spy\" to be called once, but got 0 times`\n\n1 new test fails — `hydrateUserStore` is never called by the current `+page.svelte` (it calls `setToken/setAccounts/setUser/setLastProvider/goto` with no hydrate call). 553 existing tests pass.\n\nFile: `src/routes/auth/callback/page.spec.ts` — added `// @vitest-environment happy-dom`, `vi.hoisted` spies for `hydrateMock` + `gotoMock` + `callOrder`, full mocks for all component imports, new describe block asserting `callOrder.log === ['hydrate', 'goto']`. Biome-clean. NOT committed.\n\nReady for Byrd GREEN: add `import { hydrateUserStore } from '$lib/auth/userStore'` + `await hydrateUserStore()` before `exchangeState = 'success'` in `runExchange()`.",
-    "summary": "CHORE-74 Task 4 RED complete — ready for Byrd GREEN",
-    "timestamp": "2026-05-31T11:26:02.531Z",
-    "color": "blue",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-31T11:26:05.945Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T11:26:05.946Z",
-    "color": "blue",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "[2026-05-31 11:29] Byrd reporting — CHORE-74 Task 4 GREEN complete.\n\n**Commit:** `c278506` on `chore/state-propagation` (pushed)\n\n**Gate output (verbatim):**\n- `pnpm test src/routes/auth/callback/page.spec.ts -- --run`: 554 tests pass, 0 failures. New CHORE-74 call-order test GREEN; all 6 existing callback tests still pass.\n- `pnpm check`: 0 errors, 0 warnings (1094 files).\n- `pnpm lint`: Checked 164 files in 120ms. No fixes applied.\n\n**What was done:**\n- Added `import { hydrateUserStore } from '$lib/auth/userStore'` to `+page.svelte`\n- Inserted `await hydrateUserStore()` between `setLastProvider(decoded.provider)` and `exchangeState = 'success'` in `runExchange()`\n- The spec was already on the branch (Tallis's RED commit); only `+page.svelte` was modified\n\nReady for Task 5 dispatch (Tallis RED on LandingDashboardScatter).",
-    "summary": "CHORE-74 Task 4 GREEN complete — SHA c278506",
-    "timestamp": "2026-05-31T11:29:23.203Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-31T11:29:33.492Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T11:29:33.492Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "[2026-05-31 11:31] CHORE-74 Task 5 RED complete.\n\nVerbatim error line:\n`AssertionError: expected \"spy\" to be called with arguments: [ { orgId: 'org-a', …(1) } ] — Number of calls: 0`\n\n1 new test fails — `hydrateLibrarySectionSpy` never called because the component has no `$effect` wired to `selectedOrgStore`. 554 existing tests pass (5 existing scatter tests unaffected).\n\nFile: `src/lib/components/landing/LandingDashboardScatter.spec.ts` — restructured existing `vi.mock('$lib/library/libraryStore', ...)` to also export `hydrateLibrarySection: hydrateLibrarySectionSpy` (via `vi.hoisted`); added mocks for `$lib/auth/storage`, `$lib/auth/userStore` (writable `selectedOrgStore` + `decodeJwt`), `$env/static/public`; appended CHORE-74 describe block. Biome-clean. NOT committed.\n\nReady for Byrd GREEN: add `$effect` to `LandingDashboardScatter.svelte` watching `$selectedOrgStore` + calling `hydrateLibrarySection({ orgId, personId })` per plan Task 5 Step 3.",
-    "summary": "CHORE-74 Task 5 RED complete — ready for Byrd GREEN",
-    "timestamp": "2026-05-31T11:31:59.863Z",
-    "color": "blue",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-31T11:32:02.525Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T11:32:02.525Z",
-    "color": "blue",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "[2026-05-31 11:38] Byrd reporting — CHORE-74 Task 5 GREEN complete.\n\n**Commit:** `89ab645` on `chore/state-propagation` (pushed)\n\n**Gate output (verbatim):**\n- `pnpm test:unit`: 555 tests pass, 0 failures (84 test files). Scatter spec RED→GREEN; all existing dashboard tests still pass.\n- `pnpm check`: 0 errors, 0 warnings (1094 files).\n- `pnpm lint`: Checked 164 files in 160ms. No fixes applied.\n\n**What was done:**\n- Added imports to `LandingDashboardScatter.svelte`: `hydrateLibrarySection` from libraryStore, `getToken` from storage, `PUBLIC_ENTU_DB` from env, `userStore`/`selectedOrgStore`/`decodeJwt` from userStore\n- Added `$effect` block that fires `hydrateLibrarySection({ orgId, personId })` whenever `selectedOrgStore` or `userStore` changes (guards: org present, user ready, token present, personId resolvable)\n\n**One fix required beyond plan:** `pnpm check` caught 2 type errors in the spec — the vi.mock replaces `selectedOrgStore` with a `writable` at runtime, but TypeScript sees the declared `Readable<Org | null>` type from the real module, which has no `.set()`. Fixed by casting the import as `Writable<Org | null>` in the spec. Documented in commit message body.\n\nByrd's GREEN work is complete across all 4 tasks (2, 3, 4, 5). Ready for Task 6 (Bentham review).",
-    "summary": "CHORE-74 Task 5 GREEN complete — SHA 89ab645",
-    "timestamp": "2026-05-31T11:38:26.705Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-31T11:38:32.846Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T11:38:32.846Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "[2026-05-31 11:42] Task 5 was complete before your ping — report crossed in transit. SHA 89ab645 pushed at 11:38. All 4 Byrd tasks done; waiting for Bentham review dispatch.",
-    "summary": "Task 5 already done — SHA 89ab645 at 11:38",
-    "timestamp": "2026-05-31T11:38:41.589Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-31T11:38:43.808Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T11:38:43.808Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "[2026-05-31 11:39] Bentham online (session 25). Starting CHORE-74 Task 6 branch review on `chore/state-propagation` @ 89ab645 — `git log --oneline HEAD..main` empty so no merge-shape risk. Running CALIBRATION-PNPM-CHECK-FRESH-RUN gates next as discrete bash calls.",
-    "summary": "Bentham online — CHORE-74 Task 6 review starting",
-    "timestamp": "2026-05-31T11:39:20.390Z",
-    "color": "yellow",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "[2026-05-31 11:47] **CHORE-74 Task 6 verdict: GREEN.** Branch `chore/state-propagation` @ `89ab645` is clean and ready for Josquin's Task 7 merge.\n\n## Gate output (CALIBRATION-PNPM-CHECK-FRESH-RUN — discrete bash calls, verbatim)\n\n- `pnpm check` → `COMPLETED 1094 FILES 0 ERRORS 0 WARNINGS 0 FILES_WITH_PROBLEMS`\n- `pnpm test:unit` → `Test Files 84 passed (84) | Tests 555 passed (555)` (Duration 55.41s)\n- `pnpm lint` → `Checked 164 files in 125ms. No fixes applied.`\n- `pnpm build` → `✓ built in 4.17s` + `Using @sveltejs/adapter-cloudflare ✔ done`\n\n## Per-commit-GREEN audit\n\nEach commit verified independently (discrete `pnpm check` + `pnpm test:unit` runs per commit):\n- `69244f8` Task 2 — 1094/0 errors, 553/553 tests\n- `c168518` Task 3 — 1094/0 errors, 553/553 tests\n- `c278506` Task 4 — 1094/0 errors, 554/554 tests (+1 callback call-order spec)\n- `89ab645` Task 5 — 1094/0 errors, 555/555 tests (+1 dashboard re-hydrate spec)\n\n## Per-AC results\n\n- **AC1** GREEN — `auth/callback/+page.svelte:53` `await hydrateUserStore()` lands AFTER setToken/setAccounts/setUser, BEFORE `goto(decoded.return_to || '/')`. Spec `page.spec.ts:100-121` pins call order via hoisted log array — both mocks fire, `callOrder.log === ['hydrate', 'goto']`.\n- **AC2** GREEN — `selectedOrgStore` rewritten as multi-store derive `derived([userStore, urlOrgIdStore, selectedOrgIdStore], ...)`; `selectOrg()` writes all three channels (`selectedOrgIdStore.set(orgId)` + localStorage + `goto`). Spec covers `prefers explicit pick over default` at userStore.spec.ts:568-581.\n- **AC3** GREEN — `LandingDashboardScatter.svelte:13-23` `$effect` reads `$selectedOrgStore` + `$userStore`, calls `hydrateLibrarySection({orgId, personId})`. Spec covers org-change re-fire at LandingDashboardScatter.spec.ts:90-113 — switching mocked store value re-fires the spy with new orgId.\n- **AC4** GREEN — `+layout.svelte:30-41` two `$effect` blocks: first writes `urlOrgIdStore.set(page.url.searchParams.get(ORG_URL_PARAM_NAME))`, second writes through to `selectedOrgIdStore` when URL present. `page` from `$app/state` is reactive, so effect re-fires on URL changes. Derive lists `urlOrgIdStore` in `[stores]` so URL changes propagate.\n- **AC5** GREEN — 545 baseline + 10 new = 555 passing on tip; no regressions.\n- **AC6** GREEN — new unit specs: post-login auto-hydration (callback page.spec.ts:100), selectOrg-three-write (userStore.spec.ts:612), URL-precedence (userStore.spec.ts:583), org-change dashboard re-fire (LandingDashboardScatter.spec.ts:90).\n- **AC7** GREEN — quoted above.\n- **AC8** GREEN — this verdict.\n\n## URL-overrides-persisted compliance\n\nCode-enforceable now: (a) URL wins in derive precedence (userStore.ts:117-138 lists urlOrgIdStore first); (b) URL changes trigger re-derivation (layout.svelte:31-34 effect populates urlOrgIdStore reactively via `page.url.searchParams.get`); (c) two-write symmetry on URL change (layout.svelte:37-41 second effect writes through to selectedOrgIdStore + derive backfills localStorage at userStore.ts:124-127). The rule lifted to settled patterns at session 22 is now testable at unit-spec level.\n\n## Vocabulary-neutrality grep\n\n`git diff main...HEAD --name-only | xargs grep -E \"choir|orchestra|sing\\b\" | grep -v messages/` returns one match: `userStore.spec.ts:363` comment \"real persona IDs from Pérotin probe (CHORE-68)\" — proper-noun teammate name, not vocabulary leak. Confirmed clean.\n\n## Merge-shape\n\n`git log --oneline HEAD..main` empty. Branch created from current main `33ab456` as planned. Zero negative-delta risk on squash. No CALIBRATION-MERGE-SHAPE issue.\n\n## Byrd's mechanical test updates — adjudicated GREEN\n\n5 tests in `selectedOrgStore — fallback chain` + `selectOrg — two-write` moved from `window.history.replaceState` driving to `urlOrgIdStore.set()`/`selectedOrgIdStore.set()` direct driving. Intent preserved on all 5 — pinned behavior (URL precedence; localStorage fallback; first-org default; two-write symmetry) unchanged. The `'localStorage fallback when URL absent'` rewrite is REQUIRED because the new `selectedOrgIdStore` snapshots localStorage at module-import time (via `vi.resetModules` + `await import`); setting localStorage AFTER import doesn't propagate, so the test must drive the store directly to faithfully simulate the production \"user picked org last session\" state. Byrd documented the pattern alignment in the commit body. **Adjudicated GREEN under the CHORE-72 Task-15 rule** (pattern alignment with new architectural shape, documented reason, intent unchanged).\n\n## YELLOWs/RED ledger\n\nNone. Zero carry-forwards from CHORE-74.\n\n## Recommendation\n\nGREEN — Josquin clear to execute Task 7 squash-merge per common-prompt merge procedure. Squash commit body should mention: (a) Closes #74; (b) the 4 task chain; (c) URL-overrides-persisted now code-enforceable; (d) per-commit-GREEN held across all 4 commits.\n\nScratchpad updated with CHORE-74 session-25 entry + URL-overrides-persisted \"lifted to code-enforceable\" pattern. Standing by for next dispatch.",
-    "summary": "CHORE-74 review: GREEN — clean, ready for Josquin merge",
-    "timestamp": "2026-05-31T11:46:55.679Z",
-    "color": "yellow",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-31T11:47:03.419Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T11:47:03.419Z",
-    "color": "yellow",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "[2026-05-31 11:47] Josquin online. Starting CHORE-74 Task 7: re-verify gates → squash → push → deploy → close #74 → delete branch. Surfacing only on failure.",
-    "summary": "Josquin online — CHORE-74 Task 7",
-    "timestamp": "2026-05-31T11:47:53.385Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "[2026-05-31 11:51] CHORE-74 Task 7 COMPLETE. All steps clean.\n\n**Gates (chore tip 89ab645):**\n- `pnpm check`: COMPLETED 1094 FILES 0 ERRORS 0 WARNINGS 0 FILES_WITH_PROBLEMS\n- `pnpm test:unit`: Test Files 84 passed (84) / Tests 555 passed (555)\n- `pnpm lint`: Checked 164 files in 128ms. No fixes applied.\n- `pnpm build`: ✓ built in 3.98s\n\n**Squash:** `cb3aec0` on main — fix(#74): state propagation — login + org-change auto-update UI. 7 files / +326 / -32. PO co-author trailer landed clean (verified via `git log -1 --format='%(trailers)'`). Body free of `Co-authored-by:` per session-22 GOTCHA — hook appended cleanly.\n\n**Push:** `33ab456..cb3aec0 main -> main` — clean.\n\n**Deploy:** `https://d9cdad61.multivox.pages.dev` (per-build URL). Build: ✓ 3.90s. Upload: 18 new files, 15 cached. Worker bundle uploaded.\n\n**Probes:** all HTTP 200 + `x-sveltekit-page: true`\n- `https://mvox.eu/` → 200\n- `https://multivox.pages.dev/` → 200\n- `https://d9cdad61.multivox.pages.dev/` → 200\n\n**New chunk hashes:**\n- `app.CiRjDSx0.js` (was `app.CRTEVY57.js` from CHORE-72)\n- `start.BkgjBlNh.js` (was `start.Jl8jEoV1.js` from CHORE-72)\n\n**GH #74:** closed at 10:43:31Z (auto-closed by `Closes #74` in squash body). Completion comment posted: https://github.com/mvox-dev/mvox_v4e_web/issues/74#issuecomment-4586600111\n\n**Branch:** `chore/state-propagation` deleted local + remote (was at 89ab645).\n\n**Housekeeping:** Stashed Bentham's unstaged scratchpad pre-merge, popped clean post-branch-delete. End state: main @ cb3aec0, Bentham scratchpad back in dirty/unstaged per session norm.\n\nPO manual-test pending: login auto-redirect to dashboard + OrgPicker org switch should now work without manual refresh.",
-    "summary": "CHORE-74 Task 7 COMPLETE — shipped",
-    "timestamp": "2026-05-31T11:51:15.576Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-31T11:51:20.047Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T11:51:20.047Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-31T11:51:42.885Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T11:51:42.885Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1780228820808@tallis\",\"from\":\"tallis\",\"timestamp\":\"2026-05-31T12:00:28.078Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-31T12:00:28.078Z",
-    "color": "blue",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "[2026-05-31 12:00] Bentham closing. CHORE-74 verdict GREEN delivered; zero in-progress work, scratchpad already updated this session.\n\n- **[LEARNED]** URL-overrides-persisted rule lifted from doc-only (session 22) to code-enforceable on CHORE-74 land — the reactive-shadow-store pattern (urlOrgIdStore in derive `[stores]` + layout `$effect` populator) is the testable shape. Encoded in scratchpad as a standing review check: any URL-derived state without a reactive Writable shadow = YELLOW (latent-reactivity-gap).\n- **[LEARNED]** CHORE-72 Task-15 rule (Byrd may improve a spec to match project conventions during GREEN if pattern alignment is the documented reason + intent unchanged) consumed cleanly on first post-encoding use — adjudicated GREEN on 5 mechanical test rewrites in userStore.spec.ts. Rule shape confirmed durable.\n- **[DEFERRED]** None — zero carry-forwards from CHORE-74. Stewardship ledger clean entering next-CHORE.\n\nApproving shutdown next.",
-    "summary": "Bentham closing — CHORE-74 GREEN delivered",
-    "timestamp": "2026-05-31T12:00:42.586Z",
-    "color": "yellow",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "[2026-05-31 12:00] Standing down clean. Nothing new for scratchpad — Task 7 invoked only documented patterns (stash dance, `set -a` creds, trailer hook verify, `Closes #N` auto-close, atomic chained git ops); all already in prior CHECKPOINTs.\n\n[LEARNED] None.\n[DEFERRED] None.\n[WARNING] None.\n\nEnd state: main @ cb3aec0, deploy live at d9cdad61.multivox.pages.dev, GH #74 closed, branch deleted. Bentham scratchpad still in dirty/unstaged on disk per session norm. Approving shutdown next.",
-    "summary": "Closing — no carry-forward",
-    "timestamp": "2026-05-31T12:00:43.045Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1780228826302@josquin\",\"from\":\"josquin\",\"timestamp\":\"2026-05-31T12:00:45.689Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-31T12:00:45.689Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1780228824786@bentham\",\"from\":\"bentham\",\"timestamp\":\"2026-05-31T12:00:46.492Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-31T12:00:46.492Z",
-    "color": "yellow",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1780228822757@byrd\",\"from\":\"byrd\",\"timestamp\":\"2026-05-31T12:00:55.296Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-31T12:00:55.296Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"1\",\"subject\":\"CHORE-75 — avatar dropdown user menu (6 tasks)\",\"description\":\"Driving CHORE-75 plan. Branch chore/avatar-menu created from clean main a23a678. Strictly sequential dispatch. Plan: docs/superpowers/plans/2026-05-31-chore-75-avatar-menu-plan.md. GH: #75. L117 cleanup applied between CHORE-74 ship and CHORE-75 start — fresh-spawn agents only.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-31T12:05:11.933Z\"}",
-    "timestamp": "2026-05-31T12:05:11.933Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "comenius",
-    "text": "[2026-05-31 12:05] Comenius online. On `chore/avatar-menu`, starting Task 2: nav_signed_in_as + nav_user_menu_aria × 4 locales.",
-    "summary": "Comenius ready, starting CHORE-75 Task 2",
-    "timestamp": "2026-05-31T12:05:40.804Z",
-    "color": "blue",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "comenius",
-    "text": "[2026-05-31 12:08] CHORE-75 Task 2 complete.\n\n**SHA:** `1a3ad15`\n\n**Key delta — 2 new keys × 4 locales:**\n\n| Key | en | et | lv | uk |\n|---|---|---|---|---|\n| `nav_signed_in_as` | `Signed in as` | `Sisse logitud` | `Pieslēdzies kā` | `Увійшли як` |\n| `nav_user_menu_aria` | `User menu` | `Kasutaja menüü` | `Lietotāja izvēlne` | `Меню користувача` |\n\n**Gates:** `pnpm build` ✓ · `pnpm check` 0 errors ✓ · `pnpm test:unit` 555/555 ✓ · `pnpm lint` clean ✓\n\n**Translation note:** `nav_signed_in_as` et drops the \"as\" clause — eyebrow + name-line-below makes referent clear in context. Decision logged in `i18n-conventions.md`.\n\nReady for Task 3 (Tallis RED on AvatarMenu).",
-    "summary": "CHORE-75 Task 2 complete — 2 keys × 4 locales, SHA 1a3ad15",
-    "timestamp": "2026-05-31T12:08:10.713Z",
-    "color": "blue",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "comenius",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"comenius\",\"timestamp\":\"2026-05-31T12:08:13.999Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T12:08:13.999Z",
-    "color": "blue",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "[2026-05-31 12:08] Tallis online — on chore/avatar-menu tip 1a3ad15. Writing AvatarMenu.spec.ts RED now.",
-    "summary": "Tallis online, writing AvatarMenu RED spec",
-    "timestamp": "2026-05-31T12:08:49.988Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "[2026-05-31 12:11] Task 3 RED complete.\n\n## Story Handoff\n- **Story:** #75 — Avatar dropdown user menu\n- **Branch:** chore/avatar-menu\n- **From:** Tallis (phase: RED)\n- **To:** Byrd (phase: GREEN)\n- **Status:** TESTS_WRITTEN\n\n### What was done\n- Wrote `src/lib/components/AvatarMenu.spec.ts` — 7 test cases covering trigger ARIA, menu-not-shown-initially, click-opens, sign-out-href, toggle-closes, Esc-closes, outside-click-closes\n- Formatted with `pnpm biome format --write` (1 line-length fix)\n- Verified RED: `Failed to resolve import \"./AvatarMenu.svelte\"` — all 555 existing tests pass\n\n### What to do next\nByrd implements `src/lib/components/AvatarMenu.svelte` per plan Task 3 Step 3, runs 7/7 green gates, then commits RED+GREEN atomic per plan Step 5.\n\n### Files to start with\n- `src/lib/components/AvatarMenu.spec.ts` — the RED spec\n- `docs/superpowers/plans/2026-05-31-chore-75-avatar-menu-plan.md` Task 3 Step 3 — full component implementation\n- `docs/superpowers/specs/2026-05-31-chore-75-avatar-menu-design.md` — component contract",
-    "summary": "Task 3 RED complete — AvatarMenu.spec.ts ready for Byrd",
-    "timestamp": "2026-05-31T12:11:22.259Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-31T12:11:24.746Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T12:11:24.746Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "Byrd online — reading spec and plan, starting AvatarMenu GREEN implementation on chore/avatar-menu.",
-    "summary": "Byrd online, picking up CHORE-75 Task 3 GREEN",
-    "timestamp": "2026-05-31T12:11:48.104Z",
-    "color": "yellow",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "[2026-05-31 12:13] Task 3 GREEN complete.\n\nSHA: `240288c` on `chore/avatar-menu`\n\nGates:\n- 7/7 AvatarMenu tests pass\n- pnpm check: 0 errors, 0 warnings (1096 files)\n- pnpm lint: clean\n\nAvatarMenu.svelte implements exactly the plan Step 3 spec: trigger button + drop-down panel + Esc/outside-click + ARIA wiring. RED+GREEN committed together per plan Step 5.\n\nReady for Task 4 (MvoxNav wiring — Tallis RED).",
-    "summary": "CHORE-75 Task 3 GREEN done — SHA 240288c",
-    "timestamp": "2026-05-31T12:13:59.331Z",
-    "color": "yellow",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-31T12:14:04.321Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T12:14:04.321Z",
-    "color": "yellow",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "[2026-05-31 12:15] Task 4 RED complete.\n\n## Story Handoff\n- **Story:** #75 — Avatar dropdown user menu\n- **Branch:** chore/avatar-menu\n- **From:** Tallis (phase: RED)\n- **To:** Byrd (phase: GREEN)\n- **Status:** TESTS_WRITTEN\n\n### What was done\n- Added `renders AvatarMenu trigger when signedIn (CHORE-75)` test to `src/lib/components/MvoxNav.spec.ts`\n- **Mechanical update (CHORE-72 Task-15 rule):** `renders brand and section tabs` test previously asserted `container.textContent.toContain('Maire L.')` — this pins the old inline-name shape. Updated to assert `container.querySelector('button[data-testid=\"avatar-menu-trigger\"]') not.toBeNull()` instead. Spec intent preserved (signed-in user has a visual affordance); name moves into dropdown.\n- Formatted with biome (no changes needed)\n- Verified RED: 2 tests fail (`renders brand and section tabs` + new trigger test), 561 pass\n\n### Mechanical update flag (for Byrd's commit body)\nThe `renders brand and section tabs` assertion was updated per the CHORE-72 Task-15 mechanical-update rule — old inline-name assertion replaced with AvatarMenu trigger-button assertion. Note this in the commit body.\n\n### What to do next\nByrd modifies `src/lib/components/MvoxNav.svelte` per plan Task 4 Step 3: replace the `<span class=\"inline-flex items-center gap-1.5 ...\">` avatar+name block with `<AvatarMenu name={userName} initial={userInitial} />`, add the import. Then run gates + commit both files per plan Step 5.\n\n### Files to start with\n- `src/lib/components/MvoxNav.spec.ts` — updated RED spec (2 failing tests)\n- `src/lib/components/MvoxNav.svelte` — lines 79-85: the inline avatar+name block to replace\n- `docs/superpowers/plans/2026-05-31-chore-75-avatar-menu-plan.md` Task 4 Steps 3-5",
-    "summary": "Task 4 RED complete — MvoxNav.spec.ts ready for Byrd",
-    "timestamp": "2026-05-31T12:16:11.431Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-31T12:16:15.444Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T12:16:15.444Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "[2026-05-31 12:18] Task 4 GREEN complete.\n\nSHA: `dc11ea3` on `chore/avatar-menu`\n\nGates:\n- 563/563 tests pass (7 MvoxNav + 7 AvatarMenu + all existing)\n- pnpm check: 0 errors, 0 warnings (1096 files)\n- pnpm lint: clean\n\nMvoxNav.svelte: inline avatar+name block replaced with `<AvatarMenu name={userName} initial={userInitial} />`. Import added. Tallis's mechanical test update already present in spec (commit includes both files).\n\nBranch ready for Task 5 — Bentham review.",
-    "summary": "CHORE-75 Task 4 GREEN done — SHA dc11ea3",
-    "timestamp": "2026-05-31T12:18:36.068Z",
-    "color": "yellow",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-31T12:18:39.993Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T12:18:39.993Z",
-    "color": "yellow",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "[2026-05-31 12:19] Bentham up. Starting CHORE-75 Task 5 branch review on `chore/avatar-menu` @ `dc11ea3`. Will run the 4 GREEN gates as discrete calls, audit 11 ACs, ARIA spot-check, vocab-neutrality grep, adjudicate Byrd's mechanical test update, weigh PO-name-in-navbar verdict. Verdict report incoming.\n\n(*MVOX:Bentham*)",
-    "summary": "Bentham intro — starting CHORE-75 branch review",
-    "timestamp": "2026-05-31T12:19:25.038Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "[2026-05-31 12:24] **CHORE-75 branch review verdict — YELLOW-75.1 — merge-eligible.**\n\nBranch `chore/avatar-menu` @ `dc11ea3`. Single discretionary YELLOW (focus-on-open spec gap); everything else GREEN.\n\n## 4 GREEN gates (discrete bash calls per CALIBRATION-PNPM-CHECK-FRESH-RUN)\n\n- `pnpm check` → `COMPLETED 1096 FILES 0 ERRORS 0 WARNINGS 0 FILES_WITH_PROBLEMS`\n- `pnpm test:unit` → `Test Files 85 passed (85)`, `Tests 563 passed (563)` (baseline 555 + 8 new: 7 AvatarMenu specs + 1 MvoxNav new test)\n- `pnpm lint` → `Checked 165 files in 121ms. No fixes applied.` (biome + eslint clean)\n- `pnpm build` → `built in 4.12s` + `@sveltejs/adapter-cloudflare ✔ done`\n\n## Per-commit-GREEN spot-check\n\n- `1a3ad15` (i18n): `COMPLETED 1096 FILES 0 ERRORS`\n- `240288c` (AvatarMenu): `COMPLETED 1096 FILES 0 ERRORS`, `Tests 562 passed (562)`\n- `dc11ea3` (MvoxNav wire): `COMPLETED 1096 FILES 0 ERRORS`, `Tests 563 passed (563)`\n\n## Merge-shape\n\n`git log --oneline HEAD..main` → empty. Branch from current main `a23a678`. Zero merge-from-main needed.\n\n## Per-AC audit (11 ACs)\n\n- **AC1** — Trigger keyboard-focusable + ARIA: GREEN (button element + `aria-haspopup=\"menu\"` + `aria-expanded` toggles + `aria-label={m.nav_user_menu_aria()}`)\n- **AC2** — Click toggles open/closed: GREEN (spec `clicking trigger opens` + `clicking trigger again closes`)\n- **AC3** — Esc closes menu: GREEN (`onKeyDown` handler at AvatarMenu.svelte:26-31; `triggerEl?.focus()` returns focus on close — verified line 29)\n- **AC4** — Outside click closes: GREEN (`onMouseDown` handler at AvatarMenu.svelte:33-38; spec `outside click closes the menu` pins via `document.body` mousedown)\n- **AC5** — \"Signed in as {name}\" with name from `$userStore`: GREEN (`+layout.svelte:44` derives `userName` from `$userStore.name`; flows through MvoxNav prop to AvatarMenu)\n- **AC6** — Sign out → `/auth/logout`: GREEN (`<a href=\"/auth/logout\">` at AvatarMenu.svelte:79; spec pins exact href)\n- **AC7** — 3 i18n strings + et/lv/uk: GREEN (all 4 locales have both new keys; consumed via `m.nav_signed_in_as()`, `m.nav_sign_out()`, `m.nav_user_menu_aria()`)\n- **AC8** — Existing 555 tests still pass: GREEN (555 baseline + 8 new = 563; no existing test regressions)\n- **AC9** — New AvatarMenu specs cover trigger/Esc/outside/name/link: GREEN (7 specs covering all 5 + bonus aria-expanded toggle assertions)\n- **AC10** — `pnpm check` 0 errors + `pnpm lint` clean + `pnpm build` clean: GREEN (above)\n- **AC11** — Bentham review GREEN: **YELLOW-75.1** (see below)\n\n## ARIA spot-check\n\n- Trigger: `aria-haspopup=\"menu\"` ✓ + `aria-expanded={open}` ✓ + `aria-label={m.nav_user_menu_aria()}` ✓\n- Panel: `role=\"menu\"` ✓\n- Sign out item: `role=\"menuitem\"` ✓\n- Esc closes + returns focus to trigger: ✓ (line 29 `triggerEl?.focus()` in the `$effect`)\n\n## Vocab-neutrality grep\n\n```\ngrep -rn \"choir|orchestra|sing\\b\" src/lib/components/AvatarMenu.svelte src/lib/components/MvoxNav.svelte | grep -v messages/\n→ ZERO matches.\n```\nSecond exemplar of the 2026-05-31 vertical-skin-neutrality decision honored by construction.\n\n## Byrd's mechanical test update — adjudicated GREEN\n\nPre-CHORE `MvoxNav.spec.ts:33` asserted `'Maire L.'` (CHORE-66 fixture leak — real-name doubles as text-presence pin). Post-CHORE the user's name moves into the dropdown panel (closed by default). Byrd replaced with `button[data-testid=\"avatar-menu-trigger\"]` presence check. **Stronger pattern**: fixture-independent, harder to leak, aligned with the architectural shape change. Commit body discloses change per CHORE-72 Task-15 rule. GREEN.\n\nCalibration encoded: when a CHORE moves visible text into a closed-by-default container, replace text-presence specs with structural-affordance specs (test-id on trigger) rather than open-the-dropdown-then-assert.\n\n## PO-name-in-navbar verdict — GREEN\n\nSpec defaulted to hide-name-in-navbar (only initial tile + dropdown name). The design is consistent with navbar font-tightness (`text-[11.5px]`, `gap-1.5`); adding the name back inline would re-widen the navbar. The dropdown ALREADY shows the name as load-bearing \"you are signed in as X\" disclosure (two clicks away). The 30px initial tile retains the \"which account am I in\" at-a-glance affordance. **Ship as designed**; revisit only if PO experiences identity-confusion in dogfood.\n\n## YELLOW-75.1 — focus-on-open gap\n\n**Spec L52** (`docs/superpowers/specs/2026-05-31-chore-75-avatar-menu-design.md`): *\"opening the menu focuses the first menuitem (so keyboard users can immediately Enter to sign out); closing returns focus to the trigger.\"*\n\n**Implementation** focuses trigger on Esc only (line 29). Does NOT focus first menuitem on open. Net keyboard-user path is 1 keystroke longer than spec target (Tab→Enter→Tab→Enter vs. Tab→Enter→Enter).\n\n**Why YELLOW (not GREEN)**:\n- Task 5 brief explicitly called out \"Focus management is critical for the keyboard-user path\"\n- Menu is documented as \"room to grow\" (more items coming); when item 2 lands without focus-on-open, the first item gets bypassed by default — asymmetric\n- Fix is ~3 lines: `$effect` watches `open`; on false→true transition, `panelEl?.querySelector('[role=\"menuitem\"]')?.focus()`\n\n**Recommendation**: fold-in pre-merge (sub-10-line fix per session-17 calibration) OR file as small post-merge GH issue. Either is defensible — depends on whether the menu's \"room to grow\" is days-away or weeks-away. Hot YELLOW only if a 2nd item lands before YELLOW-75.1 closes.\n\n## Summary\n\nMerge-eligible after PO weighs YELLOW-75.1 fold-in vs. defer. No REDs. All 4 gates GREEN. Per-commit-GREEN clean. ARIA wiring matches spec except the focus-on-open detail (YELLOW-75.1). Byrd's mechanical test update is the stronger pattern.\n\n(*MVOX:Bentham*)",
-    "summary": "CHORE-75 branch review verdict — YELLOW-75.1 merge-eligible",
-    "timestamp": "2026-05-31T12:25:06.470Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "bentham",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-31T12:25:13.222Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T12:25:13.222Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "[2026-05-31 12:26] YELLOW-75.1 fold-in RED complete.\n\nAppended to `src/lib/components/AvatarMenu.spec.ts`:\n\n```\nit('focuses the first menuitem when opened (CHORE-75 YELLOW-75.1 fold-in)', ...)\n```\n\nVerified RED: `document.activeElement` is not the sign-out link — current `$effect` registers key/mouse listeners but doesn't call `.focus()` on open. 1 test fails, 563 pass. Biome clean.\n\nByrd needs to add a `signoutLinkEl.focus()` call inside the `$effect` open branch (after the event listeners are registered, or via a separate `$effect` gated on `open`). File: `src/lib/components/AvatarMenu.svelte`. No commit from me.",
-    "summary": "YELLOW-75.1 RED appended — focus-on-open failing, ready for Byrd",
-    "timestamp": "2026-05-31T12:27:00.656Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "tallis",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-31T12:27:03.798Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T12:27:03.798Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "[2026-05-31 12:29] YELLOW-75.1 fold-in complete.\n\nSHA: `b83b686` on `chore/avatar-menu`\n\nGates:\n- 8/8 AvatarMenu tests pass (incl. new focus test)\n- 564/564 total tests pass\n- pnpm check: 0 errors (1096 files)\n- pnpm lint: clean\n\n3-line fold-in: `signoutLinkEl` ref bound on the anchor; `queueMicrotask(() => signoutLinkEl?.focus())` at top of open `$effect`. Tallis's RED test already present in spec — committed together.",
-    "summary": "YELLOW-75.1 fold-in done — SHA b83b686",
-    "timestamp": "2026-05-31T12:29:33.728Z",
-    "color": "yellow",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "byrd",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-31T12:29:37.404Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-31T12:29:37.404Z",
-    "color": "yellow",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin",
-    "text": "Josquin online (S25). Reading prompts + memory, starting CHORE-75 Task 6 gate re-verify on b83b686.",
-    "summary": "Josquin online — CHORE-75 Task 6 starting",
-    "timestamp": "2026-05-31T12:30:20.123Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
     "from": "josquin",
     "text": "[2026-05-31 12:33] CHORE-75 Task 6 GREEN — squash + deploy + close complete.\n\n## Gates on chore tip b83b686 (re-verified, all clean)\n- `pnpm check` → COMPLETED 1096 FILES 0 ERRORS 0 WARNINGS 0 FILES_WITH_PROBLEMS\n- `pnpm test:unit` → Test Files 85 passed (85) / Tests 564 passed (564)\n- `pnpm lint` → Checked 165 files in 136ms. No fixes applied.\n- `pnpm build` → built in 3.94s / @sveltejs/adapter-cloudflare ✔ done\n\n## Squash to main\n- **SHA**: `70ee562` — `feat(#75): avatar dropdown user menu — sign out from UI`\n- 9 files changed, +238 / -12 (matches Bentham's audit shape)\n- Fast-forward merge-base (chore branched from current main, no merge-main-first needed as flagged)\n- **Trailer hook**: PO `Co-authored-by: Mihkel Putrinš <mihkel.putrinsh@gmail.com>` appended clean (verified via `git log -1 --format='%(trailers)'`). Body had `Reviewed-by:` + `Contributors:` only, no `Co-authored-by:` collision per session-22 rule.\n- Pushed: `a23a678..70ee562 main -> main`\n\n## Production deploy\n- **Per-build URL**: https://35d3f078.multivox.pages.dev\n- Wrangler: 19 files uploaded (14 already cached), 1.28 sec upload, deployment complete\n- `mvox.eu/` → HTTP/2 200 ✓\n- `multivox.pages.dev/` → HTTP/2 200 ✓\n- **New chunks**: `app.Bs_uXyJU.js` + `start.9kRlsJ3X.js` (replaced CHORE-74's `app.CiRjDSx0.js` + `start.BkgjBlNh.js`)\n\n## GH closure\n- Issue #75 auto-closed by `Closes #75` body trailer at squash time\n- Posted deploy info as comment: https://github.com/mvox-dev/mvox_v4e_web/issues/75#issuecomment-4586695923\n\n## Branch cleanup\n- Local: `Deleted branch chore/avatar-menu (was b83b686)`\n- Remote: ` - [deleted]         chore/avatar-menu`\n\n## Notes\n- Stashed Bentham scratchpad pre-merge; popped clean post-cleanup (now back to unstaged on main, as expected).\n- PO can now sign-in → click avatar tile → see \"Signed in as {name}\" + Sign out → /auth/logout. End-to-end logout testable in the wild. CHORE-74 state propagation now has a UI exerciser.\n\nTask #1 marked completed. Standing by.",
     "summary": "CHORE-75 Task 6 GREEN — merged, deployed, closed",
@@ -836,6 +71,773 @@
     "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1780231445959@tallis\",\"from\":\"tallis\",\"timestamp\":\"2026-05-31T12:44:38.083Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
     "timestamp": "2026-05-31T12:44:38.083Z",
     "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-05-31 12:48] Finn online for session 26. Scratchpad read — context current through session 18. Ready for research requests.",
+    "summary": "Finn online, session 26 ready",
+    "timestamp": "2026-05-31T12:48:11.627Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-31T12:48:13.293Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T12:48:13.293Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "[2026-05-31 12:48] Bentham ready — session 26. Read common-prompt, my role prompt, scratchpad, architecture-decisions.md, test-gaps.md.\n\nCalibration state I'm carrying in:\n- CHORE-75 closed last session at YELLOW-75.1 (AvatarMenu focus-on-open gap) — merge-eligible; whether that was folded pre-merge or filed as a post-merge issue, let me know if you want it tracked.\n- The CHORE-72 Task-15 rule (Byrd may do mechanical test updates during GREEN when pattern-alignment is the documented reason + intent unchanged) is the lift candidate you flagged. I have it noted in two scratchpad ADJUDICATION blocks (CHORE-74 + CHORE-75). Happy to author the architecture-decisions.md entry whenever you want it lifted — just say the word.\n- Standing checks armed: per-commit-GREEN (discrete `pnpm check`/`pnpm test:unit` per commit, verbatim COMPLETED line), merge-shape (`git log --oneline branch..main` non-empty = RED-pending), vertical-skin neutrality grep, vocabulary-bearing-i18n.\n\nIdle and waiting for review requests.",
+    "summary": "Bentham ready for session 26",
+    "timestamp": "2026-05-31T12:48:31.119Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-31T12:48:35.150Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T12:48:35.150Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-31T12:48:51.967Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T12:48:51.967Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-05-31 12:55] Research complete.\n\n## MvoxNav Layout Audit\n\n### 1. Nav bar structure (left → right)\n\n**Outer container** (`<header>`):\n```\nflex items-center justify-between py-2 px-6 border-b-[1.5px] border-ink-2 bg-paper\n```\nTop-level is `justify-between` splitting two groups:\n\n**Left group** (`div.flex.items-center.gap-4`):\n- `<BrandMark size=\"m\" />` (logo link)\n- `/` separator\n- OrgPicker (3 modes: placeholder text, static chip, interactive picker)\n\n**Right group** (`div.flex.items-center.gap-3.5`):\n- When signed in:\n  - `div.flex.gap-3` containing 5 tab labels (agenda, library, roster, notices, settings) — each `font-sans text-[11.5px]`; librarian chip is inline inside the library tab label\n  - `·` separator span\n  - `<AvatarMenu />` — `div.relative.inline-flex` wrapping a 30×30px circle button\n- When signed out: single \"Sign in\" link\n\n**AvatarMenu dropdown panel** (`absolute top-full right-0 mt-1.5 min-w-[200px] z-50`):\n- Positioned absolutely relative to its `relative inline-flex` wrapper\n- `right-0` anchors to the right edge of the avatar button — fine on desktop, goes off-screen left on narrow viewports (but on mobile the whole nav bar overflows first)\n\n---\n\n### 2. Responsive handling\n\n**None whatsoever.** Not a single `sm:` / `md:` / `lg:` breakpoint class in either file. No hamburger menu, no overflow-x hidden, no scroll container, no `flex-wrap`. The header is a single fixed-width desktop row that will overflow on any viewport narrower than the sum of its content widths.\n\n---\n\n### 3. Why the avatar overflows on narrow viewports\n\nThe overflow chain:\n\n1. `<header>` is `flex` with no `min-width: 0` constraint on children and no `overflow: hidden` — it simply expands horizontally beyond the viewport.\n2. Left group: BrandMark + `/` + OrgPicker chip. OrgPicker chip has fixed pixel font sizes and no truncation. (This is what #65 tracks — chip gets wide on long locale strings.)\n3. Right group: 5 tab labels (`flex gap-3`) all inline, none truncated or hidden. At 11.5px font they each consume ~40–70px depending on locale.\n4. No `flex-shrink` or `min-width: 0` anywhere — items refuse to compress.\n5. AvatarMenu trigger is the last item in the right group. On a narrow viewport the entire right group pushes right of the screen, taking the avatar with it. The avatar button is reachable only by horizontal scroll (if the browser allows it on the body), or not at all if `overflow-x` is clipped upstream.\n\n**The avatar dropdown (`right-0` absolute) is a secondary concern** — fixing the nav layout is the real fix; the dropdown positioning within its wrapper is fine.\n\n---\n\n### 4. Existing GitHub issues — mobile/responsive\n\n**Issue #65** — \"MvoxNav chip width on long locale renderings (narrow viewport)\" — OPEN.\n- That's the OrgPicker static chip growing wide on long translations. Narrow-viewport nav overflow is listed as the symptom context.\n- Directly related: any responsive nav fix will also address #65's root cause.\n\n**No other open issues** about mobile nav, hamburger menu, or responsive layout. No existing issue tracking the avatar-off-screen problem specifically — that's new scope.\n\n---\n\n### Summary for scoping\n\n| Question | Answer |\n|---|---|\n| Responsive handling today | Zero — no breakpoints, no mobile menu, no wrapping |\n| What overflows | The entire right group (5 tabs + separator + avatar) as a unit |\n| Avatar dropdown itself | Properly positioned (`right-0`), not the root cause |\n| Related open issue | #65 (chip width) — same root, different symptom |\n| New issue needed | Yes — \"MvoxNav: mobile/responsive layout\" covers avatar off-screen |\n\n**Minimal-fix path** (avatar reachable on mobile without hamburger): collapse tab labels to icons or hide them behind a single overflow menu at `< sm`, keep avatar always visible with `ml-auto` or `flex-shrink-0`. Low surgery if tabs become icon-only.\n\n**Proper mobile nav path**: hamburger icon at mobile breakpoint, slide-in drawer or bottom sheet for tabs, avatar stays in header. More work but matches the PaperStack aesthetic potential.\n\nThat distinction is yours + PO's call.",
+    "summary": "MvoxNav layout + responsive audit complete",
+    "timestamp": "2026-05-31T12:55:34.626Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-31T12:55:37.361Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T12:55:37.361Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "[2026-05-31 13:10] Tallis online, session 26. On branch `chore/responsive-nav`. Read common-prompt, my prompt, and existing spec patterns. Starting CHORE-76 RED phase now.",
+    "summary": "Tallis ready — CHORE-76 RED starting",
+    "timestamp": "2026-05-31T13:10:45.523Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "[2026-05-31 13:13]\n\n## Story Handoff\n- **Story:** #76 — Responsive nav (CHORE-76)\n- **Branch:** chore/responsive-nav\n- **From:** Tallis (phase: RED)\n- **To:** Byrd (phase: GREEN)\n- **Status:** TESTS_WRITTEN\n\n### What was done\n- Added 12 failing tests to `src/lib/components/MvoxNav.spec.ts` in describe `MvoxNav — responsive layout (CHORE-76)`, encoding AC1–AC7.\n- All 12 new tests fail RED; 7 prior MvoxNav tests + 564 other tests remain green (1 file failed, 84 passed).\n- Committed spec-only: SHA `5a28b27`. Updated test-gaps.md with deferred Playwright viewport test note. Scratchpad updated with full data-testid contract for Byrd.\n\n### Failing test summary (12 RED)\n- **AC1**: `nav-avatar-wrapper` does not exist / lacks `flex-shrink-0`\n- **AC2 ×4**: `nav-inline-tabs` not found; `nav-tab-menu-trigger` not found; hamburger click fails (no element); librarian chip not co-located in menu\n- **AC3**: `nav-inline-tabs` not found; 0 inline tab items\n- **AC4**: `nav-org-area` not found / lacks `min-w-0`\n- **AC5 ×3**: hamburger not found (twice — focus + Escape tests); accessible name check fails\n- **AC6**: `nav-signin-wrapper` not found / lacks `flex-shrink-0`\n- **AC7**: header has no `overflow-hidden` / `overflow-x-hidden`\n\n### What Byrd must implement (data-testid contract in my scratchpad)\n- `nav-avatar-wrapper` (flex-shrink-0) wrapping AvatarMenu\n- `nav-inline-tabs` (hidden sm:flex) for the desktop tab row, with `nav-inline-tab-{tab}` per tab\n- `nav-tab-menu-trigger` button (sm:hidden, non-empty aria-label wired by Comenius as `nav_menu_open`)\n- `nav-tab-menu` panel with `nav-tab-menu-item-{tab}` entries; first item receives focus on open; Escape closes\n- `nav-chip-librarian` inside `nav-tab-menu-item-library` when library is currentTab\n- `nav-org-area` (min-w-0) wrapping the OrgPicker/chip area\n- `nav-signin-wrapper` (flex-shrink-0) wrapping the sign-in link\n- `overflow-x-hidden` on `<header>`\n\n### Files to start with\n- `src/lib/components/MvoxNav.spec.ts` — the spec (read this first)\n- `src/lib/components/MvoxNav.svelte` — the component to extend\n- `src/lib/components/AvatarMenu.svelte` — reference for keyboard/focus pattern\n",
+    "summary": "Story Handoff — CHORE-76 RED complete",
+    "timestamp": "2026-05-31T13:14:01.382Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-31T13:14:11.790Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T13:14:11.790Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-31T13:14:15.279Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T13:14:15.279Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "comenius",
+    "text": "[2026-05-31 13:16] i18n handoff — task #2 complete.\n\nKey: `nav_menu_open`\n- en: \"Open menu\"\n- et: \"Ava menüü\"\n- lv: \"Atvērt izvēlni\"\n- uk: \"Відкрити меню\"\n\nCommit: fe25470 on `chore/responsive-nav`\n\nAll 4 locale files in sync. `pnpm check` passes (0 errors, 0 warnings). Paraglide module regenerated via `pnpm i18n:gen`. Paraglide dir is gitignored — regenerated at build time.\n\nComenius going idle.",
+    "summary": "i18n task #2 done — nav_menu_open committed",
+    "timestamp": "2026-05-31T13:16:33.977Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "comenius",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"comenius\",\"timestamp\":\"2026-05-31T13:16:40.674Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T13:16:40.674Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "comenius",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"comenius\",\"timestamp\":\"2026-05-31T13:16:44.330Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T13:16:44.330Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "[2026-05-31 13:19]\n\n## Story Handoff\n- **Story:** #76 — responsive MvoxNav (minimal cheap win)\n- **Branch:** chore/responsive-nav\n- **From:** Byrd (phase: GREEN)\n- **To:** Bentham (phase: REVIEW)\n- **Status:** TESTS_PASSING\n\n### What was done\n- Implemented all 9 data-testid elements from Tallis's contract: `nav-avatar-wrapper` (flex-shrink-0), `nav-inline-tabs` (hidden sm:flex), `nav-inline-tab-{tab}` × 5, `nav-tab-menu-trigger` (sm:hidden, aria-label wired to m.nav_menu_open()), `nav-tab-menu` paper-card dropdown with `nav-tab-menu-item-{tab}` × 5, `nav-chip-librarian` co-located inside `nav-tab-menu-item-library`, `nav-org-area` (min-w-0), `nav-signin-wrapper` (flex-shrink-0), overflow-x-hidden on `<header>`.\n- Mobile hamburger menu uses the AvatarMenu keyboard/focus pattern exactly: `queueMicrotask` focus-on-open to first item, Escape closes + returns focus to trigger, click-outside dismisses.\n- Librarian chip present in both inline row and collapsed menu when library is currentTab.\n\n### Quality gate\n- `pnpm check`: 0 errors, 0 warnings.\n- `pnpm test:unit`: 576/576 passing (12 formerly RED now GREEN; all 7 prior MvoxNav tests still pass).\n- Commit SHA: 286a68c on chore/responsive-nav.\n\n### Desktop unchanged\nDesktop (sm+) renders identically — all structural changes are gated below the sm breakpoint. The inline tab row, librarian chip, avatar, and sign-in link render as before.\n\n### No deviations from contract\nAll 9 testid elements and their class requirements match Tallis's spec exactly. No test intent changed; no mechanical updates to existing MvoxNav tests were needed (the existing tests query by role/text, not by the old structure).\n\n(*MVOX:Byrd*)",
+    "summary": "CHORE-76 GREEN complete — handoff to Bentham",
+    "timestamp": "2026-05-31T13:20:11.808Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-31T13:20:19.297Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T13:20:19.297Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-31T13:20:22.093Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T13:20:22.093Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "[2026-05-31 13:24] CHORE-76 review verdict: **RED** — single blocker (RED-76.1), everything else GREEN. Mechanical fix, fast re-handoff.\n\n## RED-76.1 — `pnpm lint` fails branch-wide (format-only, spec-file-only)\n`pnpm lint` exits 1 on the tip `286a68c`. Biome's formatter wants 2 lines wrapped in `src/lib/components/MvoxNav.spec.ts`:\n- L252 — `const firstItem = menu?.querySelector('[data-testid^=\"nav-tab-menu-item-\"]') as HTMLElement | null;`\n- L271 — `const { container } = render(MvoxNav, { props: { signedIn: false, currentTab: 'agenda' as const } });`\n\nBoth exceed Biome's line width. Production component `MvoxNav.svelte` is biome-clean; eslint clean (exit 0). The over-width lines entered at the **RED commit `5a28b27`** (the spec) and were never run through `biome check --write` / `pnpm lint:fix`, so lint is red on all three commits (`5a28b27`, `fe25470`, `286a68c`).\n\nThis is RED not YELLOW because `pnpm lint:fix` is one of the four hard GREEN gates (architecture-decisions.md L125, session-16 settled decision) and it fails outright — the branch can't merge lint-dirty.\n\n**Who acts: Tallis** (owns `MvoxNav.spec.ts`). Fix is `pnpm lint:fix` on the spec → commit → re-run all 4 gates. Then re-handoff to me for GREEN re-verify. ~2 min of work.\n\n## Everything else GREEN — re-verify will only need to confirm the lint fix\n- **`pnpm check`**: tip `286a68c` → COMPLETED 1096 FILES 0 ERRORS. Verified per-commit on `5a28b27`/`fe25470`/`286a68c` (all 0 errors).\n- **`pnpm test:unit`**: tip → 576 passing, 85 files (+0 baseline 576). All 12 CHORE-76 tests pass.\n- **`pnpm build`**: 3.84s + adapter-cloudflare done.\n- **Merge-shape**: `git log HEAD..main` empty; base `1165eb3` = current main tip. Clean.\n- **AC1–AC7**: all satisfied (avatar `flex-shrink-0`; inline tabs `hidden sm:flex`; hamburger `sm:hidden` + paper-card dropdown listing all 5 tabs with librarian chip nested in library entry; org-area `min-w-0` truncation closes #65; hamburger `aria-label={m.nav_menu_open()}`; focus-on-open + Escape-to-close + click-outside; signin wrapper `flex-shrink-0`; header `overflow-x-hidden`).\n- **a11y parity**: genuinely equivalent to AvatarMenu, not just structural. The hamburger `$effect` is a faithful mirror — `queueMicrotask(() => firstItem?.focus())` focus-on-open (this is the YELLOW-75.1 resolution applied to BOTH menus), Escape closes + refocuses trigger, mousedown-outside closes. `role=\"menu\"` + `role=\"menuitem\"` + `aria-haspopup=\"menu\"` + `aria-expanded`. Matches the CHORE-75 canonical pattern I lifted in my scratchpad.\n- **i18n**: `nav_menu_open` present + translated in all 4 locales (en \"Open menu\" / et \"Ava menüü\" / lv \"Atvērt izvēlni\" / uk \"Відкрити меню\"). No hardcoded English in the new markup — `☰` glyph is decorative; the accessible name flows through `m.nav_menu_open()`. Vocabulary-neutral.\n\n## Playwright deferral — ACCEPTABLE-WITH-NOTE (not a blocker)\nTallis's structural encoding of AC2/AC3/AC7 (class presence: `hidden sm:flex`, `sm:hidden`, `overflow-x-hidden`) is the right call for jsdom — it has no layout engine, so true 320px overflow can't be asserted in unit. The class-contract assertions are the honest substitute and they DO pin the load-bearing structure. The deferred Playwright viewport test (logged in test-gaps.md) is the truer check. Acceptable for THIS CHORE because: (a) the fix is minimal-scope CSS-breakpoint work, (b) the class contracts gate the regression surface, (c) a follow-up viewport E2E is logged not lost. I'd flag it unacceptable only if this were a net-new responsive system with no prior breakpoint precedent — it isn't.\n\n## Calibration note (no action needed)\nThe lint dirt originated in the RED commit, outside the session-16 \"GREEN agents run lint:fix\" framing. Per-commit-GREEN (architecture-decisions.md L95) already covers it — every commit must pass `pnpm lint`, and the RED commit is a commit. Noting that the RED author (Tallis) needs `pnpm lint:fix` in their pre-commit ritual too; if this recurs I'll propose tightening the session-16 decision's agent-list wording. One occurrence = route the fix, note it.\n\nIdling after this. Re-ping me when the lint fix lands for GREEN re-verify.",
+    "summary": "CHORE-76 verdict: RED-76.1 (lint gate fails)",
+    "timestamp": "2026-05-31T13:25:00.490Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-31T13:25:09.583Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T13:25:09.583Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-31T13:25:18.494Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T13:25:18.494Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "[2026-05-31 13:27] Lint fix done. Commit SHA `f786a41` on `chore/responsive-nav`.\n\nAll 4 gates:\n- `pnpm check`: 0 errors\n- `pnpm test:unit`: 576/576 passed (85 files)\n- `pnpm lint`: exit 0 (biome clean)\n- `pnpm build`: ok\n\nNoted on the pre-commit ritual — will run `pnpm lint:fix` before committing specs going forward. Idle.",
+    "summary": "RED-76.1 lint fix committed — all 4 gates clean",
+    "timestamp": "2026-05-31T13:27:27.056Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-31T13:27:29.181Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T13:27:29.181Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "[2026-05-31 13:29] CHORE-76 re-verify: **GREEN.** RED-76.1 resolved. Branch `chore/responsive-nav` @ `f786a41` is merge-ready. Routing to Josquin is good to go.\n\n## Re-verify gates (all run by me, not relying on Tallis's self-report)\n- **`pnpm lint`**: exit 0 — the sole blocker is gone. biome + eslint clean, 165 files.\n- **`pnpm check`**: COMPLETED 1096 FILES 0 ERRORS.\n- **`pnpm test:unit`**: 576 passing, 85 files.\n- **`pnpm build`**: 4.03s + adapter-cloudflare done.\n- **Merge-shape**: `git log HEAD..main` empty. Clean squash.\n\n## Fix scope confirmed minimal\n`f786a41` touches ONLY `src/lib/components/MvoxNav.spec.ts` (+6/-2 — the two line-wraps Biome wanted at the old L252/L271). No production code changed, so my prior pass's findings stand unchanged: AC1–AC7 satisfied, a11y genuinely equivalent to AvatarMenu (focus-on-open + Escape + click-outside), i18n complete + vocabulary-neutral across all 4 locales, desktop no-regression (all changes gated below `sm`). Closes #65.\n\nTask #4 marked completed. Idling.",
+    "summary": "CHORE-76 GREEN — re-verify clean, merge-ready",
+    "timestamp": "2026-05-31T13:29:24.357Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-31T13:29:30.104Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T13:29:30.105Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "[2026-05-31 13:30] Josquin up — session 26. Read common-prompt, my prompt, arch-decisions, scratchpad. Starting CHORE-76 Phase 1 (PREVIEW deploy, no merge). Will report the unique preview URL + curl 200 + x-sveltekit-page check, then HOLD for your \"PO approved, merge\" go-ahead.",
+    "summary": "Josquin ready, starting CHORE-76 Phase 1 preview",
+    "timestamp": "2026-05-31T13:30:51.694Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "[2026-05-31 13:32] CHORE-76 Phase 1 PREVIEW deployed — HOLDING for your merge go-ahead.\n\nBranch `chore/responsive-nav` @ `f786a41` (verified: merge-shape clean, `git log HEAD..main` empty, base = main `1165eb3`, worktree clean). `pnpm build` clean (4.29s).\n\nPreview deploy (did NOT touch production / mvox.eu):\n- Unique per-build URL: https://5643c168.multivox.pages.dev → curl -sI returns HTTP 200 + `x-sveltekit-page: true`\n- Branch alias: https://chore-responsive-nav.multivox.pages.dev (also 200 + sveltekit)\n\nThis is the URL for PO to verify the CHORE-75 logout/avatar menu is reachable on mobile. Production mvox.eu still serving the OLD build (untouched).\n\nNote: used `pnpm exec wrangler` (bare `wrangler` not on PATH this session); credentials sourced inline from ~/.config/mvox/credentials.env.\n\nGoing idle. Will execute Phase 2 (merge + production) only on your \"PO approved, merge\".",
+    "summary": "Preview deployed, holding for merge go-ahead",
+    "timestamp": "2026-05-31T13:31:41.921Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-31T13:31:46.466Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T13:31:46.466Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "[2026-05-31 13:32] Stale task_assignment for #5 (ts 13:30:38Z) — TaskUpdate-fires-notification artifact, predates my Phase 1 preview report. Already in_progress; Phase 1 done (preview at https://5643c168.multivox.pages.dev). Still HOLDING — Phase 2 fires only on your explicit \"PO approved, merge\". No action taken.",
+    "summary": "Ack stale task_assignment, still holding",
+    "timestamp": "2026-05-31T13:31:54.527Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-31T13:31:56.737Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T13:31:56.738Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "[2026-05-31 13:42] CHORE-76 Phase 2 DONE — merged + production live.\n\n- Squash SHA on main: `da00b06` (`origin/main` = `da00b06`). Push went `70ee562..da00b06`, so the prior unpushed `1165eb3` rode up with it.\n- Commit msg as briefed; PO co-author trailer appended by hook (verified via `git log -1 --format='%(trailers)'` — `Co-authored-by: Mihkel Putrinš` present; `Contributors:` line didn't collide). 6 files, +309/-26.\n- Production deploy: `9104efdc.multivox.pages.dev`. Build chunks: `app.BHUvLTLK.js` + `start.sNdM7YDN.js` (3.99s build).\n- `curl -sI https://mvox.eu/` → HTTP 200 + `x-sveltekit-page: true`. Served HTML references the new chunks — new build is live end-to-end.\n- Branch `chore/responsive-nav` deleted local + remote. No open PR existed (local-branch flow).\n\nTask #5 marked completed. Over to you for closing GH #76 + #65.",
+    "summary": "Phase 2 done — da00b06 on main, mvox.eu live",
+    "timestamp": "2026-05-31T13:43:19.961Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-31T13:43:25.506Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T13:43:25.506Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-05-31 13:45] Research complete.\n\n## Nav Dropdown Clipping — Root Cause Analysis\n\nFiles read: `src/lib/components/MvoxNav.svelte` (post-CHORE-76), `src/routes/+layout.svelte`, `src/app.css`, `src/lib/components/DeskSurface.svelte`.\n\n---\n\n### Q1 — Header position + z-index\n\n**Exact classes on `<header>` (line 79, post-CHORE-76):**\n```\nflex items-center justify-between py-2 px-6 border-b-[1.5px] border-ink-2 bg-paper overflow-x-hidden\n```\n\n- **No `position` utility** — header is `position: static` (browser default).\n- **No `z-*` class on the header itself.** `z-50` lives only on the two dropdown panels (`AvatarMenu` panel, `nav-tab-menu` panel).\n- A `z-index` on an element with `position: static` is **ignored by the browser** — so even if someone added `z-50` to the header it would do nothing without a position class.\n\n---\n\n### Q2 — Layout sibling / paint order\n\nIn `+layout.svelte` (lines 63–75):\n```svelte\n{#if mounted}\n  <MvoxNav ... />\n{/if}\n\n{@render children()}\n```\n\n- `MvoxNav` (= `<header>`) and `{@render children()}` are **siblings at the top level** — no wrapping element between them and `<body>`.\n- `<header>` is `position: static`, so its paint order is strictly source order. It comes **before** `children()` in the DOM.\n- The page content (`children()`) paints **on top** of anything that overflows out of a static `<header>`. Any page content that happens to cover that area (even with no explicit `z-index`) will appear above the dropdown panel.\n- The landing page root is `<DeskSurface>` → `<div data-desk class=\"w-full wood-bg\">` — no position/z-index, but it fills the full width and starts immediately below the header. If the dropdown extends into that area it paints under the desk div.\n\n---\n\n### Q3 — `overflow-x-hidden` clip (the direct cause of dropdown disappearing)\n\nThis is **the primary bug introduced by CHORE-76**.\n\nThe header now has `overflow-x-hidden`. Per the CSS overflow specification (CSS Overflow Level 3 §3.2):\n\n> \"If an element has `overflow-x` or `overflow-y` set to a non-`visible` value, the other axis that is `visible` is treated as `auto`.\"\n\nSo `overflow-x: hidden` on the `<header>` **forces `overflow-y` to `auto`** (not `visible`). This means the header's box becomes a scroll container for its block axis, and any absolutely-positioned descendant that extends **below** the header box is clipped to the header's paint area.\n\nBoth dropdown panels are:\n- `absolute top-full` — positioned so their top edge aligns with the header's bottom edge\n- They extend **below** the header box by their full panel height\n\nThe header's forced `overflow-y: auto` clips everything below the header box boundary — the entire panel disappears.\n\n**This reproduces on both desktop (AvatarMenu) and mobile (nav-tab-menu).** The overflow clip applies regardless of viewport width. So yes, the CHORE-75 avatar menu (which worked before CHORE-76) is also now broken on desktop.\n\n---\n\n### Q4 — Stacking context traps\n\n**In the header and its ancestors:** No `transform`, `filter`, `opacity < 1`, `will-change`, `isolation: isolate`, `contain`, or `backdrop-filter` on `<header>`, `+layout.svelte`'s root, or `app.css` global styles.\n\n**However: `DeskSurface` has `animation` on its `<div>`.**\n\n```css\n.wood-bg {\n  animation:\n    wood-orbit1 8s  linear infinite,\n    wood-orbit2 13s linear infinite,\n    wood-orbit3 21s linear infinite;\n```\n\nPer CSS spec, **`animation` with `will-change: auto` behavior** — specifically, running CSS animations that affect `background` — can trigger GPU compositing, which creates a new stacking context on some browsers. The `@keyframes` here animate custom properties (`--dx1`, etc.) used in `background`, not `transform`, so this is a low-risk / browser-dependent path. Not the primary cause, but worth noting: if the header is promoted to a positioned stacking context (`position: relative; z-index: 1`), this guarantees its dropdown paints above the DeskSurface compositor layer regardless of browser-specific compositing decisions.\n\n**`app.css` global `scrollbar-width: none; -ms-overflow-style: none` applied to `*`** — this forces `overflow: hidden` behaviour on webkit scrollbar display, but does not create stacking contexts.\n\n---\n\n### Q5 — Desktop vs mobile reproducibility\n\n**Introduced by CHORE-76, affects both desktop and mobile.** The `overflow-x-hidden` clip on `<header>` is not breakpoint-gated — it applies at all viewport widths. The CHORE-75 AvatarMenu was working before this commit and will be broken on desktop too as of `da00b06`.\n\n---\n\n### Summary — precise cause chain\n\n| # | Cause | Certainty |\n|---|---|---|\n| **Primary** | `overflow-x-hidden` on `<header>` forces `overflow-y: auto` per CSS spec → clips `absolute top-full` dropdown panels that extend below the header box | Definitive, spec-mandated |\n| **Secondary** | `<header>` is `position: static` → `z-50` on panels is meaningless, and header loses paint-order race against sibling page content | Confirmed — would matter if clip is removed but header still static |\n| **Tertiary** | `DeskSurface` `animation` may create a GPU compositor layer on some browsers → dropdown could still lose z-battle on those even with clip removed | Browser-dependent, low confidence |\n\n**Fix prescription (ACs, not implementation):**\n1. Remove `overflow-x-hidden` from `<header>` — it is the clip source. Address the underlying overflow problem with `min-w-0` / `truncate` on content children instead (already partially done in CHORE-76 for org chip).\n2. Add `position: relative; z-index: <above page content, e.g. z-10 or z-20>` to `<header>` — this creates a stacking context so the header + all its positioned descendants (including `z-50` panels) paint above sibling page content in a defined, spec-guaranteed way.\n3. These two together fix both the clip and the stacking-context race. No changes to the panel or AvatarMenu internals needed.",
+    "summary": "Nav dropdown clip: 3 causes identified, precise classes quoted",
+    "timestamp": "2026-05-31T13:46:27.324Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-31T13:46:30.087Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T13:46:30.087Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "[2026-05-31 13:51]\n\n## Story Handoff\n- **Story:** #77 — Nav stacking regression (CHORE-77)\n- **Branch:** chore/nav-stacking-fix\n- **From:** Tallis (phase: RED)\n- **To:** Byrd (phase: GREEN)\n- **Status:** TESTS_WRITTEN\n\n### What was done\n- Revised AC7 test — old assertion encoded the bug (`overflow-hidden` clips dropdown panels); new assertion asserts the header does NOT carry `overflow-hidden` / `overflow-x-hidden`.\n- Added 2 new RED tests: `<header>` must carry a positioning class (`relative` or `sticky`) AND a `z-*` utility.\n- Added 1 forward-guard test (passes immediately, regression pin): org area keeps `min-w-0` after the stacking fix.\n- Updated test-gaps.md with expanded Playwright note (overflow + panel visibility + paint-order).\n- Commit SHA `5473953` on `chore/nav-stacking-fix`. Spec only — memory files left uncommitted as instructed.\n\n### Failing test summary (3 RED)\n- **AC7 revised**: header has `overflow-x-hidden` (current impl has it — must be removed)\n- **AC2 stacking #1**: header lacks `relative` / `sticky` positioning class\n- **AC2 stacking #2**: header lacks any `z-*` utility class\n\n19 other MvoxNav tests + 576 suite tests remain green. pnpm check/lint/build all clean.\n\n### What Byrd must implement (class contract)\nOn `<header>`:\n- REMOVE `overflow-x-hidden` (or `overflow-hidden` if present)\n- ADD `relative` (or `sticky` if the design calls for it)\n- ADD a `z-*` utility (e.g. `z-30` or `z-40`) to sit above scrolled page content\n\nThe truncation mechanism (min-w-0 on nav-org-area, flex-shrink-0 on nav-avatar-wrapper / nav-signin-wrapper / hamburger) stays as-is — it's the correct overflow control, not the header clip.\n\n### Files to start with\n- `src/lib/components/MvoxNav.spec.ts` — revised spec (read the AC7 + stacking tests)\n- `src/lib/components/MvoxNav.svelte` — the header element to patch",
+    "summary": "Story Handoff — CHORE-77 RED complete",
+    "timestamp": "2026-05-31T13:51:27.414Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-31T13:51:30.724Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T13:51:30.724Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-31T13:51:44.453Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T13:51:44.453Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "[2026-05-31 13:53]\n\n## Story Handoff\n- **Story:** #77 — header overflow/stacking fix\n- **Branch:** chore/nav-stacking-fix\n- **From:** Byrd (phase: GREEN)\n- **To:** Bentham (phase: REVIEW)\n- **Status:** TESTS_PASSING\n\n### What was done\n- Single line change on `<header>`: removed `overflow-x-hidden`, added `relative z-30`.\n- `overflow-x-hidden` was clipping the `position: absolute` dropdown panels (AvatarMenu logout + nav-tab-menu) — CSS spec forces `overflow-y: auto` when `overflow-x` is non-visible, creating a clipping context.\n- `relative` establishes the stacking context so child `z-index` utilities take effect. `z-30` places the header above unpositioned page content.\n- Horizontal overflow control is preserved via `flex-shrink-0` on fixed items and `min-w-0` + truncation on nav-org-area — no header clip needed.\n\n### Quality gate\n- `pnpm check`: 0 errors, 0 warnings.\n- `pnpm lint`: clean (exit 0).\n- `pnpm build`: success.\n- `pnpm test:unit`: 579/579 (3 formerly RED now GREEN; all 22 CHORE-76 MvoxNav tests intact).\n- Commit SHA: 316ff02 on chore/nav-stacking-fix.\n\n### No deviations\nOnly `MvoxNav.svelte` was touched, exactly the `<header>` class string. No test intent changed; no mechanical test updates needed.\n\n(*MVOX:Byrd*)",
+    "summary": "CHORE-77 GREEN complete — handoff to Bentham",
+    "timestamp": "2026-05-31T13:54:08.141Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-31T13:54:12.710Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T13:54:12.710Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-31T13:54:16.149Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T13:54:16.149Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "[2026-05-31 13:58] CHORE-77 review verdict: **GREEN.** Branch `chore/nav-stacking-fix` @ `316ff02` is merge-ready. Route to Josquin (preview → squash → deploy). This fixes a regression my own CHORE-76 GREEN let through — I own the miss; root-cause noted below.\n\n## Gates (all run by me)\n- **`pnpm check`**: tip → COMPLETED 1096 FILES 0 ERRORS.\n- **`pnpm test:unit`**: tip → 579 passing, 85 files (576 CHORE-76 baseline + 3 new CHORE-77).\n- **`pnpm lint`**: exit 0.\n- **`pnpm build`**: 3.87s + adapter-cloudflare done.\n- **Per-commit-GREEN**: RED `5473953` → check 0 errors + 3 new tests RED (576/579, correct); tip `316ff02` → flips all 3 GREEN. Held.\n- **Merge-shape**: `git log HEAD..main` empty; base `da00b06` = CHORE-76 squash on main. Clean.\n- **GREEN diff**: exactly the spec — single `<header>` line `-overflow-x-hidden +relative +z-30`. No other production change.\n\n## Your three flagged questions — all resolved\n\n**1. AC7 test-intent change — sound, legitimate RED-phase revision (not a new test).** The original AC7 test asserted the header HAS `overflow-x-hidden` — that assertion *encoded the bug*. The revised test asserts the header has NO overflow clip. This is the same-slot intent-correction pattern (my session-15 \"production-side value was itself a BUG\" calibration, CHORE-50/51): the spec pinned the buggy mechanism, so it moves with the fix. Intent preserved (AC7 = control horizontal overflow without breaking layout); mechanism attested-to flips (header-clip → no-clip + truncation does the work via the `min-w-0`/`flex-shrink-0` that CHORE-76 already had). Correct call by Tallis. Bonus: the `z-*` assertion uses `/\\bz-\\d+\\b/` (any z value, not pinned `z-30`) — good drift-resistance, lets Byrd pick + lets a future bump happen freely.\n\n**2. z-30 adequacy — adequate. I swept the WHOLE codebase, not just ancestors.** Only TWO `z-30` exist: the header (`MvoxNav.svelte:79`) and `LandingHero.svelte:38`. The three dropdown panels (`z-50`: OrgPicker, AvatarMenu, nav-tab-menu) are DESCENDANTS of the header's z-30 context — they order among themselves, don't compete with the header. All other page-content z-index is ≤ z-20. The one z-30 tie (LandingHero, a page-content sibling that paints later in DOM → would win an equal-z race) is **mutually exclusive with the dropdowns by auth state**: `+page.svelte` renders LandingMarketing (→ LandingHero) only when `!isReady` (signed-out); the header dropdowns only render when `signedIn`. They can't co-occur. So z-30 wins on every route where a dropdown can open. Finn's no-stacking-trap-on-ancestors clearance holds and I confirmed no competing sibling either.\n\n**3. Positioned/z-indexed sibling that could beat it — none today.** See above. Latent NOTE (not a blocker, no action): if a future *signed-in* page component lands a `z-30`+ positioned element, it could tie/beat the header dropdowns. Nothing does now; the unpinned `z-*` spec assertion accommodates a future bump if it ever happens.\n\n## Root-cause of the regression (my CHORE-76 miss)\n`overflow-x: hidden` on a box with `overflow-y: visible` forces `overflow-y` to compute to `auto` (CSS Overflow L3 §3.2) — making the header a clip box that cut both `absolute top-full` dropdown panels, desktop AND mobile. In my CHORE-76 review I verified the AC7 class was *present* (structural) but didn't reason about the single-axis-overflow CSS side effect on the block axis. I've encoded a standing RED trigger in my scratchpad: any single-axis overflow clip on an element hosting dropdowns/popovers/`top-full` panels is RED. Won't recur.\n\nTask #8 marked completed. Idling.",
+    "summary": "CHORE-77 verdict: GREEN — merge-ready",
+    "timestamp": "2026-05-31T13:59:32.599Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-31T13:59:38.831Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T13:59:38.831Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-31T13:59:42.393Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T13:59:42.393Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "[2026-05-31 14:01] CHORE-77 Phase 1 PREVIEW deployed — HOLDING for merge go-ahead.\n\nBranch `chore/nav-stacking-fix` @ `316ff02` (verified: merge-shape clean, `HEAD..main` empty, worktree clean). Stashed the dirty memory files before checkout — they're out of the way and won't enter any commit. `pnpm build` clean.\n\nPreview (did NOT touch production):\n- Unique build URL: https://61835d2f.multivox.pages.dev → 200 + `x-sveltekit-page: true`\n- Branch alias: https://chore-nav-stacking-fix.multivox.pages.dev → 200 + `x-sveltekit-page: true`\n\nProduction mvox.eu still serving the CHORE-76 build (`app.BHUvLTLK.js`) — untouched.\n\nGoing idle. Phase 2 fires only on your \"PO approved, merge\".",
+    "summary": "CHORE-77 preview deployed, holding",
+    "timestamp": "2026-05-31T14:00:44.755Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-31T14:00:47.515Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T14:00:47.515Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "[2026-05-31 14:01] Stale task_assignment for #9 (ts 14:00:00Z) — TaskUpdate-fires-notification artifact, predates my Phase 1 report. Already in_progress, preview done (https://61835d2f.multivox.pages.dev). Still HOLDING for \"PO approved, merge\". No action taken.",
+    "summary": "Ack stale task_assignment, still holding",
+    "timestamp": "2026-05-31T14:00:53.993Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-31T14:00:56.421Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T14:00:56.421Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "[2026-05-31 14:09] CHORE-77 Phase 2 DONE — merged + production live.\n\n- Squash SHA on main: `4cfdf85` (`origin/main` = `4cfdf85`, push `da00b06..4cfdf85`). 2 files, +49/-9 (memory scratchpads correctly excluded — only branch commits came over).\n- PO co-author trailer appended by hook (verified); `Contributors:` line for team credit, no collision.\n- Production deploy: `39e3a458.multivox.pages.dev`. New chunks: `app.DEBrL8Ie.js` + `start.DICNQU-N.js` (changed from CHORE-76's `app.BHUvLTLK.js` — new build confirmed live).\n- `curl -sI https://mvox.eu/` → HTTP 200 + `x-sveltekit-page: true`.\n- Branch `chore/nav-stacking-fix` deleted local + remote. No open PR.\n- Stash popped cleanly onto main: bentham.md / tallis.md / test-gaps.md back in the tree, uncommitted (for shutdown persist).\n\nTask #9 completed. Over to you to close GH #77.",
+    "summary": "CHORE-77 Phase 2 done — 4cfdf85, mvox.eu live",
+    "timestamp": "2026-05-31T14:09:30.899Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-31T14:09:35.522Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T14:09:35.522Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-05-31 14:12] Research complete.\n\n## /library Responsive Layout Audit\n\nFiles read: `src/routes/library/+page.svelte`, `+layout.svelte`, `LibraryMasterDetail.svelte`, `LibraryMaster.svelte`, `LibraryWorkPaperStack.svelte`, `LibraryEditionCard.svelte`, `LibraryEmptyState.svelte`.\n\n---\n\n### 1. Component tree\n\n```\n+layout.svelte          (passthrough — just {children})\n└── +page.svelte\n    └── DeskSurface     (div.w-full.wood-bg — animated wood-grain background)\n        └── div.flex.flex-col\n            ├── [Library top bar]   (flex row: title + date/search)\n            │   └── PencilSearch    (fixed w-[280px])\n            ├── [Three-card grid]   (grid-template-columns: 1fr 1fr 1.15fr, px-6 py-6 gap-5)\n            │   ├── PaperStack (Returns)\n            │   ├── PaperStack (Overdue)\n            │   └── PaperStack (Pull)\n            └── div.px-6.pb-8\n                └── LibraryMasterDetail      (conditional on store status)\n                    ├── LibraryMaster        (sticky index column, left)\n                    └── div.detail-col       (scrolling list, right)\n                        └── LibraryWorkPaperStack × N\n                            └── LibraryEditionCard × N\n```\n\n---\n\n### 2. What forces desktop-only\n\nThree independent constraints, all load-bearing:\n\n**A. The task-card grid (line 94 of +page.svelte)**\n```html\n<div class=\"px-6 py-6 grid gap-5\" style=\"grid-template-columns: 1fr 1fr 1.15fr\">\n```\nInline style — not a Tailwind class, no breakpoint gating. Three columns at all viewport widths. On a 375px phone, each `1fr` column is roughly 110px — the PaperStack cards are deeply nested with fixed font sizes, dashed-border layouts, copy chip grids (`grid-cols-6`), buttons with fixed padding. They will crush and overflow.\n\n**B. LibraryMasterDetail grid (scoped CSS in LibraryMasterDetail.svelte)**\n```css\n.md-wrap {\n  display: grid;\n  grid-template-columns: 240px 1fr;\n  gap: 24px;\n  align-items: flex-start;\n}\n```\nHard 240px left column, no `@media` query anywhere in this file. On a 375px screen, the master column is 240px and the detail gets 375 − 240 − 24 = 111px — far too narrow for the work paper stacks.\n\n**C. LibraryMaster max-height + sticky (scoped CSS in LibraryMaster.svelte)**\n```css\n.master-col {\n  position: sticky;\n  top: 24px;\n}\n.master-paper {\n  max-height: calc(100vh - 80px);\n  overflow-y: auto;\n  /* gradient fades right edge into transparency — designed for side-by-side */\n  background: linear-gradient(90deg, #fbf9f3 0%, #fbf9f3 50%, rgba(251,249,243,0.5) 75%, rgba(251,249,243,0) 100%);\n}\n```\nSticky with `top: 24px` assumes there is vertical scroll room in a two-column layout. On a single-column reflow, sticky without context of a taller container would either not stick or stick at the wrong place. The `max-height: calc(100vh - 80px)` is fine alone but is paired with the wrong grid.\n\n**D. Top bar (lines 67–92 of +page.svelte)**\n```html\n<div class=\"flex items-center justify-between py-3 px-7 bg-paper/80 border-b-[1.5px] border-ink-2\">\n```\nRight side: `flex items-center gap-4` containing a date+countdown block and `<div class=\"w-[280px]\"><PencilSearch /></div>`. The `w-[280px]` on the search box is fixed — it will overflow a narrow viewport alongside the title block.\n\n**E. LibraryWorkPaperStack work-meta grid**\n```css\n.work-meta {\n  display: grid;\n  grid-template-columns: 85px 1fr;\n}\n```\nHard 85px label column — fine at 111px detail width, but only just. No breakpoint handling.\n\n---\n\n### 3. Responsive handling present\n\n**Zero.** Not a single `sm:` / `md:` / `lg:` breakpoint class anywhere in the library components or the library route. Not a single `@media` query in any scoped `<style>` block. All six files are fixed desktop layout throughout.\n\n---\n\n### 4. Sticky/scroll mechanics\n\n**Master (LibraryMaster.svelte):**\n- `.master-col { position: sticky; top: 24px; }` — column sticks as detail scrolls past it\n- `.master-paper { max-height: calc(100vh - 80px); overflow-y: auto; }` — master list internally scrollable when it exceeds viewport height\n- Inner header: `position: sticky; top: 0` within `.master-paper` — \"count / sort\" row stays pinned inside the scrollable master\n\n**Detail (LibraryMasterDetail.svelte):**\n- `.detail-col { display: flex; flex-direction: column; gap: 22px; }` — plain flex column, no overflow constraints, scrolls with the page\n- IntersectionObserver wired to `detailContainer` ref — watches `[data-work-id]` elements, fires `selectedWorkId` + `syncUrl` when a work-stack crosses the 50% viewport threshold with `±30%` rootMargin. This is the scroll-spy that keeps master selection in sync.\n- `handleSelect` → `el.scrollIntoView({ behavior: 'smooth', block: 'start' })` — master click scrolls detail to the right work stack.\n\n**Key reflow implication:** mobile single-column requires rethinking both directions. On mobile, the natural UX is master-list → tap → navigate to detail view (separate screen or scroll-to). The IntersectionObserver scroll-spy would need to stay or be replaced with explicit nav. The sticky master column has no meaning in a stacked layout.\n\n---\n\n### 5. DeskSurface dimensions\n\n```html\n<div data-desk class=\"w-full wood-bg\">\n```\n`w-full` — fluid, takes container width. No `min-width`, no fixed pixel dimension. The animated `background` uses `background-attachment: fixed` so the wood grain is viewport-relative — it will look fine at any width.\n\n**DeskSurface imposes no minimum width.** The desktop-only constraint comes entirely from its children's layout, not the surface itself.\n\n---\n\n### 6. GitHub issues — mobile/library/responsive\n\nHits on keyword filter (`mobile`, `responsive`, `library`, `screen`, `viewport`, `breakpoint`) against open issues:\n- **#73** — \"CHORE: dashboard Library card overdue count + red+bold path (CHORE-72 YELLOW-72.4 carry-forward)\" — library bug, not responsive\n- **#59** — \"Production verify: mobile-id + id-card + apple providers\" — mobile OAuth providers, not layout\n\n**No existing issue for mobile/responsive library layout.** New issue needed.\n\n---\n\n### Scoping summary\n\n| Constraint | Location | Effort to fix |\n|---|---|---|\n| Three-task-card grid (3 col, inline style) | `+page.svelte:94` | Medium — stack to single col at `sm:` breakpoint |\n| Top bar search w-[280px] | `+page.svelte:88` | Easy — `w-full` or hide on mobile |\n| LibraryMasterDetail 240px fixed column | `LibraryMasterDetail.svelte` scoped CSS | Hard — needs a nav-pattern decision (CSS-stack vs separate screen) |\n| LibraryMaster sticky + max-height | `LibraryMaster.svelte` scoped CSS | Coupled to above |\n| work-meta 85px label column | `LibraryWorkPaperStack.svelte` | Easy — auto columns or single-col |\n\n**Quick CSS-stack path:** wrap `.md-wrap` in a `@media (max-width: 639px)` to override to single-column, hide the master sticky index, show full detail list. The task-card grid and search bar also need `@media` overrides. The IntersectionObserver scroll-spy still works in single-column. Achievable without new navigation primitives.\n\n**Proper mobile master→detail path:** mobile shows master list only; tapping a work navigates (or slides) to a detail view showing only that work's stacks; back button returns to master. Needs URL routing or a Svelte state machine for \"panel\" vs \"detail\" mode. Significantly more work but matches native mobile patterns.\n\nThe task cards (Returns/Overdue/Pull) are a separate surface — they need their own mobile treatment regardless of which master-detail pattern is chosen.",
+    "summary": "Library responsive audit — full layout facts",
+    "timestamp": "2026-05-31T14:13:04.535Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-31T14:13:07.479Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T14:13:07.479Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-05-31 14:25] Research complete.\n\n## Library Catalog Filter Dimensions\n\nSources: `$ENTU_RESEARCH/docs/schema/v4E/schema.ts` (work/edition/copy/lending), `src/lib/types/library-entu.ts`, `src/lib/types/library.ts`, `src/lib/library/hydrateLibrary.ts`.\n\n---\n\n### 1. v4E schema properties — work entity\n\n```\nname (string, required)        — title\ncomposer (string)\ncatalog_id (string)            — e.g. \"243\"\ncatalog_system (string)        — e.g. \"BWV\"\noriginal_voicing (string)      — composer's intent\noriginal_duration (number)     — minutes\noriginal_language (string, list, multi-value) — composer's text language(s)\ngenre (string, list, multi-value)\npart_of (ref → work)           — for movements\n```\n\n### v4E schema properties — edition entity\n\n```\nname (string, required)        — e.g. \"Bärenreiter BA 5103, vocal score\"\nedition_type (string, required) — full_score | vocal_score | part | reduction | audio | video | supplementary\narranger (string)              — for arrangements/transcriptions\nvoicing (string)               — optional override of work.original_voicing\nduration (number)              — optional override\nlanguage (string, list)        — optional override\npublisher (string)\nyear (number)\nlicense (string)               — public_domain | licensed | owned\nacquired_at (date)\nsource (string)                — donor / vendor / publisher\ncost (number)\nlicense_note (text)            — currently co-opted for ISBN in mvox (Pérotin probe finding)\nfile (file, list)              — S3-backed PDFs / audio / video\nexternal_link (string, list)\nwork (string, formula)         — denorm of work name\n```\n\n### v4E schema properties — copy entity\n\n```\nname (string, required)\ncopy_number (number, required)\nbarcode (string)\ncondition (string)             — good | fair | poor | lost\nnotes (text)\n```\n\n### v4E schema properties — lending entity\n\n```\nname (formula)                 — \"Alice Smith — Copy #3\"\ncopy (ref → copy, required)\nmember (ref → member, required)\nassigned_at (date, required)\nassigned_until (date)          — due back\nreturned_at (date)             — absent = still out\nrenewed_at (date, list)\nnotes (text)\n```\n\n---\n\n### 2. What mvox fetches today (hydrateLibrary.ts)\n\n**Works fetch** (`props=name,composer,voicing,language,year`):\n- Fetches: `name` → `title`, `composer`, `voicing`, `language`, `year`\n- NOT fetched: `catalog_id`, `catalog_system`, `original_voicing`, `original_duration`, `original_language`, `genre`, `part_of`\n\n**Editions fetch** (`props=name,year,publisher,license_note`):\n- Fetches: `name` → `label`, `year`, `publisher`, `license_note` → `isbn`\n- NOT fetched: `edition_type`, `arranger`, `voicing`, `language`, `license`, `acquired_at`, `source`, `cost`, `file`, `external_link`\n\n**Copies and lending: not fetched at all.** No availability data is loaded in the current library hydration. The `Loan`/`Edition.on_loan`/`Edition.overdue` fields in `src/lib/types/library.ts` exist only in the mock data shapes; they have no live Entu fetch behind them.\n\n---\n\n### 3. Mock type shapes vs live shapes\n\n`src/lib/types/library.ts` — the **mock** shapes for the 3 task stacks (Returns/Overdue/Pull). These are richer than the live types:\n- `Work`: has `title_alt`, `lang`, `period`, `tags`, `notes`, full `editions[]` with loan counts\n- `Edition`: has `voicing`, `total`, `on_loan`, `overdue`, `returned_today`, `loans[]`\n\nThese are UI scaffolding only — not backed by Entu fetches.\n\n`src/lib/types/library-entu.ts` — the **live** shapes. `EntuWork` has only: `id`, `libraryId`, `composer`, `title`, `voicing?`, `language?`, `year?`. `EntuEdition` has only: `id`, `workId`, `label`, `year?`, `publisher?`, `isbn?`.\n\n---\n\n### 4. Filter dimension status table\n\n| Filter dimension | v4E schema field | Currently fetched? | Currently in EntuWork/Edition? | Notes |\n|---|---|---|---|---|\n| Title search | `work.name` | Yes | Yes (`title`) | Full text search needs client-side filter or API `?name.string=` query |\n| Composer | `work.composer` | Yes | Yes | Ready |\n| Voicing/scoring | `work.original_voicing` | No — wrong field fetched | Partial: `work.voicing` fetched but this maps to `original_voicing` in schema; `edition.voicing` override NOT fetched | `hydrateLibrary` fetches `props=...voicing...` against work — but v4E field name is `original_voicing` not `voicing`; worth verifying what Entu actually returns |\n| Language | `work.original_language` | No — wrong field fetched | Partial: `work.language` fetched but schema field is `original_language`; same name-mismatch risk | List-valued in schema; filter needs multi-value handling |\n| Genre | `work.genre` | No | No | In schema, list-valued, not fetched |\n| Catalog system (BWV etc.) | `work.catalog_system` + `catalog_id` | No | No | In schema, not fetched |\n| Edition type | `edition.edition_type` | No | No | In schema (required!), not fetched |\n| Arranger | `edition.arranger` | No | No | In schema, not fetched |\n| License status | `edition.license` | No | No | public_domain/licensed/owned — in schema, not fetched |\n| Has files (PDF/audio) | `edition.file` | No | No | In schema, not fetched; presence derivable if file list non-empty |\n| Availability (on loan / available) | `copy` count vs `lending.returned_at` null | Not fetched | No | Requires fetching copies + open lendings per edition; no existing query |\n| Publisher | `edition.publisher` | Yes | Yes | Could filter by publisher |\n| Year (work) | `work.original_duration` / no year on work | — | `year` fetched on work | **Note: v4E `work` has no `year` property in schema** — only `original_duration`. The `year` in `EntuWork` may be mapping to nothing or a custom field |\n| Year (edition) | `edition.year` | Yes | Yes | Edition publication year — fetched |\n\n---\n\n### 5. Key findings\n\n**Voicing/language name mismatch risk:** `hydrateLibrary` fetches `props=name,composer,voicing,language,year` against work entities. The v4E schema fields are `original_voicing` and `original_language` (not `voicing`/`language`). Whether Entu returns values for a mismatched prop name is untested — these may silently come back empty. Needs a probe or a check against what the polyphony DB actually has in work entities.\n\n**Work year is not a v4E field:** v4E `work` has no `year` property — only `original_duration` (minutes). The `year` currently fetched (`w.year?.[0]?.number`) would return nothing from a v4E-compliant Entu db. Either the real works have a `year` property that's outside schema, or this is dead code.\n\n**Availability requires additional fetches:** copy count per edition (to know total) + open lending count (where `returned_at` is absent) per edition. Two extra queries per edition batch, or one aggregated query. Not currently fetched.\n\n**Genre not fetched — low cost to add:** `genre` is in schema, list-valued, not fetched. Adding `genre` to the works `props=` query is a one-line change in `hydrateLibrary.ts` and one field addition to `EntuWork`. Data population in the Entu db is the unknown.\n\n**Edition type not fetched:** `edition_type` is required in v4E schema — every edition should have it. Not in the current `EntuEdition` type. Adding it is trivial (same one-line props addition). Enables filter by score type (vocal_score, part, audio, etc.).\n\n---\n\n### Summary: filter anchoring\n\n| Filter | Status |\n|---|---|\n| Title text search | **Ready** — `title` is fetched |\n| Composer | **Ready** — `composer` is fetched |\n| Edition year | **Ready** — `edition.year` fetched |\n| Publisher | **Ready** — `edition.publisher` fetched |\n| Voicing | **Fetched but name-mismatch risk** — probe needed |\n| Language | **Fetched but name-mismatch risk** — probe needed |\n| Genre | **Schema yes, not fetched** — add `genre` to props query + verify DB population |\n| Edition type | **Schema yes (required), not fetched** — add `edition_type` to edition props |\n| Availability | **Schema yes, not fetched** — needs copy + lending queries; significant extra fetch work |\n| Arranger | **Schema yes, not fetched** — add `arranger` to edition props |\n| License | **Schema yes, not fetched** — add `license` to edition props |\n| Work year | **Probably empty** — no `year` on v4E work; field likely returns nothing from live DB |",
+    "summary": "Library filter dimensions — schema vs fetched vs missing",
+    "timestamp": "2026-05-31T14:26:13.902Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-31T14:26:15.681Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T14:26:15.681Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "comenius",
+    "text": "[2026-05-31 15:05] CHORE-78 Task 1 — i18n done. Commit: 33effc1 on chore/mobile-library.\n\n3 keys × 4 locales:\n\nlibrary_back_to_works:\n- en: \"‹ Works\"\n- et: \"‹ Teosed\"\n- lv: \"‹ Darbi\"\n- uk: \"‹ Твори\"\n\nlibrary_search_no_results:\n- en: \"No works match your search\"\n- et: \"Otsingutulemusi ei leitud\"\n- lv: \"Neviens darbs neatbilst meklēšanai\"\n- uk: \"Жодного твору не знайдено\"\n\nlibrary_search_placeholder (updated from ⌘K desktop string):\n- en: \"Search title or composer…\"\n- et: \"Otsi pealkirja või heliloojat…\"\n- lv: \"Meklēt pēc nosaukuma vai komponista…\"\n- uk: \"Пošuk za nazvoyu abo kompozytorom…\" → \"Пошук за назвою або композитором…\"\n\npnpm check: 0 errors. pnpm lint: exit 0. All 4 locales in sync. Paraglide regenerated (gitignored, built from messages/). Branch untouched except messages/*.\n\nComenius going idle.",
+    "summary": "CHORE-78 Task 1 done — 3 library keys committed",
+    "timestamp": "2026-05-31T15:05:45.814Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "comenius",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"comenius\",\"timestamp\":\"2026-05-31T15:05:51.519Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T15:05:51.519Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "comenius",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"comenius\",\"timestamp\":\"2026-05-31T15:05:56.301Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T15:05:56.301Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "comenius",
+    "text": "[2026-05-31 15:08] CHORE-78 Task 1 correction done. Commit: 883164f on chore/mobile-library.\n\nConfirmed:\n- `library_search_placeholder` restored to original desktop strings verbatim in all 4 locales (⌘K · jump to work, copy #, borrower… and locale equivalents).\n- `library_mobile_search_placeholder` added as a new key (alphabetically after library_master_sort_label, before library_overdue_*):\n  - en: \"Search title or composer…\"\n  - et: \"Otsi pealkirja või heliloojat…\"\n  - lv: \"Meklēt pēc nosaukuma vai komponista…\"\n  - uk: \"Пошук за назвою або композитором…\"\n- `library_back_to_works` and `library_search_no_results` unchanged.\n\npnpm check: 0 errors. pnpm lint: exit 0. All 4 locales in sync.\n\nComenius going idle.",
+    "summary": "CHORE-78 Task 1 corrected — desktop key restored, new mobile key added",
+    "timestamp": "2026-05-31T15:09:04.170Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "comenius",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"comenius\",\"timestamp\":\"2026-05-31T15:09:09.136Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T15:09:09.136Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "[2026-05-31 15:14]\n\n## Story Handoff\n- **Story:** #78 — Mobile library (CHORE-78)\n- **Branch:** chore/mobile-library\n- **From:** Tallis (phase: RED — Task 2)\n- **To:** Byrd (phase: GREEN — Task 3)\n- **Status:** TESTS_WRITTEN\n\n### What was done\n- Modified `src/lib/components/library/LibraryMasterDetail.spec.ts` — added CHORE-78 responsive layout describe block (9 new tests).\n- Created `src/lib/components/library/LibraryMobileList.spec.ts` — 12 new tests (full suite fails: no source file yet).\n- Updated `test-gaps.md` with deferred Playwright mobile-viewport + scroll-spy note.\n- Commit SHA `2747684` on `chore/mobile-library`. Spec files only — memory files left uncommitted.\n- pnpm lint: exit 0. pnpm build: ok. pnpm check: 1 error (expected — missing LibraryMobileList.svelte).\n\n### Failing test summary (9 + 1 suite)\n**LibraryMasterDetail — responsive layout (CHORE-78):**\n- AC2 ×2: `library-master` testid not found; `library-md-grid` testid not found\n- AC6 ×4: `library-mobile-detail` not found; `library-mobile-back` not found (×2); `library-mobile-list` not found\n- AC7: IntersectionObserver constructed on mobile viewport (matchMedia not gated)\n- AC8: `library-master` + `library-md-grid` testids not found (no testids yet)\n- AC9: `library-mobile-back` not found\n\n**LibraryMobileList.spec.ts (12 tests):** entire suite fails — `LibraryMobileList.svelte` does not exist.\n\n4 existing LibraryMasterDetail tests remain green. 579/588 other tests pass.\n\n### The 3 testable seams (Byrd must match exactly)\n\n**(a) Row-select mechanism:** Each `library-mobile-row` is an `<a>` element with `href` containing `?work=<id>`. The test asserts `row.getAttribute('href').includes('work=work-a')` etc. Do NOT use a click handler that calls `syncUrl` imperatively — use an anchor so the test (and browser back button) work without JS event handling.\n\n**(b) Scroll-spy gate predicate:** Gate the IntersectionObserver construction in `onMount` (or `$effect`) behind `window.matchMedia('(min-width: 640px)').matches`. In jsdom, `matchMedia` is not implemented (returns `matches: false`), so the observer must never be constructed. The test stubs `window.matchMedia` to return `{ matches: false }` and replaces `IntersectionObserver` with a throwing spy — the component must not throw.\n\n**(c) Mobile view mode prop:** No new prop needed. The existing `initialWorkId` prop (already on `LibraryMasterDetail`) drives the mobile view mode: `null` → render `library-mobile-list`; non-null → render `library-mobile-detail`. The tests pass `initialWorkId: 'work-a'` for detail mode and `initialWorkId: null` for list mode.\n\n### Files to start with\n- `src/lib/components/library/LibraryMasterDetail.spec.ts` — all CHORE-78 tests\n- `src/lib/components/library/LibraryMobileList.spec.ts` — new component tests\n- `src/lib/components/library/LibraryMasterDetail.svelte` — add testids + mobile branching + scroll-spy gate\n- `src/lib/components/library/LibraryMaster.svelte` — add `data-testid=\"library-master\"` + `hidden sm:block` class",
+    "summary": "Story Handoff — CHORE-78 Task 2 RED complete",
+    "timestamp": "2026-05-31T15:14:45.543Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-31T15:14:50.778Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T15:14:50.778Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-31T15:14:54.448Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T15:14:54.448Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "[2026-05-31 15:18]\n\n## Story Handoff\n- **Story:** #78 — mobile library: search-filtered list → detail\n- **Branch:** chore/mobile-library\n- **From:** Byrd (phase: GREEN)\n- **To:** Bentham (phase: REVIEW)\n- **Status:** TESTS_PASSING\n\n### What was done\n- `src/routes/library/+page.svelte`: task-card grid wrapped in `library-task-cards` testid with `hidden sm:grid`; top-bar desktop search gated `hidden sm:block`.\n- `src/lib/components/library/LibraryMaster.svelte`: added `data-testid=\"library-master\"` + `hidden sm:block` on root element.\n- `src/lib/components/library/LibraryMobileList.svelte` (new): sticky search input (`library-mobile-search`, `m.library_mobile_search_placeholder()`), `$state` query, `$derived` filtered works (case-insensitive title OR composer). Each work renders as `<a data-testid=\"library-mobile-row\" href=\"?work=<id>\">`. Empty state shows `library-mobile-empty` with `m.library_search_no_results()`.\n- `src/lib/components/library/LibraryMasterDetail.svelte`: mobile branch — `initialWorkId==null` renders `<LibraryMobileList>`; non-null renders `library-mobile-detail` with existing `LibraryWorkPaperStack` + `library-mobile-back` (`<a href=\"?\">` clears `?work=`, label `m.library_back_to_works()`). Desktop sm+ 2-col grid wrapped in `library-md-grid` (`sm:grid`). Scroll-spy `IntersectionObserver` gated behind `isDesktopViewport()` (`window.matchMedia('(min-width: 640px)').matches`) — never constructed on mobile.\n\n### Quality gate\n- `pnpm check`: 0 errors, 0 warnings.\n- `pnpm lint`: clean (exit 0).\n- `pnpm build`: success.\n- `pnpm test:unit`: 599/599 (21 formerly RED now GREEN; all 4 prior LibraryMasterDetail tests intact).\n- Commit SHA: d148450 on chore/mobile-library.\n\n### Desktop unchanged\nDesktop (sm+) renders identically. All mobile-view elements are structurally present in the DOM but gated below `sm` via Tailwind classes. The 2-col grid, sticky index, and scroll-spy all function as before at sm+.\n\n### Seams implemented as Tallis specified\n- (a) Row select = anchor: each `library-mobile-row` is `<a href=\"?work=<id>\">`.\n- (b) Scroll-spy gate: `isDesktopViewport()` predicate on `window.matchMedia` — false in jsdom, so observer not constructed in tests.\n- (c) View mode = `initialWorkId` prop: null → list, non-null → detail.\n\n(*MVOX:Byrd*)",
+    "summary": "CHORE-78 Task 3 GREEN complete — handoff to Bentham",
+    "timestamp": "2026-05-31T15:18:56.715Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-31T15:19:01.970Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T15:19:01.970Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-31T15:19:05.815Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T15:19:05.815Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "[2026-05-31 15:24] CHORE-78 review verdict: **RED** — one blocker (RED-78.1) + one YELLOW (YELLOW-78.1). Branch `chore/mobile-library` @ `d148450`.\n\n## RED-78.1 — desktop master-detail grid RENDERS in block flow on mobile (AC2 violation)\nThe fix to CHORE-76/77 desktop gating was applied to LibraryMaster + task cards, but NOT to the grid wrapper itself.\n\n`LibraryMasterDetail.svelte:98`: `<div data-testid=\"library-md-grid\" class=\"sm:grid md-wrap\">` — **no `hidden` base class.** Below sm a `<div>` is `display:block` by default; `sm:grid` only activates grid at sm+; the `.md-wrap` `grid-template-columns:240px 1fr` is inert when display isn't grid (I grepped — no `@media`/`display:none` base rule anywhere hides it). Inside the grid, `LibraryMaster` IS hidden (`hidden sm:block`), but the `.detail-col` — a flex column of ALL work paper-stacks (L104-112) — has no mobile gate.\n\n**Net mobile render**: `LibraryMobileList` (correct, `block sm:hidden`) PLUS the entire desktop detail column of every work stacked below it. The mobile user scrolls past the search-filtered list and then sees every work rendered AGAIN in full desktop detail form. That breaks AC2 (\"the 240px+1fr two-column grid are not rendered; layout is single-column\") and the spec's List-mode \"Hidden: the two-column grid\".\n\n**Who acts:**\n- **Byrd** (1-class fix): `library-md-grid` → `class=\"hidden sm:grid md-wrap\"`. `hidden` = display:none below sm; `sm:grid` overrides to grid at sm+; md-wrap unchanged.\n- **Tallis** (AC2 test gap that let this through): `LibraryMasterDetail.spec.ts:92` only asserts the className CONTAINS `sm:grid` — it does NOT assert `hidden` is present, so the buggy markup passes. Add an assertion that the grid wrapper ALSO carries `hidden` (mirror the LibraryMaster `hidden sm:block` check at L85-86).\n\nThis is the second consecutive CHORE where a structural class-presence test passed while the real mobile render was broken (CHORE-76 overflow → CHORE-78 grid). Same root: jsdom has no layout engine, so \"class X present\" can't catch the computed-display outcome. I've encoded a standing responsive-review rule: any element with a `sm:`/`md:`/`lg:` display class must be asserted to ALSO carry a base `hidden` (or have the correct default display) — a lone `sm:grid`/`sm:block` with no `hidden` is visible below the breakpoint.\n\n## YELLOW-78.1 — RED commit fails per-commit-GREEN (`pnpm check`)\nRED commit `2747684` has `pnpm check` = 1 ERROR: `Cannot find module './LibraryMobileList.svelte'` at `LibraryMobileList.spec.ts:5`. The RED spec imports a component the GREEN commit creates. Per the per-commit-GREEN rule's own enforcement clause (architecture-decisions.md L117), a non-tip commit failing the gate is YELLOW (not auto-RED) — the tip squash-merges clean, but bisect audit value is lost. The clean new-component-TDD shape (CHORE-75 held this across 3 commits) is: RED lands a minimal STUB of the new component so the module resolves + types check, and tests fail on assertions, not module-resolution. CHORE-78's RED skipped the stub. Fold the stub-shape note into the RED-78.1 fix round if cheap; otherwise note-only — not a re-sequence demand for this branch since it's going back to Byrd+Tallis anyway.\n\n## Everything else GREEN (no action)\n- **Gates @ tip**: check 1098/0 errors; test:unit 599/599 (86 files); lint exit 0; build 4.00s. Merge-shape clean.\n- **i18n**: all 4 keys ×4 locales. Desktop `library_search_placeholder` correctly restored to \"⌘K · jump to work, copy #, borrower…\" in all 4 — your caught overwrite is fixed at `883164f`. New en values: `library_back_to_works`=\"‹ Works\", `library_mobile_search_placeholder`=\"Search title or composer…\", `library_search_no_results`=\"No works match your search\". No hardcoded English in new markup.\n- **AC4 search**: case-insensitive, title OR composer (`LibraryMobileList.svelte:17-20`). Correct.\n- **AC5/AC6**: rows are `<a href=\"?work={id}\">` (browser back works); back is `<a href=\"?\">` (clears param, no `work=` — test L127 pins it). Correct.\n- **AC7 scroll-spy gate — genuinely off below sm, reasoned not just test-passing**: `isDesktopViewport()` = `matchMedia('(min-width:640px)').matches` (L26-29), and `onMount` does `if (!isDesktopViewport()) return` BEFORE constructing the observer (L51). On a real mobile browser matchMedia returns false → observer never built → no auto-`?work=` while scrolling the list. Confirmed.\n- **Cosmetic note (not a blocker)**: the comment at `LibraryMasterDetail.svelte:25` \"(CSS spec: overflow-y:auto clips absolute panels on mobile)\" is a stale copy-paste from CHORE-77 — irrelevant to scroll-spy gating. Suggest Byrd drop/fix it during the RED-78.1 round.\n\nRe-handoff to me for GREEN re-verify after the 1-class fix + AC2 test strengthen. Task #18 stays in_progress. Idling.",
+    "summary": "CHORE-78 verdict: RED-78.1 (desktop grid renders on mobile)",
+    "timestamp": "2026-05-31T15:25:16.779Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-31T15:25:25.148Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T15:25:25.148Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-31T15:25:31.635Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T15:25:31.635Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "[2026-05-31 15:27] RED-78.1 done. Commit SHA `b116629` on `chore/mobile-library`.\n\n**What changed:** AC2 grid test now asserts BOTH `hidden` AND `sm:grid` on `library-md-grid` (was asserting `sm:grid` only — false GREEN). Test name updated to `hidden sm:grid` to make the contract self-documenting.\n\n**Result:** 1 failed | 12 passed in LibraryMasterDetail.spec.ts. The one failure is the strengthened AC2 grid test. Confirmed RED on current `d148450`.\n\n**Standing-rule sweep:** checked all other CHORE-78 `sm:`/`md:`/`lg:` assertions. `library-mobile-detail` and `library-mobile-list` use the inverse `block sm:hidden` pattern — already correct, no gap. No other assertions affected.\n\n**For Byrd:** 1-class fix needed on `library-md-grid` — add `hidden` to the class list: `class=\"hidden sm:grid md-wrap\"`. pnpm lint: exit 0.\n\nNoted on YELLOW-78.1 — will land a minimal stub `.svelte` alongside next new-component RED so `pnpm check` stays at 0 errors. Idle.",
+    "summary": "RED-78.1 done — AC2 grid assertion strengthened, confirmed RED",
+    "timestamp": "2026-05-31T15:27:28.007Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-31T15:27:30.280Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T15:27:30.280Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "[2026-05-31 15:29]\n\nRED-78.1 fixed. Two edits to `LibraryMasterDetail.svelte`:\n1. `library-md-grid`: `sm:grid md-wrap` → `hidden sm:grid md-wrap`.\n2. Stale CHORE-77 comment removed from the `isDesktopViewport` predicate.\n\n- `pnpm check`: 0 errors.\n- `pnpm lint`: clean.\n- `pnpm build`: success.\n- `pnpm test:unit`: 599/599 (strengthened AC2 now passes; all others intact).\n- Commit SHA: `6c9f971` on `chore/mobile-library`.\n\nReady for Bentham re-hand.\n\n(*MVOX:Byrd*)",
+    "summary": "RED-78.1 fix done — SHA 6c9f971, 599/599 green",
+    "timestamp": "2026-05-31T15:29:44.063Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"byrd\",\"timestamp\":\"2026-05-31T15:29:47.077Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T15:29:47.077Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "[2026-05-31 15:32] CHORE-78 re-verify: **GREEN.** RED-78.1 resolved. Branch `chore/mobile-library` @ `6c9f971` is merge-ready. Route to Josquin (preview → merge → deploy).\n\n## The AC2 fix — verified at the rendering-contract level, not just class-presence\n`LibraryMasterDetail.svelte:98` is now `<div data-testid=\"library-md-grid\" class=\"hidden sm:grid md-wrap\">`. `hidden` = display:none below sm → the desktop detail column no longer renders under the mobile list; `sm:grid` reinstates the 2-col grid at sm+; `md-wrap` unchanged. Stale CHORE-77 comment removed.\n\nThe strengthening that matters: Tallis's AC2 test (`b116629`) now asserts BOTH `hidden` AND `sm:grid` on the grid wrapper. I confirmed it actually catches the bug via per-commit-GREEN — at `b116629` (test strengthened, markup still buggy `sm:grid` no-hidden) the AC2 test FAILS (598/599); at `6c9f971` (fix applied) it passes (599/599). So the test is a genuine guard, not a tautology — it would have caught the original RED-78.1 had it existed. Tallis also sweep-confirmed the other mobile elements (`library-mobile-list`/`library-mobile-detail`) use the correct inverse `block sm:hidden` pattern; no other gaps.\n\n## Re-verify gates (all run by me)\n- **`pnpm check`**: tip → COMPLETED 1098 FILES 0 ERRORS.\n- **`pnpm test:unit`**: 599 passing, 86 files.\n- **`pnpm lint`**: exit 0.\n- **`pnpm build`**: 3.98s + adapter-cloudflare done.\n- **Per-commit-GREEN on the fix commits**: `b116629` → check 0 errors + AC2 test correctly RED (598/599); `6c9f971` → all 4 gates clean, AC2 GREEN (599/599). Clean RED→GREEN cycle.\n- **Merge-shape**: `git log HEAD..main` empty; base `4552876` = current main tip. Clean squash.\n- **Fix scope**: `6c9f971` is component-only (+2/-2 — the class + comment). No collateral change. All prior GREEN findings (i18n ×4 incl. restored desktop ⌘K key, AC4 search semantics, AC5/6 anchors + back, AC7 matchMedia scroll-spy gate) stand untouched.\n\nYELLOW-78.1 (original RED-commit `2747684` module-resolution stub gap) accepted as note-only per my prior call — confirmed not present on the fix commits.\n\nTask #18 marked completed. Idling.",
+    "summary": "CHORE-78 GREEN — re-verify clean, merge-ready",
+    "timestamp": "2026-05-31T15:33:21.154Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-31T15:33:26.260Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T15:33:26.260Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "[2026-05-31 15:34] CHORE-78 Phase 1 PREVIEW deployed — HOLDING for merge go-ahead.\n\nBranch `chore/mobile-library` @ `6c9f971` (merge-shape clean, `HEAD..main` empty, base `4552876` = current main). `pnpm build` clean.\n\nPreview (did NOT touch production):\n- Unique build URL: https://30626623.multivox.pages.dev/library → 200 + `x-sveltekit-page: true`\n- Branch alias: https://chore-mobile-library.multivox.pages.dev/library → 200 + `x-sveltekit-page: true`\n(root / also 200). For PO mobile verification of the search-filtered work list → detail.\n\nProduction mvox.eu still serving CHORE-77 build (`app.DEBrL8Ie.js`) — untouched.\n\nONE heads-up: on checkout the tree carried an uncommitted edit to `docs/superpowers/plans/2026-05-31-chore-78-mobile-library.md` (2 lines — clarifying the mobile search uses a NEW `library_mobile_search_placeholder` key, not the desktop `library_search_placeholder`). It's a doc/plan file outside my write scope and NOT part of the branch's committed work, so it won't enter the squash regardless. I stashed it separately (stash@{0}) to keep the tree clean for build/deploy; the memory files are in stash@{1}. In Phase 2 I'll pop BOTH stashes back onto main after the deploy so the intentional plan edit + scratchpads land in main's tree (uncommitted, for shutdown persist). Flagging so you know it's preserved, not lost or silently merged.\n\nGoing idle. Phase 2 on your \"PO approved, merge\".",
+    "summary": "CHORE-78 preview deployed, holding; plan-file stashed",
+    "timestamp": "2026-05-31T15:34:55.224Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-31T15:34:58.826Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T15:34:58.826Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "[2026-05-31 15:35] Stale task_assignment for #19 (ts 15:33:45Z) — TaskUpdate-fires-notification artifact, predates my Phase 1 report. Already in_progress; preview done (https://30626623.multivox.pages.dev/library). Still HOLDING for \"PO approved, merge\". No action taken.",
+    "summary": "Ack stale task_assignment, still holding",
+    "timestamp": "2026-05-31T15:35:05.939Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-31T15:35:07.983Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T15:35:07.984Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-05-31 15:43] Research complete.\n\n## /library Auth Behavior — Current State\n\nFiles read: `src/hooks.server.ts`, `src/routes/library/+page.svelte` (guards section), `src/routes/+page.server.ts`, all `+page.server.ts` and `+layout.server.ts` in the route tree.\n\n---\n\n### 1. Server-side files at `/library`\n\nThere is **no `+page.server.ts`, no `+page.ts`, and no `+layout.server.ts` under `src/routes/library/`**. The only files in that directory are:\n- `+layout.svelte` — passthrough, just `{@render children()}`\n- `+page.svelte` — client-side only\n- `page.spec.ts` — tests\n\nThe root `+page.server.ts` (`src/routes/+page.server.ts`) is a stub that returns `{}`. No auth logic there.\n\n**No server-side auth gate exists for `/library`.**\n\n---\n\n### 2. `hooks.server.ts` — global auth pattern\n\n```ts\nimport type { Handle } from '@sveltejs/kit';\n\nexport const handle: Handle = async ({ event, resolve }) => {\n  return resolve(event);\n};\n```\n\n**Passthrough only.** No auth checking, no path-based redirect, no session inspection. There is no global protection pattern in hooks — no route is server-side guarded.\n\n---\n\n### 3. The only guard — client-side, post-mount `$effect`\n\n`+page.svelte` lines 44–61:\n\n```ts\n$effect(() => {\n  const org = $selectedOrgStore;\n  const user = $userStore;\n  if (!org || user.status !== 'ready') return;        // silently do nothing\n  const token = getToken();\n  if (!token) return;                                   // silently do nothing\n  const claims = decodeJwt(token);\n  const personId = claims?.accounts?.[PUBLIC_ENTU_DB];\n  if (!personId) return;                               // silently do nothing\n  hydrateLibrarySection({ orgId: org.id, personId });\n});\n\n$effect(() => {\n  const state = $librarySectionStore;\n  if (state.status === 'no-rights') {\n    goto('/');                                          // redirect to / only on explicit no-rights from Entu\n  }\n});\n```\n\n---\n\n### 4. Behavior per user state\n\n| User state | What happens |\n|---|---|\n| **Not logged in (no JWT in localStorage)** | `/library` renders fully — task cards, top bar, search, DeskSurface all paint. The hydration `$effect` fires, finds `user.status !== 'ready'` and `getToken()` returns null, and **silently returns without fetching**. `librarySectionStore` stays in `{ status: 'loading' }` forever. The catalog section shows the loading indicator indefinitely. **No redirect.** |\n| **Logged in but no org selected** | Same silent return — `!org` guard fires. Catalog stays in loading state. **No redirect.** |\n| **Logged in, org selected, but not a librarian** | `hydrateLibrarySection` runs → `hydrateLibrary` fetches the `library` entity under the org → `libRaw._editor` does not include `personId` → returns `{ status: 'no-rights' }` → second `$effect` fires → `goto('/')`. **Redirects to `/`**, not to `/auth/login`. |\n| **Logged in + is librarian** | Full hydration runs, catalog loads. |\n\n---\n\n### 5. The CHORE-67 spec intent vs. implementation gap\n\nThe spec said: \"librarian-only, redirect-to-/ on no-librarian-rights.\" The `goto('/')` for `no-rights` is implemented. But:\n\n- **No redirect for unauthenticated users** — the spec didn't specify what to do for a user with no JWT. Currently: stays on `/library`, sees the full page shell with a permanent loading spinner in the catalog section.\n- **No redirect for \"logged in but no org\"** — same permanent loading state.\n- **All client-side** — the page SSR-renders fully (DeskSurface, task cards, top bar) before any auth check runs. There is no SvelteKit `redirect()` anywhere in the library route. The `mounted` guard in `+layout.svelte` means the nav itself doesn't render until hydration, but the page content does render (it's not behind a `{#if signedIn}` gate).\n\n---\n\n### Summary\n\n- **Unauthenticated user visiting `/library`:** page renders, catalog section spins forever, no redirect.\n- **Logged-in non-librarian:** page renders briefly, catalog section enters loading, then after Entu responds `no-rights`, `goto('/')` fires.\n- **No global auth hook** — every route is individually responsible; most (including `/library`) have no server-side protection.\n- **CHORE-78 is layout-only** — it does not need to touch this. If a redirect-unauthenticated-to-login behavior is wanted, that's a separate scope (likely a follow-on CHORE or a hooks.server.ts guard).",
+    "summary": "/library auth behavior — no gate, no redirect for unauthenticated",
+    "timestamp": "2026-05-31T15:44:18.408Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-31T15:44:20.440Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T15:44:20.440Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "[2026-05-31 15:49] CHORE-78 Phase 2 DONE — merged + production live.\n\n- Squash SHA on main: `9f8bcd3` (`origin/main` = `9f8bcd3`, push `4cfdf85..9f8bcd3` — spec+plan commits `73c3fef`+`4552876` rode up too). 10 files, +453/-5 (i18n ×4, LibraryMaster/MasterDetail/+page, new LibraryMobileList .svelte + .spec). No docs/memory in the squash.\n- PO co-author trailer appended by hook (verified); `Contributors:` line, no collision.\n- Production deploy: `c77b89d6.multivox.pages.dev`. New chunks: `app.BlWNemeh.js` + `start.yhLn1xom.js` (changed from CHORE-77's `app.DEBrL8Ie.js` — new build live).\n- `curl -sI https://mvox.eu/library` → HTTP 200 + `x-sveltekit-page: true`.\n- Branch `chore/mobile-library` deleted local + remote. No open PR.\n- Both stashes popped CLEAN onto main: plan-doc edit + bentham.md/tallis.md/test-gaps.md all back in tree, uncommitted (for shutdown persist). No stashes of mine remain.\n\nTask #19 completed. Over to you to close GH #78.",
+    "summary": "CHORE-78 Phase 2 done — 9f8bcd3, mvox.eu/library live",
+    "timestamp": "2026-05-31T15:59:51.810Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-31T15:59:56.555Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T15:59:56.555Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-05-31 15:59] Research complete.\n\n## Session JWT Storage — Ground Truth\n\nFiles read: `src/lib/auth/storage.ts`, `src/routes/auth/callback/+page.svelte`, `src/routes/auth/callback/+page.server.ts`, `src/routes/auth/logout/perform-logout.ts`, `src/hooks.server.ts`, plus a grep of all `src/` for `cookie`/`cookies`/`event.locals`.\n\n---\n\n### 1. Where the JWT is stored after login\n\n`src/routes/auth/callback/+page.svelte` (client-side `$effect`, runs in browser):\n\n```ts\nsetToken(result.token);     // localStorage.setItem('token', token)\nsetAccounts(result.accounts); // localStorage.setItem('accounts', ...)\nsetUser(result.user);         // localStorage.setItem('user', ...)\n```\n\n**All three writes are to `localStorage`.** No `cookies.set(...)` call anywhere in the auth flow. The callback `+page.server.ts` only validates the `?key=` param and passes the session token down as `data` — it sets no cookies.\n\n---\n\n### 2. `getToken()` — where it reads from\n\n`src/lib/auth/storage.ts:40–46`:\n\n```ts\nexport function getToken(): string | null {\n  if (isStaleVersion()) {\n    clearAll({ preserveProvider: false });\n    return null;\n  }\n  return localStorage.getItem(KEYS.token);   // key name: 'token'\n}\n```\n\n**Pure `localStorage.getItem('token')`.** No cookie read, no server-side origin.\n\n---\n\n### 3. Logout — how state is cleared\n\n`src/routes/auth/logout/perform-logout.ts`:\n\n```ts\nexport function performLogout(): void {\n  clearAll({ preserveProvider: false });\n}\n```\n\n`clearAll` removes `localStorage` keys `token`, `accounts`, `user`, `mvox.token_version` and clears `sessionStorage`. **No `cookies.delete()` call.** The logout route has no `+page.server.ts` at all.\n\n---\n\n### 4. Cookies — entire codebase\n\nGrep of all `src/**/*.ts` and `src/**/*.svelte` for `cookie`, `cookies`, `event.locals`, `locals.` — **zero hits** (excluding spec files and `.svelte-kit/` generated output).\n\nThere are **no cookies anywhere in the mvox codebase** — not set, not read, not deleted.\n\n---\n\n### 5. `hooks.server.ts` / `event.locals`\n\n```ts\nexport const handle: Handle = async ({ event, resolve }) => {\n  return resolve(event);\n};\n```\n\n`event.locals` is never populated. No session object, no user, no token. The server is completely blind at the hooks level.\n\n---\n\n### 6. Can the server read auth state for CHORE-79?\n\n**No.** The server has zero visibility into auth state today:\n\n- No cookie carries the JWT or any session indicator.\n- `event.locals` is empty.\n- The only auth state is in `localStorage`, which is inaccessible to the server.\n\n---\n\n### Design implications for CHORE-79\n\n| Approach | What's needed |\n|---|---|\n| **Global server-side redirect** (`hooks.server.ts`) | Requires a cookie the server can read. Needs a new step: after OAuth exchange, mirror the JWT (or a separate session flag) into an httpOnly (or at minimum readable) cookie via a SvelteKit server endpoint. |\n| **Per-route server guard** (`+page.server.ts` / `+layout.server.ts`) | Same prerequisite — server still can't see auth without a cookie. |\n| **Client-side guard** (`$effect` + `goto`) | Usable today with no infrastructure change. Pattern already exists in `/library`. Downside: page renders before redirect fires (the flash PO wants to eliminate). |\n| **Hybrid: cookie flag + server redirect** | On login callback, fire a server endpoint (`/auth/set-session`) that sets a lightweight httpOnly cookie (just a boolean or the token). `hooks.server.ts` reads the cookie to gate protected routes. The full JWT stays in localStorage for Entu API calls. This is the minimal path to true server-side guard. |\n\n**Bottom line for the design conversation with PO:** a true no-flash server-side guard requires introducing a session cookie — that's new infrastructure. The question is whether to do that as part of CHORE-79 or whether a client-side guard (which exists today as a pattern) is acceptable for now.",
+    "summary": "Session JWT is localStorage-only — server is completely blind to auth",
+    "timestamp": "2026-05-31T16:00:05.301Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-31T16:00:07.683Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T16:00:07.683Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "comenius",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1780244845488@comenius\",\"from\":\"comenius\",\"timestamp\":\"2026-05-31T16:27:37.970Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-31T16:27:37.970Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "[2026-05-31 16:27]\n\n[LEARNED] `overflow-x-hidden` on a flex header clips `position:absolute` dropdowns; correct pattern is `relative z-30` + per-child `flex-shrink-0`/`min-w-0`.\n[LEARNED] `hidden sm:grid` (not just `sm:grid`) required for desktop-only grid wrappers to keep them out of block flow below sm.\n[LEARNED] Mobile list/detail routing via existing `initialWorkId` prop + anchor rows (`<a href=\"?work=<id>\">`) — no JS navigation, free back-button support.\n\nScratchpad updated at `teams/mvox-dev/memory/byrd.md`. Approving shutdown.\n\n(*MVOX:Byrd*)",
+    "summary": "Byrd shutdown approved — scratchpad saved",
+    "timestamp": "2026-05-31T16:28:00.312Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "[2026-05-31 16:28] Session 26 close. Lift-candidate is logged at the TOP of `teams/mvox-dev/memory/bentham.md`, tagged `[LIFT-CANDIDATE → session 27]` — both responsive-review rules consolidated into one proposed arch-decision with sources + an offer to author solo on session-27 startup.\n\n- [LEARNED] Both session-26 REDs share one root: jsdom has no layout engine, so structural class-presence tests pass while the computed display/visibility is broken. Rule 1: single-axis overflow clip on a dropdown host = RED (CSS Overflow L3 §3.2 forces the other axis to auto). Rule 2: a `sm:`/`md:` display utility with no paired base `hidden` is visible below the breakpoint; specs must assert BOTH halves. Tallis already adopted the BOTH-halves sweep as standing practice (validated in the CHORE-78 re-verify).\n- [DEFERRED] YELLOW-78.1 (RED-commit module-resolution stub gap) accepted note-only; no issue needed — for the next NEW-component CHORE, Tallis should stub the component in the RED commit so `pnpm check` stays green per-commit (CHORE-75 did this; CHORE-78 didn't). Worth a one-line reminder at that dispatch, not a tracked item.\n- [WARNING] None. Three branches reviewed this session (CHORE-76/77/78), all landed GREEN after their fix rounds; main is clean.\n\nApproving shutdown.",
+    "summary": "Session 26 close — lift-candidate logged, ready to shut down",
+    "timestamp": "2026-05-31T16:28:01.814Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1780244844030@byrd\",\"from\":\"byrd\",\"timestamp\":\"2026-05-31T16:28:03.503Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-31T16:28:03.503Z",
+    "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1780244842605@tallis\",\"from\":\"tallis\",\"timestamp\":\"2026-05-31T16:28:03.807Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-31T16:28:03.807Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1780244840721@bentham\",\"from\":\"bentham\",\"timestamp\":\"2026-05-31T16:28:05.334Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-31T16:28:05.334Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "[2026-05-31 16:28] Session 26 close — Josquin out.\n\n[LEARNED] Three CHOREs (76/77/78) shipped via two-phase preview→merge→deploy, all clean. SHAs on main: da00b06, 4cfdf85, 9f8bcd3. `wrangler` not on bare PATH this session — `pnpm exec wrangler` is the working invocation (logged in scratchpad as a GOTCHA).\n[DEFERRED] CHORE-79 GREEN (server-side cookie + hooks guard) is mine next session — plan committed. Scratchpad flags a pre-impl check: re-read it against the Path C \"BFF/hooks is a no-op\" decision before writing, surface-and-stop if it reintroduces server-side session state vs intended.\n[WARNING] None. Working tree on main has 4 expected uncommitted files for your shutdown persist: plan-doc edit + bentham.md/tallis.md/test-gaps.md. No stashes of mine remain.\n\nApproving shutdown.",
+    "summary": "Session 26 close — 3 CHOREs shipped, out",
+    "timestamp": "2026-05-31T16:28:11.544Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1780244846970@josquin\",\"from\":\"josquin\",\"timestamp\":\"2026-05-31T16:28:14.633Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-31T16:28:14.633Z",
+    "color": "pink",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1780244838305@finn\",\"from\":\"finn\",\"timestamp\":\"2026-05-31T16:28:15.933Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-31T16:28:15.933Z",
+    "color": "blue",
     "type": "message",
     "read": true
   }

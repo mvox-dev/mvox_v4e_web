@@ -1,8 +1,77 @@
 [
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1780231451021@bentham\",\"from\":\"team-lead\",\"reason\":\"End-of-session-25. CHORE-74 + CHORE-75 shipped end-to-end. Stand down cleanly per L117.\",\"timestamp\":\"2026-05-31T12:44:11.021Z\"}",
-    "timestamp": "2026-05-31T12:44:11.021Z",
+    "text": "[2026-05-31 12:49] Thanks Ben. Clearing your calibration item: YELLOW-75.1 (AvatarMenu focus-on-open) was folded in pre-merge at `b83b686` before CHORE-75 squashed to `70ee562`. It's resolved on main — no post-merge issue to track.\n\nThe CHORE-72 Task-15 rule lift is still on the table as a session-26 candidate; holding until PO sets priority. I'll ping you if we go that route. Stay idle for now.",
+    "summary": "YELLOW-75.1 was folded pre-merge; no tracking needed",
+    "timestamp": "2026-05-31T12:48:45.555Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-05-31 13:21] Review request — CHORE-76 (issue #76), branch `chore/responsive-nav`. Task #4 is yours.\n\n## What it is\nMinimal-scope responsive fix for MvoxNav. PO on mobile couldn't reach logout because the desktop-only nav pushed the avatar (CHORE-75 menu) off-screen. Fix: avatar always anchored/visible; below `sm` the 5 tab labels collapse behind a hamburger paper-card menu; OrgPicker chip truncates (also closes #65). Desktop (`sm`+) unchanged.\n\n## Branch chain\n- `5a28b27` Tallis RED — 12 tests, AC1–AC7\n- `fe25470` Comenius — `nav_menu_open` ×4 locales\n- `286a68c` Byrd GREEN — 576/576 passing\n\n## Please verify\n- AC1–AC7 satisfied (see issue #76 body for the list).\n- **Desktop no-regression** — all changes gated below `sm`; confirm the inline row / chip / avatar render identically at `sm`+.\n- **a11y parity** — hamburger menu reuses the AvatarMenu focus-on-open + Escape + click-outside pattern (the YELLOW-75.1 pattern). Confirm keyboard nav is genuinely equivalent, not just structurally present.\n- **i18n** — `nav_menu_open` present in all 4 locales; no hardcoded English in the new markup.\n- Per-commit-GREEN + merge-shape as usual.\n- Note: jsdom can't assert real Tailwind breakpoint layout — Tallis encoded AC2/AC3 structurally (class presence) and logged a deferred Playwright viewport test in test-gaps.md. Flag if you think that deferral is unacceptable for this CHORE vs. acceptable-with-note.\n\nSend verdict (RED/YELLOW/GREEN) with rationale + who-acts. Then idle.",
+    "summary": "Review request — CHORE-76 responsive nav",
+    "timestamp": "2026-05-31T13:20:35.696Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"4\",\"subject\":\"CHORE-76 REVIEW — Bentham RED/YELLOW/GREEN\",\"description\":\"Review chore/responsive-nav for CHORE-76. Verify AC1-AC7, desktop no-regression, i18n completeness (4 locales), keyboard a11y parity with AvatarMenu, per-commit-GREEN, merge-shape. Owner: Bentham.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-31T13:20:38.155Z\"}",
+    "timestamp": "2026-05-31T13:20:38.155Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-05-31 13:28] RED-76.1 resolved. Tallis ran `pnpm lint:fix` on `MvoxNav.spec.ts`, recommitted at `f786a41` (tip of `chore/responsive-nav`). He reports all 4 gates clean: check 0 errors, 576/576 tests, `pnpm lint` exit 0, build ok.\n\nPlease re-verify and confirm GREEN (the lint gate was the only blocker). If GREEN, I'll route to Josquin for merge + deploy.",
+    "summary": "RED-76.1 fixed — re-verify for GREEN",
+    "timestamp": "2026-05-31T13:27:36.365Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-05-31 13:55] Review request — CHORE-77 (issue #77), branch `chore/nav-stacking-fix`. Task #8 yours.\n\n## What/why\nRegression fix for CHORE-76 (`da00b06`). The `overflow-x-hidden` we added to `<header>` forced `overflow-y: auto` (CSS spec), clipping BOTH dropdown panels (AvatarMenu logout + nav-tab-menu) on desktop AND mobile — logout was unreachable again. Fix removes the clip, adds `relative z-30` to the header for a proper stacking context above page content.\n\n## Branch chain\n- `5473953` Tallis RED — revised the AC7 test (it had asserted the buggy `overflow-x-hidden`), +2 stacking tests, +1 forward-guard\n- `316ff02` Byrd GREEN — single-line `<header>` change (`-overflow-x-hidden +relative +z-30`), 579/579\n\n## Please verify\n- AC1–AC6 (issue #77): no block-axis clip on header; header forms a stacking context (`relative` + `z-30`) above unpositioned page content (`{@render children()}` / DeskSurface); horizontal overflow still controlled by `min-w-0`/truncate + `flex-shrink-0` (NOT a header clip); both panels structurally unclipped; desktop no-regression.\n- **Confirm the AC7 test-intent change is sound** — the prior test encoded the bug; the revised assertion (header must NOT carry overflow clip) is the correct contract. Was this a legitimate RED-phase revision vs something that should've been a new test? Your call.\n- `z-30` adequacy: page content/DeskSurface is unpositioned (Finn confirmed no transform/filter/opacity/isolation stacking traps on ancestors), so z-30 should win. Flag if you see any positioned/z-indexed content sibling that could still beat it.\n- Per-commit-GREEN + merge-shape.\n\nVerdict + rationale. Then idle.",
+    "summary": "Review — CHORE-77 nav stacking/overflow regression fix",
+    "timestamp": "2026-05-31T13:54:27.908Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"8\",\"subject\":\"CHORE-77 REVIEW — Bentham\",\"description\":\"Verify AC1-AC6: no block-axis clip on header; stacking context above content; horizontal overflow controlled without clip; AvatarMenu (desktop) + nav-tab-menu (mobile) dropdowns fully visible; desktop no-regression. Per-commit-GREEN + merge-shape. Owner: Bentham.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-31T13:54:30.326Z\"}",
+    "timestamp": "2026-05-31T13:54:30.326Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-05-31 15:20] Review request — CHORE-78 (issue #78), branch `chore/mobile-library`. Task #18 yours. Spec: `docs/superpowers/specs/2026-05-31-chore-78-mobile-library-design.md`; plan alongside.\n\n## What it is\nMobile-only (`<sm`) responsive /library. Below `sm`: hide task cards + sticky index + 2-col grid; show a new `LibraryMobileList` (search on title+composer → filtered `<a href=?work=id>` rows) when `initialWorkId==null`, else a mobile detail (existing WorkPaperStack + back affordance). Desktop master-detail untouched. Driven by existing `?work=` param.\n\n## Branch chain\n- `883164f` Comenius — 3 i18n keys (incl. NEW `library_mobile_search_placeholder`; desktop `library_search_placeholder` ⌘K string was restored after I caught an accidental overwrite — please confirm desktop key is back to \"⌘K · jump to work, copy #, borrower…\")\n- `2747684` Tallis RED — 9 + 12 tests\n- `d148450` Byrd GREEN — 599/599\n\n## Please verify (AC1–AC9, spec)\n- Desktop (`sm`+) no-regression — 2-col grid/index/scroll-spy still render via `sm:` gating; the restored desktop ⌘K placeholder.\n- Search semantics: case-insensitive, title OR composer.\n- **Scroll-spy gate genuinely off `<sm`** — reason about `isDesktopViewport()` (`matchMedia('(min-width:640px)')`), not just that the test passes. On a real mobile browser matchMedia returns false → observer never built → no auto-`?work=` while scrolling the list. Confirm.\n- Rows are anchors (`?work=`) so browser back works; back affordance clears the param.\n- i18n: 3 keys ×4 in sync; no hardcoded English in new markup; desktop key untouched.\n- Per-commit-GREEN + merge-shape (`git log HEAD..main` should be empty; base = current main).\n\nVerdict + rationale + who-acts. Then idle.",
+    "summary": "Review — CHORE-78 mobile library",
+    "timestamp": "2026-05-31T15:19:19.372Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"18\",\"subject\":\"CHORE-78 Task 4 — REVIEW (Bentham)\",\"description\":\"Verify AC1-9, desktop no-regression, scroll-spy gate, i18n ×4, per-commit-GREEN, merge-shape. Branch chore/mobile-library.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-31T15:19:21.699Z\"}",
+    "timestamp": "2026-05-31T15:19:21.699Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-05-31 15:31] RED-78.1 resolved. Tallis strengthened the AC2 test (`b116629`, now asserts `hidden` + `sm:grid`); Byrd applied the 1-class fix + dropped the stale CHORE-77 comment at `6c9f971` (tip). Tallis's standing-rule sweep confirmed the other mobile elements use `block sm:hidden` correctly — no further gaps. Byrd reports check 0 / 599 tests / lint 0 / build ok.\n\nPlease re-verify GREEN — focus the AC2 mobile-render fix (`library-md-grid` now `hidden sm:grid md-wrap` → desktop detail column no longer renders below the mobile list) + per-commit-GREEN on the fix commits + merge-shape. If GREEN, I route to Josquin for preview→merge. YELLOW-78.1 (RED-commit stub) is accepted as note-only per your call.",
+    "summary": "RED-78.1 fixed — re-verify CHORE-78",
+    "timestamp": "2026-05-31T15:29:58.080Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1780244840721@bentham\",\"from\":\"team-lead\",\"reason\":\"Session 26 wrap. Strong reviews — you caught RED-76.1 (overflow clip) + RED-78.1 (md-grid missing base hidden). Make sure your new responsive-review rule (sm:/md: display class must also assert base hidden; single-axis overflow clip on dropdown hosts = RED) is in your scratchpad for the session-27 lift to architecture-decisions.md. Then approve shutdown.\",\"timestamp\":\"2026-05-31T16:27:20.721Z\"}",
+    "timestamp": "2026-05-31T16:27:20.721Z",
     "type": "message",
     "read": true
   }

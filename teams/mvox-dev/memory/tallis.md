@@ -286,4 +286,39 @@ Updated: `src/tests/routes/auth/oauth/cookie-server.spec.ts` (5 new tests — as
 
 [GOTCHA] MvoxNav.spec.ts line 33 previously pinned `container.textContent.toContain('Maire L.')` — this was the inline-name assertion that would have silently passed even after AvatarMenu wiring (name still present in DOM, just inside the dropdown). Replacing it with a `querySelector` for the trigger button is the correct structural pin.
 
+## [CHECKPOINT] 2026-05-31 — Session 26: CHORE-76 RED phase
+
+[DECISION] 12 new tests in `src/lib/components/MvoxNav.spec.ts` — describe block `MvoxNav — responsive layout (CHORE-76)`. All 12 RED. Commit SHA `5a28b27` on `chore/responsive-nav`. Existing 7 MvoxNav + 564 other tests stay green.
+
+[PATTERN] Responsive layout test strategy: jsdom has no CSS engine; encode responsiveness structurally. Assert responsive Tailwind classes exist (`hidden sm:flex`, `sm:hidden`, `flex-shrink-0`, `min-w-0`, `overflow-x-hidden`). Assert hamburger click reveals a `[data-testid="nav-tab-menu"]` with 5 `[data-testid^="nav-tab-menu-item-"]` children. jsdom pixel overflow deferred to Playwright — flagged in test-gaps.md.
+
+[PATTERN] Hamburger focus-on-open pattern: mirrors AvatarMenu keyboard pattern. After `fireEvent.click(hamburger)`, assert `document.activeElement === firstItem` (the first `[data-testid^="nav-tab-menu-item-"]`).
+
+[DECISION] data-testid contract (Byrd must implement):
+- `nav-avatar-wrapper` — flex wrapper around AvatarMenu (must have `flex-shrink-0`)
+- `nav-inline-tabs` — desktop inline tab row (must have `hidden sm:flex`)
+- `nav-inline-tab-{agenda|library|roster|notices|settings}` — individual inline tab elements
+- `nav-tab-menu-trigger` — hamburger button (must have `sm:hidden`, non-empty aria-label)
+- `nav-tab-menu` — collapsed menu panel
+- `nav-tab-menu-item-{agenda|library|roster|notices|settings}` — menu entries (first must receive focus on open)
+- `nav-chip-librarian` — librarian chip (must be child of `nav-tab-menu-item-library` when menu open)
+- `nav-org-area` — org picker / chip wrapper (must have `min-w-0`)
+- `nav-signin-wrapper` — wrapper for sign-in link (must have `flex-shrink-0`)
+
+[DECISION] i18n key needed: `nav_menu_open` for hamburger aria-label — test couples to presence of non-empty accessible name, NOT the literal string. Comenius wires it.
+
+[GAP] CHORE-76 — Playwright viewport test at 320px deferred. See test-gaps.md.
+
+## [CHECKPOINT] 2026-05-31 — Session 26: CHORE-77/78 RED + RED-78.1
+
+[DECISION] CHORE-77 RED: 3 tests in MvoxNav.spec.ts (2 RED + 1 forward-guard). AC7 revised (no overflow clip on header), stacking context added (relative/sticky + z-* class). SHA `5473953` on `chore/nav-stacking-fix`.
+
+[DECISION] CHORE-78 Task 2 RED: 9 failing tests in `LibraryMasterDetail.spec.ts` + new `LibraryMobileList.spec.ts` (12 tests, suite RED on missing file). SHA `2747684`. RED-78.1 follow-up `b116629` — strengthened AC2 grid assertion to require BOTH `hidden` AND `sm:grid`.
+
+[PATTERN] Bentham's standing responsive rule (RED-78.1): a `sm:grid`/`sm:block`/`sm:flex` without a base `hidden` renders in block flow below the breakpoint. ALWAYS assert BOTH `hidden` AND the responsive display class. Inverse (`block sm:hidden`) needs no companion. Apply this sweep to every CHORE with breakpoint-gated elements.
+
+[GOTCHA] YELLOW-78.1 — stub rule for new components in RED phase: land a minimal stub `.svelte` (export default empty component, throw-not-implemented body) alongside the spec so `pnpm check` stays at 0 errors. Tests fail on assertions, not module resolution. Apply from next new-component RED onward.
+
+[DECISION] CHORE-78 testable seams (all three matched Byrd's GREEN): (a) row-select = `<a href="?work=<id>">` anchor; (b) scroll-spy gate = `window.matchMedia('(min-width: 640px)').matches` in onMount/$effect; (c) mobile view mode = derived from existing `initialWorkId` prop.
+
 (*MVOX:Tallis*)

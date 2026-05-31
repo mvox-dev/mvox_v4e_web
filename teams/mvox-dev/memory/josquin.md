@@ -4,6 +4,29 @@ Personal notes. Only Josquin writes here.
 
 ---
 
+## [CHECKPOINT] 2026-05-31 session 26 — three nav/library CHOREs shipped via two-phase preview→merge→deploy
+
+Shipped 3 squash-merges + 3 production deploys this session, each as a strict two-phase flow (PREVIEW deploy from branch → HOLD → merge+production only on team-lead's explicit "PO approved, merge"). All clean.
+
+- **CHORE-76** (`da00b06`): responsive MvoxNav — mobile nav + logout reachable + org-chip truncate. Closes #76 + #65. Push `70ee562..da00b06` (carried the unpushed session-25 `1165eb3`). Prod chunks `app.BHUvLTLK.js`.
+- **CHORE-77** (`4cfdf85`): nav dropdown clip fix — drop header overflow clip + add stacking context. Closes #77. Prod chunks `app.DEBrL8Ie.js`.
+- **CHORE-78** (`9f8bcd3`): mobile library — search-filtered work list → detail. Closes #78. Push carried spec+plan `73c3fef`+`4552876`. 10 files. Prod chunks `app.BlWNemeh.js` + `start.yhLn1xom.js`.
+
+### Durables
+
+[GOTCHA] **`wrangler` is NOT on bare PATH this session — use `pnpm exec wrangler`.** Bare `wrangler pages deploy ...` → `command not found`. `pnpm exec wrangler pages deploy .svelte-kit/cloudflare --project-name=multivox [--branch=<b>]` works. Creds still sourced inline `set -a; . ~/.config/mvox/credentials.env; set +a`. Preview = `--branch=<branch>` (lands on `<hash>.multivox.pages.dev` + `<branch>.multivox.pages.dev` alias, does NOT touch prod/mvox.eu). Production = no `--branch`. Verify with `curl -sI https://mvox.eu[/path]` → 200 + `x-sveltekit-page: true`, and diff the served `app.<hash>.js` chunk vs the prior deploy to confirm the new build is actually live (don't trust the deploy success line alone).
+
+[PATTERN] **Carry-over tree files that aren't yours: stash separately + surface, don't silently merge.** On CHORE-78 checkout, the tree carried an uncommitted edit to `docs/superpowers/plans/2026-05-31-chore-78-mobile-library.md` (intentional team-lead doc edit, NOT a branch commit, outside my write scope). `git merge --squash` only brings branch commits so it'd never enter the squash regardless — but I stashed it in its OWN stash (separate from the `teams/mvox-dev/memory/` scratchpad stash), flagged it to team-lead in the Phase 1 report, and popped BOTH stashes back onto main after the production deploy per the Phase 2 brief. Two-stash pop order doesn't matter; both popped clean. Generalizes: any pre-existing dirty tree file you didn't author gets stashed + named + surfaced, never folded into a commit by omission.
+
+[PATTERN] **Stale `task_assignment` notifications keep arriving AFTER the Phase 1 report** (same artifact as session-17 L151). Each CHORE's task_assignment JSON arrived with a timestamp predating my preview report. Ack one-liner ("stale, predates report, no action") + keep holding for the real "PO approved, merge". Never let it trigger a re-do. The merge go-ahead is ALWAYS a plain-text "PO approved, merge" SendMessage from team-lead, never the task_assignment JSON.
+
+### Next session
+- **CHORE-79 GREEN is mine** — server-side: cookie + hooks guard. Plan is committed (per team-lead shutdown note). Read the plan first; note this is server-side work (`src/lib/server/`, `hooks.server.ts`, `+page.server.ts`) — re-check it against the Path C "browser-direct, BFF reserved for elevated ops only" decision in arch-decisions before implementing, since a new cookie/hooks guard touches the auth boundary that Path C deliberately made a no-op. If the plan reintroduces server-side session state, surface-and-stop to confirm it's intended (elevated-ops list addition) vs drift.
+
+(*MVOX:Josquin*)
+
+---
+
 ## [CHECKPOINT] 2026-05-24 session 23 — CHORE-67 + CHORE-68 squash + same-session deploy
 
 Shipped one squash to main and one production deploy:

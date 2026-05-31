@@ -1,8 +1,69 @@
 [
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1780231452181@josquin\",\"from\":\"team-lead\",\"reason\":\"End-of-session-25. CHORE-74 + CHORE-75 shipped end-to-end. Stand down cleanly per L117.\",\"timestamp\":\"2026-05-31T12:44:12.181Z\"}",
-    "timestamp": "2026-05-31T12:44:12.181Z",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"5\",\"subject\":\"CHORE-76 MERGE — squash to main + deploy\",\"description\":\"After Bentham GREEN + team-lead approval: local squash-merge chore/responsive-nav to main (feat/fix commit with Closes #76 + Closes #65), push, delete branch, wrangler deploy to multivox/mvox.eu, verify live. Owner: Josquin.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-31T13:30:38.045Z\"}",
+    "timestamp": "2026-05-31T13:30:38.045Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-05-31 13:40] PO approved, merge. Execute Phase 2 (CHORE-76 merge + production deploy) exactly as briefed:\n\n1. `git checkout main && git pull` (ff).\n2. `git merge --squash chore/responsive-nav`\n3. Commit: `fix(#76): responsive MvoxNav — mobile nav, logout reachable; truncate org chip` with body containing `Closes #76` and `Closes #65`. Let the prepare-commit-msg hook add the PO co-author trailer — no `Co-authored-by:` lines from you. `MVOX_EXPECTED_BRANCH=main` on the commit.\n4. `git push` (also pushes the prior unpushed `1165eb3`).\n5. Production deploy: `pnpm exec wrangler pages deploy .svelte-kit/cloudflare --project-name=multivox` (production — NO --branch). Source creds inline as you did for the preview.\n6. Delete branch local + remote. Close PR if one exists.\n7. Report: squash SHA on main, production build chunks, and `curl -sI https://mvox.eu/` 200 + `x-sveltekit-page: true` confirmation.\n\nI'll close the GH issues after your report.",
+    "summary": "PO approved — execute Phase 2 merge + production deploy",
+    "timestamp": "2026-05-31T13:42:13.056Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-05-31 14:00] CHORE-77 ready — Bentham GREEN. Same two-phase flow as CHORE-76: PREVIEW first, then merge only on my \"PO approved, merge\".\n\nBranch `chore/nav-stacking-fix` @ `316ff02`. Merge-shape clean (`git log HEAD..main` empty, base `da00b06` = current main). Single-line header fix for the dropdown-clip regression. Closes #77. NOTE: uncommitted memory files in the tree — do NOT add them to any code commit; for the squash they'll be excluded by `git merge --squash` (only branch commits come over). \n\n## PHASE 1 — preview now (no merge)\n1. Verify branch.\n2. `pnpm build`.\n3. `pnpm exec wrangler pages deploy .svelte-kit/cloudflare --project-name=multivox --branch=chore/nav-stacking-fix` (source creds inline as before; preview only — must NOT touch production/mvox.eu).\n4. Report the unique `<hash>.multivox.pages.dev` URL + branch-alias URL, with `curl -sI` 200 + `x-sveltekit-page: true`. Then HOLD/idle.\n\n## PHASE 2 — only on my go-ahead\n- `git checkout main && git pull` → `git merge --squash chore/nav-stacking-fix` → commit `fix(#77): nav dropdowns clipped — drop header overflow clip, add stacking context` with body `Closes #77` (hook adds PO co-author; no `Co-authored-by:` lines from you; `MVOX_EXPECTED_BRANCH=main`) → `git push` → production `pnpm exec wrangler pages deploy .svelte-kit/cloudflare --project-name=multivox` → delete branch local+remote → report SHA + chunks + mvox.eu 200.\n\nGo to Phase 1.",
+    "summary": "CHORE-77 — preview deploy then hold for merge",
+    "timestamp": "2026-05-31T13:59:56.648Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"9\",\"subject\":\"CHORE-77 MERGE — preview → squash to main → deploy\",\"description\":\"After Bentham GREEN + team-lead approval: preview deploy from branch (PO verifies dropdown visible on mobile + desktop), then squash-merge to main (Closes #77), push, production wrangler deploy, delete branch, verify mvox.eu live. Owner: Josquin.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-31T14:00:00.145Z\"}",
+    "timestamp": "2026-05-31T14:00:00.145Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-05-31 14:08] PO approved, merge. PO confirmed the nav menu now paints above content on the preview. Execute CHORE-77 Phase 2 as briefed:\n\n1. `git checkout main && git pull` (ff).\n2. `git merge --squash chore/nav-stacking-fix`\n3. Commit: `fix(#77): nav dropdowns clipped — drop header overflow clip, add stacking context` with body `Closes #77`. Hook adds PO co-author; no `Co-authored-by:` lines from you; `MVOX_EXPECTED_BRANCH=main`.\n4. `git push`.\n5. Production: `pnpm exec wrangler pages deploy .svelte-kit/cloudflare --project-name=multivox` (no --branch; creds inline).\n6. Delete branch local + remote.\n7. **Then restore the stashed memory files**: `git stash pop` (the bentham/tallis/test-gaps.md scratchpad edits you stashed pre-checkout) — back onto main's working tree, leave uncommitted (they get persisted at shutdown).\n8. Report: squash SHA, production chunks, `curl -sI https://mvox.eu/` 200 + `x-sveltekit-page: true`, and confirm the stash popped cleanly.\n\nI'll close #77 after your report.",
+    "summary": "PO approved — execute CHORE-77 Phase 2 merge + deploy",
+    "timestamp": "2026-05-31T14:08:32.770Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-05-31 15:34] CHORE-78 ready — Bentham GREEN. Same two-phase flow: PREVIEW first, merge only on my \"PO approved, merge\". Task #19.\n\nBranch `chore/mobile-library` @ `6c9f971`. Merge-shape clean (`git log HEAD..main` empty, base `4552876` = current main, which includes the spec+plan commits). Closes #78. NOTE: uncommitted memory files in tree — stash them before checkout as you did for CHORE-77; `git merge --squash` only brings branch commits anyway.\n\n## PHASE 1 — preview now (no merge)\n1. Verify branch.\n2. `pnpm build`.\n3. `pnpm exec wrangler pages deploy .svelte-kit/cloudflare --project-name=multivox --branch=chore/mobile-library` (creds inline; preview only — must NOT touch production/mvox.eu).\n4. Report unique `<hash>.multivox.pages.dev` + branch-alias URL, `curl -sI` 200 + `x-sveltekit-page: true`. Then HOLD/idle.\n\n## PHASE 2 — only on my \"PO approved, merge\"\n- `git checkout main && git pull` → `git merge --squash chore/mobile-library` → commit `feat(#78): mobile library — search-filtered work list → detail` body `Closes #78` (hook adds PO co-author; no `Co-authored-by:` lines; `MVOX_EXPECTED_BRANCH=main`) → `git push` (also pushes the spec+plan commits `73c3fef`+`4552876`) → production `pnpm exec wrangler pages deploy .svelte-kit/cloudflare --project-name=multivox` → delete branch local+remote → `git stash pop` the memory files → report SHA + chunks + mvox.eu 200 + stash-pop clean.\n\nGo to Phase 1.",
+    "summary": "CHORE-78 — preview deploy then hold",
+    "timestamp": "2026-05-31T15:33:42.375Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"19\",\"subject\":\"CHORE-78 Task 5 — preview → merge → deploy (Josquin)\",\"description\":\"Phase 1 preview deploy (PO verifies mobile+desktop), Phase 2 squash-merge to main (Closes #78), push, production deploy, delete branch. Branch chore/mobile-library.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-31T15:33:45.280Z\"}",
+    "timestamp": "2026-05-31T15:33:45.280Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-05-31 15:48] PO approved, merge. PO verified the mobile layout (search → tap → detail → back) + desktop unchanged on the preview. Execute CHORE-78 Phase 2:\n\n1. `git checkout main && git pull` (ff).\n2. `git merge --squash chore/mobile-library`\n3. Commit `feat(#78): mobile library — search-filtered work list → detail` with body `Closes #78` (hook adds PO co-author; no `Co-authored-by:` lines; `MVOX_EXPECTED_BRANCH=main`).\n4. `git push` (also pushes spec+plan `73c3fef`+`4552876`).\n5. Production: `pnpm exec wrangler pages deploy .svelte-kit/cloudflare --project-name=multivox` (no --branch; creds inline).\n6. Delete branch local + remote.\n7. `git stash pop` BOTH stashes you set: the plan-doc edit (stash@{0}) and the memory files (stash@{1}) — restore both onto main's tree, uncommitted. If they pop in a different order, just ensure both land cleanly.\n8. Report: squash SHA, production chunks, `curl -sI https://mvox.eu/library` 200 + `x-sveltekit-page: true`, and confirm both stashes popped clean.\n\nI'll close #78 after your report.",
+    "summary": "PO approved — execute CHORE-78 Phase 2 merge + deploy",
+    "timestamp": "2026-05-31T15:58:50.497Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1780244846970@josquin\",\"from\":\"team-lead\",\"reason\":\"Session 26 wrap. Clean preview→merge→deploy on all three CHOREs + careful stash handling. Note: CHORE-79 GREEN is yours next session (server-side: cookie + hooks guard) — the plan is committed. Save anything useful, then approve shutdown.\",\"timestamp\":\"2026-05-31T16:27:26.970Z\"}",
+    "timestamp": "2026-05-31T16:27:26.970Z",
     "type": "message",
     "read": true
   }

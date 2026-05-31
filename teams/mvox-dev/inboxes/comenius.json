@@ -1,8 +1,38 @@
 [
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1780231449001@comenius\",\"from\":\"team-lead\",\"reason\":\"End-of-session-25. CHORE-74 + CHORE-75 shipped end-to-end. Stand down cleanly per L117.\",\"timestamp\":\"2026-05-31T12:44:09.001Z\"}",
-    "timestamp": "2026-05-31T12:44:09.001Z",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"2\",\"subject\":\"CHORE-76 i18n — nav_menu_open aria-label key × 4 locales\",\"description\":\"Add a single new Paraglide key nav_menu_open (accessible name for the mobile hamburger button) to messages/{en,et,lv,uk}.json. en: 'Open menu' (or similar). Owner: Comenius. Must exist before Byrd's GREEN references it (L100).\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-31T13:14:44.568Z\"}",
+    "timestamp": "2026-05-31T13:14:44.568Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-05-31 14:40] CHORE-78 Task 1 (issue #78) — yours. Plan: `docs/superpowers/plans/2026-05-31-chore-78-mobile-library.md` (Task 1). Spec: `docs/superpowers/specs/2026-05-31-chore-78-mobile-library-design.md`.\n\n## Branch\n`chore/mobile-library` is checked out in the shared tree (verify `git branch --show-current`; checkout if needed). NOTE: uncommitted memory files (bentham/tallis/test-gaps.md) in the tree — leave them, `git add` only `messages/*` + regenerated paraglide.\n\n## Task — add 3 keys ×4 locales (en/et/lv/uk)\nMobile library search/detail strings. `library_*` family, alphabetical, consistent with your existing `library_*` keys:\n- `library_search_placeholder` — en: \"Search title or composer…\"\n- `library_back_to_works` — en: \"‹ Works\"  (translate the word \"Works\"; keep the ‹ glyph as the back chevron)\n- `library_search_no_results` — en: \"No works match your search\"\nProvide proper et/lv/uk translations (concept-mapped).\n\n## Done\n- `pnpm i18n:gen` to regenerate paraglide; verify all 4 locales in sync.\n- `pnpm check` 0 errors, `pnpm lint` exit 0 (lint:fix first if needed).\n- Commit (`MVOX_EXPECTED_BRANCH=chore/mobile-library`, no `Co-authored-by:` lines).\n- Handoff to me with key names + en + 3 translations + SHA. Then idle.",
+    "summary": "CHORE-78 Task 1 — 3 library i18n keys ×4",
+    "timestamp": "2026-05-31T15:03:23.058Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"15\",\"subject\":\"CHORE-78 Task 1 — i18n keys (Comenius)\",\"description\":\"Add 3 keys ×4 locales: library_search_placeholder ('Search title or composer…'), library_back_to_works ('‹ Works'), library_search_no_results ('No works match your search'). Run i18n:gen. Branch chore/mobile-library. Per plan Task 1.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-31T15:03:28.092Z\"}",
+    "timestamp": "2026-05-31T15:03:28.092Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-05-31 15:10] Small correction on Task 1 — my plan was ambiguous, my miss. `library_search_placeholder` already existed and belongs to the DESKTOP search (`PencilSearch` in +page.svelte) — its original value was \"⌘K · jump to work, copy #, borrower…\" (the desktop search jumps by work/copy#/borrower, broader than our mobile title+composer search). Overwriting it changes desktop copy + mis-describes the desktop search. We must leave desktop untouched.\n\nPlease:\n1. **Restore `library_search_placeholder` to its original values on `main`** in all 4 locales. Get them via `git show main:messages/en.json` (and et/lv/uk) — grep `library_search_placeholder`. The en original is \"⌘K · jump to work, copy #, borrower…\"; restore each locale's original verbatim.\n2. **Add a NEW key `library_mobile_search_placeholder`** for the mobile search, using the title/composer strings you already wrote:\n   - en: \"Search title or composer…\"\n   - et: \"Otsi pealkirja või heliloojat…\"\n   - lv: \"Meklēt pēc nosaukuma vai komponista…\"\n   - uk: \"Пошук за назвою або композитором…\"\n3. Keep `library_back_to_works` + `library_search_no_results` as you have them (those are correct, new keys).\n4. `pnpm i18n:gen`, verify 4-locale sync, `pnpm check` 0 + `pnpm lint` 0, commit (`MVOX_EXPECTED_BRANCH=chore/mobile-library`).\n5. Reply with the new SHA + confirm `library_search_placeholder` is back to the original desktop string and `library_mobile_search_placeholder` is the new one. Then idle.\n\n(Byrd will wire the mobile input to `m.library_mobile_search_placeholder()` — I've updated the plan contract.)",
+    "summary": "CHORE-78 Task 1 correction — don't reuse desktop placeholder key",
+    "timestamp": "2026-05-31T15:07:03.610Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1780244845488@comenius\",\"from\":\"team-lead\",\"reason\":\"Session 26 wrap. i18n for #76 + #78 done (and the good catch-and-correct on not reusing the desktop search key). Approve shutdown when ready.\",\"timestamp\":\"2026-05-31T16:27:25.488Z\"}",
+    "timestamp": "2026-05-31T16:27:25.488Z",
     "type": "message",
     "read": true
   }

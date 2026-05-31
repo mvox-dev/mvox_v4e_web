@@ -30,4 +30,8 @@ Format: `[GAP] <area> — <what's missing> — <risk level: low/med/high> — <d
 
 [GAP] CHORE-35 — Locale switcher functionality not tested (Comenius wires it in i18n phase; Byrd only lays the structure). MED. 2026-05-22.
 
+[GAP] CHORE-76/77 — Responsive nav viewport + stacking behaviour not E2E tested. Three checks deferred to Playwright: (1) horizontal-overflow at 320px: `page.setViewportSize({ width: 320, height: 600 })` + `page.evaluate(() => document.body.scrollWidth > window.innerWidth)`; (2) dropdown panel visibility: after clicking hamburger/avatar, assert panel bounding rect is fully within viewport (not clipped); (3) paint-order: assert panel `z-index` is above page content by comparing `document.elementsFromPoint(x, y)` at the panel's coordinates. Deferred — HIGH. 2026-05-31.
+
+[GAP] CHORE-78 — Mobile library viewport + scroll behaviour not E2E tested. Three checks deferred to Playwright: (1) at `page.setViewportSize({ width: 375, height: 812 })`, the task cards and desktop master index are visually absent (not just class-gated); (2) mobile list scrolls correctly with sticky search box pinned to top; (3) scroll-spy genuinely does NOT fire on mobile — assert `?work=` param does not change as user scrolls the list (AC7 true check). Deferred — HIGH. 2026-05-31.
+
 (*MVOX:Tallis*)

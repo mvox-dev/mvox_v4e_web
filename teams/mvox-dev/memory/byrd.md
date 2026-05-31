@@ -84,4 +84,18 @@
 
 [LEARNED] **CHORE-74 store architecture:** `selectedOrgIdStore` (Writable, localStorage-initialized) + `urlOrgIdStore` (Writable, null default) + `selectedOrgStore` (derived over all three, URL > pick > first-org). Layout `$effect` wires `page.url` → `urlOrgIdStore`. `selectOrg` writes all three channels. Auth/callback `await hydrateUserStore()` before `goto()` fixes post-login stale state.
 
+## [CHECKPOINT] 2026-05-31 — CHORE-76/77/78 GREEN (session 26)
+
+[LEARNED] **`overflow-x-hidden` on a flex header clips `position:absolute` dropdowns** — CSS spec forces `overflow-y: auto` when `overflow-x` is non-visible, creating a containing block that clips `top-full` panels. The correct pattern for headers with dropdowns: `relative z-30` (stacking context + z-index), NOT any overflow clip. Horizontal overflow control belongs on flex-child wrappers via `flex-shrink-0` + `min-w-0`/`truncate`.
+
+[LEARNED] **Responsive nav pattern (MvoxNav CHORE-76/77):** Desktop tab row: `hidden sm:flex` wrapper. Mobile hamburger: `sm:hidden` button with `aria-label={m.nav_menu_open()}`. Dropdown panel: `position:absolute top-full` inside the `relative` hamburger wrapper. Focus-on-open via `queueMicrotask(() => firstItem?.focus())` in `$effect`. Escape closes + returns focus to trigger. Click-outside via `window.addEventListener('mousedown', ...)` in same `$effect`.
+
+[LEARNED] **Mobile list/detail routing via existing URL param (CHORE-78):** `initialWorkId` prop (already derived from `page.url.searchParams.get('work')` in `+page.svelte`) drives mobile view mode — null = list, non-null = detail. No new prop needed. Mobile rows are `<a href="?work=<id>">` anchors; back affordance is `<a href="?">`. This gives browser back-button support without JS navigation.
+
+[LEARNED] **Scroll-spy IntersectionObserver must be gated to `sm+`** — `isDesktopViewport()` predicate using `window.matchMedia('(min-width: 640px)').matches` ensures the observer is never constructed on mobile. In jsdom, `matchMedia` returns `matches: false`, so tests that replace IntersectionObserver with a throwing spy catch any mobile-path violation cleanly.
+
+[LEARNED] **`hidden sm:grid` not just `sm:grid` for desktop-only grid wrappers** — `sm:grid` alone leaves the element in block flow below sm, causing mobile layout bleed. Must use `hidden sm:grid` so the element is absent on mobile and activates as a grid at sm+. Same principle applies to any element that should be invisible below the breakpoint.
+
+[GOTCHA] **Library component specs are in `src/lib/components/library/` (subfolder)**, not `src/lib/components/`. The brief says "Tallis's paths are authoritative" — always check the actual file locations before reading plan paths.
+
 (*MVOX:Byrd*)
