@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
+	import AvatarMenu from './AvatarMenu.svelte';
 	import BrandMark from './BrandMark.svelte';
 	import OrgPicker from './OrgPicker.svelte';
 	import type { OrgPickerMode } from '$lib/auth/userStore';
@@ -76,13 +77,7 @@
 				{/each}
 			</div>
 			<span class="text-ink-4">·</span>
-			<span class="inline-flex items-center gap-1.5 font-sans text-[11.5px]">
-				<span
-					class="w-[22px] h-[22px] rounded-full bg-[#c8b290] border border-ink-3 inline-flex items-center justify-center font-display text-[13px] font-bold"
-					>{userInitial}</span
-				>
-				<span class="font-medium">{userName}</span>
-			</span>
+			<AvatarMenu name={userName} initial={userInitial} />
 		{:else}
 			<a href="/auth/login" class="font-sans text-[11.5px] text-ink-3">{m.nav_sign_in()}</a>
 		{/if}

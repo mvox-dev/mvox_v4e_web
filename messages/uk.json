@@ -147,9 +147,11 @@
 	"nav_org_picker_switch_to": "Перейти до {orgName}",
 	"nav_sign_in": "Увійти",
 	"nav_sign_out": "Вийти",
+	"nav_signed_in_as": "Увійшли як",
 	"nav_tab_agenda": "Програма",
 	"nav_tab_library": "Бібліотека",
 	"nav_tab_notices": "Повідомлення",
 	"nav_tab_roster": "Учасники",
-	"nav_tab_settings": "Налаштування"
+	"nav_tab_settings": "Налаштування",
+	"nav_user_menu_aria": "Меню користувача"
 }

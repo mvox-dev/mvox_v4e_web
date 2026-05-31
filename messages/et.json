@@ -147,9 +147,11 @@
 	"nav_org_picker_switch_to": "Lülitu: {orgName}",
 	"nav_sign_in": "Logi sisse",
 	"nav_sign_out": "Logi välja",
+	"nav_signed_in_as": "Sisse logitud",
 	"nav_tab_agenda": "Kava",
 	"nav_tab_library": "Raamatukogu",
 	"nav_tab_notices": "Teated",
 	"nav_tab_roster": "Liikmed",
-	"nav_tab_settings": "Seaded"
+	"nav_tab_settings": "Seaded",
+	"nav_user_menu_aria": "Kasutaja menüü"
 }

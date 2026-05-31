@@ -147,9 +147,11 @@
 	"nav_org_picker_switch_to": "Pārslēgt uz {orgName}",
 	"nav_sign_in": "Pierakstīties",
 	"nav_sign_out": "Izrakstīties",
+	"nav_signed_in_as": "Pieslēdzies kā",
 	"nav_tab_agenda": "Programma",
 	"nav_tab_library": "Bibliotēka",
 	"nav_tab_notices": "Paziņojumi",
 	"nav_tab_roster": "Dalībnieki",
-	"nav_tab_settings": "Iestatījumi"
+	"nav_tab_settings": "Iestatījumi",
+	"nav_user_menu_aria": "Lietotāja izvēlne"
 }

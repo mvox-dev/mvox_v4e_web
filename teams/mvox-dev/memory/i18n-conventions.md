@@ -290,4 +290,29 @@ Covers all landing page keys for the redesigned `/` route: `landing_hero_*`, `la
 | `landing_pillars_heading` | lv | `Kas iekšā` | "What's inside" — elliptical Latvian construction; natural for a heading. |
 | `landing_pillars_heading` | uk | `Що всередині` | "What's inside" — standard Ukrainian heading form. |
 
+### New key group: `nav_signed_in_as` + `nav_user_menu_aria` (CHORE-75, added session 25, 2026-05-31)
+
+Two utility/a11y keys for the avatar dropdown menu. Both neutral register, no brand voice.
+
+**`nav_signed_in_as`** — eyebrow label above the user name in the dropdown panel. Short noun phrase, label-register (not a sentence).
+- et: `Sisse logitud` — past-passive noun phrase ("logged in"); dropping "as" is natural for Estonian eyebrow context; the name line immediately below supplies the referent.
+- lv: `Pieslēdzies kā` — "signed in as"; reflexive perfect + `kā` (as); standard Latvian UI phrasing for session-state indicators.
+- uk: `Увійшли як` — "signed in as"; 2nd-person plural (`увійшли`) + `як` (as); polite standard Ukrainian for session-state labels.
+
+**`nav_user_menu_aria`** — aria-label on the trigger button; functional, screen-reader-only. Pure noun phrase.
+- et: `Kasutaja menüü` — "user menu"; genitive compound; direct and unambiguous.
+- lv: `Lietotāja izvēlne` — "user's menu"; genitive + `izvēlne` (menu); standard Latvian accessibility label pattern.
+- uk: `Меню користувача` — "menu of the user"; noun + genitive; standard Ukrainian accessibility label form.
+
+**Register note:** `nav_signed_in_as` is a visible eyebrow (UI copy); `nav_user_menu_aria` is aria-only (never displayed). Both are utility copy — no brand voice, no tagline register.
+
+| Key | Locale | Value | Rationale |
+|---|---|---|---|
+| `nav_signed_in_as` | et | `Sisse logitud` | Past-passive label; "as" dropped — eyebrow context + name below makes referent clear. |
+| `nav_signed_in_as` | lv | `Pieslēdzies kā` | Reflexive perfect + `kā`; natural Latvian session-state indicator. |
+| `nav_signed_in_as` | uk | `Увійшли як` | 2nd-pl polite + `як`; standard Ukrainian for session-state labels. |
+| `nav_user_menu_aria` | et | `Kasutaja menüü` | Genitive compound; direct aria-label. |
+| `nav_user_menu_aria` | lv | `Lietotāja izvēlne` | Genitive + `izvēlne` (menu); standard Latvian a11y label. |
+| `nav_user_menu_aria` | uk | `Меню користувача` | Noun + genitive; standard Ukrainian a11y label form. |
+
 (*MVOX:Comenius*)

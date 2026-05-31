@@ -30,7 +30,23 @@ describe('MvoxNav', () => {
 		expect(container.textContent).toContain('mvox');
 		expect(container.textContent).toContain('Agenda');
 		expect(container.textContent).toContain('Library');
-		expect(container.textContent).toContain('Maire L.');
+		// mechanical update (CHORE-72 Task-15 rule): name moves into AvatarMenu dropdown;
+		// trigger button is the new signed-in affordance
+		expect(container.querySelector('button[data-testid="avatar-menu-trigger"]')).not.toBeNull();
+	});
+
+	it('renders AvatarMenu trigger when signedIn (CHORE-75)', () => {
+		const { container } = render(MvoxNav, {
+			props: {
+				signedIn: true,
+				userName: 'Mihkel Putrinš',
+				userInitial: 'M',
+				currentTab: 'agenda',
+			},
+		});
+		const trigger = container.querySelector('button[data-testid="avatar-menu-trigger"]');
+		expect(trigger).not.toBeNull();
+		expect(trigger?.textContent).toContain('M');
 	});
 
 	it('shows LIBRARIAN role chip when on library tab and signed in', () => {
