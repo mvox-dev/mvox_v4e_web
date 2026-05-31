@@ -109,6 +109,8 @@ Vertical paper stack (A1 composition) on a desk backdrop.
 
 **Backdrop:** `DeskSurface` component (existing — animated wood-grain E-recipe from CHORE-67; 3 orbital `repeating-radial-gradient` layers at 8/13/21s linear infinite). **Note:** the wood-grain CSS is intentionally inherited from `DeskSurface` and NOT re-specified here. Brainstorm mockups showed static gradient approximations for review-speed; the implementation uses the animated component for visual consistency with /library. Per PO during brainstorm: "we'll work on wood grain CSS later — we did achieve really good results in previous sessions."
 
+**Live reference:** the deployed `https://mvox.eu/library` page is the canonical visual reference for the wood-grain surface. Tallis can ground RED-spec assertions against the live element classes; Byrd can verify GREEN parity by eyeballing the deployed page side-by-side with `pnpm dev`. No need to read CSS source to understand the target — it's already in production.
+
 Used in all backdrops: marketing hero, pillars section, invites section, request section, dashboard scattered area. Footer is the only section that does NOT use `DeskSurface` (it's a flat ink slab).
 
 ### `<LandingPillarsSection />`
