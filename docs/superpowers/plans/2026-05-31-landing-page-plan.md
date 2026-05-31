@@ -892,7 +892,7 @@ pnpm test src/lib/components/landing/LandingInvitesSection.spec.ts 2>&1 | tail -
 			aria-hidden="true"
 			class="absolute -top-7 right-6 border-[3px] border-red text-red rounded-full w-20 h-20 flex flex-col items-center justify-center text-center font-mono text-[9.5px] font-bold tracking-widest leading-tight bg-paper/85 z-10"
 			style="transform: rotate(6deg);"
-		>INVITE<br>ONLY</span>
+		>INVITE ONLY</span> <!-- NOT `INVITE<br>ONLY` — <br> produces no textContent space, breaks the test assertion. CSS wraps naturally in the circular stamp. (CHORE-72 Task 7 lesson.) -->
 		<div
 			class="relative bg-paper rounded p-[34px_26px_28px] border border-ink/10 shadow-md"
 			style="transform: rotate(-1deg);"
@@ -1061,15 +1061,18 @@ import { render, cleanup } from '@testing-library/svelte';
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import LandingFooter from './LandingFooter.svelte';
 
-const setLocaleSpy = vi.fn();
+// IMPORTANT: vi.mock is hoisted above const declarations — referencing a `const` from
+// the factory hits the temporal dead zone. Use vi.hoisted() to declare the spy at
+// hoist time. (Lesson from CHORE-72 surface-and-stop.)
+const { setLanguageTagSpy } = vi.hoisted(() => ({ setLanguageTagSpy: vi.fn() }));
 vi.mock('$lib/paraglide/runtime.js', () => ({
-	setLocale: setLocaleSpy,
-	getLocale: () => 'en',
+	setLanguageTag: setLanguageTagSpy,
+	languageTag: () => 'en',
 }));
 
 afterEach(() => {
 	cleanup();
-	setLocaleSpy.mockClear();
+	setLanguageTagSpy.mockClear();
 });
 
 describe('LandingFooter', () => {
@@ -1093,11 +1096,11 @@ describe('LandingFooter', () => {
 		expect(active?.classList.contains('bg-paper')).toBe(true);
 	});
 
-	it('clicking a locale chip calls setLocale()', async () => {
+	it('clicking a locale chip calls setLanguageTag()', async () => {
 		const { container } = render(LandingFooter);
 		const etChip = container.querySelector('button[data-testid="locale-chip-et"]') as HTMLButtonElement;
 		etChip.click();
-		expect(setLocaleSpy).toHaveBeenCalledWith('et');
+		expect(setLanguageTagSpy).toHaveBeenCalledWith('et');
 	});
 
 	it('external links open in a new tab with rel=noopener noreferrer', () => {
@@ -1121,15 +1124,15 @@ pnpm test src/lib/components/landing/LandingFooter.spec.ts 2>&1 | tail -10
 <!-- src/lib/components/landing/LandingFooter.svelte -->
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
-	import { setLocale, getLocale } from '$lib/paraglide/runtime.js';
+	import { setLanguageTag, languageTag } from '$lib/paraglide/runtime.js';
 
 	const locales = ['en', 'et', 'lv', 'uk'] as const;
 	type Locale = typeof locales[number];
 
-	let currentLocale = $state<Locale>(getLocale() as Locale);
+	let currentLocale = $state<Locale>(languageTag() as Locale);
 
 	function pick(locale: Locale) {
-		setLocale(locale);
+		setLanguageTag(locale);
 		currentLocale = locale;
 	}
 </script>
@@ -1171,7 +1174,7 @@ pnpm test src/lib/components/landing/LandingFooter.spec.ts -- --run
 pnpm check && pnpm lint
 ```
 
-Expected: 4/4 pass. Note: `$lib/paraglide/runtime.js` must export `setLocale` + `getLocale`; Comenius's Task 2 included these already if the existing Paraglide setup ships them. If not, surface to team-lead before committing.
+Expected: 4/4 pass. The project's Paraglide setup exports `setLanguageTag` + `languageTag` (older Paraglide API names). Newer Paraglide versions use `setLocale` + `getLocale`; if this project ever upgrades Paraglide, this component + spec need a rename pass.
 
 - [ ] **Step 5: Commit**
 
@@ -1183,7 +1186,7 @@ feat(#chore-72): LandingFooter — ink slab with brand, links, locales
 
 Footer with brand mark, tagline, vertical link list (about, open
 infra, contact, source), functional locale picker wired to Paraglide
-setLocale(), and micro year/invite line. External links use
+setLanguageTag(), and micro year/invite line. External links use
 target=_blank + rel=noopener noreferrer.
 
 Reviewed-by: Tallis (RED spec)
@@ -1646,14 +1649,14 @@ git push
 
 **Files:**
 - Rewrite: `src/routes/+page.svelte`
-- Rewrite: `src/routes/+page.spec.ts`
+- Create: `src/tests/routes/landing/page.spec.ts` — NOTE: SvelteKit reserves the `+` prefix in `src/routes/`, so the spec lives outside the routes tree (mirroring the existing `src/tests/routes/landing/page.server.spec.ts` from CHORE-35). The pre-CHORE scaffold `src/routes/+page.spec.ts` (if any) is deleted as part of this rewrite. (CHORE-72 Task 14 lesson.)
 
 The orchestrator branches on `$userStore.status` and renders the appropriate wrapper. This is the deletion point for the old scaffold code.
 
 - [ ] **Step 1: Tallis — rewrite the page spec**
 
 ```ts
-// src/routes/+page.spec.ts (REPLACE existing contents)
+// src/tests/routes/landing/page.spec.ts (NEW FILE)
 // @vitest-environment happy-dom
 import { render, cleanup } from '@testing-library/svelte';
 import { describe, it, expect, vi, afterEach } from 'vitest';
@@ -1715,7 +1718,7 @@ describe('/+page.svelte (landing orchestrator)', () => {
 - [ ] **Step 2: Tallis — verify RED**
 
 ```bash
-pnpm test src/routes/+page.spec.ts 2>&1 | tail -15
+pnpm test src/tests/routes/landing/page.spec.ts 2>&1 | tail -15
 ```
 
 Expected: FAIL — the old +page.svelte still has the scaffold code; the new components aren't wired yet. Spec assertions fail because no `[data-testid="landing-hero"]` exists in the rendered output.
@@ -1761,7 +1764,7 @@ Surface any failure; do NOT commit if any gate is non-green.
 
 ```bash
 export MVOX_EXPECTED_BRANCH=chore/landing-redesign
-git add src/routes/+page.svelte src/routes/+page.spec.ts
+git add src/routes/+page.svelte src/tests/routes/landing/page.spec.ts
 git commit -m "$(cat <<'EOF'
 feat(#chore-72): rewrite / orchestrator — branches on userStore.status
 
@@ -1841,7 +1844,7 @@ Particularly verify:
 - AC 5: roster/notes/repertoire dashboard cards are `<button disabled>` with SOON badge — verify in code AND in rendered DOM at /+page test
 - AC 6: hero CTA href is exactly `mailto:hello@mvox.eu?subject=Invite%20request%20%E2%80%94%20mvox`
 - AC 7: hero secondary "sign in" link goes to `/auth/login`
-- AC 8: footer locale chips render + click calls `setLocale()`
+- AC 8: footer locale chips render + click calls `setLanguageTag()`
 - AC 9, 10: i18n key delta correct in all 4 locale files
 - AC 11-14: gates clean
 
@@ -1850,7 +1853,7 @@ Particularly verify:
 Per `architecture-decisions.md` "Vertical-skin neutrality" rule landed in `3382a01` — RED any code that hardcodes vertical vocabulary outside i18n values. Grep:
 
 ```bash
-grep -rn "choir\|sing\|orchestra\|ensemble" src/lib/components/landing/ src/routes/+page.svelte src/routes/+page.spec.ts
+grep -rn "choir\|sing\|orchestra\|ensemble" src/lib/components/landing/ src/routes/+page.svelte src/tests/routes/landing/page.spec.ts
 ```
 
 Expected: zero matches in `.svelte` and `.ts` files (all vocabulary is in i18n values via `m.*()`). Matches in spec files are acceptable IF they're inside test fixture strings, NOT inside template assertions. Bentham flags any hard-coded vertical word in user-facing templates.
@@ -2018,5 +2021,33 @@ CHORE-72 shipped end-to-end.
 - [x] **No placeholders in tests:** every test has executable assertions with code blocks.
 - [x] **i18n key naming:** all keys vocabulary-neutral per the new arch rule (no `landing_choir_*` keys).
 - [x] **Plan execution mode:** team-driven only, no fork offered per L113.
+
+---
+
+## Post-CHORE retrospective (added after CHORE-72 shipped at squash `29de0d2`, 2026-05-31)
+
+CHORE-72 shipped end-to-end in one strictly-sequential session. Production deploy live at `mvox.eu` + `multivox.pages.dev`; build chunks `app.CRTEVY57.js` + `start.Jl8jEoV1.js`. 4 carry-forward GH issues filed; this section captures lessons applied above + open ones for future plans.
+
+### Applied corrections (above)
+
+1. **Paraglide API names** — the project's Paraglide install uses `setLanguageTag` / `languageTag` (older API), not `setLocale` / `getLocale` (newer API the original plan assumed). Surfaced by Byrd at Task 9 GREEN; fixed via Tallis spec amendment + Byrd implementation re-route. Corrected throughout Task 9 above.
+2. **Vitest hoisting via `vi.hoisted()`** — `vi.mock` factories are hoisted ABOVE `const` declarations; referencing a spy `const` from the factory hits temporal dead zone. Surfaced by Byrd at Task 9 GREEN second iteration. The Task 9 spec mock above now uses `vi.hoisted()`; future specs with module-mock + spy reference should follow the same pattern.
+3. **Stamp text `<br>`** — `INVITE<br>ONLY` produces no text-content space, breaking `toContain('INVITE ONLY')` test assertions. Use `INVITE ONLY` (plain space); CSS wraps in the circular stamp naturally. Corrected in Task 7 GREEN above.
+4. **Task 14 spec location** — SvelteKit reserves the `+` prefix in `src/routes/`. Spec files in the routes tree cannot use `+page.spec.ts`. Project precedent from CHORE-35 places landing-route specs at `src/tests/routes/landing/page.spec.ts`. Corrected in Task 14 above.
+
+### Open lessons (not yet codified)
+
+5. **Bentham's spec-rewrite-during-GREEN rule** — Byrd autonomously rewrote Tallis's Task 14 spec (dynamic `vi.doMock` + `resetModules` → static `vi.mock` + store-mutation matching `src/routes/library/page.spec.ts`). Bentham adjudicated GREEN with a new rule: "Byrd may improve a spec to match project conventions during GREEN if AND ONLY IF pattern alignment is the documented reason — must be flagged in commit message body. Spec intent must remain unchanged." Worth lifting to `architecture-decisions.md` as stewardship pass.
+
+6. **Hardcoded stamp text in templates** — LandingInvitesSection and LandingRequestSection initially shipped with hardcoded English literals for the stamps, bypassing the existing i18n keys. Bentham's YELLOW-72.2 catch + fold-in. The general pattern (CHORE-60 YELLOW-A echo from session 21): "any new `.svelte` file with more than 2 English noun-phrases that aren't passed as props gets a discretionary YELLOW asking 'where's the paraglide import?'" — Bentham calibration that's worth carrying forward into future plans' Self-review checklist.
+
+7. **Task 14 missing `Reviewed-by:` trailer in Byrd's commit** — plan template was correct; Byrd just didn't copy it into the actual `git commit` body. Cosmetic; suggests Task 14's dispatch should explicitly quote the full commit template (which it did in the original plan above — so it's actually a Byrd-side execution gap, not a plan defect).
+
+8. **Mid-CHORE team-recreate workflow** — performed during PO's pause between Tasks 2 and 3. Sequence: (a) write resumption-state doc to repo; (b) persist runtime inboxes via `jq '.[-100:]'`; (c) commit + push on main; (d) `shutdown_request` to active members; (e) surgical config.json edit removing stale members; (f) `TeamDelete` + `TeamCreate`; (g) restore inboxes from repo; (h) return to feature branch. Total elapsed ~3 minutes when nothing's in flight. Worth carrying as a documented recovery procedure for future mid-CHORE pauses where the team has accumulated stale `-2` suffixed entries.
+
+### Filed GH issues from this CHORE
+
+- **#72** — YELLOW-72.3 `/about` href fix (cosmetic, ~1 line)
+- **#73** — YELLOW-72.4 dashboard overdue count + `.replace()` brittleness (blocked on future lending CHORE)
 
 (*MVOX:Palestrina*)
