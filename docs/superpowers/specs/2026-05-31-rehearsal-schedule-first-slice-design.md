@@ -59,6 +59,12 @@ It is deliberately the smallest slice that feels like a real product: a conducto
 
 Event fields left unset (`name`, `event_type`, `location`, `description`, `duration_minutes`) fall back to the parent series' values **at read time, in the BFF** — the schema declares these as notes, not as `formula` properties. **RED trap to avoid:** do not "optimise" any inherited field into an Entu `formula` (e.g. `event_series.*.default_location`). The formula evaluator bypasses rights, and these are raw strings — projecting a `private` series' `default_description` onto an event read would leak across the rights boundary. Inheritance stays in the BFF merge.
 
+### 3.3 DELETE is an `_owner`-tier capability (not `_editor`)
+
+The verified Entu permission **tier-mechanics** (live-Entu case study) define the tiers as: `_owner` = full control **+ delete** + manage rights; `_editor` = read + **edit properties** (except rights props), **no delete**; `_expander` = read + create children. The v4E README's role-table calls the conductor's access "full" — that is role-design aspiration; **the tier-mechanics are what Entu's API actually enforces, so they win.**
+
+Consequence for this slice: **create + property-edit** sit at `_editor` (conductor), but **every DELETE** (Capability 5a cancel-one-event, Capability 6 delete-series) sits at `_owner`. The admin-conductor demo persona holds `_owner` on the org, which **cascades** through season→series→event (`inheritsRights: true`), so the demo persona can delete. A *pure* conductor (`_editor` only, no org `_owner`) would 403 on delete — see §8/§10 for how we resolve that later. This is confirmed-by-probe before GREEN (§8), but the spec encodes the `_owner`-for-delete contract up front so the plan builds the right rights story.
+
 ## 4. Materialisation algorithm (eager)
 
 On successful `event_series` creation, **synchronously within the BFF response cycle** (no background job in v1):
@@ -140,16 +146,16 @@ Right: `_editor`/`_owner`. Singer view out of scope.
 - **Tests:** ordered by `start_datetime` asc; filtered to `event_type=rehearsal` (concerts excluded); empty → 200 + empty array (not 404). **Playwright (deferrable):** conductor → list → events grouped by series with correct dates.
 
 ### Capability 5 — Cancel / edit a single instance *(NEW — file ADMIN-8)*
-Right: `_editor`/`_owner`.
-**5a. Cancel (delete) one event:**
+Rights differ by sub-capability (see §3.3): **5a delete → `_owner`-tier**; **5b edit → `_editor`**.
+**5a. Cancel (delete) one event:** *(right: `_owner`-tier — admin-conductor demo persona has it via org `_owner` cascade)*
 1. Conductor selects one rehearsal → confirm cancel.
 2. BFF `DELETE /entity/{eventId}`.
 3. Sibling events (same series) unaffected; series entity not deleted.
 4. Deleting the last event in a series leaves the series (orphaned series is a valid v1 state).
 5. Deleted row disappears from the list (re-fetch or optimistic removal).
-- **Tests:** delete → 200, siblings remain; singer → 403; non-existent `_id` → 404.
+- **Tests:** delete (as `_owner`-tier) → 200, siblings remain; `_editor`-only persona → 403 (delete is `_owner`-tier, §3.3); singer → 403; non-existent `_id` → 404.
 
-**5b. Edit one instance (override inherited fields):**
+**5b. Edit one instance (override inherited fields):** *(right: `_editor` — property-edit, not delete)*
 1. Select one rehearsal → edit form pre-populated with current (effective) values.
 2. Editable: `start_datetime`, `duration_minutes`, `location`, `description`. Not editable: `event_type`, `_parent`.
 3. BFF replaces the property values (clear existing `_id`s then POST new — Entu POST-appends semantics, `project_entu_post_appends_multi_value`).
@@ -159,18 +165,18 @@ Right: `_editor`/`_owner`.
 - **Tests:** PATCH `location` → GET reflects it, siblings unchanged; PATCH `start_datetime` → override holds, siblings at original times; singer → 403; non-existent → 404.
 
 ### Capability 6 — Delete series (cascade) *(NEW — file ADMIN-9)*
-Right: `_editor`/`_owner`. **PO-requested addition.**
+Right: **`_owner`-tier** (delete; see §3.3 — demo persona has it via org `_owner` cascade). **PO-requested addition.**
 1. Conductor selects a series → confirm delete (confirmation states "this will delete the series and its N rehearsals").
-2. BFF fetches all `event`s whose `_parent` includes the series.
+2. BFF fetches all `event`s **whose `_parent` references this specific `event_series`** (NOT merely "shares the org/season" — `event` is multi-parent, so filtering on the series parent specifically prevents sweeping a sibling series' events under the same season).
 3. BFF deletes the child events **first**, serially (`DELETE /entity/{eventId}` each — Entu has no bulk delete, `project_entu_no_bulk_delete`), tracking success/failure per event.
 4. **All children deleted** → BFF deletes the `event_series` entity → 200 with deleted count.
 5. **Partial failure** (some event deletes fail) → BFF **keeps the series**, returns a partial result: "deleted X of N rehearsals — retry to finish." This prevents orphaned events pointing at a deleted-series parent.
 6. Best-effort semantics (PO: "attempt to delete all generated events too"): a retry re-fetches remaining children and continues.
-- **Tests:** delete series with N events, all succeed → series + all N gone, 200 + count N; singer → 403; simulated mid-batch event-delete failure → series NOT deleted, partial count reported, remaining events still queryable; retry after partial → completes.
+- **Tests:** delete series (as `_owner`-tier) with N events, all succeed → series + all N gone, 200 + count N; child query filters on THIS series' parent only (a sibling series' events under the same season are untouched); `_editor`-only persona → 403 (§3.3); singer → 403; simulated mid-batch event-delete failure → series NOT deleted, partial count reported, remaining events still queryable; retry after partial → completes.
 
 ## 8. Open questions / probes before implementation
 
-1. **Delete rights:** this spec assumes `_editor` (cascaded from the season) suffices to `DELETE` an `event` and an `event_series`. If Entu requires `_owner` for entity deletion, Capabilities 5a/6 need the org-admin right instead. **Probe on the live polyphony playground (Pérotin) before the GREEN phase** — create a throwaway series+events as an `_editor`-only persona and attempt delete.
+1. **Delete rights (confirm the `_owner`-tier contract):** the verified Entu tier-mechanics put DELETE at `_owner`, not `_editor` (§3.3), and the spec now encodes that. This is a **confirmation** probe, not an open guess: **Pérotin, on the live polyphony playground before GREEN** — as an `_editor`-only persona (no org `_owner`), create a throwaway series+events and attempt `DELETE /entity/{id}`; expect it to fail. Then repeat as an `_owner` persona; expect success. If Entu surprises us and `_editor` *can* delete, we relax 5a/6 back to `_editor` (cheap direction). The expensive direction — shipping AC that says `_editor` deletes — is now avoided.
 2. **Series→season date containment** (Capability 2 AC4): confirm we want a hard 400, vs a soft warning, when a series spills outside the season's dates. Spec currently says hard 400.
 3. **Partial-failure UX** (Capabilities 3 + 6): v1 surfaces a count and asks for retry. Confirm no rollback is acceptable for first ship.
 
@@ -189,6 +195,7 @@ Recommended labels: `admin`, `conductor`; no milestone (consistent with #19/#20)
 
 ## 10. Deferred follow-ups (for `test-gaps.md` / later slices)
 
+- **Pure-conductor delete rights.** Because DELETE is `_owner`-tier (§3.3), a conductor who is *only* `_editor` (not an org admin) cannot cancel a rehearsal or delete a series. In the demo the persona is admin+conductor, so it works; but if real choirs want conductors to cancel rehearsals without making them org owners, that needs a deliberate choice — grant `_owner` on the *season* (scoped), or add a curated BFF elevated-op for the cancel action (which would go on the enumerated elevated-ops list with justification). Deferred decision; surface to PO when the pure-conductor persona becomes real.
 - Series **pattern editing + regeneration** with a cancelled-dates ledger (Bentham YELLOW-1).
 - Materialisation **rollback / transaction** on partial failure.
 - **Per-org timezone** field (replacing the hardcoded `Europe/Tallinn`).
