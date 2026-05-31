@@ -1,6 +1,15 @@
 # CHORE-72 — Landing page (`/`) redesign — Implementation Plan
 
-> **For team agents:** This is a **team-driven** plan owned by the mvox-dev TDD chain. Each task lists steps owned by named roles (Tallis RED → Byrd GREEN → Comenius i18n → Bentham REVIEW → Josquin MERGE). Steps use checkbox (`- [ ]`) syntax. Per `feedback_plan_execution_mode_baked_in`: do NOT offer a subagent-driven-vs-team-driven mode fork after this plan ships — the team mode is baked in by construction. Per `feedback_atomic_git_chaining`: chain commits inside single Bash calls. Per `feedback_no_parallel_branches`: only `chore/landing-redesign` is active during this CHORE; no dispatching parallel work to other branches.
+> **For team agents:** This is a **team-driven** plan owned by the mvox-dev TDD chain. Each task lists steps owned by named roles (Tallis RED → Byrd GREEN → Comenius i18n → Bentham REVIEW → Josquin MERGE). Steps use checkbox (`- [ ]`) syntax. Per `feedback_plan_execution_mode_baked_in`: do NOT offer a subagent-driven-vs-team-driven mode fork after this plan ships — the team mode is baked in by construction. Per `feedback_atomic_git_chaining`: chain commits inside single Bash calls.
+
+> **SEQUENCING DISCIPLINE — STRICTLY SEQUENTIAL** (per `feedback_no_parallel_branches` Level 1 + Level 2, the latter added session 24, 2026-05-31 by PO directive on this very plan):
+> 1. **Only one feature branch is active across the team:** `chore/landing-redesign`. No parallel CHOREs on other branches during CHORE-72.
+> 2. **Only one task is dispatched at a time within this branch.** Tasks execute strictly in numeric order: Task 1 → Task 2 → Task 3 → … → Task 16.
+> 3. **Each task must fully close before the next dispatches.** "Close" = commit pushed + gates green + handoff report received by team-lead.
+> 4. **No pre-spawning.** Do NOT dispatch Tallis for Task N+1 while Byrd is mid-GREEN on Task N. Do NOT have Comenius authoring new keys in parallel with a downstream RED. Do NOT have Bentham starting his review while Byrd is still committing.
+> 5. **Within a single task, the Tallis-RED → Byrd-GREEN sequence is itself strictly serial** — Tallis hands off via SendMessage to team-lead, team-lead dispatches Byrd. They are NOT both active at once.
+> 6. **Always-on agents are ambient, not parallel.** Bentham/Finn/Pérotin idle until pinged for their respective tasks (15/research/data-probe). Their presence in the team config doesn't constitute parallel work; only an active dispatch does.
+> 7. **Team-lead is the serializer.** After every teammate's report arrives, team-lead is the single point that decides whether the task closed cleanly + whom to dispatch next. No "while X works, also kick off Y" patterns anywhere in this CHORE.
 
 **Goal:** Replace the current generic-Tailwind scaffold at `/` with a coherent paper-and-ink landing page — a curious-bystander doorway when signed-out (5-section marketing scroll: hero + pillars + invites + request + footer) and a welcome-back dashboard when signed-in (scattered pillar cards on the desk).
 
