@@ -1,4 +1,13 @@
 {
+	"about_intro": "mvox is the back-of-house for choral organisations. We build the quiet infrastructure that keeps a choir running: its library, its roster, its rehearsal record.",
+	"about_marginalia": "~ the mvox team",
+	"about_mission_body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.",
+	"about_mission_heading": "Our Mission",
+	"about_page_title": "About mvox",
+	"about_story_body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget.",
+	"about_story_heading": "Our Story",
+	"about_values_body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras mattis consectetur purus sit amet fermentum. Cras justo odio, dapibus ac facilisis in, egestas eget quam.",
+	"about_values_heading": "What We Believe",
 	"actions_cancel": "Cancel",
 	"actions_save": "Save",
 	"auth_callback_failed": "Sign-in failed.",
