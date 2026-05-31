@@ -282,17 +282,57 @@ describe('MvoxNav — responsive layout (CHORE-76)', () => {
 	});
 
 	// AC7 — No horizontal overflow 320–640px.
-	// jsdom can't measure pixel overflow. Structural guard: the <header> must NOT
-	// carry `overflow-x-visible` or have no overflow constraint at all —
-	// it must carry `overflow-x-hidden` (or `overflow-hidden`) so any stray child
-	// can't cause body scroll.
-	// NOTE: a Playwright test at viewport 320px is the truer check — see test-gaps.md.
-	it('AC7 — header carries overflow-x-hidden to prevent body horizontal scroll', () => {
+	// CHORE-77 intent correction: `overflow-hidden` / `overflow-x-hidden` on <header>
+	// clips `absolute`-positioned dropdown panels (AvatarMenu + nav-tab-menu) that sit
+	// `top-full` below the header — they become invisible. The correct solution is to
+	// control overflow via `flex-shrink-0` on fixed items and `min-w-0` + truncation on
+	// the org area (asserted in AC1/AC4/AC6), NOT a block-axis clip on the header itself.
+	// NOTE: true no-overflow-at-320px requires Playwright — see test-gaps.md.
+	it('AC7 — header does NOT carry an overflow clip (would cut dropdown panels)', () => {
 		const { container } = render(MvoxNav, { props: signedInProps });
 		const header = container.querySelector('header');
 		expect(header).not.toBeNull();
 		const cls = header?.className ?? '';
-		// Accept either `overflow-hidden` (all axes) or `overflow-x-hidden`
-		expect(cls.includes('overflow-x-hidden') || cls.includes('overflow-hidden')).toBe(true);
+		// Neither `overflow-hidden` nor `overflow-x-hidden` may appear on <header>.
+		// Dropdown panels must not be clipped by a parent overflow constraint.
+		expect(cls.includes('overflow-x-hidden')).toBe(false);
+		expect(cls.includes('overflow-hidden')).toBe(false);
+	});
+
+	// AC2 stacking — dropdown panels must paint above page content.
+	// <header> must be a positioned ancestor (`relative` or `sticky`) so child
+	// `z-index` classes take effect in the stacking context. It must also carry a
+	// `z-*` utility high enough to sit above normal page content.
+	// NOTE: true paint-order verification requires Playwright — see test-gaps.md.
+	it('AC2 stacking — header carries a positioning class (relative or sticky)', () => {
+		const { container } = render(MvoxNav, { props: signedInProps });
+		const header = container.querySelector('header');
+		expect(header).not.toBeNull();
+		const cls = header?.className ?? '';
+		// Must be `relative` or `sticky` so child z-index values take effect.
+		expect(cls.includes('relative') || cls.includes('sticky')).toBe(true);
+	});
+
+	it('AC2 stacking — header carries a z-index utility (z-*) to sit above page content', () => {
+		const { container } = render(MvoxNav, { props: signedInProps });
+		const header = container.querySelector('header');
+		expect(header).not.toBeNull();
+		const cls = header?.className ?? '';
+		// Assert presence of ANY z-* Tailwind utility — Byrd picks the exact value
+		// (z-30 / z-40 / etc.). Over-pinning the number is fragile; we only need to
+		// confirm a z-index is set so the header sits above scrolled page content.
+		expect(/\bz-\d+\b/.test(cls)).toBe(true);
+	});
+
+	// AC3 horizontal-overflow control without clip — confirm the correct mechanism.
+	// Overflow is controlled by truncation on flexible items, not by a header clip.
+	// This test is a positive complement to the AC7 "no clip" assertion.
+	it('AC3 overflow control — org area keeps min-w-0 (truncation, not header clip)', () => {
+		const { container } = render(MvoxNav, {
+			props: { ...signedInProps, orgPickerMode: 'static' },
+		});
+		const orgArea = container.querySelector('[data-testid="nav-org-area"]');
+		expect(orgArea).not.toBeNull();
+		expect(orgArea?.className).toContain('min-w-0');
 	});
 });

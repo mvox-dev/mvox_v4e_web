@@ -76,7 +76,7 @@
 	});
 </script>
 
-<header class="flex items-center justify-between py-2 px-6 border-b-[1.5px] border-ink-2 bg-paper overflow-x-hidden">
+<header class="relative z-30 flex items-center justify-between py-2 px-6 border-b-[1.5px] border-ink-2 bg-paper">
 	<!-- Left: brand + org picker (min-w-0 lets org chip truncate instead of overflow) -->
 	<div class="flex items-center gap-4 min-w-0">
 		<a href="/"><BrandMark size="m" /></a>
