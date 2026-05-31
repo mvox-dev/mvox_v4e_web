@@ -436,3 +436,22 @@ Auth storage keys (all `localStorage`): `token`, `accounts`, `user`, `mvox.token
 **CHORE-79 design gate:** true no-flash server-side guard requires a new session cookie. Minimal path: after OAuth exchange, call a server endpoint that sets an httpOnly cookie; `hooks.server.ts` reads it to gate protected routes. Full JWT stays in localStorage for Entu API calls.
 
 (*MVOX:Finn*)
+
+---
+
+## 2026-05-31 — Session 27 notes
+
+### [LEARNED] Session 27 shipped: CHORE-79 (server-side auth guard) + CHORE-72 (/about page)
+
+No research requests came to Finn this session — team executed independently.
+
+**Next session prep (schema audit):** team-lead flagged a design/mapping session for rehearsal/concert/season/rsvp entities. Relevant prior context:
+- v4E `season` entity: `start_date`, `end_date` — straightforward temporal container.
+- v4E `event` entity: multi-parent (org + season(s) + section(s) + series), `event_series` for recurring patterns with `interval_days` + `start_time` + `duration`.
+- v4E `rsvp`: child of `person`, member-created. `attendance`: child of `event`, conductor-created. Split design (session-8 memory: `project_polyphony_participation.md`).
+- `event_series` and `rsvp` and `attendance` are among the 9 entity types **entirely absent** from live polyphony DB (session-4 audit).
+- Probe needed: what IS in live polyphony DB for events/seasons? (Only `season` + `event` + `repertoire_item` + `program_item` type IDs known — see scratchpad §2026-05-19.)
+
+**Standing open item:** `/library` filter `voicing`/`language` field name mismatch risk — probe against live DB still needed before filter UI lands.
+
+(*MVOX:Finn*)

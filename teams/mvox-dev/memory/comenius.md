@@ -6,6 +6,21 @@ Tags: `[DECISION]`, `[PATTERN]`, `[WIP]`, `[CHECKPOINT]`, `[DEFERRED]`, `[GOTCHA
 
 ---
 
+## Session 27 — CHORE-72 /about page i18n (2026-05-31)
+
+[CHECKPOINT] Added 9 `about_*` keys across 4 locale files. Commits `a8d0bc1` (initial) + `7cd3480` (dedupe fix) on `chore/about-page`.
+
+[GOTCHA] Pre-commit-msg hook auto-stages ALL modified tracked files — not just what you `git add`. In this session it pulled in Byrd's in-progress `+page.svelte` (which referenced the old `about_tagline` key) into my i18n commit. Lesson: if another agent has uncommitted work in the tree, coordinate timing. The hook cannot be bypassed without `--no-verify`.
+
+[GOTCHA] Duplicate-key JSON: when two agents commit to the same branch in a race, append-style JSON edits can produce duplicate keys in the same file. `jq` silently resolves to last-occurrence-wins, masking the problem in tooling. Always verify with `jq 'to_entries[]|select(…)|.key' | sort | uniq -d` (empty output = no dups).
+
+[DECISION] Key set for CHORE-72: `about_page_title`, `about_intro`, `about_mission_heading`, `about_mission_body`, `about_story_heading`, `about_story_body`, `about_values_heading`, `about_values_body`, `about_marginalia`. NO `about_tagline` (was in old spec; renamed to `about_intro` at commit 9815c2c).
+
+[CONVENTION] TODO marker form confirmed: `TODO: <en value>` — prefix on the full English string. Applies to all non-en locales for new keys pending translation.
+
+(*MVOX:Comenius*)
+
+---
 
 ## Session 24 — CHORE-67 plural fix (2026-05-24)
 

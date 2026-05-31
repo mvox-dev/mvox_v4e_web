@@ -1,6 +1,79 @@
 # Palestrina — Team Lead Scratchpad
 
-### [NEXT SESSION] 2026-05-31 end-of-session-26 — session-26 → session-27
+### [NEXT SESSION] 2026-05-31 end-of-session-27 — session-27 → session-28
+
+**Headline: A "ship two CHOREs through a badly flaky tool-channel" session. CHORE-79 (server-side auth guard, hybrid) + CHORE-72 (/about page) both shipped end-to-end to mvox.eu. Filed #80 (DRY follow-up). Saved a core product-motivation memory. NEXT SESSION IS A DESIGN/MAPPING SESSION (PO directive): map the rehearsal / concert / season / RSVP functionality — NOT a coding session to start.**
+
+## ⭐ Session-28 first real work: map rehearsal/concert/season/rsvp (PO directive)
+
+PO asked to "devote next session for mapping the functionality we will plan for rehearsal/concert/season/rsvp." This is **requirements/design mapping, not implementation.**
+- **Lead with brainstorming** (superpowers:brainstorming) + **Victoria** (requirements analyst) + **Finn** (research the existing v4E schema shapes already designed for this). Pérotin too if seed-data shape matters.
+- **Huge head start already exists in memory** — the polyphony schema work already designed most of this. Read these MEMORY.md entries first:
+  - `project_polyphony_seasons_events` — season (start+end date), event (multi-parent: org+season(s)+section(s)+series), event_series (recurring: interval_days + start_time + duration)
+  - `project_polyphony_participation` — split rsvp (child of person, member-created) + attendance (child of event, conductor-created); user-rights native both sides
+  - `project_polyphony_programs` — repertoire_item (child of season) + program_item (child of event)
+  - So "rehearsal/concert" = `event` (event_type distinguishes them); "season" = `season`; "rsvp" = the `rsvp` entity. **Much of the data model is already decided** — session 28 is likely about (a) confirming/refreshing those decisions against current v4E schema.ts, (b) deciding the UI/feature surface (what pages, what flows), (c) maybe a spec for the first slice.
+  - Also read `$ENTU_RESEARCH/docs/schema/v4E/` to see what actually landed in schema.ts vs the memory (memory is polyphony-era; mvox is v4E-clean per `project_seed_data_v4e_clean`).
+- **Suggested opening move:** Finn audit — "what's the current v4E schema shape for season/event/event_series/rsvp/attendance/repertoire_item/program_item, and what does mvox already have wired (routes/components/types) for any of it?" Then brainstorm the feature surface with PO. Then Victoria drafts requirements → spec → (future session) TDD chain.
+
+## What shipped to main/prod this session
+
+| SHA | What |
+|---|---|
+| `e91233a` | feat(#79) server-side auth guard (hybrid) — httpOnly `mvox_session` cookie (=Entu JWT, 48h) set at OAuth callback, cleared at logout; `hooks.server.ts` decodes exp + 302→`/auth/login?redirect=` for protected paths; Entu data stays client-side (IP-bound JWT). Includes logout-greet fix (performLogout resets in-memory userStore). Closes #79. Live: `app.DIpxe8VD.js`. |
+| `a0b2fcf` | feat(#72) /about placeholder page — real route (not the no-op fix); title + hero intro + Our Mission/Our Story/What We Believe + marginalia; reuses landing primitives; 9 about_* keys ×4 locales (en real+lorem, et/lv/uk TODO). Footer link now resolves (was 404). Closes #72. Live: `app.BlDa5F1S.js` + `start.B2QecvaZ.js`, prod deploy `2b2ba588`. |
+| `9957f66` | docs stewardship — Bentham's responsive-layout decision lift to architecture-decisions.md + plan-doc now-fix + scratchpads. |
+| `fa3f2f3` | docs — bentham scratchpad session-27 notes. (current main tip) |
+
+## ⚠️ L121 — THE tool-channel was badly flaky all session (the dominant lesson)
+
+Output dropped, garbled, and DUPLICATED across Bash + Read for nearly every agent AND team-lead. Symptoms: empty output on single-line commands; 19k-line floods; stale buffers read as current; **fabricated SHAs/hashes/test-counts** (Bentham fabricated a whole review verdict twice; Josquin fabricated SHAs ~4×; I sent 2 "verified" messages before my own verify returned). Also: task_assignment notifications fire to ALL agents (not just owner) → repeated "this isn't my task" flags.
+
+**What worked (KEEP as standing discipline — promote to architecture-decisions/Brilliant next session):**
+- **Team-lead verifies every load-bearing identifier (SHA, gate count, file set, prod status) against own git/curl BEFORE asserting or acting.** Gate every claim on a completed read in the SAME turn. Never assert before the tool result returns (I violated this twice early; corrected).
+- **Blob-level proof settles disputes:** `git rev-parse <sha>:<path>` + `git cat-file -p <blob>` is immutable and cut through "your bytes vs my bytes" disagreements (the duplicate-key + uncommitted-fix confusion).
+- **Surface-and-stop held the line** — Tallis, Josquin, Byrd each caught my bad first diagnoses / stale assignments before writing wrong code. The discipline works even when the channel doesn't.
+- **Staged-set gate before every commit:** agent shows `git diff --cached --name-only`, team-lead confirms exact file set, THEN authorize commit. Caught the duplicate-key sweep risk + kept my uncommitted doc/memory files out of feature squashes repeatedly.
+
+## L122 — Self-inflicted: don't change a spec mid-TDD-chain
+
+CHORE-72 churned ~3× more than a placeholder page warranted because I updated the spec structure (PO's 4-section pick) AFTER dispatching RED. In the flaky session the chain raced through the OLD structure first → duplicate i18n keys (last-wins masking correct values), page+spec on wrong headings, a dedupe correction + an align commit. **Fix: freeze the spec before dispatching the chain. If a mid-chain change is unavoidable, PAUSE the chain and re-sync every downstream agent before they commit — don't let the update chase a moving branch.**
+
+## L123 — `Closes #N` auto-close is inconsistent via squash-push
+
+#79's trailer did NOT auto-close it (I closed manually); #72's DID. Both were squash-merge-via-local-push with `Closes #N` in the body. Don't assume — always `gh issue view N` after merge and close manually if still open. (Completion comment + close is team-lead's job regardless.)
+
+## Carry-forward backlog (priority-ish for after the season/event mapping)
+
+- **#80** — DRY: login page should import the tested `safeRedirectTarget` instead of inlining its own open-redirect check (YELLOW-79.1 deferred from CHORE-79). ~5-line Byrd fix. NOTE: `safeRedirectTarget` lives in `src/lib/server/auth/session-cookie.ts` (server dir) — check it tree-shakes safely for client import, or re-export from a non-server location.
+- **/about real content** — page ships with lorem ipsum (en) + TODO placeholders (et/lv/uk). Swap to real copy + translations when PO provides.
+- **#73** overdue red+bold (blocked on lending); **CHORE-C** test infra (MSW+Playwright, 9 tasks, heavy — `docs/superpowers/plans/2026-05-23-chore-53-c-test-infra.md`); **#54** client error capture; **#44** CF Pages git-deploy (still manual wrangler); **#49** Biome lint; **#6** Email (blocked PO SPF/DKIM).
+- **Stewardship:** promote L121 verification-discipline + L122 freeze-spec rule to architecture-decisions.md / Brilliant KB (deferred this session — channel too noisy to do a clean KB batch).
+- Stale branches (unchanged): local `chore/per-commit-green-arch-decision`, `chore/seed-librarian-bundle`, `feat/phase-b-live-wiring`; remote `origin/feat/phase-a-migration`, `origin/fix/phase-a-partial-failure-recovery`.
+
+## New memory saved this session
+
+- `project_mvox_federation_publisher_mediation` (+ MEMORY.md index) — **core product motivation:** federation orgs exist to mediate the painful collective↔publisher relationship (Carus, SP-Music, …) — aggregate demand, vouch for amateur collectives, simplify licensed score acquisition, keep mvox a trustworthy publisher partner (not a piracy risk). Reframes the library/edition/lending subsystem as a legitimate acquisition+rights channel. **Relevant to the season/event work too** — concerts need programmed repertoire which needs licensed editions.
+
+## Expected first action session 28
+
+1. Read this seed + the 4 polyphony memory entries (seasons_events, participation, programs, work_edition_model) + skim `$ENTU_RESEARCH/docs/schema/v4E/schema.ts` for the current season/event/rsvp shapes.
+2. Verify prod health: `curl -sI https://mvox.eu/` + `/about` (→200) + `/library` (→302 /auth/login). Build chunks `app.BlDa5F1S.js` + `start.B2QecvaZ.js` (no deploys since #72).
+3. Spawn finn + bentham (always-on). For this session ALSO spawn **victoria** (requirements) early — she's the lead for a mapping/requirements session.
+4. **Don't jump to a TDD chain.** This is brainstorm → research → requirements → (maybe) spec. Open with a Finn audit of current v4E season/event/rsvp schema + any existing mvox wiring, then brainstorm the feature surface with PO.
+
+## Production health at session close
+
+- `mvox.eu` 200 on `/`, `/about` (new), 302-guard on `/library`. CHORE-72 build live (`app.BlDa5F1S.js` + `start.B2QecvaZ.js`).
+- main @ `fa3f2f3` (local==origin). Tests: 613 unit at #72 ship (was 599 session-26 close; +10 #79 + others). check 0 · lint 0 · build clean.
+- Polyphony Entu db unchanged (607 librarian-bundle entities under EFK Library `6a12036c4ff8277cd4306b26`).
+- Agents this session: finn, bentham, tallis, josquin, byrd, comenius all spawned (clean, no `-2` ghosts). Shutting down via shutdown_request waterfall now (L117).
+
+(*MVOX:Palestrina*)
+
+---
+
+### [PROCESSED 2026-05-31 session-27] 2026-05-31 end-of-session-26 — session-26 → session-27
 
 **Headline: A "mobile/responsive + auth" session. THREE CHOREs shipped end-to-end to mvox.eu (CHORE-76 responsive nav +closed #65, CHORE-77 dropdown-clip regression fix, CHORE-78 mobile library). CHORE-79 (server-side auth guard, hybrid) fully brainstormed + specced + planned but NOT started — queued as session-27's first real work. Live build: `app.BlWNemeh.js` + `start.yhLn1xom.js`.**
 

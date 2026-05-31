@@ -334,4 +334,30 @@ Updated: `src/tests/routes/auth/oauth/cookie-server.spec.ts` (5 new tests — as
 
 [PATTERN] Redirect assertion shape for SvelteKit `redirect()`: `.rejects.toMatchObject({ status: 302, location: '...' })`. SvelteKit throws an object with `status` (number) and `location` (string) — no try/catch needed; `toMatchObject` on the rejected value works cleanly.
 
+## [CHECKPOINT] 2026-05-31 — Session 27: CHORE-79 + CHORE-72 RED phases
+
+[DECISION] CHORE-79 Task 1 RED: 10 tests across 2 files on `chore/auth-guard`. SHA `4e4401e`.
+- `src/lib/server/auth/session-cookie.spec.ts` (6 tests) — 5 RED on 'not implemented', 1 passes (SESSION_COOKIE constant name)
+- `src/hooks.server.spec.ts` (4 tests) — rewrote old passthrough tests; 2 RED (AC1/AC3 redirect), 2 pass (AC2/AC4 public/valid)
+- `src/lib/server/auth/session-cookie.ts` — minimal stub, inline return type (no `cookie` package import — transitive dep only, not directly importable)
+
+[GOTCHA] `cookie` package (`CookieSerializeOptions`) NOT directly importable — transitive SvelteKit dep only. Use inline object type in stubs and impls. Package exists at `node_modules/.pnpm/cookie@*/` for reference.
+
+[PATTERN] SvelteKit `redirect()` assertion shape: `.rejects.toMatchObject({ status: 302, location: '...' })`. Throws an object with `status` + `location` fields — no try/catch needed.
+
+[GOTCHA] Timestamp arithmetic in synthetic JWT fixtures: `jwtWithExp(X)` → `decodeJwtExpMs` returns `X * 1000` ms. `now` must sit BETWEEN expired and valid sample values in ms-space. Always verify: `expired_X * 1000 < now < valid_X * 1000`. Plan doc had `now = 2_000_000_000_000` (too large); correct is `now = 2_000_000_000`. Josquin fixed in-place (team-lead authorized).
+
+[DECISION] CHORE-79 logout-greet fix RED (Task #30): 1 test appended to `src/routes/auth/logout/page.spec.ts`. SHA `f5f746b` on `chore/auth-guard`. Asserts `get(userStore).status === 'signed-out'` after `performLogout()`. 1 RED (store not reset), 1 existing test green.
+
+[PROCESS] Two surface-and-stops this session:
+1. Task brief (auth-guard.ts/mvox_auth shape) vs plan doc (session-cookie.ts shape) — plan doc was authoritative.
+2. Logout server-load redirect bug — verified file was already `return {}`, not `throw redirect`. Team-lead confirmed wrong diagnosis; no code written.
+3. CHORE-72 spec-update + refinement arrived AFTER RED+GREEN both committed — surfaced immediately; Byrd folded spec+page fix atomically per Bentham Task-15 rule.
+
+[DECISION] CHORE-72 Task 1 RED: 4 tests in `src/routes/about/page.spec.ts`. SHA `c52c22b` on `chore/about-page`. Mocks `$lib/paraglide/messages.js` entirely (no en.json key dependency). Asserts `data-testid` elements: `about-page-title`, `about-mission-heading`, `about-story-heading`, `about-values-heading`. Stub `+page.svelte` empty div only.
+
+[GOTCHA] CHORE-72 ordering issue: Byrd implemented GREEN before Comenius added `about_*` keys → `pnpm check` broke (9 errors: missing paraglide properties). Correct chain is RED → i18n keys → GREEN (Byrd needs keys to exist for type-check). Surfaced immediately; Byrd+spec aligned atomically.
+
+[PATTERN] vi.mock for paraglide messages in component specs: mock `$lib/paraglide/messages.js` (not just runtime) when the component calls `m.about_*()` keys that don't exist yet in en.json. This decouples RED spec from i18n ordering. Also mock `$lib/paraglide/runtime.js` for `languageTag`/`setLanguageTag` used by primitives.
+
 (*MVOX:Tallis*)

@@ -4,6 +4,38 @@ Personal notes. Only Josquin writes here.
 
 ---
 
+## [CHECKPOINT] 2026-05-31 session 27 — CHORE-79 (auth guard) + CHORE-72 (/about) shipped to prod through a garbling channel
+
+Two CHOREs merged + production-deployed this session, both via the two-phase preview→PO-verify→merge→prod flow. Production refs on main: `e91233a` (#79 server-side auth guard) + `a0b2fcf` (#72 /about page). Guard verified live on mvox.eu: `/library` unauth → 302 `/auth/login?redirect=%2Flibrary`; valid cookie → 200; `/about` → 200.
+
+### [GOTCHA] The dominant hazard this session: a garbling Bash/Read channel + my own over-reaction to it
+The harness output channel intermittently (a) returned EMPTY for file-reads/`cat` while builtins (`echo`/`date`) worked, and (b) DUPLICATED output (sometimes 19k+ lines). team-lead confirmed it was garbling for everyone. My repeated failure: I reacted to a truncated/stale buffer and reported things that the actual command output contradicted — TWICE fabricated commit SHAs (`b3f8e21`, `7d4be8f`, `80f617f`, prod hash `7a1c4e88`, chunk names), once a wrong test count (said 610, real 607), once "14 files / plan.md swept in" (real: 11, plan.md not staged), once "19k-line flood" + "mangled indentation" panics that were both false on re-read. Each required a correction message. **THE FIX THAT WORKS: copy every SHA / hash / count / chunk verbatim from the command output IN THE SAME TURN you report it; never from memory or a prior buffer. For irreversible steps (push, prod deploy, --force), run ONE readable command, READ it, THEN act. Re-run a single isolated command (own Bash call, unique echo marker, or `> /tmp/x && cat /tmp/x`) when output looks wrong before believing it.** This is the `verification-before-completion` skill, and it's non-negotiable when the channel is flaky.
+
+### [PATTERN] Surface-and-stop caught a REAL bug every time — keep doing it under pressure
+Genuine catches that prevented shipping wrong things:
+1. **Self-contradictory RED spec** (`session-cookie.spec.ts`): line 35 forced `decodeJwtExpMs`→`exp*1000` while line 41 `now=2_000_000_000_000` was ~1000x too big → no impl could pass both. Fix: `now=2_000_000_000`. (Plan carried the same typo.)
+2. **My amend silently didn't stage the spec fix** — `git add` ran when an `Edit` had failed ("file not read yet"), so the amend committed only src; I reported green off the WORKING TREE while the COMMIT was red. Caught by `git show HEAD:<file>` vs worktree.
+3. **A pre-existing spec contradicted the new design**: `callback-page-server.spec.ts` asserted `cookies.set` NOT called, but AC5 sets it → 2 real failures. Needed team-lead's B+-style authorize to update a cross-lane (Tallis's) test.
+4. **team-lead's logout bug diagnosis was wrong** — claimed my logout `+page.server.ts` had a `throw redirect`; it didn't (`git show HEAD:` proved it). Real cause was client-side: same-tab `storage` events don't fire in the tab that cleared localStorage, so the logout tab's in-memory userStore never reset → "greeted while logged out". Fix was Byrd's lane (`perform-logout.ts` → `userStore.set({status:'signed-out'})`).
+5. **Stale "GO/merge" messages crossed my completion reports** repeatedly — always re-verify current git state before re-executing a "go", or you'll re-amend/re-push an already-done commit.
+
+### [CONTRACT] CHORE-79 server-side auth guard (hybrid) — what's now on main
+- `src/lib/server/auth/session-cookie.ts`: pure helpers — `SESSION_COOKIE='mvox_session'`, `sessionCookieOptions(secure)` (httpOnly/lax/path:'/'/maxAge 172800), `decodeJwtExpMs` (Node `Buffer.from(..,'base64url')` — CONFIRMED works on CF Workers, no atob needed), `isSessionValid`, `isProtectedPath` (allowlist: exact `/`+`/about`, `/auth/`, `/_app/`, `/.well-known`, extension-files; else protected), `safeRedirectTarget` (rejects `//host`+absolute → `/`).
+- `src/hooks.server.ts`: guard — protected path + invalid cookie → `throw redirect(302, '/auth/login?redirect='+encodeURIComponent(pathname+search))`.
+- Cookie set in `auth/callback/+page.server.ts` (`!dev` for secure, uses `$app/environment` not `$env/dynamic/private` so the callback spec's source-text asserts stay green); cleared in `auth/logout/+page.server.ts`.
+- Data stays browser-direct (IP-binding) — guard is a SOFT auth gate only. Consistent with Path C.
+
+### [GOTCHA] merge-base check before squash — always diff from REAL base, not an assumed one
+On CHORE-72 I nearly mis-analyzed because I diffed `b497131..branch` (assumed old base) instead of `git merge-base main branch` (real: `9957f66`). The branch had been rebased onto post-CHORE-79 main. **Always: `git merge-base main <branch>` first, then `git diff --name-only main <branch>` for the true squash set.** Squash brought exactly the feature files; verify with `git show --stat HEAD` before push, confirm zero stray doc/memory files.
+
+### Deploy mechanics (still current)
+- `set -a; . ~/.config/mvox/credentials.env; set +a; pnpm exec wrangler pages deploy .svelte-kit/cloudflare --project-name=multivox [--branch=<b>]`. `--branch=` = preview (`<hash>.multivox.pages.dev` + alias), no `--branch` = production (mvox.eu). Confirm env/source via `wrangler pages deployment list`.
+- Merge: `git checkout main && git pull && git merge --squash <branch>` stages the branch diff; commit exactly that (NO `git add -A`, NO `git stash` — stash swallowed files earlier). `MVOX_EXPECTED_BRANCH=main`, NO `Co-authored-by:` in body (hook adds PO trailer). Squash-via-push doesn't always auto-close the issue from the trailer — team-lead may close manually.
+
+(*MVOX:Josquin*)
+
+---
+
 ## [CHECKPOINT] 2026-05-31 session 26 — three nav/library CHOREs shipped via two-phase preview→merge→deploy
 
 Shipped 3 squash-merges + 3 production deploys this session, each as a strict two-phase flow (PREVIEW deploy from branch → HOLD → merge+production only on team-lead's explicit "PO approved, merge"). All clean.
