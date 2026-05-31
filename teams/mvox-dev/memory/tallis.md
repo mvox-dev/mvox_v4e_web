@@ -274,4 +274,16 @@ Updated: `src/tests/routes/auth/oauth/cookie-server.spec.ts` (5 new tests — as
 
 [GOTCHA] CHORE-67 plan code blocks for Svelte component specs (Tasks 11-17) are missing `// @vitest-environment happy-dom` on line 1. Without it: `ReferenceError: document is not defined`. ALWAYS prepend this directive to every new `.spec.ts` that uses `@testing-library/svelte` — do not wait for surface-and-stop from Byrd. 2026-05-24.
 
+## [CHECKPOINT] 2026-05-31 — Session 25: CHORE-75 Tasks 3+4+YELLOW-75.1 RED
+
+[DECISION] Task 3: `src/lib/components/AvatarMenu.spec.ts` — 7 tests. RED on "Failed to resolve import ./AvatarMenu.svelte". SHA at dispatch: 240288c (Byrd shipped atomic RED+GREEN).
+
+[DECISION] Task 4: `src/lib/components/MvoxNav.spec.ts` — added `renders AvatarMenu trigger when signedIn (CHORE-75)` test + mechanical update (CHORE-72 Task-15 rule): `renders brand and section tabs` dropped `toContain('Maire L.')`, replaced with `querySelector('button[data-testid="avatar-menu-trigger"]')` assertion. Name moves to dropdown; spec intent preserved.
+
+[DECISION] YELLOW-75.1 fold-in: 8th test appended to AvatarMenu.spec.ts — `focuses the first menuitem when opened`. RED: `document.activeElement` is not the sign-out link — `$effect` registers listeners but never calls `.focus()`. Byrd must add `signoutLinkEl?.focus()` in the open branch.
+
+[PATTERN] Mechanical-update rule (CHORE-72 Task-15): when an existing assertion pins a shape that's changing by design (e.g. inline-name → dropdown-name), replace the old assertion with one that pins the new shape. Flag in handoff AND commit body. Do NOT leave contradictory assertions.
+
+[GOTCHA] MvoxNav.spec.ts line 33 previously pinned `container.textContent.toContain('Maire L.')` — this was the inline-name assertion that would have silently passed even after AvatarMenu wiring (name still present in DOM, just inside the dropdown). Replacing it with a `querySelector` for the trigger button is the correct structural pin.
+
 (*MVOX:Tallis*)

@@ -1,24 +1,24 @@
 [
   {
     "from": "team-lead",
-    "text": "[2026-05-31 11:24] Tasks 2 + 3 shipped (69244f8, c168518). Dispatch — **CHORE-74 Task 4 RED: auth/callback hydrateUserStore call order**.\n\nPlan ref: Task 4 Steps 1-2.\n\n1. Read existing `src/routes/auth/callback/page.spec.ts`. Append a new test asserting `hydrateUserStore()` is called BEFORE `goto()` on a successful exchange.\n\nApproach: mock both `hydrateUserStore` (from `$lib/auth/userStore`) and `goto` (from `$app/navigation`). Push to a shared `callOrder: string[]` array as each mock fires, then assert order. Match existing spec's mock style — read file first.\n\nIf the existing spec doesn't have a clean fixture for the success path, scaffold one inline (mock `exchangeSession` to return ok, mock localStorage state for OAUTH_STATE_KEY, etc.).\n\n**Hoisting reminder:** if you declare a spy const that the `vi.mock` factory references, use `vi.hoisted(() => ({...}))` per the CHORE-72 + early-session-24 lessons.\n\n2. Run + verify FAIL: current callback page calls `setToken/setAccounts/setUser/setLastProvider` then `goto()` — does NOT call `hydrateUserStore()`. Test fails with call-order or missing-call error.\n\n3. Hand off to Byrd — no commit. Pre-format with biome. Atomic-chain your file writes.\n\nUnsupervised.",
-    "summary": "Task 4 RED — auth/callback hydrate call order",
-    "timestamp": "2026-05-31T11:23:44.112Z",
+    "text": "[2026-05-31 12:14] Task 3 shipped at 240288c. Dispatch — **CHORE-75 Task 4 RED: MvoxNav wires AvatarMenu**.\n\nPlan ref: Task 4 Steps 1-2.\n\nPer plan:\n1. Read existing `src/lib/components/MvoxNav.spec.ts`. Add a new test asserting MvoxNav renders the AvatarMenu trigger when signedIn=true:\n   ```ts\n   it('renders AvatarMenu trigger when signedIn (CHORE-75)', () => {\n     const { container } = render(MvoxNav, {\n       signedIn: true,\n       userName: 'Mihkel Putrinš',\n       userInitial: 'M',\n       currentTab: 'agenda',\n     });\n     const trigger = container.querySelector('button[data-testid=\"avatar-menu-trigger\"]');\n     expect(trigger).not.toBeNull();\n     expect(trigger?.textContent).toContain('M');\n   });\n   ```\n\n2. If existing MvoxNav tests assert the inline-avatar text shape (the `<span>{userName}</span>` next to a tile), update those assertions to expect the new AvatarMenu trigger shape. Invoke the **Bentham CHORE-72-Task-15 mechanical-update rule** + flag in your handoff message AND in the eventual commit body. Spec intent (signed-in user sees their name) is preserved — name now lives in the dropdown panel.\n\n3. Run + verify FAIL (component not wired yet — MvoxNav doesn't render AvatarMenu yet). Pre-format. Hand off — no commit.\n\nUnsupervised.",
+    "summary": "Task 4 RED — MvoxNav wires AvatarMenu",
+    "timestamp": "2026-05-31T12:14:21.589Z",
     "type": "message",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "[2026-05-31 11:30] Tasks 2-4 shipped (69244f8, c168518, c278506). B-1 fixed. Dispatch — **CHORE-74 Task 5 RED: LandingDashboardScatter re-hydration $effect**.\n\nPlan ref: Task 5 Steps 1-2.\n\nPer plan Step 1: append a new test to `src/lib/components/landing/LandingDashboardScatter.spec.ts`. The test drives an org change through a mocked writable `selectedOrgStore` and asserts `hydrateLibrarySection` was called with the new org id. Need to mock:\n- `$lib/library/libraryStore` (writable librarySectionStore + hydrateLibrarySection spy via `vi.hoisted`)\n- `$lib/auth/storage` (getToken returning a fake token)\n- `$lib/auth/userStore` (writable user + selectedOrgStore + decodeJwt returning fake personId)\n- `$env/static/public` (PUBLIC_ENTU_DB)\n\nVerbatim test content in plan Task 5 Step 1. Read the existing spec first to see current mock structure — Tallis's session-24 work suggested using `vi.hoisted` for the hydrate spy + module-level writable selectedOrgStore mock.\n\nRun + verify FAIL — current component has the meta `$derived.by()` block consuming librarySectionStore but doesn't have an `$effect` that CALLS hydrateLibrarySection on org change. Test fails: spy never called.\n\nHand off — no commit (per chain convention; Byrd's GREEN commit ships both).\n\nUnsupervised.",
-    "summary": "Task 5 RED — LandingDashboardScatter re-hydrate",
-    "timestamp": "2026-05-31T11:29:56.842Z",
+    "text": "[2026-05-31 12:26] Bentham YELLOW-75.1 fold-in. Dispatch — **add focus-on-open test to AvatarMenu.spec.ts**.\n\nPer spec L52: opening the menu should focus the first menuitem (so keyboard users hit Tab→Enter→Enter, not Tab→Enter→Tab→Enter). Current impl only focuses-on-close. Add a RED test:\n\n```ts\nit('focuses the first menuitem when opened (CHORE-75 YELLOW-75.1 fold-in)', async () => {\n  const { container } = render(AvatarMenu, { name: 'Mihkel Putrinš', initial: 'M' });\n  const btn = container.querySelector('button[data-testid=\"avatar-menu-trigger\"]') as HTMLButtonElement;\n  await fireEvent.click(btn);\n  const signoutLink = container.querySelector('a[data-testid=\"avatar-menu-signout\"]') as HTMLAnchorElement;\n  expect(document.activeElement).toBe(signoutLink);\n});\n```\n\nRun + verify FAIL — current `$effect` doesn't auto-focus on open. Pre-format. Hand off to Byrd — no commit.\n\nUnsupervised.",
+    "summary": "YELLOW-75.1 RED — focus-on-open assertion",
+    "timestamp": "2026-05-31T12:25:34.666Z",
     "type": "message",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1780228820808@tallis\",\"from\":\"team-lead\",\"reason\":\"CHORE-74 shipped; clean-cleanup at CHORE boundary per L117. Stand down cleanly; next-CHORE Tallis will be a fresh spawn.\",\"timestamp\":\"2026-05-31T12:00:20.808Z\"}",
-    "timestamp": "2026-05-31T12:00:20.808Z",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1780231445959@tallis\",\"from\":\"team-lead\",\"reason\":\"End-of-session-25. CHORE-74 + CHORE-75 shipped end-to-end. Stand down cleanly per L117.\",\"timestamp\":\"2026-05-31T12:44:05.959Z\"}",
+    "timestamp": "2026-05-31T12:44:05.959Z",
     "type": "message",
     "read": true
   }

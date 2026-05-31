@@ -1,8 +1,8 @@
 [
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1780228824786@bentham\",\"from\":\"team-lead\",\"reason\":\"CHORE-74 shipped; clean-cleanup at CHORE boundary per L117. Stand down cleanly; next-CHORE Bentham will be a fresh spawn for CHORE-75 review.\",\"timestamp\":\"2026-05-31T12:00:24.786Z\"}",
-    "timestamp": "2026-05-31T12:00:24.786Z",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1780231451021@bentham\",\"from\":\"team-lead\",\"reason\":\"End-of-session-25. CHORE-74 + CHORE-75 shipped end-to-end. Stand down cleanly per L117.\",\"timestamp\":\"2026-05-31T12:44:11.021Z\"}",
+    "timestamp": "2026-05-31T12:44:11.021Z",
     "type": "message",
     "read": true
   }

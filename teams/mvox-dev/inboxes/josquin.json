@@ -1,16 +1,8 @@
 [
   {
     "from": "team-lead",
-    "text": "[2026-05-31 11:52] Acknowledged. Clean ship at cb3aec0; deploy live; #74 closed; branch deleted. Idle as planned. (*MVOX:Palestrina*)",
-    "summary": "Ack CHORE-74 ship",
-    "timestamp": "2026-05-31T11:51:41.047Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1780228826302@josquin\",\"from\":\"team-lead\",\"reason\":\"CHORE-74 shipped; clean-cleanup at CHORE boundary per L117. Stand down cleanly; next-CHORE Josquin will be a fresh spawn for CHORE-75 merge.\",\"timestamp\":\"2026-05-31T12:00:26.302Z\"}",
-    "timestamp": "2026-05-31T12:00:26.302Z",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1780231452181@josquin\",\"from\":\"team-lead\",\"reason\":\"End-of-session-25. CHORE-74 + CHORE-75 shipped end-to-end. Stand down cleanly per L117.\",\"timestamp\":\"2026-05-31T12:44:12.181Z\"}",
+    "timestamp": "2026-05-31T12:44:12.181Z",
     "type": "message",
     "read": true
   }

@@ -1,40 +1,24 @@
 [
   {
     "from": "team-lead",
-    "text": "[2026-05-31 11:21] Task 2 confirmed at 69244f8. Dispatch — **CHORE-74 Task 3: +layout.svelte $effect blocks**.\n\nPlan ref: Task 3 Steps 1-3. **Impl only — no spec for this task** (effects are simple plumbing; coverage flows through Task 2 + future Task 5 indirectly).\n\nPer plan Task 3 Step 1:\n\n1. Read `src/routes/+layout.svelte`. Update import line to include `urlOrgIdStore` + `selectedOrgIdStore` from `$lib/auth/userStore`. (Hardcoded `'org'` is fine in template context per session-24 precedent; or use the `ORG_URL_PARAM_NAME` constant you just exported — your call.)\n\n2. Add two `$effect` blocks AFTER the existing `onMount(...)` call but BEFORE the `$derived` declarations:\n   ```ts\n   // CHORE-74: reactive URL → urlOrgIdStore propagation\n   $effect(() => {\n     if (!mounted) return;\n     urlOrgIdStore.set(page.url.searchParams.get('org'));\n   });\n\n   // CHORE-74: URL precedence write-through to selectedOrgIdStore\n   $effect(() => {\n     if (!mounted) return;\n     const urlOrgId = page.url.searchParams.get('org');\n     if (urlOrgId) selectedOrgIdStore.set(urlOrgId);\n   });\n   ```\n\n3. Gates: `pnpm check && pnpm test:unit && pnpm lint`. Expect 0 errors, all tests pass, lint clean.\n\n4. Commit + push (atomic chain in single Bash call). Report SHA + gate output.\n\n`page` from `$app/state` is already imported in the layout (line 3) and is reactive — both effects re-run on URL changes naturally.\n\nUnsupervised.",
-    "summary": "Task 3 — +layout.svelte $effect blocks",
-    "timestamp": "2026-05-31T11:21:28.548Z",
+    "text": "[2026-05-31 12:16] Dispatch — **CHORE-75 Task 4 GREEN: MvoxNav wires AvatarMenu**.\n\nPlan ref: Task 4 Steps 3-5.\n\n1. Read `src/lib/components/MvoxNav.svelte`. Locate the inline avatar+name block in the signed-in branch (Tallis noted lines 79-85; the `<span class=\"inline-flex items-center gap-1.5 font-sans text-[11.5px]\">` containing the initial tile + `{userName}`).\n\n2. Replace that block with:\n   ```svelte\n   <AvatarMenu name={userName} initial={userInitial} />\n   ```\n\n3. Add to imports at the top:\n   ```ts\n   import AvatarMenu from './AvatarMenu.svelte';\n   ```\n\n4. Gates: `pnpm test:unit -- --run && pnpm check && pnpm lint`. Expect all green (the new test + the mechanically-updated `renders brand and section tabs` test both pass).\n\n5. Commit RED+GREEN; push (atomic chain). Use plan's commit message template + **include Tallis's mechanical-update flag** in body:\n   ```\n   feat(#75): MvoxNav wires AvatarMenu — avatar becomes menu trigger\n\n   Replace the inline avatar+name block with <AvatarMenu>. User name\n   now lives inside the dropdown panel (under \"Signed in as\"); only\n   the initial tile remains visible in the navbar.\n\n   Mechanical test update per CHORE-72 Task-15 rule: existing\n   'renders brand and section tabs' test asserted hardcoded inline\n   name 'Maire L.'; updated to assert the AvatarMenu trigger button\n   instead. Intent preserved (signed-in user visual affordance);\n   name moves into dropdown.\n\n   Reviewed-by: Tallis (RED spec)\n   ```\n\n6. Report SHA + gate output.\n\nUnsupervised.",
+    "summary": "Task 4 GREEN — MvoxNav wires AvatarMenu",
+    "timestamp": "2026-05-31T12:16:35.296Z",
     "type": "message",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "[2026-05-31 11:26] Dispatch — **CHORE-74 Task 4 GREEN: auth/callback hydrateUserStore call**.\n\nPlan ref: Task 4 Steps 3-5. Tallis's RED spec uses callOrder array; expects ['hydrate', 'goto'] sequence.\n\nPer plan:\n1. In `src/routes/auth/callback/+page.svelte`: add `hydrateUserStore` to the `$lib/auth/userStore` import; inside `runExchange()`, add `await hydrateUserStore()` between `setLastProvider(decoded.provider)` and `exchangeState = 'success'`.\n\n2. Gates: `pnpm test src/routes/auth/callback/page.spec.ts -- --run && pnpm check && pnpm lint`. Expect: new test passes; existing callback tests still pass.\n\n3. Commit RED+GREEN together with plan's commit message; push. Atomic chain.\n\n4. Report SHA + gate output.\n\nUnsupervised.",
-    "summary": "Task 4 GREEN — callback hydrateUserStore",
-    "timestamp": "2026-05-31T11:26:17.069Z",
+    "text": "[2026-05-31 12:27] Dispatch — **YELLOW-75.1 GREEN: focus the sign-out link on open**.\n\nIn `src/lib/components/AvatarMenu.svelte`:\n\n1. Add a `signoutLinkEl` bindable element ref alongside the existing `triggerEl` + `panelEl`:\n   ```ts\n   let signoutLinkEl: HTMLAnchorElement | undefined = $state();\n   ```\n\n2. Bind it on the sign-out anchor:\n   ```svelte\n   <a bind:this={signoutLinkEl} data-testid=\"avatar-menu-signout\" ...>\n   ```\n\n3. Inside the existing `$effect` that runs when `open === true`, add the focus call right at the top (before the keydown/mousedown handlers are registered). Use `requestAnimationFrame` or `setTimeout(.., 0)` to defer past the {#if open} mount tick if needed:\n   ```ts\n   $effect(() => {\n     if (!open) return;\n     // CHORE-75 YELLOW-75.1: focus the first menuitem on open\n     signoutLinkEl?.focus();\n     // ... existing keydown + mousedown listeners ...\n   });\n   ```\n\n   If the focus call lands before the anchor is mounted, defer it: `queueMicrotask(() => signoutLinkEl?.focus())`.\n\n4. Gates: `pnpm test src/lib/components/AvatarMenu.spec.ts -- --run && pnpm check && pnpm test:unit && pnpm lint`. Expect 8/8 + 563+ total.\n\n5. Commit + push (atomic chain) with this body:\n   ```\n   fix(#75): focus first menuitem on open (YELLOW-75.1 fold-in)\n\n   Spec L52 required opening the menu focuses the first menuitem so\n   keyboard users hit Tab → Enter → Enter (not Tab → Enter → Tab →\n   Enter). Implementation previously only focused-on-Esc-close.\n\n   3-line fold-in: bind signoutLinkEl + call .focus() inside the open\n   $effect (queueMicrotask to defer past the {#if open} mount tick).\n\n   Per Bentham YELLOW-75.1 + session-17 sub-10-line fold-in calibration.\n\n   Reviewed-by: Tallis (RED spec) + Bentham (YELLOW-75.1)\n   ```\n\n6. Report SHA + gate output.\n\nUnsupervised.",
+    "summary": "YELLOW-75.1 GREEN — focus-on-open",
+    "timestamp": "2026-05-31T12:27:28.271Z",
     "type": "message",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "[2026-05-31 11:32] Dispatch — **CHORE-74 Task 5 GREEN: LandingDashboardScatter re-hydration $effect**.\n\nPlan ref: Task 5 Steps 3-5.\n\nAdd to `src/lib/components/landing/LandingDashboardScatter.svelte`:\n\n```ts\n// new imports (some may already be present — dedupe):\nimport { getToken } from '$lib/auth/storage';\nimport { PUBLIC_ENTU_DB } from '$env/static/public';\nimport { userStore, decodeJwt } from '$lib/auth/userStore';\nimport { hydrateLibrarySection } from '$lib/library/libraryStore';\n\n// after existing $derived/$state declarations, add:\n$effect(() => {\n  const org = $selectedOrgStore;\n  const user = $userStore;\n  if (!org || user.status !== 'ready') return;\n  const token = getToken();\n  if (!token) return;\n  const claims = decodeJwt(token);\n  const personId = claims?.accounts?.[PUBLIC_ENTU_DB];\n  if (!personId) return;\n  hydrateLibrarySection({ orgId: org.id, personId });\n});\n```\n\nNote: `selectedOrgStore` should already be imported (used by the existing meta `$derived.by()` block); verify before adding duplicate.\n\nGates: `pnpm test src/lib/components/landing/LandingDashboardScatter.spec.ts -- --run && pnpm check && pnpm test:unit && pnpm lint`. Run the full unit suite — this is the integration moment for dashboard flow.\n\nCommit RED+GREEN; push. Atomic chain. Report SHA + gate output.\n\nUnsupervised.",
-    "summary": "Task 5 GREEN — Scatter re-hydration effect",
-    "timestamp": "2026-05-31T11:32:20.776Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-31 11:42] Status ping — Task 5 GREEN was dispatched 10 min ago, no commit landed yet. Tasks 2-4 averaged 2-3 min. Are you stuck, mid-iteration, or hit a gate failure? Brief reply with where you are is fine. If you're permission-blocked on something silent (the agent_spawn_prompt gotcha), just say so.",
-    "summary": "Status check on Task 5",
-    "timestamp": "2026-05-31T11:38:02.405Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1780228822757@byrd\",\"from\":\"team-lead\",\"reason\":\"CHORE-74 shipped; clean-cleanup at CHORE boundary per L117. Stand down cleanly; next-CHORE Byrd will be a fresh spawn.\",\"timestamp\":\"2026-05-31T12:00:22.757Z\"}",
-    "timestamp": "2026-05-31T12:00:22.757Z",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1780231447512@byrd\",\"from\":\"team-lead\",\"reason\":\"End-of-session-25. CHORE-74 + CHORE-75 shipped end-to-end. Stand down cleanly per L117.\",\"timestamp\":\"2026-05-31T12:44:07.512Z\"}",
+    "timestamp": "2026-05-31T12:44:07.512Z",
     "type": "message",
     "read": true
   }

@@ -1,6 +1,78 @@
 # Palestrina — Team Lead Scratchpad
 
-### [NEXT SESSION] 2026-05-31 end-of-session-24 — session-24 → session-25
+### [NEXT SESSION] 2026-05-31 end-of-session-25 — session-25 → session-26
+
+**Headline: Two consequential CHOREs shipped end-to-end in one clean session — CHORE-74 (state propagation, `cb3aec0`) + CHORE-75 (avatar dropdown user menu, `70ee562`). Live at `mvox.eu`. L117 ghost-process protocol validated twice in production (mid-session-25 between CHOREs, and at session-25 close).**
+
+## Session-25 outcome (what shipped to main)
+
+| SHA | What |
+|---|---|
+| `cb3aec0` | fix(#74): state propagation — login + org-change auto-update UI. Eliminates manual-refresh requirement after sign-in + after OrgPicker org change. 4-task TDD chain (Tallis RED → Byrd GREEN per task) + Bentham GREEN + Josquin merge. 555 tests pass. URL-overrides-persisted arch rule (session 22) now code-enforceable via `urlOrgIdStore` + `selectedOrgIdStore` + multi-store derive. Deployed at `d9cdad61.multivox.pages.dev` — chunks `app.CiRjDSx0.js` + `start.BkgjBlNh.js`. Closes #74. |
+| `d530c54` | chore(mvox-dev): post-CHORE-74 state preserve. Mid-session team-recreate cleanup per L117. |
+| `70bba39` | spec(#75): CHORE-75 avatar dropdown menu — design. 11 ACs, ~6 files. |
+| `a23a678` | plan(#75): 6-task implementation plan. |
+| `70ee562` | feat(#75): avatar dropdown user menu — sign out from UI. MvoxNav avatar tile becomes a button toggling a paper-card dropdown ("Signed in as {name}" + "Sign out" → /auth/logout). Pure Svelte 5; no headless library. 2 new i18n keys × 4 locales. Bentham YELLOW-75.1 (focus-on-open keyboard nav) folded in pre-merge at `b83b686`. 564 tests pass. Deployed at `35d3f078.multivox.pages.dev` — chunks `app.Bs_uXyJU.js` + `start.9kRlsJ3X.js`. Closes #75. |
+
+## L117 protocol — validated twice in production
+
+**Pre-session-25:** the protocol was codified at end-of-session-24 after the ghost-process disaster. Session-25 was the first test.
+
+**Validation 1 (between CHORE-74 ship and CHORE-75 start):**
+1. SendMessage shutdown_request to all 4 active agents (tallis, byrd, bentham, josquin) in parallel
+2. Wait for all 4 `teammate_terminated` system events + agent-side `shutdown_approved`
+3. THEN TeamDelete (succeeded cleanly, no "active members" error, no zombies)
+4. TeamCreate, restore inboxes from repo, fresh start
+
+**Validation 2 (session-25 close):** identical pattern with 5 agents (tallis, byrd, comenius, bentham, josquin). Same clean outcome. No surgical config-edit workaround used. No zombies surface.
+
+**Codify L117 as standing procedure** — `feedback_no_parallel_branches` Level 2 now has a sibling rule worth memorizing: "TeamDelete is preceded by shutdown_request waterfall to all live members." Already captured in session-24 [NEXT SESSION] seed; session-25 confirmed it works.
+
+## Carry-forward state (other CHORE backlog)
+
+- **GH #72** — `/about` href fix (~1 line, cosmetic). YELLOW-72.3 from CHORE-72 review.
+- **GH #73** — overdue red+bold path + `.replace()` brittleness. BLOCKED on future lending CHORE; revisit when lending data lands.
+- **GH #65** — narrow-viewport chip width (~15 min Byrd). Carry-forward from CHORE-62 era.
+- **CHORE-C** — test infra (MSW + Playwright bootstrap). Plan at `docs/superpowers/plans/2026-05-23-chore-53-c-test-infra.md`, 791 lines, 9 tasks. Heavy; warrants its own session start.
+- **#54** client-side error capture (deferred); **#44** CF Pages Git-connected migration; **#49** Biome lint enable; **#6** Email Resend (blocked on PO SPF/DKIM).
+- **Scheduled routine** `trig_014xDo7ZTuzNLpBUuWdtEs32` next_run_at 2026-05-30T09:00:00Z — likely past now; verify state at next session open.
+
+## Bentham's CHORE-72 Task-15 rule consumed cleanly
+
+Twice this session. Byrd invoked the "mechanical test update during GREEN if pattern alignment is the documented reason" rule at both:
+- CHORE-74 Task 2 — `window.history.replaceState` → `urlOrgIdStore.set()` direct driving in 5 userStore.spec.ts tests
+- CHORE-75 Task 4 — `'Maire L.'` hardcoded inline-name assertion → `button[data-testid="avatar-menu-trigger"]` structural assertion
+
+Both adjudicated GREEN by Bentham. The rule is durable and Byrd uses it correctly when applicable. **Worth lifting to `architecture-decisions.md` as a settled decision** — currently lives only in Bentham's CHORE-72 review report. Session-26 lift candidate.
+
+## Expected first action session 26
+
+1. Read this seed.
+2. Verify production health: `curl -sI https://mvox.eu/` + `curl -sI https://multivox.pages.dev/` — both 200 + `x-sveltekit-page: true`. Build chunks should still be `app.Bs_uXyJU.js` + `start.9kRlsJ3X.js` (no deploys since session-25 close).
+3. **Apply L117**: at startup, IF any ghost processes from session-25 are alive (sending unsolicited idle pings), send them shutdown_request first. Otherwise proceed to Phase 2 (TeamCreate).
+4. Confirm with PO what to pick up. Carry-forward options:
+   - Small cosmetic polish pair (#72 + #65, ~30 min batched) — quick win
+   - CHORE-C test infra (9 tasks, heavy)
+   - Lift Bentham's "mechanical test update during GREEN" rule to `architecture-decisions.md` (small stewardship pass)
+   - Something new PO surfaces
+
+## Production health at session close
+
+- `mvox.eu` + `multivox.pages.dev` both 200; CHORE-75 build live (`app.Bs_uXyJU.js` + `start.9kRlsJ3X.js`).
+- Polyphony Entu db unchanged (607 librarian-bundle entities under EFK Library `6a12036c4ff8277cd4306b26`).
+- Tests at session-25 ship: **564 unit tests pass** (vs session-24 close's 545; +10 from CHORE-74 + +8 from CHORE-75 + 1 mechanical test moved). Check 0 errors, lint clean, build clean.
+
+## Stale local + remote branches (housekeeping carry-forward)
+
+- Local: `chore/per-commit-green-arch-decision`, `chore/seed-librarian-bundle`, `feat/phase-b-live-wiring`
+- Remote: `origin/feat/phase-a-migration`, `origin/fix/phase-a-partial-failure-recovery` (verify)
+- Both feature CHORE branches from this session (`chore/state-propagation`, `chore/avatar-menu`) deleted clean — local + remote.
+
+(*MVOX:Palestrina*)
+
+---
+
+### [PROCESSED 2026-05-31 end-of-session-25] 2026-05-31 end-of-session-24 — session-24 → session-25
 
 **Headline: Session ended at PO call ("we should exit the session — its messed up") after the harness's ghost-process problem with TeamDelete surfaced mid-CHORE-74.**
 
