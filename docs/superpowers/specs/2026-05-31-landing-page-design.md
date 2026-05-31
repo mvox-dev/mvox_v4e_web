@@ -519,6 +519,7 @@ None. No new Entu entity types, no new properties, no new formulas, no rights ch
 - **Real form vs mailto:**: defer until CHORE-6 ships SPF/DKIM. Spec uses `mailto:`. Migration path: replace `LandingRequestSection`'s anchor with a `<form>` POST'ing to a CF Worker function calling Resend.
 - **Time-of-day greeting**: out of scope; static "Welcome back". A future polish CHORE may add it.
 - **Public catalog preview** (curious bystander browses a sample library without signing in): considered + rejected at Q3 (invite-only). Revisit if/when posture changes to open-beta.
+- **Vertical skin architecture** (Q15, 2026-05-31): PO confirmed mvox's data model (v4E + library/roster/agenda) is identical across choir / orchestra / chamber ensemble / mixed-voicing groups — the product fits all. Current spec deliberately locks **"choir"** copy as the initial vertical skin to preserve the personality and specificity that made Direction A work. Future verticals (orchestra, ensemble) will be implemented as net-new skin layers — same components, swapped copy bundle. **Implementation constraint to preserve this option:** all human-facing "choir" references must live in i18n message values (`messages/en.json`), NEVER as hard-coded strings in `.svelte` templates or as part of component / type / file names. The i18n keys themselves stay skin-neutral (`landing_hero_headline`, not `landing_hero_choir_headline`). When a future "orchestra" skin lands, it becomes a sibling `messages/orchestra/*.json` (or similar) layered over the base; no component edits required.
 
 ## Related
 
