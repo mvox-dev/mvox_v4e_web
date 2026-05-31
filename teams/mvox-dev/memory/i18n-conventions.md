@@ -228,3 +228,66 @@ i18n message **keys** never carry vertical-specific vocabulary (no `choir`, `sin
 When authoring translations: don't preserve the source-language metaphor literally. The English value `"The back-of-house for your choir."` is a load-bearing piece of brand copy; the Estonian / Latvian / Ukrainian values are free to find the most idiomatic equivalent for their reader, not a word-for-word port.
 
 (*MVOX:Palestrina, contributed for Comenius's stewardship*)
+
+---
+
+### New key group: `landing_*` (CHORE-72, added session 24, 2026-05-31)
+
+Covers all landing page keys for the redesigned `/` route: `landing_hero_*`, `landing_pillars_*`, `landing_pillar_*`, `landing_invites_*`, `landing_request_*`, `landing_footer_*`, `landing_dashboard_*`.
+
+**Deprecated and removed:** 7 scaffold-era keys (`landing_signed_out_headline`, `landing_signed_out_cta`, `landing_signed_in_heading`, `landing_empty_state`, `landing_error_state`, `landing_retry_button`, `landing_members_per_section`) removed from all 4 locale files. The old `+page.svelte` scaffold references were replaced with inline string literals (temporary: the page is rewritten in Task 15).
+
+**First `_html`-suffix key:** `landing_invites_body_1_html` — contains `<strong>` tags rendered via `{@html}`. All translations preserve the `<strong>` tags verbatim. This is the project's first HTML-bearing i18n key. Convention: `_html` suffix = key value may contain safe, developer-authored HTML; Svelte templates use `{@html m.key()}`. Never use for user-generated content.
+
+**`landing_dashboard_library_meta_ready` plural note:** `{worksCount} works · {copiesCount} copies · {overdueCount} overdue` — three plural-word gotchas per the no-ICU-plural rule. Static suffixes used in all locales:
+- et: `{worksCount} teost · {copiesCount} eksemplari · {overdueCount} hilinenud` — partitive forms work for all n; "hilinenud" (overdue/delayed) is an adjective that doesn't inflect with count — grammatically clean.
+- lv: `{worksCount} darbi · {copiesCount} eksemplāri · {overdueCount} nokavēti` — nom. pl.; minor imperfection at n=1 ("1 darbi"), accepted per convention.
+- uk: `{worksCount} творів · {copiesCount} примірників · {overdueCount} прострочено` — gen. pl. for works/copies; "прострочено" (overdue, short passive) is invariant — grammatically comfortable with any count.
+
+**"Back office" localization:** the English brand phrase "the back-of-house" / "back office" varies by locale:
+- et: `tagakontor` (footer tagline, hero headline) — compound noun, natural Estonian; shorter than `tagatuba` (backroom). In marginalia context: `kontor` alone (concise for Caveat stamp).
+- lv: `aizmugures birojs` — "back office" as two words; `birojs` (office) is the standard Latvian term.
+- uk: `офіс` — "office"; the English "back-of-house" metaphor doesn't translate naturally; `офіс хору` (choir's office) in the tagline is more idiomatic.
+
+**Stamp / badge uppercase note:** `landing_pillar_badge_*`, `landing_*_stamp`, `landing_dashboard_badge_soon` — all uppercase in source. Translations rendered uppercase where natural:
+- `SHIPPED` → et: `VALMIS` (ready/done), lv: `PIEEJAMS` (available — "shipped" doesn't map cleanly; "pieejams" signals it's usable), uk: `ГОТОВО` (done/ready)
+- `IN DEV` → et: `ARENDUSES`, lv: `IZSTRĀDĒ`, uk: `В РОЗРОБЦІ`
+- `COMING` → et: `TULEMAS`, lv: `GAIDĀMS`, uk: `НЕЗАБАРОМ`
+- `SOON` → et: `PEAGI`, lv: `DRĪZUMĀ`, uk: `НЕЗАБАРОМ`
+- `INVITE ONLY` → et: `AINULT KUTSEGA`, lv: `TIKAI AR UZAICINĀJUMU`, uk: `ЛИШЕ ЗА ЗАПРОШЕННЯМ`
+- `RECEIVED` → et: `SAADUD`, lv: `SANEMTS` (pre-existing diacritic-dropped form — matches `library_returns_stamp` pattern), uk: `ОТРИМАНО`
+
+**`landing_hero_cta` ("Request an invite"):**
+- et: `Taotle kutset` — imperative 2nd-sg + partitive; natural Estonian action phrase.
+- lv: `Lūgt uzaicinājumu` — infinitive + accusative; standard Latvian CTA form.
+- uk: `Надіслати запит на запрошення` — infinitive "send a request for an invite"; more natural than "запросити запрошення" (invite an invite — tautological).
+
+**`landing_footer_link_about` ("About mvox"):**
+- et: `mvox-ist` — elative case; Estonian "about" construction; concise.
+- lv: `Par mvox` — standard Latvian "about" preposition.
+- uk: `Про mvox` — standard Ukrainian "about" preposition.
+
+**`landing_dashboard_eyebrow` + `landing_dashboard_greeting`:** reuse the `auth_login_heading` welcome-back register for consistency (et: `Tere tulemast tagasi`, lv: `Laipni atpakaļ`, uk: `З поверненням`). The greeting adds the name param: `{name}.` appended directly.
+
+**`landing_invites_eyebrow` ("Getting in"):**
+- et: `Sissesaamine` — verbal noun "getting in/entry"; concise, action-oriented.
+- lv: `Kā pievienoties` — "How to join"; more natural than a direct noun translation for Latvian.
+- uk: `Як потрапити` — "How to get in"; same pattern as lv, most natural for Ukrainian.
+
+| Key | Locale | Value | Rationale |
+|---|---|---|---|
+| `landing_dashboard_marginalia` | et | `{org} · kontor` | `kontor` = office; shorter than `tagakontor` for Caveat marginalia context. |
+| `landing_dashboard_marginalia` | lv | `{org} · birojs` | `birojs` = office; concise for marginalia. |
+| `landing_dashboard_marginalia` | uk | `{org} · офіс` | `офіс` = office; the "back-of-house" metaphor doesn't translate; clean noun. |
+| `landing_footer_tagline` | uk | `Офіс хору. Бібліотека…` | "Choir's office" vs literal "back-of-house" — more idiomatic Ukrainian. |
+| `landing_hero_headline` | et | `Koori tagakontor.` | "Choir's back office" — `tagakontor` is the established compound. |
+| `landing_hero_headline` | lv | `Kora aizmugures birojs.` | "Choir's back office" — two-word Latvian compound. |
+| `landing_hero_headline` | uk | `Офіс вашого хору.` | "Your choir's office" — possessive form feels more personal in Ukrainian. |
+| `landing_pillar_badge_shipped` | lv | `PIEEJAMS` | "SHIPPED" has no clean Latvian equivalent; `PIEEJAMS` (available/accessible) communicates the same user-facing meaning (it works, you can use it). |
+| `landing_invites_body_1_html` | all | `<strong>` preserved | HTML tags preserved verbatim in et/lv/uk per `_html`-suffix convention. |
+| `landing_dashboard_library_meta_ready` | uk | `{overdueCount} прострочено` | `прострочено` is a short passive form invariant across counts — avoids the one/few/other split that ICU plurals would need. |
+| `landing_pillars_heading` | et | `Mida sisaldab` | "What's inside" — verb-last Estonian construction; natural. |
+| `landing_pillars_heading` | lv | `Kas iekšā` | "What's inside" — elliptical Latvian construction; natural for a heading. |
+| `landing_pillars_heading` | uk | `Що всередині` | "What's inside" — standard Ukrainian heading form. |
+
+(*MVOX:Comenius*)
