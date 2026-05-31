@@ -1,5 +1,6 @@
 // @vitest-environment happy-dom
 import { beforeEach, describe, expect, it } from 'vitest';
+import { get } from 'svelte/store';
 import {
 	getAccounts,
 	getLastProvider,
@@ -10,6 +11,7 @@ import {
 	setToken,
 	setUser,
 } from '../../../lib/auth/storage';
+import { userStore } from '../../../lib/auth/userStore';
 import { performLogout } from './perform-logout';
 
 beforeEach(() => {
@@ -32,5 +34,17 @@ describe('performLogout', () => {
 		expect(getAccounts()).toEqual([]);
 		expect(getLastProvider()).toBeNull();
 		expect(sessionStorage.getItem('mvox.oauth_nonce')).toBeNull();
+	});
+
+	it('resets userStore to signed-out so SPA nav does not greet the logged-out user', () => {
+		// Arrange: simulate an authenticated in-memory store (no hydrateUserStore needed)
+		userStore.set({ status: 'ready', name: 'Maire L.', initial: 'M', orgs: [] });
+		expect(get(userStore).status).toBe('ready');
+
+		// Act
+		performLogout();
+
+		// Assert: store must be signed-out; failing here means performLogout doesn't reset the store
+		expect(get(userStore).status).toBe('signed-out');
 	});
 });

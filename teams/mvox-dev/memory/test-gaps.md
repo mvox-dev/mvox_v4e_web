@@ -34,4 +34,6 @@ Format: `[GAP] <area> — <what's missing> — <risk level: low/med/high> — <d
 
 [GAP] CHORE-78 — Mobile library viewport + scroll behaviour not E2E tested. Three checks deferred to Playwright: (1) at `page.setViewportSize({ width: 375, height: 812 })`, the task cards and desktop master index are visually absent (not just class-gated); (2) mobile list scrolls correctly with sticky search box pinned to top; (3) scroll-spy genuinely does NOT fire on mobile — assert `?work=` param does not change as user scrolls the list (AC7 true check). Deferred — HIGH. 2026-05-31.
 
+[GAP] CHORE-79 — Auth guard E2E flow not Playwright-tested. Deferred checks: (1) logged-out user navigates to `/library` → redirected to `/auth/login?redirect=%2Flibrary`; (2) completes login → cookie set → redirected back to `/library`; (3) logout → cookie cleared → `/library` redirects again. Requires preview deploy + real OAuth or a test-Entu mock harness. Deferred — HIGH. 2026-05-31.
+
 (*MVOX:Tallis*)

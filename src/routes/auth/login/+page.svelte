@@ -14,7 +14,13 @@
 	const { data }: { data: { providers: Provider[] } } = $props();
 
 	const error = $derived(page.url.searchParams.get('error'));
-	const returnTo = $derived(page.url.searchParams.get('return_to') ?? '/');
+	// The server-side auth guard redirects here with `?redirect=<path>` (CHORE-79).
+	// Accept it as the post-login destination; fall back to the existing `return_to`.
+	// Keep only safe local paths (must start with `/`, not `//`) — open-redirect guard.
+	const returnTo = $derived.by(() => {
+		const raw = page.url.searchParams.get('redirect') ?? page.url.searchParams.get('return_to');
+		return raw && raw.startsWith('/') && !raw.startsWith('//') ? raw : '/';
+	});
 	const lastProvider = $state(typeof window !== 'undefined' ? getLastProvider() : null);
 
 	onMount(() => {
