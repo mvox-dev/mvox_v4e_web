@@ -32,7 +32,7 @@ Byrd implements; Tallis asserts against these.
 | Desktop master index | `library-master` (on `LibraryMaster` root) | `hidden sm:block` |
 | Master-detail grid wrapper | `library-md-grid` | single-col `< sm`, `sm:grid` 2-col |
 | Mobile list container | `library-mobile-list` | `block sm:hidden`, rendered only when no `?work=` |
-| Mobile search input | `library-mobile-search` | inside mobile list; `aria-label`/placeholder = `m.library_search_placeholder()` |
+| Mobile search input | `library-mobile-search` | inside mobile list; `aria-label`/placeholder = `m.library_mobile_search_placeholder()` (NOT the desktop `library_search_placeholder`) |
 | Mobile work row | `library-mobile-row` (one per work; carry `data-work-id`) | tap sets `?work=<id>` |
 | Mobile empty-result | `library-mobile-empty` | shown when filtered list is empty |
 | Mobile detail container | `library-mobile-detail` | `block sm:hidden`, rendered only when `?work=<id>` |
@@ -47,7 +47,7 @@ i18n keys: `library_back_to_works`, `library_search_no_results`, `library_search
 **Files:** Modify `messages/{en,et,lv,uk}.json`
 
 - [ ] **Step 1:** Add three keys (alphabetical, `library_*` family) to all four locales:
-  - `library_search_placeholder` — en: "Search title or composer…"
+  - `library_mobile_search_placeholder` — en: "Search title or composer…"  (NEW key — do NOT reuse the existing `library_search_placeholder`, which belongs to the broader desktop ⌘K search "jump to work, copy #, borrower…" and must stay unchanged)
   - `library_back_to_works` — en: "‹ Works" (translate the word, keep the ‹ glyph)
   - `library_search_no_results` — en: "No works match your search"
   Provide proper et/lv/uk translations (concept-mapped, consistent with existing `library_*` keys).
