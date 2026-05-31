@@ -85,13 +85,13 @@
 						{m.library_rehearsal_in({ time: '16:00', countdown: '1h 28m' })}
 					</div>
 				</div>
-				<div class="w-[280px]">
+				<div class="hidden sm:block w-[280px]">
 					<PencilSearch placeholder={m.library_search_placeholder()} />
 				</div>
 			</div>
 		</div>
 
-		<div class="px-6 py-6 grid gap-5" style="grid-template-columns: 1fr 1fr 1.15fr">
+		<div data-testid="library-task-cards" class="hidden sm:grid px-6 py-6 gap-5" style="grid-template-columns: 1fr 1fr 1.15fr">
 			<!-- Returns stack -->
 			<PaperStack rotate={-0.8}>
 				<StackHeader

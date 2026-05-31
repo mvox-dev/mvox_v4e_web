@@ -11,7 +11,7 @@
 	let { works, selectedWorkId, onselect }: Props = $props();
 </script>
 
-<div class="master-col">
+<div data-testid="library-master" class="master-col hidden sm:block">
 	<div class="master-paper">
 		<div class="master-hdr">
 			<span>{m.library_master_count({ n: works.length })}</span>
