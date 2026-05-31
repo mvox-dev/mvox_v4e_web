@@ -564,6 +564,53 @@ Bentham REDs PRs that violate any of these.
 
 ---
 
+## Vertical-skin neutrality — domain vocabulary lives in i18n values, never in code (2026-05-31, session 24)
+
+**Decision**: Every human-facing reference to mvox's current vertical ("choir", "choirs", "choral", "sing", "voicing", etc.) MUST live in i18n message **values** (`messages/{locale}.json`), never in:
+
+- Hard-coded strings inside `.svelte` templates
+- Component file names (e.g., `ChoirNav.svelte`, `ChoirCard.svelte` — forbidden; use `EnsembleNav` / generic names)
+- TypeScript type names (`type ChoirEntity = ...` — forbidden; use `EnsembleEntity` / generic)
+- Function names, prop names, store names, route segments, CSS class names
+- Comments, error messages, log lines
+- i18n message **keys** themselves — keys stay vocabulary-neutral (`landing_hero_headline`, not `landing_hero_choir_headline`)
+
+**Rationale**: PO confirmed (session 24, 2026-05-31) that mvox's v4E schema and component architecture are vertical-identical across choir / orchestra / chamber ensemble / mixed-voicing / instrumental groups — the product fits all of them. Current copy is choir-specific for personality + specificity reasons (lean character-rich; see `feedback_mvox_visual_personality`). Future verticals will land as net-new **skin layers** — a sibling messages bundle (e.g., `messages/orchestra/{locale}.json`) layered over the base, swapping the vocabulary without touching components, routes, or types. The skin swap MUST be a copy operation, never a refactor.
+
+**What violates the rule**:
+- ❌ A `.svelte` template with `<h1>For your choir.</h1>` baked in → must be `<h1>{m.landing_hero_headline()}</h1>`
+- ❌ A component named `ChoirAvatar.svelte` → name it `EnsembleAvatar.svelte` (or `MemberAvatar.svelte`, etc.)
+- ❌ A type `type ChoirSection = { ... }` → name it `type EnsembleSection` (or `type VoicePart`, etc., if vocabulary is genuinely part of the domain modeling vs. just labeling)
+- ❌ An i18n key `landing_hero_for_choirs` → key should be `landing_hero_eyebrow` (semantic, not vocabulary)
+- ❌ A route `/choir-settings` → use `/settings` (generic)
+- ❌ A grep returns `// for the choir page` in code comments → comments use neutral language
+
+**What does NOT violate the rule**:
+- ✓ `messages/en.json` containing `"landing_hero_headline": "The back-of-house for your choir."` — values carry vocabulary; that's by design
+- ✓ A spec or design doc using "choir" freely — specs are human-readable artifacts, not the skin surface
+- ✓ Brand assets like the favicon, logo, or domain — they're not text strings under i18n control
+- ✓ Test fixtures in `*.spec.ts` files using "choir" as test data — fixture data is not user-facing strings
+- ✓ The `MvoxNav` component name (vendor-namespaced, not vertical-specific)
+
+**Tallis RED triggers**: any spec touching new user-facing copy must assert the string comes from a `m.*()` call, not a literal in the template. Existing CHORE-66 / CHORE-67 specs already follow this pattern; new specs continue it.
+
+**Bentham RED triggers**: any PR with new templates / components / types / routes / class names where the diff introduces a vertical-specific word ("choir", "sing", "voice" as a type word, etc.) gets RED with a pointer to this decision. Vocabulary-bearing values that flow through `m.*()` are fine; structural names that hardcode the vertical are not.
+
+**Implementation cost when a future skin lands**: a new vertical (e.g., orchestra) becomes:
+1. Author `messages/orchestra/en.json` + et/lv/uk variants (Comenius)
+2. Wire skin selection (cookie? subdomain? route prefix? — defer that mechanism decision until expansion is taken)
+3. Ship
+
+Zero `.svelte` / `.ts` files touched. Zero tests rewritten (specs assert key invocation, not value equality). The skin swap is a copy operation.
+
+**First exemplar of the rule**: CHORE-72 landing page redesign (spec `docs/superpowers/specs/2026-05-31-landing-page-design.md`). All `choir` references in the landing copy live in `messages/en.json` values; the 14 new components carry no vertical-specific names.
+
+**Source**: PO decision, session 24, 2026-05-31. Q15 of CHORE-72 brainstorm.
+
+(*MVOX:Palestrina*)
+
+---
+
 ## Cloudflare Pages project name — `multivox` (2026-05-18, session 3)
 
 **Decision**: The mvox Cloudflare Pages project is named `multivox`, served at `multivox.pages.dev` (and any future custom domain). Cloudflare account ID `1431b76f0b65e3d23833966744ff2bdf`. `mvox.pages.dev` is owned by a third party (live cert, dead origin); `multivox.pages.dev` and `mvox-app.pages.dev` were both free as of 2026-05-18.
