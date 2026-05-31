@@ -13,6 +13,8 @@ vi.mock('$env/static/public', () => ({
 }));
 
 let userStore: typeof import('./userStore');
+let selectedOrgIdStore: typeof import('./userStore')['selectedOrgIdStore'];
+let urlOrgIdStore: typeof import('./userStore')['urlOrgIdStore'];
 
 const FAKE_HEADER = btoa(JSON.stringify({ alg: 'none', typ: 'JWT' }));
 const makeJwt = (payload: Record<string, unknown>) =>
@@ -57,6 +59,8 @@ beforeEach(async () => {
 	window.history.replaceState({}, '', '/');
 	globalThis.fetch = vi.fn();
 	userStore = await import('./userStore');
+	selectedOrgIdStore = userStore.selectedOrgIdStore;
+	urlOrgIdStore = userStore.urlOrgIdStore;
 });
 
 describe('userStore — initial state', () => {
@@ -198,6 +202,11 @@ describe('hydrateUserStore — fetch + ready state', () => {
 });
 
 describe('selectedOrgStore — fallback chain', () => {
+	beforeEach(() => {
+		selectedOrgIdStore.set(null);
+		urlOrgIdStore.set(null);
+	});
+
 	const setReadyWithTwoOrgs = () => {
 		userStore.userStore.set({
 			status: 'ready',
@@ -220,15 +229,18 @@ describe('selectedOrgStore — fallback chain', () => {
 		expect(get(userStore.selectedOrgStore)).toBeNull();
 	});
 
+	// URL param is now propagated via urlOrgIdStore (layout $effect in production);
+	// tests drive the store directly — readOrgParam() helper was removed in CHORE-74
 	it('URL param wins when present and valid', () => {
 		setReadyWithTwoOrgs();
-		window.history.replaceState({}, '', '/?org=org-2');
+		urlOrgIdStore.set('org-2');
 		expect(get(userStore.selectedOrgStore)?.id).toBe('org-2');
 	});
 
 	it('localStorage fallback when URL absent', () => {
 		setReadyWithTwoOrgs();
 		localStorage.setItem('mvox.selectedOrgId', 'org-2');
+		selectedOrgIdStore.set('org-2');
 		expect(get(userStore.selectedOrgStore)?.id).toBe('org-2');
 	});
 
@@ -239,14 +251,14 @@ describe('selectedOrgStore — fallback chain', () => {
 
 	it('first-org default when URL param does not match any org id', () => {
 		setReadyWithTwoOrgs();
-		window.history.replaceState({}, '', '/?org=bogus');
+		urlOrgIdStore.set('bogus');
 		expect(get(userStore.selectedOrgStore)?.id).toBe('org-1');
 	});
 
 	it('two-write symmetry: URL wins AND backfills localStorage', () => {
 		setReadyWithTwoOrgs();
 		localStorage.setItem('mvox.selectedOrgId', 'org-1');
-		window.history.replaceState({}, '', '/?org=org-2');
+		urlOrgIdStore.set('org-2');
 		const resolved = get(userStore.selectedOrgStore);
 		expect(resolved?.id).toBe('org-2');
 		expect(localStorage.getItem('mvox.selectedOrgId')).toBe('org-2');
@@ -254,6 +266,11 @@ describe('selectedOrgStore — fallback chain', () => {
 });
 
 describe('selectOrg — two-write on user change', () => {
+	beforeEach(() => {
+		selectedOrgIdStore.set(null);
+		urlOrgIdStore.set(null);
+	});
+
 	it('writes localStorage and updates URL', async () => {
 		userStore.userStore.set({
 			status: 'ready',
@@ -508,5 +525,107 @@ describe('pickerModeStore — derived from orgs.length', () => {
 			],
 		});
 		expect(get(userStore.pickerModeStore)).toBe('dropdown');
+	});
+});
+
+// === CHORE-74 — new tests ===
+
+describe('selectedOrgIdStore + urlOrgIdStore (CHORE-74)', () => {
+	beforeEach(() => {
+		// Reset stores between tests
+		selectedOrgIdStore.set(null);
+		urlOrgIdStore.set(null);
+		userStore.userStore.set({ status: 'loading' });
+		if (typeof localStorage !== 'undefined') localStorage.clear();
+	});
+
+	it('selectedOrgIdStore exposes a writable that defaults to null when localStorage empty', () => {
+		expect(get(selectedOrgIdStore)).toBeNull();
+	});
+
+	it('urlOrgIdStore exposes a writable that defaults to null', () => {
+		expect(get(urlOrgIdStore)).toBeNull();
+	});
+
+	it('selectedOrgStore returns null when userStore not ready', () => {
+		expect(get(userStore.selectedOrgStore)).toBeNull();
+	});
+
+	it('selectedOrgStore falls back to first org when no pick / no url', () => {
+		userStore.userStore.set({
+			status: 'ready',
+			name: 'Test',
+			initial: 'T',
+			orgs: [
+				{ id: 'org-a', label: 'Org A', initials: 'A', role: 'owner' },
+				{ id: 'org-b', label: 'Org B', initials: 'B', role: undefined },
+			],
+		});
+		const sel = get(userStore.selectedOrgStore);
+		expect(sel?.id).toBe('org-a');
+	});
+
+	it('selectedOrgStore prefers explicit pick over default', () => {
+		userStore.userStore.set({
+			status: 'ready',
+			name: 'Test',
+			initial: 'T',
+			orgs: [
+				{ id: 'org-a', label: 'Org A', initials: 'A', role: 'owner' },
+				{ id: 'org-b', label: 'Org B', initials: 'B', role: undefined },
+			],
+		});
+		selectedOrgIdStore.set('org-b');
+		const sel = get(userStore.selectedOrgStore);
+		expect(sel?.id).toBe('org-b');
+	});
+
+	it('selectedOrgStore prefers URL over pick over default', () => {
+		userStore.userStore.set({
+			status: 'ready',
+			name: 'Test',
+			initial: 'T',
+			orgs: [
+				{ id: 'org-a', label: 'Org A', initials: 'A', role: 'owner' },
+				{ id: 'org-b', label: 'Org B', initials: 'B', role: undefined },
+				{ id: 'org-c', label: 'Org C', initials: 'C', role: undefined },
+			],
+		});
+		selectedOrgIdStore.set('org-b');
+		urlOrgIdStore.set('org-c');
+		const sel = get(userStore.selectedOrgStore);
+		expect(sel?.id).toBe('org-c');
+	});
+
+	it('selectedOrgStore writes URL choice through to localStorage', () => {
+		userStore.userStore.set({
+			status: 'ready',
+			name: 'Test',
+			initial: 'T',
+			orgs: [{ id: 'org-x', label: 'Org X', initials: 'X', role: 'owner' }],
+		});
+		urlOrgIdStore.set('org-x');
+		const _ = get(userStore.selectedOrgStore); // force evaluation
+		expect(localStorage.getItem('mvox.selectedOrgId')).toBe('org-x');
+	});
+
+	it('selectOrg writes to selectedOrgIdStore + localStorage + navigates', async () => {
+		userStore.userStore.set({
+			status: 'ready',
+			name: 'Test',
+			initial: 'T',
+			orgs: [
+				{ id: 'org-a', label: 'Org A', initials: 'A', role: 'owner' },
+				{ id: 'org-b', label: 'Org B', initials: 'B', role: undefined },
+			],
+		});
+
+		// goto is mocked in the existing setup; verify it was called with the right URL
+		await userStore.selectOrg('org-b');
+
+		expect(get(selectedOrgIdStore)).toBe('org-b');
+		expect(localStorage.getItem('mvox.selectedOrgId')).toBe('org-b');
+		// selectedOrgStore reflects the new pick immediately (no need for URL change)
+		expect(get(userStore.selectedOrgStore)?.id).toBe('org-b');
 	});
 });

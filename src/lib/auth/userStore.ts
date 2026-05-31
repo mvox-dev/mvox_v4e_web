@@ -16,7 +16,15 @@ import { deriveInitials } from './types';
 const SELECTED_ORG_KEY = 'mvox.selectedOrgId';
 const ORG_URL_PARAM = 'org';
 
+export const ORG_URL_PARAM_NAME = ORG_URL_PARAM;
+
 export const userStore: Writable<UserState> = writable({ status: 'loading' });
+
+export const selectedOrgIdStore: Writable<string | null> = writable(
+	typeof localStorage !== 'undefined' ? localStorage.getItem(SELECTED_ORG_KEY) : null,
+);
+
+export const urlOrgIdStore: Writable<string | null> = writable(null);
 
 export function decodeJwt(token: string): EntuJwtClaims | null {
 	try {
@@ -26,11 +34,6 @@ export function decodeJwt(token: string): EntuJwtClaims | null {
 	} catch {
 		return null;
 	}
-}
-
-function readOrgParam(): string | null {
-	if (typeof window === 'undefined') return null;
-	return new URL(window.location.href).searchParams.get(ORG_URL_PARAM);
 }
 
 export async function hydrateUserStore(): Promise<void> {
@@ -111,26 +114,28 @@ export async function hydrateUserStore(): Promise<void> {
 	}
 }
 
-export const selectedOrgStore: Readable<Org | null> = derived(userStore, ($user) => {
-	if ($user.status !== 'ready' || $user.orgs.length === 0) return null;
+export const selectedOrgStore: Readable<Org | null> = derived(
+	[userStore, urlOrgIdStore, selectedOrgIdStore],
+	([$user, $urlOrgId, $selectedOrgId]) => {
+		if ($user.status !== 'ready' || $user.orgs.length === 0) return null;
 
-	const urlOrgId = readOrgParam();
-	const storedOrgId =
-		typeof localStorage !== 'undefined' ? localStorage.getItem(SELECTED_ORG_KEY) : null;
-
-	const fromUrl = urlOrgId ? $user.orgs.find((o) => o.id === urlOrgId) : undefined;
-	if (fromUrl) {
-		if (storedOrgId !== fromUrl.id && typeof localStorage !== 'undefined') {
-			localStorage.setItem(SELECTED_ORG_KEY, fromUrl.id);
+		// 1. URL wins; write-through to localStorage
+		const fromUrl = $urlOrgId ? $user.orgs.find((o) => o.id === $urlOrgId) : undefined;
+		if (fromUrl) {
+			if (typeof localStorage !== 'undefined') {
+				localStorage.setItem(SELECTED_ORG_KEY, fromUrl.id);
+			}
+			return fromUrl;
 		}
-		return fromUrl;
-	}
 
-	const fromStorage = storedOrgId ? $user.orgs.find((o) => o.id === storedOrgId) : undefined;
-	if (fromStorage) return fromStorage;
+		// 2. Explicit pick
+		const fromPick = $selectedOrgId ? $user.orgs.find((o) => o.id === $selectedOrgId) : undefined;
+		if (fromPick) return fromPick;
 
-	return $user.orgs[0];
-});
+		// 3. Default to first org
+		return $user.orgs[0];
+	},
+);
 
 export type OrgPickerMode = 'placeholder' | 'static' | 'dropdown';
 
@@ -145,10 +150,10 @@ export async function selectOrg(orgId: string): Promise<void> {
 	if (state.status !== 'ready') return;
 	if (!state.orgs.find((o) => o.id === orgId)) return;
 
+	selectedOrgIdStore.set(orgId);
 	if (typeof localStorage !== 'undefined') {
 		localStorage.setItem(SELECTED_ORG_KEY, orgId);
 	}
-
 	if (typeof window !== 'undefined') {
 		const url = new URL(window.location.href);
 		url.searchParams.set(ORG_URL_PARAM, orgId);

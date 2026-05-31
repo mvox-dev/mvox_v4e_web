@@ -1,19 +1,40 @@
 // @vitest-environment happy-dom
 import { render, cleanup } from '@testing-library/svelte';
-import { describe, it, expect, afterEach } from 'vitest';
-import { writable } from 'svelte/store';
+import { describe, it, expect, afterEach, vi } from 'vitest';
+import { writable, type Writable } from 'svelte/store';
+import type { Org } from '$lib/auth/types';
 import LandingDashboardScatter from './LandingDashboardScatter.svelte';
 
 afterEach(cleanup);
 
+const hydrateLibrarySectionSpy = vi.hoisted(() => vi.fn(async () => {}));
+
 vi.mock('$lib/library/libraryStore', async () => {
 	const { writable } = await import('svelte/store');
 	const store = writable({ status: 'loading' });
-	return { librarySectionStore: store };
+	return { librarySectionStore: store, hydrateLibrarySection: hydrateLibrarySectionSpy };
 });
 
-import { vi } from 'vitest';
+vi.mock('$lib/auth/storage', () => ({
+	getToken: () => 'fake.jwt.token',
+}));
+
+vi.mock('$lib/auth/userStore', async () => {
+	const { writable } = await import('svelte/store');
+	const userStore = writable({ status: 'ready', name: 'Test', initial: 'T', orgs: [] });
+	const selectedOrgStore = writable({ id: 'org-a', label: 'A', initials: 'A' });
+	return {
+		userStore,
+		selectedOrgStore,
+		decodeJwt: () => ({ accounts: { 'test-db': 'person-id' } }),
+	};
+});
+
+vi.mock('$env/static/public', () => ({ PUBLIC_ENTU_DB: 'test-db' }));
+
 import { librarySectionStore } from '$lib/library/libraryStore';
+import { selectedOrgStore as _selectedOrgStore } from '$lib/auth/userStore';
+const selectedOrgStore = _selectedOrgStore as unknown as Writable<Org | null>;
 
 describe('LandingDashboardScatter', () => {
 	it('renders 4 pillar cards', () => {
@@ -61,5 +82,32 @@ describe('LandingDashboardScatter', () => {
 			expect(cards[i].hasAttribute('disabled')).toBe(true);
 			expect(cards[i].textContent).toContain('SOON');
 		}
+	});
+});
+
+// === CHORE-74 — re-hydrates librarySectionStore on selectedOrgStore change ===
+
+describe('LandingDashboardScatter — selectedOrgStore re-hydration (CHORE-74)', () => {
+	it('re-hydrates librarySectionStore when selectedOrgStore changes', async () => {
+		hydrateLibrarySectionSpy.mockClear();
+		selectedOrgStore.set({ id: 'org-a', label: 'A', initials: 'A' });
+
+		render(LandingDashboardScatter, { orgInitials: 'A' });
+
+		// $effect fires asynchronously — flush microtask queue
+		await new Promise((r) => setTimeout(r, 0));
+		expect(hydrateLibrarySectionSpy).toHaveBeenCalledWith({
+			orgId: 'org-a',
+			personId: 'person-id',
+		});
+
+		// Switch org — effect should re-fire
+		hydrateLibrarySectionSpy.mockClear();
+		selectedOrgStore.set({ id: 'org-b', label: 'B', initials: 'B' });
+		await new Promise((r) => setTimeout(r, 0));
+		expect(hydrateLibrarySectionSpy).toHaveBeenCalledWith({
+			orgId: 'org-b',
+			personId: 'person-id',
+		});
 	});
 });

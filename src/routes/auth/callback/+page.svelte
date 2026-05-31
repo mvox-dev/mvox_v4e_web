@@ -4,6 +4,7 @@
 	import { setAccounts, setLastProvider, setToken, setUser } from '$lib/auth/storage';
 	import { decodeState } from '$lib/auth/state';
 	import { OAUTH_STATE_KEY } from '../[provider]/build-oauth-init-url';
+	import { hydrateUserStore } from '$lib/auth/userStore';
 	import * as m from '$lib/paraglide/messages.js';
 
 	const { data } = $props<{ data: { sessionToken: string; db: string } }>();
@@ -48,6 +49,8 @@
 		localStorage.removeItem(OAUTH_STATE_KEY);
 
 		setLastProvider(decoded.provider);
+
+		await hydrateUserStore();
 
 		exchangeState = 'success';
 		goto(decoded.return_to || '/');

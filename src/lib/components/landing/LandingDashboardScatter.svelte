@@ -1,11 +1,26 @@
 <!-- src/lib/components/landing/LandingDashboardScatter.svelte -->
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
-	import { librarySectionStore } from '$lib/library/libraryStore';
+	import { librarySectionStore, hydrateLibrarySection } from '$lib/library/libraryStore';
+	import { getToken } from '$lib/auth/storage';
+	import { PUBLIC_ENTU_DB } from '$env/static/public';
+	import { userStore, selectedOrgStore, decodeJwt } from '$lib/auth/userStore';
 	import DashboardPillarCard from './DashboardPillarCard.svelte';
 
 	type Props = { orgInitials: string };
 	let { orgInitials }: Props = $props();
+
+	$effect(() => {
+		const org = $selectedOrgStore;
+		const user = $userStore;
+		if (!org || user.status !== 'ready') return;
+		const token = getToken();
+		if (!token) return;
+		const claims = decodeJwt(token);
+		const personId = claims?.accounts?.[PUBLIC_ENTU_DB];
+		if (!personId) return;
+		hydrateLibrarySection({ orgId: org.id, personId });
+	});
 
 	const libraryMeta = $derived.by(() => {
 		const state = $librarySectionStore;
