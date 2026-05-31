@@ -211,3 +211,20 @@ Tab label keys for MvoxNav: `nav_tab_agenda`, `nav_tab_library`, `nav_tab_roster
 | `nav_org_picker_switch_to` | uk | `Перейти до {orgName}` | "Go to {orgName}" — infinitive + `до` (to/into); natural Ukrainian aria-label for navigation-style selection. |
 
 (*MVOX:Comenius*)
+
+---
+
+### Naming rule: i18n keys are vocabulary-neutral (added session 24, 2026-05-31)
+
+i18n message **keys** never carry vertical-specific vocabulary (no `choir`, `sing`, `orchestra`, etc. in key names). The **values** carry the vocabulary; the keys describe what slot the string fills semantically.
+
+- ✓ `landing_hero_headline` — semantic, vertical-neutral
+- ✗ `landing_hero_choir_headline` — vertical word in the key
+- ✓ `pillar_roster_title` — describes the pillar slot
+- ✗ `pillar_choir_members_title` — describes a choir-specific concept
+
+**Why**: future verticals (orchestra, ensemble, etc.) will be implemented as net-new skin layers — sibling locale bundles that swap the message **values** without touching keys. Keys are the stable contract; values are the skinnable surface. See `architecture-decisions.md` → "Vertical-skin neutrality — domain vocabulary lives in i18n values, never in code (2026-05-31)" for the full rule, which also covers component / type / route / function names.
+
+When authoring translations: don't preserve the source-language metaphor literally. The English value `"The back-of-house for your choir."` is a load-bearing piece of brand copy; the Estonian / Latvian / Ukrainian values are free to find the most idiomatic equivalent for their reader, not a word-for-word port.
+
+(*MVOX:Palestrina, contributed for Comenius's stewardship*)
