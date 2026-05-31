@@ -14,11 +14,11 @@ The conductor/admin "create" side of the season is where the v4E data model alre
 
 > **Open a season → define a recurring rehearsal series → the individual rehearsals are generated → see them as a list → cancel/edit a single one → or delete the whole series.**
 
-It is deliberately the smallest slice that feels like a real product: a conductor can sit down and lay out a term's worth of Tuesday rehearsals, then manage them.
+It is deliberately the smallest slice that feels like a real product: an owner opens a season and hands it to one or more conductors, who lay out a term's worth of Tuesday rehearsals and then manage them. The **owner→conductor handoff** (capability 7) is what makes the rights story real rather than relying on a single person who happens to be both admin and conductor.
 
 ## 2. Scope
 
-### In scope (6 capabilities)
+### In scope (7 capabilities)
 
 1. **Create season** — `season` entity under the org.
 2. **Create rehearsal series** — recurring `event_series` (`event_type = rehearsal`) under the season.
@@ -26,6 +26,7 @@ It is deliberately the smallest slice that feels like a real product: a conducto
 4. **View the rehearsal list** — the conductor's primary screen.
 5. **Cancel / edit a single instance** — delete one rehearsal, or override one rehearsal's fields.
 6. **Delete the series (cascade)** — best-effort delete of all generated events, then the series.
+7. **Assign / manage season conductors** — owner grants `_editor` on the season to chosen org members (roles-as-rights, no new property). *Logically follows capability 1 in the owner's setup flow: create season → assign conductors → those conductors then do 2–6.*
 
 ### Out of scope (deferred to later slices)
 
@@ -54,6 +55,8 @@ It is deliberately the smallest slice that feels like a real product: a conducto
 - The demo persona needs **exactly two explicit grants**: `_owner` on the org (admin, to create the season) + `_editor` on the season (conductor, to run rehearsals). In a single-person demo these are held by the same user.
 - **Do NOT mint per-event `_editor` grants.** They are redundant (rights already cascade from the season) and would pollute the membership-rights-pairing audit. This must be encoded so Tallis tests the cascade and no one "helpfully" adds per-event grants.
 - The org island stops any of this leaking *up* to an umbrella org.
+
+**Conductors are exactly the season's direct `_editor` grantees (roles-as-rights).** Per the settled "roles as rights" decision and v4E's `roleMapping: _editor → conductor`, there is **no `conductors` property** — assigning a conductor *is* granting them a direct `_editor` on the season (capability 7), and "who conducts this season?" is answered by reading the season's directly-granted `_editor`s (excluding the cascaded org-`_owner` admin). Granting/revoking those grants is a **rights-management operation, which is `_owner`-tier** (§3.3: editors edit properties but cannot manage rights) — so only the owner assigns conductors, exactly as intended. The owner does this with their own `_owner` rights, so it is **user-rights-default, not an elevated op**.
 
 ### 3.2 Inheritance is BFF logic, never a formula
 
@@ -174,11 +177,24 @@ Right: **`_owner`-tier** (delete; see §3.3 — demo persona has it via org `_ow
 6. Best-effort semantics (PO: "attempt to delete all generated events too"): a retry re-fetches remaining children and continues.
 - **Tests:** delete series (as `_owner`-tier) with N events, all succeed → series + all N gone, 200 + count N; child query filters on THIS series' parent only (a sibling series' events under the same season are untouched); `_editor`-only persona → 403 (§3.3); singer → 403; simulated mid-batch event-delete failure → series NOT deleted, partial count reported, remaining events still queryable; retry after partial → completes.
 
+### Capability 7 — Assign / manage season conductors *(NEW — file ADMIN-10)*
+Model: roles-as-rights (§3.1) — a "conductor of the season" *is* a person holding a **direct `_editor` grant** on that season; there is no `conductors` property. Right to assign/unassign: **`_owner`-tier** (managing rights is owner-only, §3.3).
+1. From a season, the owner sees a "Conductors" panel: the current conductor list + an "Add conductor" picker.
+2. The picker offers **active org members only** — the membership-rights-pairing invariant: you cannot grant `_editor` to a non-member. (Inviting new members is out of scope — ADMIN-3 #21, blocked on email.)
+3. **Assign:** BFF grants the selected person a **direct `_editor`** on the season (POST `_editor` reference to the person). They can now create/edit series + events under the season via cascade.
+4. Before granting, BFF verifies the person has an active `member` in the org; if not → 400 "must be an org member first."
+5. **List conductors:** BFF reads the season's **directly-granted** `_editor`s (excluding the cascaded org-`_owner` admin) and resolves person display names (single-hop).
+6. **Unassign:** owner removes a conductor → BFF deletes that `_editor` grant value; the person loses season edit access (and the cascade to its series/events).
+7. Only `_owner`-tier may assign/unassign. An `_editor` conductor attempting to add or remove another conductor → 403.
+8. Empty state: a season with no assigned conductors → "No conductors assigned yet" + add CTA (owner only).
+- **Tests:** assign an org member (as `_owner`) → 200, person appears in the conductor list AND can now POST a series under the season; assign a non-member → 400; list returns direct `_editor`s only (the cascaded org-owner admin is NOT listed as a conductor); unassign → 200, grant removed, the person now 403s on series-create; `_editor`-only conductor attempting to assign another → 403; singer → 403.
+
 ## 8. Open questions / probes before implementation
 
 1. **Delete rights (confirm the `_owner`-tier contract):** the verified Entu tier-mechanics put DELETE at `_owner`, not `_editor` (§3.3), and the spec now encodes that. This is a **confirmation** probe, not an open guess: **Pérotin, on the live polyphony playground before GREEN** — as an `_editor`-only persona (no org `_owner`), create a throwaway series+events and attempt `DELETE /entity/{id}`; expect it to fail. Then repeat as an `_owner` persona; expect success. If Entu surprises us and `_editor` *can* delete, we relax 5a/6 back to `_editor` (cheap direction). The expensive direction — shipping AC that says `_editor` deletes — is now avoided.
 2. **Series→season date containment** (Capability 2 AC4): confirm we want a hard 400, vs a soft warning, when a series spills outside the season's dates. Spec currently says hard 400.
 3. **Partial-failure UX** (Capabilities 3 + 6): v1 surfaces a count and asks for retry. Confirm no rollback is acceptable for first ship.
+4. **Conductor-grant wire shape + membership enforcement** (Capability 7): confirm the Entu wire for a direct `_editor` grant (POST `_editor` reference to the person on the season; revoke = DELETE that property value's `_id`) and that the BFF's membership-pairing check (assignee must have an active `member` in the org) is the right gate. **Pérotin probe** alongside the delete-rights probe (#1) — both are rights-mechanics confirmations on the live playground.
 
 ## 9. Issue disposition (Victoria; team-lead files after PO approves this spec)
 
@@ -190,6 +206,7 @@ Right: **`_owner`-tier** (delete; see §3.3 — demo persona has it via org `_ow
 | 4 View rehearsal list | **File ADMIN-7** (the "primary screen" gap) |
 | 5 Cancel/edit single instance | **File ADMIN-8** (5a + 5b; split only if they land in different cycles) |
 | 6 Delete series (cascade) | **File ADMIN-9** (PO-requested) |
+| 7 Assign/manage season conductors | **File ADMIN-10** (PO-requested; relates to #23 ADMIN-5 roster — both read org members) |
 
 Recommended labels: `admin`, `conductor`; no milestone (consistent with #19/#20).
 
