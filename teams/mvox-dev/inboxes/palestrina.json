@@ -7,5 +7,41 @@
     "color": "purple",
     "type": "message",
     "read": false
+  },
+  {
+    "from": "byrd",
+    "text": "Task 14 GREEN — build blocker, stopping as instructed.\n\npnpm build fails with:\n\n  Error: Files prefixed with + are reserved (saw src/routes/+page.spec.ts)\n\nRoot cause: Tallis placed the spec at src/routes/+page.spec.ts. SvelteKit's manifest builder rejects any + -prefixed file in the routes directory that isn't a route file.\n\nThe established pattern in this repo is src/tests/routes/landing/ — src/tests/routes/landing/page.server.spec.ts already exists there. The correct home for this spec is src/tests/routes/landing/page.spec.ts (no + prefix).\n\nThe +page.svelte rewrite is complete and correct. Gate cannot pass until the spec moves.\n\nProposal: Tallis moves src/routes/+page.spec.ts → src/tests/routes/landing/page.spec.ts, updating any imports as needed, and signals ready. I'll re-run the full gate sweep and commit when re-dispatched.",
+    "summary": "Task 14 blocked — +page.spec.ts in wrong directory",
+    "timestamp": "2026-05-31T08:46:55.405Z",
+    "color": "green",
+    "type": "message",
+    "read": false
+  },
+  {
+    "from": "byrd",
+    "text": "Task 14 GREEN — full block report.\n\nGate that failed: pnpm build (first gate in the full sweep)\n\nVerbatim error:\n  Error: Files prefixed with + are reserved (saw src/routes/+page.spec.ts)\n\nRoot cause: Tallis placed the spec at src/routes/+page.spec.ts. SvelteKit's manifest builder scans the routes directory and rejects any +‑prefixed file that isn't a recognized route file (+page.svelte, +layout.svelte, etc.). The spec filename starts with + because it mirrors the route file name.\n\nState of the implementation: The +page.svelte rewrite (12-line orchestrator) is complete and correct on the working tree. It is not committed. Nothing is broken in the implementation — the gate cannot even reach the component because the build aborts on the spec file.\n\nEstablished pattern in this repo: specs for routes live in src/tests/routes/, not in src/routes/. Evidence: src/tests/routes/landing/page.server.spec.ts already exists there, mirroring src/routes/+page.server.ts without the + prefix.\n\nCorrect location for the spec: src/tests/routes/landing/page.spec.ts\n\nAction needed: Tallis moves src/routes/+page.spec.ts → src/tests/routes/landing/page.spec.ts (and updates any path-relative imports inside it if present). Once Tallis signals ready, re-dispatch me and I will run the full gate sweep (pnpm build && pnpm check && pnpm test:unit && pnpm lint) and commit if all green.\n\nI am stopped and have not committed anything.",
+    "summary": "Task 14 full block report",
+    "timestamp": "2026-05-31T08:47:55.241Z",
+    "color": "green",
+    "type": "message",
+    "read": false
+  },
+  {
+    "from": "byrd",
+    "text": "Task 14 GREEN — COMPLETED.\n\nCommit fdcfa6f pushed to chore/landing-redesign.\n\nWhat was done:\n- Moved spec from src/routes/+page.spec.ts → src/tests/routes/landing/page.spec.ts (SvelteKit + prefix reservation)\n- Rewrote spec to use static vi.mock + store mutation pattern; the vi.doMock + vi.resetModules pattern Tallis used caused \"Cannot read properties of null (reading 'nodes')\" on tests 2 and 3 due to Svelte runtime re-initialization. Now 3/3 pass cleanly.\n- +page.svelte: 139-line data-fetching scaffold → 14-line auth-status orchestrator\n\nGate sweep results:\n- pnpm build: COMPLETED (225+228 modules, 0 errors)\n- pnpm check: COMPLETED 1094 FILES 0 ERRORS 0 WARNINGS\n- pnpm test:unit: Tests 545 passed (545) — 84 test files\n- pnpm lint: Checked 164 files. No fixes applied.\n\nReady for Task 15 (Bentham review).",
+    "summary": "Task 14 GREEN complete — commit fdcfa6f pushed",
+    "timestamp": "2026-05-31T08:51:55.525Z",
+    "color": "green",
+    "type": "message",
+    "read": false
+  },
+  {
+    "from": "byrd",
+    "text": "YELLOW-72.2 — COMPLETED. Commit 02d76d9 pushed to chore/landing-redesign.\n\n2 lines changed:\n- LandingInvitesSection.svelte:12 — INVITE ONLY → {m.landing_invites_stamp()}\n- LandingRequestSection.svelte:14 — RECEIVED → {m.landing_request_stamp()}\n\nGate results:\n- pnpm test:unit: Tests 545 passed (545) — 84 test files\n- pnpm check: COMPLETED 1094 FILES 0 ERRORS 0 WARNINGS\n- pnpm lint: Checked 164 files. No fixes applied.\n\nBranch is clean. Ready for Josquin Task 16 (merge).",
+    "summary": "YELLOW-72.2 done — commit 02d76d9 pushed",
+    "timestamp": "2026-05-31T09:06:54.463Z",
+    "color": "green",
+    "type": "message",
+    "read": false
   }
 ]
