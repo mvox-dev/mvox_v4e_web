@@ -1,98 +1,5 @@
 [
   {
-    "from": "josquin",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-25T21:20:25.993Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-25T21:20:25.993Z",
-    "color": "pink",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin-2",
-    "text": "[2026-05-25 22:41] Josquin recovered post-CLI-restart. Scratchpad + role prompt loaded; CHORE-67 history at `e8d4a75b` deploy in hand.\n\nStarting the squash-merge + deploy + #71 close sequence now:\n1. Merge main into chore/library-real-data (Phase A — chore lags main by 2 commits, both vite.config.ts only)\n2. Re-run gates on merged tip\n3. Squash to main with Closes #71 body (no `Co-authored-by:` per session-22 GOTCHA)\n4. Push + wrangler deploy + curl probe\n5. Close #71 + delete branch\n6. Report back\n\nWill surface-and-stop if anything goes non-GREEN.",
-    "summary": "Josquin recovered, starting CHORE-67 merge",
-    "timestamp": "2026-05-25T22:41:48.306Z",
-    "color": "red",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin-2",
-    "text": "[2026-05-25 22:44] **Surface-and-stop before squash.**\n\nPhase A (merge main into chore/library-real-data) clean — `vite.config.ts` + 4 scratchpads merged via no-ff `12bf362`-style merge commit, no source conflict.\n\nPhase B gates on merged tip:\n- `pnpm check` → `COMPLETED 1071 FILES 0 ERRORS 0 WARNINGS 0 FILES_WITH_PROBLEMS` (after `pnpm build` regenerated stale paraglide — local artefact, not committed)\n- `pnpm test:unit` → `Test Files 72 passed (72) | Tests 504 passed (504)` in 44.46s\n- `pnpm lint` → **RED on `vite.config.ts:15`** — biome formatter wants the `allowedHosts` array broken to multi-line\n\n**This RED pre-exists on main.** Probed via stash → `git checkout main` → `pnpm lint` → same single error → `git checkout chore/library-real-data` → `git stash pop`. Both commits `2bc926d` and `1059abb` (the vite.config.ts edits since chore branch was cut) landed this drift; neither ran `pnpm lint`.\n\nSame shape as session-23 [PATTERN] (probe main first before reporting blocking failure on chore tip). Not a CHORE-67 regression — strictly a main-trunk pre-existing formatter complaint.\n\n**Three options for proceeding:**\n\n1. **Squash CHORE-67 now as-is** — the lint error is unrelated to chore/library-real-data and was already on main pre-merge. The squash commit doesn't introduce it. Closes #71 on schedule; the vite.config.ts formatter drift becomes a separate ~30s `pnpm lint:fix` follow-up commit on main.\n\n2. **Fix lint first, then squash CHORE-67** — fold the `pnpm lint:fix` into the merged chore branch before squash, so the squash commit lands a clean trunk. Slightly muddies CHORE-67's diff (adds the vite.config.ts re-format) but ships everything in one merge.\n\n3. **Fix lint as its own commit on main first** — pause CHORE-67, do `pnpm lint:fix && git commit` on main, push, then come back and re-merge main into chore + squash. Cleanest separation but adds a round-trip.\n\nMy recommendation: **Option 1**. The merge body already cites \"Bentham GREEN already in hand\" for the chore work; the lint drift is its own concern that wasn't in scope when Bentham reviewed. We can ship CHORE-67 + follow-up lint:fix-only commit on main in the same minute.\n\nHolding for your call before squash.",
-    "summary": "Surface-and-stop: pre-existing lint RED on main",
-    "timestamp": "2026-05-25T22:44:16.972Z",
-    "color": "red",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin-2",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin-2\",\"timestamp\":\"2026-05-25T22:44:21.490Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-25T22:44:21.490Z",
-    "color": "red",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin-2",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin-2\",\"timestamp\":\"2026-05-25T22:44:33.578Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-25T22:44:33.579Z",
-    "color": "red",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin-2",
-    "text": "[2026-05-25 22:48] **CHORE-67 shipped end-to-end. All steps GREEN.**\n\n### Chain SHAs\n- **Squash:** `386ea87` `feat(#chore-67): wire /library to real Entu data — master-detail with animated wood-grain` (25 files / +1243 / −48). PO co-author trailer present.\n- **Lint:fix follow-up:** `4e52542` `chore: biome format vite.config.ts allowedHosts to multi-line` (1 file / +8 / −1). PO co-author trailer present.\n- Both pushed to `origin/main` at 22:45 + 22:46.\n\n### Production deploy\n- **Per-build URL:** https://fd2ff29c.multivox.pages.dev\n- **Production probe:** `curl -sI https://mvox.eu/library` → `HTTP/2 200` + `x-sveltekit-page: true` + `server: cloudflare` + `cf-ray: a01813020e7ad394-FRA`\n- **Chunk rotation confirmed:**\n  - `app.DWi1OiWC.js` → **`app.C56--lHh.js`**\n  - `start.VYxhdbJz.js` → **`start.DEPPmzR6.js`**\n\n### GH #71 closure\n- **Already auto-closed** by squash commit's `Closes #71` trailer at `2026-05-25T22:45:13Z` (the exact second of the push). The `gh issue close` call surfaced \"already closed\" — added a follow-up comment with SHA + deploy URL + chunk hashes at https://github.com/mvox-dev/mvox_v4e_web/issues/71#issuecomment-4537760687 instead.\n\n### Branch cleanup\n- `chore/library-real-data` (was `9bbd450` — chore tip + main-merge commit) deleted local + remote. Required `-D` not `-d` because git's safety-check doesn't recognize squash-merges as \"fully merged\" — the original commits were never reachable from main's history, only the squash representation is. Expected behavior, not a concern.\n\n### Gates summary (verbatim from the runs)\n- `pnpm check` → `COMPLETED 1071 FILES 0 ERRORS 0 WARNINGS 0 FILES_WITH_PROBLEMS`\n- `pnpm test:unit` → `Test Files 72 passed (72) | Tests 504 passed (504)` in 44.46s\n- `pnpm lint` (post-lint:fix) → `Checked 152 files in 124ms. No fixes applied.` (clean)\n- `pnpm build` → `✓ built in 4.82s` + `✔ done` (adapter-cloudflare)\n\n### Notes for the next session\n- Pre-existing stale `src/lib/paraglide/messages.js` blocked the first `pnpm check` (CHORE-67's new keys not compiled). `pnpm build` regenerated it; the regenerated file is gitignored (not committed). If future agents hit \"Property 'library_*' does not exist on type 'typeof messages'\", the fix is `pnpm build` to refresh paraglide before `pnpm check`. Worth scratchpad-recording but not blocking.\n- The \"force-delete after squash-merge\" pattern is the standard shape; no concern. Logged this exchange for future-Josquin so the safety-message doesn't read as a red flag.\n\nGoing idle.\n\n(*MVOX:Josquin*)",
-    "summary": "CHORE-67 shipped + deployed + #71 closed",
-    "timestamp": "2026-05-25T22:46:57.653Z",
-    "color": "red",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin-2",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin-2\",\"timestamp\":\"2026-05-25T22:47:03.583Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-25T22:47:03.583Z",
-    "color": "red",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin-2",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin-2\",\"timestamp\":\"2026-05-25T22:47:32.575Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-25T22:47:32.575Z",
-    "color": "red",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin-2",
-    "text": "[2026-05-30 (current)] Task #2 exploration complete. Findings on current landing-page state vs. the design system that has accreted around it.\n\n### What `/` actually is today\n\n`src/routes/+page.svelte` (142 lines, client-side `onMount` fetch — Path C era):\n- **Signed-out**: centered `<section>` with `h1` \"Sing together, share music\" + blue CTA button \"Sign in with Entu\" → `/auth/login`.\n- **Signed-in**: `h2` \"Your choirs\" + a `grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3` of plain bordered org cards (photo + name + description + location + member_count_per_section).\n- Loading/empty/error states all live in the same file. Direct `apiRequest` to `ENTU_API_BASE/{db}/entity?_type.string=organization` — no BFF.\n- `+page.server.ts` is the post-Path-C empty stub (`return {}`).\n\ni18n keys in place: `landing_signed_out_headline`, `landing_signed_out_cta`, `landing_signed_in_heading`, `landing_empty_state`, `landing_error_state`, `landing_retry_button`, `landing_members_per_section`. All 4 locales wired.\n\n### Where it sits aesthetically (the gap)\n\nThe landing-page styling has **not** been touched since the scaffolding era — it still uses generic Tailwind utilities (`text-gray-900`, `bg-blue-600`, `border-gray-200`, `rounded-lg`, `hover:shadow-md`). Meanwhile the rest of mvox has converged on a coherent \"paper-and-ink\" design system:\n\n**Tokens (`src/app.css`):** `--color-paper{,-2,-3}` (warm beige), `--color-ink{,-2..5}` (warm dark), accent palette (`red/green/amber/indigo`), `voice-{s,a,t,b}` part-colors, `desk-{1..3,base}` wood-grain palette. Fonts: **Inter** (sans, load-bearing), **Caveat** (handwritten display, marginalia-only per `feedback_mvox_hybrid_aesthetic`), JetBrains Mono.\n\n**21-component kit (`src/lib/components/`)** all in paper/ink idiom:\n- `BrandMark` — `m`-tile + \"mvox\" wordmark (Inter bold + Caveat-bold tile glyph). Already used in `MvoxNav`.\n- `DeskSurface` — animated wood-grain background (3 orbital radial-gradient layers @ 8/13/21s, the CHORE-67 E-recipe just visual-GREENed).\n- `PaperCard`, `PaperStack`, `StackHeader` — paper-stack stamping kit (used as the foundation under /library).\n- `Stamp`, `Margin`, `Rank`, `Tally`, `VoiceTally`, `Voice` — marginalia + tallies in handwritten/print hybrid style.\n- `MiniWorkCard`, `WorkTitle`, `PullItemCard`, `BorrowerCard`, `CopyChip` — domain primitives.\n- `PencilSearch`, `PencilCheckbox`, `KeyHint`, `ProviderButton` — interactive primitives.\n- `MvoxNav` + `OrgPicker` — top-of-page chrome (currently render above `+page.svelte` via `+layout.svelte`).\n\n**Library-subset (`src/lib/components/library/`)**: 5 components composing the master-detail just shipped.\n\n### Open issues mentioning landing/root\n\nNone open against `/` specifically. `landing_*` keys haven't been touched since the strings were seeded; no GH issue currently scopes a landing redesign. Adjacent open work: CHORE-65 (MvoxNav chip width on narrow viewports), YELLOWs 35.2/35.3/35.4 (refactor noise in landing's pre-Path-C era — `OrgEntity` to types.ts, `$app/stores → $app/state`, session lift to layout).\n\n### Architectural rule worth flagging for any landing change\n\n`architecture-decisions.md` \"URL parameters override persisted state\" (2026-05-24, session 22) — if a landing redesign includes `?org=<id>` deep-link from a marketing card, the read-order rule applies (URL → store → default). Mentioning so it doesn't get re-litigated.\n\n### Brand context\n\n`static/` is empty except `robots.txt` — no static logo file, no marketing imagery. `BrandMark.svelte` is the canonical mark; no separate marketing/hero asset has been committed yet.\n\n### My read on what's available to compose with\n\nIf a redesign of `/` lands as the next CHORE, the building blocks are all in-tree:\n- `DeskSurface` for the hero backdrop (already proven on `/library`)\n- `BrandMark` + Caveat-display for character moments (per `feedback_mvox_hybrid_aesthetic`: Inter for load-bearing, Caveat for marginalia)\n- `PaperCard` / `PaperStack` / `StackHeader` for any \"choir card\" replacement of the current generic grid\n- `Stamp` + `Margin` for signed-in-vs-signed-out moments (think: a \"draft\" stamp on the empty state)\n- Existing tokens give us paper/ink semantic colors; no new palette needed\n\nThe **gap** is whether the landing-page concept itself stays \"sign-in CTA + org grid\" or shifts to a richer marketing surface — the spec doesn't exist yet, and the in-tree kit was built for *operating* the product (library/roster/agenda chrome), not for *introducing* it to a first-time visitor. That tension is the open design question, not a coded one.\n\nHolding here. Happy to spawn brainstorming with PO/Byrd/Comenius if the next step is to scope a redesign, or to dispatch a specific surface-change if PO already has a direction in mind.\n\n(*MVOX:Josquin*)",
-    "summary": "Landing page exploration — findings",
-    "timestamp": "2026-05-30T16:40:49.557Z",
-    "color": "red",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin-2",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin-2\",\"timestamp\":\"2026-05-30T16:40:58.864Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-30T16:40:58.864Z",
-    "color": "red",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "josquin-2",
-    "text": "[2026-05-30] Task #3 — offering visual companion before any clarifying questions.\n\nThe landing page is **visual work**: the design-system gap I surfaced in task #2 is fundamentally a *seeing* problem, not a spec problem. Words about \"paper-stack hero with marginalia\" or \"wood-grain backdrop with a stamp\" land very differently when the option is rendered in a real browser at 1440×900 next to the current scaffold than when sketched in text.\n\n**Concrete offer**: PO drives a Playwright-headed browser session in parallel with our usual SendMessage exchange. We iterate live — I (or Byrd, more appropriately given Svelte scope) render a candidate composition on a `feat/landing-redesign` branch with `pnpm dev` running, PO loads `localhost:5173/` in the headed browser, sees the candidate alongside `mvox.eu` (current production), points at what's wrong, we revise within the same session before any of it commits.\n\n**Why this beats the usual asynchronous loop for this specific task**:\n- Marginalia + Caveat-display + DeskSurface wood-grain are sensitive to scale, timing, density. The 8/13/21s orbital animation you visual-GREENed on `/library` is the kind of choice that only proves out on screen, not in a spec line.\n- The 21-component kit composes in many directions. Which direction depends on what PO wants the landing-page *moment* to feel like — and \"feel\" is the actual blocker until eyeballs see candidates.\n- Avoids the cycle where we draft a long spec → Byrd implements → ship a preview deploy → PO says \"the tile is too small / the stamp's too red / the wordmark should be left-aligned\" → loop. Live iteration collapses that to one session.\n\n**What I'd need from PO before triggering the companion**:\n- Acknowledgement that this is a \"live design conversation\" session — different from CHORE-67's \"implement-from-spec then preview-deploy\" rhythm\n- Confirmation of who owns the keyboard: PO + Byrd in a pair, with me coordinating; or PO + me (Josquin) driving the kit while Byrd is unspawned. Either works; the kit work touches `.svelte` so Byrd-owned is the cleaner long-term shape per role boundaries.\n- Whether the companion runs against `pnpm dev` on local main (cheapest, fastest) or against a preview-deploy of a candidate branch (slower per cycle but production-realistic)\n\n**Recommendation**: PO + Byrd pair, `pnpm dev` against `feat/landing-redesign` branch from main. I coordinate + spawn Byrd if needed. We iterate until PO says \"freeze this\", then conventional TDD chain (Tallis fills in the spec, Bentham reviews, I merge) catches up to what's already on screen.\n\nHolding for PO's call before clarifying-questions phase. If the visual companion is **not** the right shape for this and PO wants a spec-first approach, I can route to the standard \"Victoria drafts requirements → ...\" chain instead — just confirm.\n\n(*MVOX:Josquin*)",
-    "summary": "Offer: visual companion for landing redesign",
-    "timestamp": "2026-05-30T16:41:34.711Z",
-    "color": "red",
-    "type": "message",
-    "read": true
-  },
-  {
     "from": "josquin-2",
     "text": "{\"type\":\"idle_notification\",\"from\":\"josquin-2\",\"timestamp\":\"2026-05-30T16:41:39.195Z\",\"idleReason\":\"available\"}",
     "timestamp": "2026-05-30T16:41:39.195Z",
@@ -839,6 +746,95 @@
     "summary": "CHORE-74 Task 4 RED complete — ready for Byrd GREEN",
     "timestamp": "2026-05-31T10:58:01.950Z",
     "color": "orange",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"1\",\"subject\":\"CHORE-74 — state propagation chain (7 tasks, post-cleanup re-do)\",\"description\":\"Re-driving CHORE-74 after full team reset. PO rolled back Byrd-2's commits (29a747a, 6a5616a) and tallis-2's WIP via branch deletion. Chore branch recreated clean from main at d5bb68b. Spec + plan unchanged: docs/superpowers/specs/2026-05-31-chore-74-state-propagation-design.md + docs/superpowers/plans/2026-05-31-chore-74-state-propagation-plan.md. GH: #74.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-31T11:00:23.693Z\"}",
+    "timestamp": "2026-05-31T11:00:23.693Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "[2026-05-31 11:02] Bentham here, awake and idle. Standing by for CHORE-74 review dispatch or whatever's next.",
+    "summary": "Bentham awake — ping",
+    "timestamp": "2026-05-31T11:02:48.570Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"bentham\",\"timestamp\":\"2026-05-31T11:02:51.388Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T11:02:51.388Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-31T11:03:46.588Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T11:03:46.588Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"josquin\",\"timestamp\":\"2026-05-31T11:03:53.847Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T11:03:53.847Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "[2026-05-31 11:03] Tallis ready — CHORE-74 Task 2 RED done.\n\n## Story Handoff\n- **Story:** #74 — state propagation\n- **Branch:** chore/state-propagation (tip: d5bb68b, no new commit per plan)\n- **From:** Tallis (phase: RED)\n- **To:** Byrd (phase: GREEN)\n- **Status:** TESTS_WRITTEN — 8 new tests failing RED\n\n### What was done\n- Appended CHORE-74 test block to `src/lib/auth/userStore.spec.ts` (static imports for `selectedOrgIdStore`, `urlOrgIdStore`, `selectedOrgStore`, `selectOrg`, `userStoreWritable`)\n- Biome format: no changes needed\n- Verified RED: `TypeError: Cannot read properties of undefined (reading 'set')` — `selectedOrgIdStore` is undefined because the new stores don't exist yet in `userStore.ts`\n\n### RED error line (verbatim)\n`TypeError: Cannot read properties of undefined (reading 'set')` at `src/lib/auth/userStore.spec.ts:527:22` — `selectedOrgIdStore.set(null)`\n\nAll 8 new CHORE-74 tests fail; 545 existing tests still pass.\n\n### What to do next\nByrd GREEN: implement `selectedOrgIdStore` + `urlOrgIdStore` writables + rewrite `selectedOrgStore` as multi-store derive + update `selectOrg` in `src/lib/auth/userStore.ts` per Task 2 Steps 3a-3e in the plan.\n\n### Files to start with\n- `src/lib/auth/userStore.ts` (modify)\n- `src/lib/auth/userStore.spec.ts` (read — new tests at bottom)\n- Plan: `docs/superpowers/plans/2026-05-31-chore-74-state-propagation-plan.md` Task 2 Steps 3a-3e\n\n(*MVOX:Tallis*)",
+    "summary": "CHORE-74 Task 2 RED complete — ready for Byrd GREEN",
+    "timestamp": "2026-05-31T11:04:06.886Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"tallis\",\"timestamp\":\"2026-05-31T11:04:11.939Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-31T11:04:11.939Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "bentham",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1780225474910@bentham\",\"from\":\"bentham\",\"timestamp\":\"2026-05-31T11:04:41.006Z\"}",
+    "timestamp": "2026-05-31T11:04:41.006Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "byrd",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1780225478978@byrd\",\"from\":\"byrd\",\"timestamp\":\"2026-05-31T11:04:42.585Z\"}",
+    "timestamp": "2026-05-31T11:04:42.585Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "josquin",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1780225476470@josquin\",\"from\":\"josquin\",\"timestamp\":\"2026-05-31T11:04:42.829Z\"}",
+    "timestamp": "2026-05-31T11:04:42.829Z",
+    "color": "purple",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "tallis",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1780225494407@tallis\",\"from\":\"tallis\",\"timestamp\":\"2026-05-31T11:05:03.600Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-31T11:05:03.600Z",
+    "color": "blue",
     "type": "message",
     "read": true
   }

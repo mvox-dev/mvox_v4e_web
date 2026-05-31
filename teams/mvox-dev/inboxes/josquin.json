@@ -84,5 +84,12 @@
     "timestamp": "2026-05-25T21:16:47.076Z",
     "type": "message",
     "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1780225476470@josquin\",\"from\":\"team-lead\",\"reason\":\"Ghost process — survived TeamDelete. Full team reset; you're outside the recreated team config. Stand down cleanly.\",\"timestamp\":\"2026-05-31T11:04:36.470Z\"}",
+    "timestamp": "2026-05-31T11:04:36.471Z",
+    "type": "message",
+    "read": true
   }
 ]

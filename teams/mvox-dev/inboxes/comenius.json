@@ -22,5 +22,12 @@
     "timestamp": "2026-05-25T15:06:22.877Z",
     "type": "message",
     "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1780225480513@comenius\",\"from\":\"team-lead\",\"reason\":\"Pre-emptive shutdown in case you survived TeamDelete as a ghost. If you're alive, please stand down; if dead, this message dies in your unread queue.\",\"timestamp\":\"2026-05-31T11:04:40.513Z\"}",
+    "timestamp": "2026-05-31T11:04:40.513Z",
+    "type": "message",
+    "read": false
   }
 ]

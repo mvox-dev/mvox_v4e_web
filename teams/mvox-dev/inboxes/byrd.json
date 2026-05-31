@@ -181,5 +181,12 @@
     "timestamp": "2026-05-25T21:06:53.300Z",
     "type": "message",
     "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1780225478978@byrd\",\"from\":\"team-lead\",\"reason\":\"Pre-emptive shutdown in case you survived TeamDelete as a ghost. If you're alive, please stand down; if dead, this message dies in your unread queue.\",\"timestamp\":\"2026-05-31T11:04:38.978Z\"}",
+    "timestamp": "2026-05-31T11:04:38.978Z",
+    "type": "message",
+    "read": true
   }
 ]
