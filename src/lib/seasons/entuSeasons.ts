@@ -24,6 +24,17 @@ type EntuProp =
 	| { type: string; datetime: string }
 	| { type: string; number: number };
 
+// Entu's create endpoint requires `_type` posted as a REFERENCE to the type-entity
+// id, not `{ string: 'season' }` — the string form returns HTTP 400. These ids are
+// the polyphony type entities (verified working from scripts seed-demo-seasons.ts).
+// FOLLOW-UP: resolve these per-db at runtime (GET ?_type.string=entity&name.string=<type>)
+// instead of hardcoding polyphony ids — tracked separately.
+const TYPE_IDS = {
+	season: '69c7ea528489bfcb0e81a044',
+	event_series: '6a0d2e8490c8df7a1cc7deb1',
+	event: '69c7ea548489bfcb0e81a0a2',
+} as const;
+
 export interface CreateSeasonInput {
 	orgId: string;
 	name: string;
@@ -85,7 +96,7 @@ async function createEntity(cfg: EntuCfg, props: EntuProp[]): Promise<string> {
 
 export async function createSeason(cfg: EntuCfg, input: CreateSeasonInput): Promise<string> {
 	return createEntity(cfg, [
-		{ type: '_type', string: 'season' },
+		{ type: '_type', reference: TYPE_IDS.season },
 		{ type: '_parent', reference: input.orgId },
 		{ type: '_sharing', string: 'public' },
 		{ type: 'name', string: input.name },
@@ -121,7 +132,7 @@ export async function createSeriesWithEvents(
 ): Promise<CreateSeriesResult> {
 	// 1. Create the event_series entity (private; parented to org + season).
 	const seriesProps: EntuProp[] = [
-		{ type: '_type', string: 'event_series' },
+		{ type: '_type', reference: TYPE_IDS.event_series },
 		{ type: '_sharing', string: 'private' },
 		{ type: '_parent', reference: input.orgId },
 		{ type: '_parent', reference: input.seasonId },
@@ -145,7 +156,7 @@ export async function createSeriesWithEvents(
 	const eventIds: string[] = [];
 	for (const date of dates) {
 		const eventProps: EntuProp[] = [
-			{ type: '_type', string: 'event' },
+			{ type: '_type', reference: TYPE_IDS.event },
 			{ type: '_sharing', string: 'private' },
 			{ type: '_parent', reference: input.orgId },
 			{ type: '_parent', reference: input.seasonId },

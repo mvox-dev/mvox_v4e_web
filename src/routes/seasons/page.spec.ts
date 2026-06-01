@@ -71,6 +71,7 @@ vi.mock('$lib/paraglide/messages.js', () => ({
 	seasons_notice_partial_delete: () => 'Some rehearsals could not be deleted.',
 	seasons_notice_assign_not_member: () => 'That person is not an org member.',
 	seasons_notice_delete_forbidden: () => 'You do not have permission to delete this.',
+	seasons_notice_create_failed: () => 'Could not create season. Please try again.',
 	common_loading: () => 'Loading…',
 	common_error: () => 'Something went wrong.',
 }));
@@ -812,5 +813,79 @@ describe('/seasons page — delete-series wiring (T5, #86)', () => {
 		await new Promise((r) => setTimeout(r, 50));
 
 		expect(container.querySelector('[data-testid="seasons-notice"]')).not.toBeNull();
+	});
+});
+
+// ── Season-create error/feedback (fix/seasons-create-wire) ───────────────────
+
+describe('/seasons page — season-create error handling (fix)', () => {
+	const ownerOrg = { id: 'org1', label: 'EFK', initials: 'EFK', role: 'owner' };
+
+	beforeEach(() => {
+		mockListRehearsals.mockResolvedValue([]);
+		mockListSeries.mockResolvedValue([]);
+		mockListConductors.mockResolvedValue([]);
+		mockListOrgMembers.mockResolvedValue([]);
+		mockHydrate.mockResolvedValue(undefined);
+	});
+
+	it('createSeason reject → seasons-notice shown, no unhandled rejection', async () => {
+		mockCreateSeason.mockRejectedValue(new Error('400 entity create failed'));
+		(selectedOrgStore as ReturnType<typeof import('svelte/store').writable>).set(ownerOrg);
+		(seasonsStore as ReturnType<typeof import('svelte/store').writable>).set({
+			status: 'ready',
+			seasons: [],
+		});
+
+		const { container } = render(Page);
+		await new Promise((r) => setTimeout(r, 50));
+
+		const nameInput = container.querySelector('[data-testid="season-name"]') as HTMLInputElement;
+		const startInput = container.querySelector(
+			'[data-testid="season-start-date"]',
+		) as HTMLInputElement;
+		const endInput = container.querySelector('[data-testid="season-end-date"]') as HTMLInputElement;
+		const submitBtn = container.querySelector('[data-testid="season-submit"]') as HTMLButtonElement;
+
+		await fireEvent.input(nameInput, { target: { value: 'Autumn 2026' } });
+		await fireEvent.input(startInput, { target: { value: '2026-09-01' } });
+		await fireEvent.input(endInput, { target: { value: '2027-05-31' } });
+		await fireEvent.click(submitBtn);
+		await new Promise((r) => setTimeout(r, 50));
+
+		expect(container.querySelector('[data-testid="seasons-notice"]')).not.toBeNull();
+	});
+
+	it('createSeason success → goto called with the new season id (auto-selection)', async () => {
+		const { goto } = await import('$app/navigation');
+		const mockGoto = vi.mocked(goto);
+
+		mockCreateSeason.mockResolvedValue('new-sea-id');
+		(selectedOrgStore as ReturnType<typeof import('svelte/store').writable>).set(ownerOrg);
+		(seasonsStore as ReturnType<typeof import('svelte/store').writable>).set({
+			status: 'ready',
+			seasons: [],
+		});
+
+		const { container } = render(Page);
+		await new Promise((r) => setTimeout(r, 50));
+
+		const nameInput = container.querySelector('[data-testid="season-name"]') as HTMLInputElement;
+		const startInput = container.querySelector(
+			'[data-testid="season-start-date"]',
+		) as HTMLInputElement;
+		const endInput = container.querySelector('[data-testid="season-end-date"]') as HTMLInputElement;
+		const submitBtn = container.querySelector('[data-testid="season-submit"]') as HTMLButtonElement;
+
+		await fireEvent.input(nameInput, { target: { value: 'Autumn 2026' } });
+		await fireEvent.input(startInput, { target: { value: '2026-09-01' } });
+		await fireEvent.input(endInput, { target: { value: '2027-05-31' } });
+		await fireEvent.click(submitBtn);
+		await new Promise((r) => setTimeout(r, 50));
+
+		// goto must be called with a URL containing the new season id (auto-selection)
+		expect(mockGoto).toHaveBeenCalled();
+		const lastCall = mockGoto.mock.calls[mockGoto.mock.calls.length - 1][0] as string;
+		expect(lastCall).toContain('new-sea-id');
 	});
 });

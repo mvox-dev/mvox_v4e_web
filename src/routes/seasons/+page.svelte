@@ -109,15 +109,24 @@
 		const org = $selectedOrgStore;
 		const token = getToken() ?? '';
 		const cfg = { db: PUBLIC_ENTU_DB, token };
-		await createSeason(cfg, {
-			orgId: org?.id ?? '',
-			name: payload.name,
-			startDate: payload.startDate,
-			endDate: payload.endDate,
-		});
+		notice = null;
+		let newId: string;
+		try {
+			newId = await createSeason(cfg, {
+				orgId: org?.id ?? '',
+				name: payload.name,
+				startDate: payload.startDate,
+				endDate: payload.endDate,
+			});
+		} catch {
+			notice = m.seasons_notice_create_failed();
+			return;
+		}
 		const claims = decodeJwt(token);
 		const personId = claims?.accounts?.[PUBLIC_ENTU_DB];
 		await hydrateSeasons({ orgId: org?.id ?? '', personId: personId ?? '', token });
+		// Auto-select the new season so its chip becomes active.
+		selectSeason(newId);
 	}
 
 	async function handleSeriesCreate(payload: import('$lib/components/seasons/SeriesForm.svelte').SeriesCreatePayload) {

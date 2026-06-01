@@ -203,6 +203,7 @@
 	"seasons_form_series_heading": "Нова серія репетицій",
 	"seasons_form_series_submit": "Створити серію",
 	"seasons_notice_assign_not_member": "Диригентами можна призначати лише учасників організації.",
+	"seasons_notice_create_failed": "Не вдалося створити — будь ласка, спробуйте ще раз.",
 	"seasons_notice_delete_forbidden": "У вас немає дозволу на видалення.",
 	"seasons_notice_partial_delete": "Видалено {deleted} з {total} репетицій. Повторіть для завершення.",
 	"seasons_notice_partial_generate": "Створено {created} з {total} репетицій. Видаліть серію та спробуйте ще раз.",

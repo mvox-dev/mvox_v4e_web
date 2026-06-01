@@ -35,9 +35,11 @@ describe('createSeason', () => {
 		expect(id).toBe('season1');
 		const body = JSON.parse(fetchMock.mock.calls[0][1].body);
 		// Entu create POSTs an array of property objects incl. _type, _parent, _sharing
+		// _type must be a REFERENCE to the type-entity id (not string: 'season')
+		// Type id verified from seed-demo-seasons.ts; Josquin adds TYPE_IDS const.
 		expect(body).toEqual(
 			expect.arrayContaining([
-				{ type: '_type', string: 'season' },
+				{ type: '_type', reference: '69c7ea528489bfcb0e81a044' },
 				{ type: '_parent', reference: 'org1' },
 				{ type: '_sharing', string: 'public' },
 				{ type: 'name', string: '2026/27' },
@@ -240,6 +242,8 @@ describe('createSeriesWithEvents', () => {
 		const seriesProps = calls[0];
 		expect(seriesProps).toEqual(
 			expect.arrayContaining([
+				// _type must be reference to event_series type-entity id (not string form)
+				{ type: '_type', reference: '6a0d2e8490c8df7a1cc7deb1' },
 				{ type: '_sharing', string: 'private' },
 				{ type: '_parent', reference: 'org1' },
 				{ type: '_parent', reference: 'seas1' },
@@ -274,6 +278,8 @@ describe('createSeriesWithEvents', () => {
 		const eventProps = calls[1];
 		expect(eventProps).toEqual(
 			expect.arrayContaining([
+				// _type must be reference to event type-entity id (not string form)
+				{ type: '_type', reference: '69c7ea548489bfcb0e81a0a2' },
 				{ type: '_sharing', string: 'private' },
 				{ type: '_parent', reference: 'org1' },
 				{ type: '_parent', reference: 'seas1' },
