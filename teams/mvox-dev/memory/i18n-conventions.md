@@ -57,7 +57,8 @@ Keys are flat strings in `messages/{locale}.json`. No nesting.
 | `repertoire_` | Works, editions, copies, scores |
 | `materials_` | File uploads, attachments, documents |
 | `roster_` | Members, sections, roles within an org |
-| `events_` | Seasons, events, series, programmes |
+| `events_` | Seasons, events, series, programmes (see note) |
+| `seasons_` | Rehearsal-schedule feature sub-group (session 29+): season/series forms, conductor panel, rehearsal list, confirmations. Chosen over `events_` to match the `src/lib/seasons/` module name — first concrete slice of the `events_` domain. Future concert/programme keys will use `events_` or their own sub-group. |
 | `org_` | Organisation-level settings, onboarding, admin |
 | `auth_` | Login, logout, identity, invite flows |
 

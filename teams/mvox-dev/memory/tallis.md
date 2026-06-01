@@ -360,4 +360,86 @@ Updated: `src/tests/routes/auth/oauth/cookie-server.spec.ts` (5 new tests — as
 
 [PATTERN] vi.mock for paraglide messages in component specs: mock `$lib/paraglide/messages.js` (not just runtime) when the component calls `m.about_*()` keys that don't exist yet in en.json. This decouples RED spec from i18n ordering. Also mock `$lib/paraglide/runtime.js` for `languageTag`/`setLanguageTag` used by primitives.
 
+## [CHECKPOINT] 2026-06-01 — Session 29: Rehearsal Schedule RED phase (Tasks 1+2)
+
+[DECISION] 21 tests written across 2 spec files on `feat/rehearsal-schedule`. SHA `d3196f3`. All 21 RED on "not implemented". pnpm check: 0 errors.
+
+- `src/lib/seasons/recurrence.spec.ts` (8 tests) — occurrenceDates (5) + toStartDatetime DST (3)
+- `src/lib/seasons/validation.spec.ts` (13 tests) — validateSeason (5) + validateSeries (8)
+- `src/lib/seasons/recurrence.ts` — minimal stub (throw not implemented)
+- `src/lib/seasons/validation.ts` — minimal stub with types (throw not implemented)
+
+[GOTCHA] Plan Task 2 code block uses `.code` directly on `ValidationResult` union type (e.g., `validateSeries(...).code`) — type error under strict TypeScript because `ValidationOk` has no `code` property. Changed those 2 assertions to `.toMatchObject({ ok: false, code: '...' })` which is equivalent and type-safe. Remaining plan assertions (`.toEqual({ ok: false, field, code })`) work correctly because `toEqual` does not care about the TypeScript type.
+
+[PATTERN] Stubs must be committed alongside specs (not after): stubs first → RED on assertions → commit both together in one atomic commit.
+
+[GOTCHA] Was accidentally on `chore/probe-rights-mechanics` when creating files. Files were untracked so they transferred safely on `git checkout feat/rehearsal-schedule`. Always verify branch before starting work.
+
+[OPEN] Tasks 1-13 GREEN (Byrd/Josquin). Task 15 RED dispatched (SHA e0db5d8). All RED phases complete.
+
+## [CHECKPOINT] 2026-06-01 — Session 29: Rehearsal Schedule RED phase (Task 15)
+
+[DECISION] 9 tests in `src/routes/seasons/page.spec.ts`. SHA `e0db5d8`. 4 RED on assertions, 5 forward guards. pnpm check: 0 errors.
+
+RED: owner-controls not shown when org.role='owner' (canManage=false stub); seasons-empty-owner same; createSeriesWithEvents not called after series create; seasons-notice not shown on PartialGenerationError.
+Forward guards: loading/error/no-rights states; season-selector when ready; owner-controls absent for non-owner.
+
+[GOTCHA] DeskSurface.svelte must NOT be mocked — removing the mock fixed '(0 , default) is not a function' error. Just let it render (it's a plain wrapper with {#render children()}).
+
+[PATTERN] entuSeasons mock: use vi.importActual spread + override specific fns with vi.fn(). This lets PartialGenerationError class be imported from the real module while keeping fn mocks in place.
+
+[PATTERN] seasonsStore mock: vi.mock with async factory using writable() from svelte/store. Tests call (seasonsStore as Writable).set(...) to drive state transitions.
+
+## [CHECKPOINT] 2026-06-01 — Session 29: Rehearsal Schedule RED phase (Task 11)
+
+[DECISION] 4 tests in `src/lib/seasons/seasonsStore.spec.ts`. SHA `7659f97`. All 4 RED on assertions. pnpm check: 0 errors.
+- loading set synchronously before listSeasons resolves → ready
+- listSeasons returns [] → no-rights
+- listSeasons throws → error
+- reset-on-org-change: capturedMid inside mock must be 'loading'
+
+[PATTERN] seasonsStore mirrors libraryStore pattern exactly: writable + hydration fn + vi.mock('./entuSeasons') for isolation. No real fetch issued. `beforeEach` resets store to 'idle'.
+
+[PATTERN] reset-on-org-change test: capture store status INSIDE the mock implementation (not before/after the call) to verify the synchronous loading-set happens before any async work.
+
+## [CHECKPOINT] 2026-06-01 — Session 29: Rehearsal Schedule RED phase (Task 10)
+
+[DECISION] 6 tests added to `src/lib/seasons/entuSeasons.spec.ts`. SHA `0593639`. All 6 RED on "not implemented". pnpm check: 0 errors.
+
+listConductors (3): P0.3 filter (property_type==='_editor' AND inherited!==true), empty-array case, per-person GET resolution.
+assignConductor (2): non-member throws /must be an org member/, member → POST _editor ref to season.
+revokeConductor (1): DELETE /property/{propertyValueId} (property-value wire, not entity wire).
+
+[GOTCHA] revokeConductor test asserts URL contains 'prop-val-42'. Wire shape for conductor revoke is DELETE /property/{id} (property-value _id, per project_entu_wire_shape_entity_vs_property). Josquin must NOT use DELETE /entity/.
+
+[PATTERN] listConductors test encodes three _editor entries including a direct-_owner (property_type:'_owner', inherited absent). This is the critical P0.3 case — a bare !inherited guard passes the _owner entry. The filter MUST check property_type === '_editor' explicitly.
+
+## [CHECKPOINT] 2026-06-01 — Session 29: Rehearsal Schedule RED phase (Tasks 6-9)
+
+[DECISION] 13 tests added to `src/lib/seasons/entuSeasons.spec.ts`. SHA `303d4f4`. All 13 RED on "not implemented". pnpm check: 0 errors.
+
+Task 6 (listRehearsals — 4): sort asc, empty→[], read-time inheritance merge (location from series), explicit override.
+Task 7 (updateRehearsal — 3): DELETE-then-POST replace; null valueId skips DELETE; no sibling contamination.
+Task 8 (deleteRehearsal — 3): correct URL, DeleteForbiddenError on 403, targeted-only delete.
+Task 9 (deleteSeriesCascade — 3): cascade, partial-failure, series-specific child query (Bentham sibling-sweep guard).
+
+[GOTCHA] deleteRehearsal test asserts `toBeInstanceOf(DeleteForbiddenError)` — stub throws plain Error, which correctly produces a RED failure with "expected Error: not implemented to be an instance of DeleteForbiddenError". Josquin must throw DeleteForbiddenError specifically on 403, not a generic Error.
+
+[PATTERN] RehearsalPatch `valueId: string | null` — null means property doesn't exist yet; implementation must skip DELETE when null, only POST.
+
+[PATTERN] Task 6 inheritance-merge test uses URL-based two-fetch mock dispatch (entity/series1 → series lookup; otherwise → event search). Josquin must do per-series-id GET to avoid N+1.
+
+## [CHECKPOINT] 2026-06-01 — Session 29: Rehearsal Schedule RED phase (Tasks 4+5)
+
+[DECISION] 12 tests in `src/lib/seasons/entuSeasons.spec.ts` on `feat/rehearsal-schedule`. SHA `cb263d6`. 11 RED, 1 forward guard passes. pnpm check: 0 errors.
+- `src/lib/seasons/entuSeasons.ts` — minimal stub (createSeason, listSeasons, createSeriesWithEvents; throw not implemented)
+- `src/lib/seasons/types.ts` — domain + Entu raw types (no standalone test; exercised by Task 4+)
+- `src/lib/seasons/entuSeasons.spec.ts` — 12 tests (Task 4: 7; Task 5: 5)
+
+[GOTCHA] `createSeason > throws when Entu returns ok: false` passes immediately (stub throws unconditionally). Forward guard — will stay GREEN through impl. Josquin must NOT suppress the throw on the 403 branch.
+
+[PATTERN] Task 5 "POSTs events with correct parents" test infers seriesId from mock return ('id1' = first call `_id`). Josquin must use the series POST response `_id` as the `_parent` reference for event POSTs.
+
+[PATTERN] `entuSeasons.spec.ts` covers both Tasks 4+5 in one file. Committed as one RED commit since the file is shared; both task issue numbers cited in commit message.
+
 (*MVOX:Tallis*)

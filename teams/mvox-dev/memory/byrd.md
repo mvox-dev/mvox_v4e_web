@@ -110,4 +110,69 @@
 
 [GOTCHA] **`git checkout origin/<branch> -- .` overwrites unstaged implementation files** — used to sync to a fast-moving branch tip, but this reverted my written `+page.svelte` back to the stub. Always stage or commit your own files before syncing to origin tip via checkout.
 
+## [CHECKPOINT] 2026-06-01 — Session 29 startup (rehearsal-schedule, Tasks 12/13/15)
+
+[LEARNED] **Data layer fully landed at `6fdef24`** — `src/lib/seasons/` has `types.ts`, `recurrence.ts`, `validation.ts`, `entuSeasons.ts` (Tasks 1–10), `seasonsStore.ts` (stub — `hydrateSeasons` not yet implemented). No `seasonsStore.spec.ts` yet; store wiring (Task 11) is Josquin's.
+
+[LEARNED] **Conductor type has `propertyValueId: string`** (YELLOW-D1 fix). `listConductors` returns `{ personId, name, propertyValueId }`. `ConductorPanel` must pass `propertyValueId` to `onremove` — NOT just `personId`.
+
+[LEARNED] **`seasonsStore.ts` stub** — `hydrateSeasons` throws `not implemented`. Route wiring (Task 15) cannot call it until Task 11 GREEN lands (Josquin's). Route may call `listSeasons` directly if store is still a stub.
+
+[PATTERN] **Component pattern to follow:** `LibraryMaster.svelte` / `LibraryEditionCard.svelte` for spec patterns. Props via `interface Props { ... }` + `$props()`. All i18n via `m.seasons_*()`. `afterEach(() => cleanup())` in every spec.
+
+[PATTERN] **Route pattern to follow:** `/library/+page.svelte` for the hydration-store + `$effect` + `goto` pattern. `let initialWorkId = $derived(page.url.searchParams.get('work'))` → same pattern for `?season=<id>`.
+
+[PATTERN] **Empty state styling:** `LibraryEmptyState.svelte` uses Caveat font for marginalia, centered, muted. Same tone for seasons empty states.
+
+[GOTCHA] **No `seasons/` components dir yet** — will need to create `src/lib/components/seasons/` when writing Task 12 files. Plan path map is correct.
+
+[DEFERRED] Task 12 RED: waiting for Tallis to write `SeasonForm.spec.ts` + `ConductorPanel.spec.ts`.
+[DEFERRED] Task 13 RED: waiting for Tallis to write `SeriesForm.spec.ts` + `RehearsalList.spec.ts`.
+[DEFERRED] Task 14 i18n: Comenius writes `seasons_*` keys — needed before my components can `pnpm check` clean.
+[DEFERRED] Task 15 RED: waiting for Tallis (route spec) + Tasks 12/13 both GREEN.
+
+## [CHECKPOINT] 2026-06-01 — Session 29 Task 15 re-GREEN + re-review (f9aac13)
+
+[LEARNED] **`vi.importActual` module isolation — store writes go to the wrong instance.** `vi.importActual('$lib/seasons/seasonsStore')` returns an isolated module instance whose internal `seasonsStore` writable is separate from the mock factory's store (the one the component subscribes to). Calling `realHydrate(...)` inside the real module writes to the isolated store, not the mock store. Consequence: `runRealHydrate` tests never reach the component. Fix for Tallis: drive store state with `(seasonsStore as Writable).set(...)` directly — same diagnosis as the vi.doMock isolation issue.
+
+[GOTCHA] **i18n key rename in component = spec mock update required.** Swapping `m.seasons_actions_confirm()` → `m.seasons_actions_edit()` on the edit button broke the RehearsalList spec mock (strict vi.mock proxy throws on undefined keys). When renaming any `m.*()` call in a component, update the corresponding spec's `vi.mock('$lib/paraglide/messages.js', ...)` factory. Mechanical fix = Byrd's responsibility.
+
+[PATTERN] **P0.6 retry poll shape for series-create re-hydrate.** `await hydrateSeasons(args)` immediately after success, then `for (i < 3) { if (state.seasons.length > 0) break; await sleep(500); await hydrateSeasons(args); }`. Unit tests only assert hydrateSeasons was called ≥1 time; timing is invisible.
+
+[LEARNED] **Branch is at f9aac13** — all my Tasks 12/13/15 work is GREEN. 701/703 unit tests pass. 2 failing RED-29.1 tests are Tallis's to fix (vi.importActual isolation). Now heading to Bentham review (Task 16).
+
+## [CHECKPOINT] 2026-06-01 — #86 T4+T5 GREEN (8c3ab00)
+
+[GOTCHA] **`data-testid` element's `textContent` is polluted when the element contains child elements beyond text.** Adding a `<button>` inside a `<div data-testid="rehearsal-group-header">` makes `h.textContent` = `'Tuesday EveningDelete'` instead of `'Tuesday Evening'`. Fix: split into a wrapper (flex) + a text-only child that carries the testid. Pattern: always put the `data-testid` on the most granular element that the test will `.textContent`-match.
+
+[PATTERN] **`handleDeleteSeries` shape.** `deleteSeriesCascade(cfg, seriesId)` → `{ deleted, seriesDeleted }`. If `!seriesDeleted`: partial notice. If `DeleteForbiddenError`: forbidden notice (try/catch guard). On any result: re-load `listRehearsals` + `listSeries` via `Promise.resolve().then()` null-guard pattern. No rollback in v1.
+
+[LEARNED] **Branch at 8c3ab00** — T4 (cancel) + T5 (delete-series) both GREEN. 734/734. T6 (edit form) next.
+
+## [CHECKPOINT] 2026-06-01 — #86 T2+T3 GREEN (074d709)
+
+[GOTCHA] **`seasons_actions_confirm` → `seasons_actions_edit` missed in page.spec.ts.** When the edit button label changed (YELLOW-29.2) I updated `RehearsalList.spec.ts` but not `page.spec.ts`. The page spec renders `RehearsalList` and the strict mock threw on the unmocked key, making rehearsal rows null. Always grep for the old key name across ALL spec files when renaming any `m.*()` call.
+
+[PATTERN] **P0.6 retry with `listRehearsals` (updated from old hydrateSeasons poll).** After `createSeriesWithEvents`: (1) call `hydrateSeasons` once (tests assert it was called); (2) poll `listRehearsals` up to 3× at 500ms until `current.length > 0`. Loop shape: `let current = await fetchRehearsals(); for (i<3) { if (current.length>0) break; await sleep(500); current = await fetchRehearsals(); }`.
+
+[LEARNED] **Branch at 074d709** — conductor wiring (T2) + read-path (T3) both GREEN. 725/725 tests. T4 (cancel wiring) next.
+
+## [CHECKPOINT] 2026-06-01 — RED-86.1 GREEN (b4639a6)
+
+[GOTCHA] **`window.confirm` in a component breaks route integration tests** that click through it. The route spec's `beforeEach` for any test that clicks a confirm-gated button must `vi.stubGlobal('confirm', vi.fn().mockReturnValue(true))`. Also: any key called inside the component via `m.*()` must be in the page spec messages mock — the route renders the component, and the strict mock throws on unmocked keys even if the test isn't directly about that key.
+
+[PATTERN] **Confirm gate in `RehearsalList` (per RED-86.1).** `rehearsal-cancel`: `if (!window.confirm(m.seasons_confirm_cancel_rehearsal_body())) return; oncancel(id)`. `series-delete`: `if (!window.confirm(m.seasons_confirm_delete_series_body({ n: group.rows.length }))) return; ondeleteseries(seriesId)`.
+
+[LEARNED] **Branch at b4639a6** — RED-86.1/YELLOW-86.1 GREEN (confirm gates + i18n guard removal + edit hidden). 737/737. All #86 Byrd tasks done.
+
+## [CHECKPOINT] 2026-06-01 — feat/seasons-mobile route restructure (a3cb428)
+
+[GOTCHA] **Route restructure breaks tests assuming always-on forms.** When SeasonForm moved from always-on to on-demand (behind a `+` click), tests that directly query `[data-testid="season-name"]` find null. Fix: add `await fireEvent.click(createBtn)` before form queries. Also applies to integration specs.
+
+[GOTCHA] **New component i18n keys must be added to ALL spec mocks that render it.** SeasonBar uses `m.seasons_a11y_create_season()` + `m.seasons_a11y_edit_season()`. Both `page.spec.ts` AND `page.integration.spec.ts` mock messages independently — both needed the new keys. Integration spec is easy to miss since it's a separate file.
+
+[PATTERN] **`panelMode` for on-demand forms.** `$state<'none'|'create'|'edit'>('none')`. `{#if panelMode==='create'}<SeasonForm oncreate>` / `{:else if panelMode==='edit'}<SeasonForm season={sel} onupdate>`. Closes on success by setting `panelMode='none'`.
+
+[LEARNED] **Branch at a3cb428** — route restructure GREEN: SeasonBar + on-demand panels + full-width stacked layout. 768/768. Ready for Bentham + PO preview.
+
 (*MVOX:Byrd*)

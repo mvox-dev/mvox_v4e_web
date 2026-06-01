@@ -1,6 +1,74 @@
 # Palestrina — Team Lead Scratchpad
 
-### [NEXT SESSION] 2026-06-01 end-of-session-28 — session-28 → session-29
+### [NEXT SESSION] 2026-06-01 end-of-session-29 — session-29 → session-30
+
+**Headline: The IMPLEMENTATION session. Shipped the rehearsal-schedule first slice end-to-end to a live preview, seeded EFK demo data, then iterated hard on PO live-testing feedback (every bug was found by hands-on clicking, not unit tests). main advanced `89632a4` → `674b1d9` (origin matches). One change is mid-flight and DEFERRED to session 30 by PO: the season-tag pencil TOGGLE + mirrored active state — RED is committed and pushed, awaiting GREEN.**
+
+## ⭐ FIRST ACTION session 30: finish the pencil-toggle (it's at RED, primed)
+
+PO's request (verbatim): *"can we mirror the pencil, when edit form is open? and close the edit form, if pencil is tapped again?"* — i.e. the ✏️ on the selected season tag should (a) TOGGLE the edit panel (second tap closes it) and (b) render in an active/mirror state while the edit form is open.
+
+- **Branch:** `feat/seasons-pencil-toggle` off main `674b1d9`. **RED committed: `f761ca4`** (tests only, +94 lines, 2 spec files) — pushed to origin. 3 assertions fail for the right reasons:
+  1. `src/routes/seasons/page.spec.ts:1104` — tapping `season-tag-edit` with edit panel open should leave `season-form` ABSENT (toggle to none). Currently `onedit` always sets `'edit'`, so it stays open → RED.
+  2. `src/lib/components/seasons/SeasonBar.spec.ts:177` — new prop `editing?: boolean`; `editing={true}` must put an `is-editing` class on `season-tag-edit`. Prop/class don't exist → RED.
+  3. (negative: `editing={false}` → no class — passes trivially, expected.)
+- **GREEN (dispatch Byrd, two tiny edits):**
+  1. `SeasonBar.svelte` — add `editing?: boolean` to the Props interface; apply `class:is-editing={editing}` on the `season-tag-edit` button; add a CSS rule for `.is-editing` (mirror/active look — e.g. flipped/filled pencil, accent bg).
+  2. `+page.svelte` (onedit handler, ~line 342) — change `() => { panelMode = 'edit'; }` to `() => { panelMode = panelMode === 'edit' ? 'none' : 'edit'; }`; pass `editing={panelMode === 'edit'}` to `<SeasonBar>`.
+- Then Bentham review → Josquin merge to main → **redeploy preview** (`preview-seasons.multivox.pages.dev`) and **PING PO** ("preview redeployed") — PO explicitly asked to be pinged on redeploy.
+
+## Slice state at session close (what's LIVE on the preview)
+
+`preview-seasons.multivox.pages.dev` (last build `app.vQrtCqAM.js`, from main `674b1d9`). Deploy cmd: `set -a; . ~/.config/mvox/credentials.env; set +a; wrangler pages deploy .svelte-kit/cloudflare --project-name=multivox --branch=preview-seasons` (CF transient `8000000` → retry ≤3×). **mvox.eu production was NOT touched this session** — all on the preview branch.
+
+Working capabilities (PO-verified by clicking): create season, edit season (name/dates/description), create rehearsal series → eager event generation, view rehearsal list (grouped by series, muted-past), cancel single rehearsal (confirm), delete series cascade (confirm), assign/remove conductors (dedupe-correct). `/seasons` is in the main nav.
+
+## EFK demo seed (live in polyphony Entu db)
+
+Org EFK `69c7f8718489bfcb0e81b065` (PO owns it). Seeded: season **2026/27** + a **Tuesday rehearsal series** → **16 events**, DST flip 2026-10-27 verified (wall-clock 19:00 stays 19:00 across the boundary). EFK has members **Jaan Kõrv** + **Eve Lepik** so the conductor-assign flow has real people. PO owns all 6 polyphony orgs → always sees owner view. Pérotin's scratchpad on `chore/seed-demo-seasons` (`2dd6f46`) records the live data state.
+
+## Bugs PO found by live-clicking + how each was fixed (the session's real story)
+
+All shipped GREEN first — see `feedback_partial_assertions_hide_bugs` (written this session). Live-clicking beat green unit tests every time.
+
+1. **`_type` create 400** — app posted `_type` as a string; Entu requires a **reference** to the type-entity id. Fixed `47be076`. → `project_entu_create_type_reference` (memory). TYPE_IDS (polyphony db): season `69c7ea528489bfcb0e81a044`, event_series `6a0d2e8490c8df7a1cc7deb1`, event `69c7ea548489bfcb0e81a0a2`.
+2. **Conductor duplicates** — assigning the same person twice created multiple `_editor` grants; list showed one but remove only dropped one. PO specified 3 layers, all implemented (`bbfacb1`): (1) don't show already-assigned in the picker, (2) idempotent assign (GET `_editor`, skip if present), (3) revoke removes ALL grants. Root cause = **Entu POST appends to multi-valued props** (`project_entu_post_appends_multi_value`) — flagged as a likely pattern across all our create/grant ops; worth an audit pass.
+3. **Season-date hard-block** — series dates were constrained to fit inside the season; PO: "why would they?" Changed to a **non-blocking soft-warn** (`series-season-warning`, submits anyway). `validation.ts` `outside_season` hard-block removed. (Series↔season stays a parent-child structural link; we just don't police dates.)
+4. **Mobile layout** — forms rendered side-by-side on phones. Redesigned (`674b1d9`): season tags in a horizontal `SeasonBar` at top, ✏️ on the selected tag for edit + `+` to create, forms open as on-demand panels (`panelMode: 'none'|'create'|'edit'`), `.stacked-section` replaces the side-by-side conductor layout. Mocked first at `/tmp/seasons-mock` (PO approved the mock). **The pencil-toggle (above) is the last refinement on top of this.**
+5. **Description-wipe (RED-MOB.1)** — editing any season field silently wiped `description` because the test asserted `objectContaining({name,startDate,endDate})` (missed the clobbering `description:''`). Fixed: threaded `description` through Season/listSeasons/SeasonForm; tightened to `toEqual`.
+
+## New code shape (for orientation)
+
+`src/lib/seasons/` mirrors `src/lib/library/` (client-side hydration). Key files: `entuSeasons.ts` (all Entu helpers — createSeason, listSeasons, createSeriesWithEvents, listRehearsals, updateRehearsal, deleteRehearsal, deleteSeriesCascade, listConductors [dedupes, filters `property_type==='_editor' && inherited!==true`], assignConductor [idempotent], revokeConductor [deletes ALL grants], listOrgMembers, listSeries, updateSeason [clear-then-set]); `types.ts`; `seasonsStore.ts` (emits `ready` on empty, not no-rights); `validation.ts`. Components under `src/lib/components/seasons/`: SeasonForm (dual create/edit), SeasonBar (NEW), SeriesForm, RehearsalList, ConductorPanel. Route `src/routes/seasons/+page.svelte`.
+
+## Memory written this session
+
+- `project_entu_create_type_reference` — `_type` must be a reference on create; mocks can't catch wire contracts; gate new entity types on a live smoke-create.
+- `partial-assertions-and-seams-hide-real-bugs` — assert full shape (`toEqual`), drive the real producer, live-click beats green tests; 4× recurrence this session.
+- Updated `spawn-agents-with-worktree-isolation` — `isolation:"worktree"` does NOT reliably isolate; agents self-EnterWorktree + sync via origin; team-lead Edits on absolute `~/workspace` paths hit the SHARED tree.
+
+## Coordination note (carry-forward)
+
+**In-process agents go idle without acting on post-spawn inbox messages.** This session Tallis (the original spawn) idled 3× on the pencil-toggle dispatch without producing anything — re-sending the brief via SendMessage did NOT wake him. The fix that worked: **re-spawn fresh with the task baked into the spawn prompt** (spawned `tallis-2`, who delivered the RED immediately). When a teammate idles repeatedly with no work product, don't keep messaging — re-spawn with the task in the prompt. (Extends `feedback_in_process_agents`.)
+
+## Open issues / backlog after pencil-toggle
+
+- **#83 / #84 / #85** — cancel-edit / delete-series / conductors: data layer done, partially delivered via **#86** (manage-ops wiring). Audit `gh issue list` and close what's satisfied (`feedback_closes_n_pattern`).
+- **#87** — edit a SINGLE rehearsal (Cap 5b): needs `updateRehearsal` partial-patch wiring in the UI (helper exists; pattern = `updateSeason`).
+- **#88** — runtime type-id resolution (polyphony TYPE_IDS are hardcoded; resolve by name per-db for portability).
+- **#80** DRY safeRedirectTarget; **/about** real copy; **#73** overdue red+bold; **#54** client error capture; **#44** CF Pages git-deploy; **#49** Biome lint; **#6** Email (blocked PO SPF/DKIM); **CHORE-C** test infra (heavy).
+
+## Expected first action session 30
+
+1. Read this seed. Verify `main` at `674b1d9` (origin==local), prod `mvox.eu` health unchanged.
+2. Spawn finn + bentham (always-on) + tallis + byrd. The pencil-toggle RED is already on `feat/seasons-pencil-toggle` (`f761ca4`) — go straight to **Byrd GREEN** (two edits above), then Bentham → Josquin merge → redeploy preview → **ping PO**.
+3. Then pick up the backlog (close satisfied issues, #87 edit-one-rehearsal is the natural next capability).
+
+(*MVOX:Palestrina*)
+
+---
+
+### [PROCESSED 2026-06-01 session-29] 2026-06-01 end-of-session-28 — session-28 → session-29
 
 **Headline: A pure DESIGN/MAPPING session (PO directive), executed cleanly end-to-end. Mapped the rehearsal/concert/season/rsvp domain, then brainstormed + specced + planned the FIRST buildable slice — "Lay out the rehearsal schedule" (conductor/admin-first). Output: domain map → APPROVED spec → 17-task implementation plan → 7 GitHub issues (#81–#85 new). ZERO implementation code, by design. Session 29 IS the implementation session: opens with PO authorizing Pérotin's Phase-0 rights probes, then the TDD chain on `feat/rehearsal-schedule`.**
 
