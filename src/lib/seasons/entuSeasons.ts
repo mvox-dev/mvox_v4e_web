@@ -1,0 +1,440 @@
+import { ENTU_API_BASE } from '$lib/entu-config';
+import { occurrenceDates, toStartDatetime } from './recurrence';
+import type { Conductor, Rehearsal, RehearsalRaw, Season, SeasonRaw, SeriesRaw } from './types';
+
+export interface EntuCfg {
+	db: string;
+	token: string;
+}
+
+/** Property objects in an Entu entity-create body — one of the typed value shapes. */
+type EntuProp =
+	| { type: string; string: string }
+	| { type: string; reference: string }
+	| { type: string; date: string }
+	| { type: string; datetime: string }
+	| { type: string; number: number };
+
+export interface CreateSeasonInput {
+	orgId: string;
+	name: string;
+	startDate: string;
+	endDate: string;
+}
+
+export interface CreateSeriesInput {
+	orgId: string;
+	seasonId: string;
+	name: string;
+	intervalDays: number;
+	startTime: string;
+	durationMinutes: number;
+	startDate: string;
+	endDate: string;
+	location?: string;
+}
+
+export interface CreateSeriesResult {
+	seriesId: string;
+	eventIds: string[];
+}
+
+/**
+ * Thrown when event generation fails part-way through a series create. The
+ * series and the events created before the failure are NOT rolled back
+ * (spec §4 — best-effort, no rollback); the caller surfaces a partial notice.
+ */
+export class PartialGenerationError extends Error {
+	readonly seriesId: string;
+	readonly createdCount: number;
+	constructor(seriesId: string, createdCount: number, cause?: unknown) {
+		super(`series ${seriesId}: generated ${createdCount} event(s) before failure`);
+		this.name = 'PartialGenerationError';
+		this.seriesId = seriesId;
+		this.createdCount = createdCount;
+		if (cause !== undefined) (this as { cause?: unknown }).cause = cause;
+	}
+}
+
+function authHeaders(token: string): HeadersInit {
+	return { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
+}
+
+/** POST an Entu entity-create property array; returns the new entity `_id`. */
+async function createEntity(cfg: EntuCfg, props: EntuProp[]): Promise<string> {
+	const res = await fetch(`${ENTU_API_BASE}${cfg.db}/entity`, {
+		method: 'POST',
+		headers: authHeaders(cfg.token),
+		body: JSON.stringify(props),
+	});
+	if (!res.ok) {
+		throw new Error(`entity create failed: ${res.status}`);
+	}
+	const body = (await res.json()) as { _id: string };
+	return body._id;
+}
+
+export async function createSeason(cfg: EntuCfg, input: CreateSeasonInput): Promise<string> {
+	return createEntity(cfg, [
+		{ type: '_type', string: 'season' },
+		{ type: '_parent', reference: input.orgId },
+		{ type: '_sharing', string: 'public' },
+		{ type: 'name', string: input.name },
+		{ type: 'start_date', date: input.startDate },
+		{ type: 'end_date', date: input.endDate },
+	]);
+}
+
+export async function listSeasons(cfg: EntuCfg, orgId: string): Promise<Season[]> {
+	const res = await fetch(
+		`${ENTU_API_BASE}${cfg.db}/entity?_type.string=season&_parent.reference=${orgId}&props=name,start_date,end_date&limit=200`,
+		{ headers: authHeaders(cfg.token) },
+	);
+	if (!res.ok) {
+		throw new Error(`listSeasons failed: ${res.status}`);
+	}
+	const body = (await res.json()) as { entities?: SeasonRaw[] };
+	return (body.entities ?? [])
+		.map(
+			(raw): Season => ({
+				id: raw._id,
+				name: raw.name?.[0]?.string ?? '',
+				startDate: raw.start_date?.[0]?.date ?? '',
+				endDate: raw.end_date?.[0]?.date ?? '',
+			}),
+		)
+		.sort((a, b) => a.startDate.localeCompare(b.startDate));
+}
+
+export async function createSeriesWithEvents(
+	cfg: EntuCfg,
+	input: CreateSeriesInput,
+): Promise<CreateSeriesResult> {
+	// 1. Create the event_series entity (private; parented to org + season).
+	const seriesProps: EntuProp[] = [
+		{ type: '_type', string: 'event_series' },
+		{ type: '_sharing', string: 'private' },
+		{ type: '_parent', reference: input.orgId },
+		{ type: '_parent', reference: input.seasonId },
+		{ type: 'event_type', string: 'rehearsal' },
+		{ type: 'name', string: input.name },
+		{ type: 'interval_days', number: input.intervalDays },
+		{ type: 'start_time', string: input.startTime },
+		{ type: 'duration_minutes', number: input.durationMinutes },
+		{ type: 'start_date', date: input.startDate },
+		{ type: 'end_date', date: input.endDate },
+	];
+	if (input.location !== undefined) {
+		seriesProps.push({ type: 'default_location', string: input.location });
+	}
+	const seriesId = await createEntity(cfg, seriesProps);
+
+	// 2. Eagerly generate one event per occurrence (serial — Entu has no bulk create).
+	//    Unset event fields (duration, location) are inherited at read time, never
+	//    via formula (spec §3.2) — so we set only the per-occurrence datetime here.
+	const dates = occurrenceDates(input.startDate, input.endDate, input.intervalDays);
+	const eventIds: string[] = [];
+	for (const date of dates) {
+		const eventProps: EntuProp[] = [
+			{ type: '_type', string: 'event' },
+			{ type: '_sharing', string: 'private' },
+			{ type: '_parent', reference: input.orgId },
+			{ type: '_parent', reference: input.seasonId },
+			{ type: '_parent', reference: seriesId },
+			{ type: 'event_type', string: 'rehearsal' },
+			{ type: 'name', string: input.name },
+			{ type: 'start_datetime', datetime: toStartDatetime(date, input.startTime) },
+			{ type: 'duration_minutes', number: input.durationMinutes },
+		];
+		try {
+			eventIds.push(await createEntity(cfg, eventProps));
+		} catch (cause) {
+			// Best-effort: keep what landed, no rollback (spec §4).
+			throw new PartialGenerationError(seriesId, eventIds.length, cause);
+		}
+	}
+
+	return { seriesId, eventIds };
+}
+
+// ── Task 6: listRehearsals ─────────────────────────────────────────────────────
+
+export interface ListRehearsalsInput {
+	orgId: string;
+	seasonId: string;
+}
+
+export async function listRehearsals(
+	cfg: EntuCfg,
+	input: ListRehearsalsInput,
+): Promise<Rehearsal[]> {
+	const { orgId, seasonId } = input;
+	const res = await fetch(
+		`${ENTU_API_BASE}${cfg.db}/entity?_type.string=event&event_type.string=rehearsal&_parent.reference=${seasonId}&props=name,event_type,start_datetime,duration_minutes,location,_parent&limit=500`,
+		{ headers: authHeaders(cfg.token) },
+	);
+	if (!res.ok) {
+		throw new Error(`listRehearsals failed: ${res.status}`);
+	}
+	const body = (await res.json()) as { entities?: RehearsalRaw[] };
+	const raws = body.entities ?? [];
+	if (raws.length === 0) return [];
+
+	// Identify each event's series parent (the _parent ref that is neither org nor season).
+	const seriesIdFor = (raw: RehearsalRaw): string =>
+		(raw._parent ?? []).map((p) => p.reference).find((ref) => ref !== orgId && ref !== seasonId) ??
+		'';
+
+	// Read-time inheritance merge: fetch each unique parent series ONCE (cache —
+	// avoids N+1), then fill event fields that are absent on the event itself.
+	// Never a formula (spec §3.2); the explicit event value always wins.
+	const seriesCache = new Map<string, SeriesRaw>();
+	const uniqueSeriesIds = [...new Set(raws.map(seriesIdFor).filter(Boolean))];
+	await Promise.all(
+		uniqueSeriesIds.map(async (sid) => {
+			const sRes = await fetch(
+				`${ENTU_API_BASE}${cfg.db}/entity/${sid}?props=default_location,duration_minutes`,
+				{ headers: authHeaders(cfg.token) },
+			);
+			if (!sRes.ok) return;
+			const sBody = (await sRes.json()) as { entity?: SeriesRaw };
+			if (sBody.entity) seriesCache.set(sid, sBody.entity);
+		}),
+	);
+
+	return raws
+		.map((raw): Rehearsal => {
+			const seriesId = seriesIdFor(raw);
+			const series = seriesCache.get(seriesId);
+			return {
+				id: raw._id,
+				seriesId,
+				startDatetime: raw.start_datetime?.[0]?.datetime ?? '',
+				durationMinutes:
+					raw.duration_minutes?.[0]?.number ?? series?.duration_minutes?.[0]?.number ?? 0,
+				location: raw.location?.[0]?.string ?? series?.default_location?.[0]?.string,
+				name: raw.name?.[0]?.string,
+			};
+		})
+		.sort((a, b) => a.startDatetime.localeCompare(b.startDatetime));
+}
+
+// ── Task 7: updateRehearsal ───────────────────────────────────────────────────
+
+/**
+ * Patch payload for a single rehearsal. Each field carries both the new value
+ * AND the existing property-value `_id` (needed for DELETE-then-POST replace
+ * semantics — `project_entu_post_appends_multi_value`).
+ */
+export interface RehearsalPatch {
+	start_datetime?: { valueId: string; value: string };
+	duration_minutes?: { valueId: string; value: number };
+	location?: { valueId: string | null; value: string };
+	description?: { valueId: string | null; value: string };
+}
+
+export async function updateRehearsal(
+	cfg: EntuCfg,
+	eventId: string,
+	patch: RehearsalPatch,
+): Promise<void> {
+	const headers = authHeaders(cfg.token);
+	const base = `${ENTU_API_BASE}${cfg.db}`;
+
+	// Replace semantics per field: if a value already exists (valueId), DELETE it
+	// first, then POST the new value (Entu POST appends — clear-then-set).
+	const applyField = async (valueId: string | null, prop: EntuProp): Promise<void> => {
+		if (valueId !== null) {
+			const delRes = await fetch(`${base}/property/${valueId}`, { method: 'DELETE', headers });
+			if (!delRes.ok) throw new Error(`property delete failed: ${delRes.status}`);
+		}
+		const postRes = await fetch(`${base}/entity/${eventId}`, {
+			method: 'POST',
+			headers,
+			body: JSON.stringify([prop]),
+		});
+		if (!postRes.ok) throw new Error(`property POST failed: ${postRes.status}`);
+	};
+
+	if (patch.start_datetime) {
+		await applyField(patch.start_datetime.valueId, {
+			type: 'start_datetime',
+			datetime: patch.start_datetime.value,
+		});
+	}
+	if (patch.duration_minutes) {
+		await applyField(patch.duration_minutes.valueId, {
+			type: 'duration_minutes',
+			number: patch.duration_minutes.value,
+		});
+	}
+	if (patch.location) {
+		await applyField(patch.location.valueId, { type: 'location', string: patch.location.value });
+	}
+	if (patch.description) {
+		await applyField(patch.description.valueId, {
+			type: 'description',
+			string: patch.description.value,
+		});
+	}
+}
+
+// ── Task 8: deleteRehearsal ───────────────────────────────────────────────────
+
+/** Thrown when Entu returns 403 on a delete (insufficient tier — _owner required). */
+export class DeleteForbiddenError extends Error {
+	readonly entityId: string;
+	constructor(entityId: string) {
+		super(`delete forbidden: ${entityId} — _owner tier required`);
+		this.name = 'DeleteForbiddenError';
+		this.entityId = entityId;
+	}
+}
+
+export async function deleteRehearsal(cfg: EntuCfg, eventId: string): Promise<void> {
+	const res = await fetch(`${ENTU_API_BASE}${cfg.db}/entity/${eventId}`, {
+		method: 'DELETE',
+		headers: authHeaders(cfg.token),
+	});
+	if (res.status === 403) throw new DeleteForbiddenError(eventId);
+	if (!res.ok) throw new Error(`deleteRehearsal failed: ${res.status}`);
+}
+
+// ── Task 9: deleteSeriesCascade ───────────────────────────────────────────────
+
+export interface DeleteCascadeResult {
+	deleted: number;
+	seriesDeleted: boolean;
+}
+
+export async function deleteSeriesCascade(
+	cfg: EntuCfg,
+	seriesId: string,
+): Promise<DeleteCascadeResult> {
+	const headers = authHeaders(cfg.token);
+	const base = `${ENTU_API_BASE}${cfg.db}`;
+
+	// Children search is filtered by THIS series specifically (+ event type), never
+	// just the season — guards against sweeping sibling-series events (spec Cap6 step 2).
+	const searchRes = await fetch(
+		`${base}/entity?_type.string=event&_parent.reference=${seriesId}&props=_id&limit=500`,
+		{ headers },
+	);
+	if (!searchRes.ok) throw new Error(`cascade child search failed: ${searchRes.status}`);
+	const searchBody = (await searchRes.json()) as { entities?: Array<{ _id: string }> };
+	const children = searchBody.entities ?? [];
+
+	// Serial DELETE (Entu has no bulk delete). Count successes; abort the series
+	// delete if any child delete fails (best-effort, no rollback).
+	let deleted = 0;
+	let allDeleted = true;
+	for (const child of children) {
+		const delRes = await fetch(`${base}/entity/${child._id}`, { method: 'DELETE', headers });
+		if (delRes.ok) deleted++;
+		else allDeleted = false;
+	}
+
+	let seriesDeleted = false;
+	if (allDeleted) {
+		const sRes = await fetch(`${base}/entity/${seriesId}`, { method: 'DELETE', headers });
+		seriesDeleted = sRes.ok;
+	}
+
+	return { deleted, seriesDeleted };
+}
+
+// ── Task 10: conductor grant/revoke/list ──────────────────────────────────────
+
+export interface AssignConductorInput {
+	seasonId: string;
+	orgId: string;
+	personId: string;
+}
+
+export interface RevokeConductorInput {
+	seasonId: string;
+	/** The `_editor` property-value `_id` to DELETE (not the person entity id). */
+	propertyValueId: string;
+}
+
+/**
+ * Returns the directly-assigned conductors on a season — i.e. `_editor` entries
+ * where `property_type === '_editor'` AND `inherited !== true`.
+ * P0.3 finding: the `_editor` GET field is a flattened owner+editor view; direct
+ * conductor grants have `inherited` ABSENT (not `false`).
+ */
+export async function listConductors(cfg: EntuCfg, seasonId: string): Promise<Conductor[]> {
+	const headers = authHeaders(cfg.token);
+	const base = `${ENTU_API_BASE}${cfg.db}`;
+
+	const res = await fetch(`${base}/entity/${seasonId}?props=_editor`, { headers });
+	if (!res.ok) throw new Error(`listConductors failed: ${res.status}`);
+	const body = (await res.json()) as { entity?: SeasonRaw };
+
+	// P0.3: `_editor` GET is a flattened owner+editor rights view. Direct conductor
+	// grants are property_type '_editor' with `inherited` ABSENT; cascaded org-owner
+	// entries carry `inherited: true`, and a direct _owner is property_type '_owner'.
+	const directEditors = (body.entity?._editor ?? []).filter(
+		(e) => e.property_type === '_editor' && e.inherited !== true,
+	);
+
+	// Single-hop name resolution: one GET /entity/{personId} per conductor (Cap7).
+	// propertyValueId = the _editor entry's _id, needed for revokeConductor (YELLOW-D1).
+	return Promise.all(
+		directEditors.map(async (entry): Promise<Conductor> => {
+			const pRes = await fetch(`${base}/entity/${entry.reference}?props=name`, { headers });
+			const pBody = (await pRes.json()) as { entity?: { name?: Array<{ string: string }> } };
+			return {
+				personId: entry.reference,
+				name: pBody.entity?.name?.[0]?.string ?? '',
+				propertyValueId: entry._id ?? '',
+			};
+		}),
+	);
+}
+
+/**
+ * Grants conductor rights to a person on a season.
+ * Throws if the person is not an active org member (membership-pairing gate, spec Cap7).
+ */
+export async function assignConductor(cfg: EntuCfg, input: AssignConductorInput): Promise<void> {
+	const headers = authHeaders(cfg.token);
+	const base = `${ENTU_API_BASE}${cfg.db}`;
+
+	// Membership-pairing gate (spec Cap7): a conductor must be an active org member.
+	const memberRes = await fetch(
+		`${base}/entity?_type.string=member&person.reference=${input.personId}&_parent.reference=${input.orgId}&props=_id&limit=1`,
+		{ headers },
+	);
+	if (!memberRes.ok) throw new Error(`member lookup failed: ${memberRes.status}`);
+	const memberBody = (await memberRes.json()) as { entities?: Array<{ _id: string }> };
+	if ((memberBody.entities ?? []).length === 0) {
+		throw new Error(`${input.personId} must be an org member before becoming a conductor`);
+	}
+
+	// Grant: roles-as-rights — POST a direct _editor reference on the season.
+	const grantRes = await fetch(`${base}/entity/${input.seasonId}`, {
+		method: 'POST',
+		headers,
+		body: JSON.stringify([{ type: '_editor', reference: input.personId }]),
+	});
+	if (!grantRes.ok) throw new Error(`conductor grant failed: ${grantRes.status}`);
+}
+
+/**
+ * Revokes a conductor grant by DELETEing the `_editor` property value on the season.
+ * The `propertyValueId` is the `_id` of the property value entry, not the person entity.
+ */
+export async function revokeConductor(cfg: EntuCfg, input: RevokeConductorInput): Promise<void> {
+	// Property-VALUE delete, NOT /entity/ — conflating the two 404s
+	// (project_entu_wire_shape_entity_vs_property). The propertyValueId is the
+	// `_id` of the `_editor` array entry, carried from the listConductors view.
+	const res = await fetch(`${ENTU_API_BASE}${cfg.db}/property/${input.propertyValueId}`, {
+		method: 'DELETE',
+		headers: authHeaders(cfg.token),
+	});
+	if (!res.ok) throw new Error(`revokeConductor failed: ${res.status}`);
+}
+
+// Re-export types consumed by tests (avoids separate import in spec)
+export type { Conductor, Rehearsal, RehearsalRaw, SeriesRaw };

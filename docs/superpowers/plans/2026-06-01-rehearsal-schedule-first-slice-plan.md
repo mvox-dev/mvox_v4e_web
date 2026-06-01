@@ -196,7 +196,11 @@ describe('validateSeries', () => {
 ```ts
 export interface SeasonRaw { _id: string; name?: Array<{ string: string }>;
   start_date?: Array<{ date: string }>; end_date?: Array<{ date: string }>;
-  _parent?: Array<{ reference: string }>; _editor?: Array<{ reference: string; inherited?: boolean }>; }
+  _parent?: Array<{ reference: string }>;
+  // P0.3: the GET `_editor` field is a FLATTENED rights view mixing _owner + _editor
+  // entries, distinguished by `property_type`. Direct grants have `inherited` ABSENT
+  // (undefined), cascaded ones have `inherited: true`. See findings 2026-06-01.
+  _editor?: Array<{ reference: string; property_type?: string; inherited?: boolean }>; }
 export interface Season { id: string; name: string; startDate: string; endDate: string; }
 
 export interface SeriesRaw { _id: string; name?: Array<{ string: string }>;
@@ -386,12 +390,20 @@ it('partial failure keeps the series', async () => {
 - [ ] **Step 1 (Tallis RED):**
 
 ```ts
-it('listConductors returns direct _editor grantees, excluding inherited', async () => {
+// P0.3 (findings 2026-06-01): the `_editor` GET field is a FLATTENED rights view that
+// mixes _owner AND _editor entries. Direct conductor grants have `inherited` ABSENT
+// (NOT `false`); cascaded org-owner has `inherited: true`; a self/direct _owner has
+// neither property_type==='_editor' nor inherited. The correct filter is BOTH
+// `property_type === '_editor'` AND `inherited !== true` — a bare `!inherited` guard
+// would wrongly admit the direct-_owner entry. The spec §8 #4 org-owner-subtraction
+// fallback is therefore NOT needed.
+it('listConductors returns direct _editor grantees, excluding inherited + _owner', async () => {
   vi.stubGlobal('fetch', vi.fn().mockImplementation((url: string) => {
     if (url.includes('/entity/season1')) return Promise.resolve({ ok: true, json: async () => ({ entity: {
       _id: 'season1', _editor: [
-        { reference: 'p_admin', inherited: true },   // cascaded org-owner → excluded
-        { reference: 'p_cond', inherited: false },    // direct conductor → included
+        { reference: 'p_admin', property_type: '_owner', inherited: true }, // cascaded org-owner → excluded
+        { reference: 'p_self', property_type: '_owner' },                    // direct _owner, no `inherited` → still excluded
+        { reference: 'p_cond', property_type: '_editor' },                   // direct conductor (inherited ABSENT) → included
       ] } }) });
     // person name resolution
     return Promise.resolve({ ok: true, json: async () => ({ entity: { _id: 'p_cond', name: [{ string: 'Jane C.' }] } }) });
@@ -408,7 +420,7 @@ it('assignConductor refuses a non-member', async () => {
 ```
 
 - [ ] **Step 2–5:** RED→FAIL → Josquin GREEN:
-  - `listConductors`: GET season, filter `_editor` to entries **without `inherited: true`** (P0.3), resolve each `personId` via a separate `GET /entity/{personId}` (single-hop; spec Cap7 item 5). *If P0.3 found no flag, use the org-`_owner`-subtraction fallback.*
+  - `listConductors`: GET season, filter `_editor` to entries where **`property_type === '_editor'` AND `inherited !== true`** (P0.3 — the field is a flattened owner+editor view; direct grants have `inherited` absent), resolve each `personId` via a separate `GET /entity/{personId}` (single-hop; spec Cap7 item 5). *The org-`_owner`-subtraction fallback is NOT needed — the flag + `property_type` are present.*
   - `assignConductor`: first verify the person has an active `member` in the org (search `member` by person+org); if none → throw `must be an org member first`; else POST `_editor` reference to the person on the season.
   - `revokeConductor`: DELETE the season's `_editor` property value for that person.
   - → PASS + check 0 → Commit `feat(#ADMIN-10): conductor grant/revoke/list (roles-as-rights, inherited-flag filter)`.

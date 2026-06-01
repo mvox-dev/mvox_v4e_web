@@ -200,6 +200,16 @@ Model: roles-as-rights (§3.1) — a "conductor of the season" *is* a person hol
 
 ## 8. Open questions / probes before implementation
 
+> **✅ PROBE RESULTS — resolved 2026-06-01 (Pérotin, live polyphony playground).** Findings: `docs/migration/findings/rights-mechanics-2026-06-01.md`; artifact: `scripts/migrations/seed-results/probe-rights-mechanics-2026-06-01T00-27-51-059Z.json`. Summary:
+> - **#1 Delete tier:** owner-DELETE → 200 **and** editor-DELETE → 403 — **both confirmed** (P0.1 minted a throwaway editor persona via a key-only `_probe` person). Caveat: the editor 403 read `"No user"` — a key-only person with no OAuth/db-account binding reads as *unauthenticated*, so this confirms the split via Entu's documented tier model rather than a clean authenticated-editor tier-check. Fails safe regardless. **Contract holds: 5a/6 stay `_owner`-tier.**
+> - **#4 Grant/revoke wire:** confirmed. Grant = `POST /db/entity/{seasonId}` body `[{type:'_editor', reference:<personId>}]`; response `properties[0]._id` is the revoke value-id (no separate GET). Revoke = `DELETE /db/property/{propValueId}` → 200, post-count 0.
+> - **#4 Direct-vs-inherited (gating):** flag **present** → no org-owner-subtraction fallback needed. **Critical nuance:** the `_editor` GET field is a *flattened* rights view mixing `_owner`+`_editor` entries (keyed by `property_type`); direct grants have `inherited` **absent** (not `false`). Correct `listConductors` filter = `property_type === '_editor'` **AND** `inherited !== true`. Plan Task 3 type + Task 10 RED updated accordingly.
+> - **#4 Revoke tier-cascade:** confirmed — single DELETE drops `_expander`/`_viewer` too (~1s), no orphans.
+> - **#4 Creator auto-owner:** **confirmed real** — creator gets entity-level `_owner` automatically. So §7-Cap6 option-A residual edge stands; surface in UI ("deleting a series removes all its events").
+> - **Propagation timing:** measured 193ms (the "~1.5–3.5s/level" was a conservative upper bound). Test retry window: 500ms initial + 2–3 retries is ample.
+>
+> Items #2 (date containment = hard 400) and #3 (partial-failure = count+retry, no rollback) were PO/spec decisions, not live probes — they remain as specified.
+
 1. **Delete rights (confirm the `_owner`-tier contract):** the verified Entu tier-mechanics put DELETE at `_owner`, not `_editor` (§3.3), and the spec now encodes that. This is a **confirmation** probe, not an open guess: **Pérotin, on the live polyphony playground before GREEN** — as an `_editor`-only persona (no org `_owner`), create a throwaway series+events and attempt `DELETE /entity/{id}`; expect it to fail. Then repeat as an `_owner` persona; expect success. If Entu surprises us and `_editor` *can* delete, we relax 5a/6 back to `_editor` (cheap direction). The expensive direction — shipping AC that says `_editor` deletes — is now avoided.
 2. **Series→season date containment** (Capability 2 AC4): confirm we want a hard 400, vs a soft warning, when a series spills outside the season's dates. Spec currently says hard 400.
 3. **Partial-failure UX** (Capabilities 3 + 6): v1 surfaces a count and asks for retry. Confirm no rollback is acceptable for first ship.
