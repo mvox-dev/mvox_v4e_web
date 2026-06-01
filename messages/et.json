@@ -202,6 +202,8 @@
 	"seasons_form_season_submit": "Loo hooaeg",
 	"seasons_form_series_heading": "Uus prooviseeria",
 	"seasons_form_series_submit": "Loo seeria",
+	"seasons_notice_assign_not_member": "Dirigendiks saab määrata ainult organisatsiooni liikmeid.",
+	"seasons_notice_delete_forbidden": "Sul pole õigust seda kustutada.",
 	"seasons_notice_partial_delete": "Kustutati {deleted} / {total} proovist. Korda lõpetamiseks.",
 	"seasons_notice_partial_generate": "Loodi {created} / {total} proovist. Kustuta seeria ja proovi uuesti.",
 	"seasons_page_title": "Proovide ajakava"

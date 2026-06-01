@@ -1,6 +1,15 @@
 import { ENTU_API_BASE } from '$lib/entu-config';
 import { occurrenceDates, toStartDatetime } from './recurrence';
-import type { Conductor, Rehearsal, RehearsalRaw, Season, SeasonRaw, SeriesRaw } from './types';
+import type {
+	Conductor,
+	OrgMember,
+	Rehearsal,
+	RehearsalRaw,
+	RehearsalSeries,
+	Season,
+	SeasonRaw,
+	SeriesRaw,
+} from './types';
 
 export interface EntuCfg {
 	db: string;
@@ -436,5 +445,68 @@ export async function revokeConductor(cfg: EntuCfg, input: RevokeConductorInput)
 	if (!res.ok) throw new Error(`revokeConductor failed: ${res.status}`);
 }
 
+// ── T1: listOrgMembers ────────────────────────────────────────────────────────
+
+/**
+ * Returns active org members as `OrgMember[]` for the conductor-picker.
+ * Two-fetch pattern (mirrors listConductors): search active members, resolve
+ * each person's name via a second GET.
+ */
+export async function listOrgMembers(cfg: EntuCfg, orgId: string): Promise<OrgMember[]> {
+	const headers = authHeaders(cfg.token);
+	const base = `${ENTU_API_BASE}${cfg.db}`;
+
+	const res = await fetch(
+		`${base}/entity?_type.string=member&_parent.reference=${orgId}&status.string=active&props=person&limit=500`,
+		{ headers },
+	);
+	if (!res.ok) throw new Error(`listOrgMembers failed: ${res.status}`);
+	const body = (await res.json()) as {
+		entities?: Array<{ person?: Array<{ reference: string }> }>;
+	};
+	const members = body.entities ?? [];
+	if (members.length === 0) return [];
+
+	// Resolve each unique person name once (single-hop GET per person — mirrors
+	// listConductors). De-dupe personIds so a person attached via multiple member
+	// rows isn't fetched twice.
+	const personIds = [
+		...new Set(members.map((m) => m.person?.[0]?.reference).filter((id): id is string => !!id)),
+	];
+	return Promise.all(
+		personIds.map(async (personId): Promise<OrgMember> => {
+			const pRes = await fetch(`${base}/entity/${personId}?props=name`, { headers });
+			const pBody = (await pRes.json()) as { entity?: { name?: Array<{ string: string }> } };
+			return { personId, name: pBody.entity?.name?.[0]?.string ?? '' };
+		}),
+	);
+}
+
+// ── T3: listSeries ────────────────────────────────────────────────────────────
+
+/**
+ * Returns the event_series entities under a season, mapped to RehearsalSeries[].
+ * Used by the route to build the seriesNames Map for RehearsalList grouping.
+ */
+export async function listSeries(cfg: EntuCfg, seasonId: string): Promise<RehearsalSeries[]> {
+	const res = await fetch(
+		`${ENTU_API_BASE}${cfg.db}/entity?_type.string=event_series&_parent.reference=${seasonId}&props=name,interval_days,start_time,duration_minutes,start_date,end_date&limit=200`,
+		{ headers: authHeaders(cfg.token) },
+	);
+	if (!res.ok) throw new Error(`listSeries failed: ${res.status}`);
+	const body = (await res.json()) as { entities?: SeriesRaw[] };
+	return (body.entities ?? []).map(
+		(raw): RehearsalSeries => ({
+			id: raw._id,
+			name: raw.name?.[0]?.string ?? '',
+			intervalDays: raw.interval_days?.[0]?.number ?? 0,
+			startTime: raw.start_time?.[0]?.string ?? '',
+			durationMinutes: raw.duration_minutes?.[0]?.number ?? 0,
+			startDate: raw.start_date?.[0]?.date ?? '',
+			endDate: raw.end_date?.[0]?.date ?? '',
+		}),
+	);
+}
+
 // Re-export types consumed by tests (avoids separate import in spec)
-export type { Conductor, Rehearsal, RehearsalRaw, SeriesRaw };
+export type { Conductor, OrgMember, Rehearsal, RehearsalRaw, RehearsalSeries, SeriesRaw };

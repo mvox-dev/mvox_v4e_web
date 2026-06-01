@@ -10,6 +10,8 @@ import {
 	listConductors,
 	assignConductor,
 	revokeConductor,
+	listOrgMembers,
+	listSeries,
 	DeleteForbiddenError,
 } from './entuSeasons';
 
@@ -749,5 +751,160 @@ describe('revokeConductor', () => {
 		// Wire shape: DELETE /property/{propertyValueId} (not /entity/)
 		expect(deleted).toHaveLength(1);
 		expect(deleted[0]).toContain('prop-val-42');
+	});
+});
+
+// ── T1: listOrgMembers (#86) ──────────────────────────────────────────────────
+
+describe('listOrgMembers', () => {
+	it('queries active members under orgId and resolves names via per-person GET', async () => {
+		const fetched: string[] = [];
+		vi.stubGlobal(
+			'fetch',
+			vi.fn().mockImplementation((url: string) => {
+				fetched.push(url);
+				// Member search response — two active members
+				if (url.includes('_type.string=member')) {
+					return Promise.resolve({
+						ok: true,
+						json: async () => ({
+							entities: [
+								{ _id: 'm1', person: [{ reference: 'p1' }] },
+								{ _id: 'm2', person: [{ reference: 'p2' }] },
+							],
+						}),
+					});
+				}
+				// Per-person name resolution
+				if (url.includes('/entity/p1')) {
+					return Promise.resolve({
+						ok: true,
+						json: async () => ({ entity: { _id: 'p1', name: [{ string: 'Alice A.' }] } }),
+					});
+				}
+				return Promise.resolve({
+					ok: true,
+					json: async () => ({ entity: { _id: 'p2', name: [{ string: 'Bob B.' }] } }),
+				});
+			}),
+		);
+
+		const members = await listOrgMembers({ db: 'd', token: 't' }, 'org1');
+
+		expect(members).toHaveLength(2);
+		expect(members.map((m) => m.name).sort()).toEqual(['Alice A.', 'Bob B.']);
+		expect(members.map((m) => m.personId).sort()).toEqual(['p1', 'p2']);
+	});
+
+	it('query string carries status.string=active and _parent.reference=orgId', async () => {
+		let searchUrl = '';
+		vi.stubGlobal(
+			'fetch',
+			vi.fn().mockImplementation((url: string) => {
+				if (url.includes('_type.string=member')) searchUrl = url;
+				return Promise.resolve({ ok: true, json: async () => ({ entities: [] }) });
+			}),
+		);
+
+		await listOrgMembers({ db: 'd', token: 't' }, 'myOrg');
+
+		expect(searchUrl).toContain('status.string=active');
+		expect(searchUrl).toContain('myOrg');
+		expect(searchUrl).toContain('_type.string=member');
+	});
+
+	it('empty member search → []', async () => {
+		vi.stubGlobal(
+			'fetch',
+			vi.fn().mockResolvedValue({
+				ok: true,
+				json: async () => ({ entities: [] }),
+			}),
+		);
+
+		const members = await listOrgMembers({ db: 'd', token: 't' }, 'org1');
+		expect(members).toEqual([]);
+	});
+
+	it('resolves each person name via a separate GET /entity/{personId} (single-hop)', async () => {
+		const fetched: string[] = [];
+		vi.stubGlobal(
+			'fetch',
+			vi.fn().mockImplementation((url: string) => {
+				fetched.push(url);
+				if (url.includes('_type.string=member')) {
+					return Promise.resolve({
+						ok: true,
+						json: async () => ({ entities: [{ _id: 'm1', person: [{ reference: 'px' }] }] }),
+					});
+				}
+				return Promise.resolve({
+					ok: true,
+					json: async () => ({ entity: { _id: 'px', name: [{ string: 'Carol C.' }] } }),
+				});
+			}),
+		);
+
+		await listOrgMembers({ db: 'd', token: 't' }, 'org1');
+
+		// Must have fetched the person entity by id (single-hop name resolution)
+		expect(fetched.some((u) => u.includes('/entity/px'))).toBe(true);
+	});
+});
+
+// ── T3: listSeries (#86) ──────────────────────────────────────────────────────
+
+describe('listSeries', () => {
+	it('queries event_series under seasonId and maps to RehearsalSeries[]', async () => {
+		vi.stubGlobal(
+			'fetch',
+			vi.fn().mockResolvedValue({
+				ok: true,
+				json: async () => ({
+					entities: [
+						{
+							_id: 'ser1',
+							name: [{ string: 'Tuesday Evening' }],
+							interval_days: [{ number: 7 }],
+							start_time: [{ string: '19:00' }],
+							duration_minutes: [{ number: 90 }],
+							start_date: [{ date: '2026-09-02' }],
+							end_date: [{ date: '2027-05-30' }],
+						},
+					],
+				}),
+			}),
+		);
+
+		const series = await listSeries({ db: 'd', token: 't' }, 'season1');
+
+		expect(series).toHaveLength(1);
+		expect(series[0].id).toBe('ser1');
+		expect(series[0].name).toBe('Tuesday Evening');
+	});
+
+	it('query string carries _type.string=event_series and _parent.reference=seasonId', async () => {
+		let searchUrl = '';
+		vi.stubGlobal(
+			'fetch',
+			vi.fn().mockImplementation((url: string) => {
+				searchUrl = url;
+				return Promise.resolve({ ok: true, json: async () => ({ entities: [] }) });
+			}),
+		);
+
+		await listSeries({ db: 'd', token: 't' }, 'mySeason');
+
+		expect(searchUrl).toContain('_type.string=event_series');
+		expect(searchUrl).toContain('mySeason');
+	});
+
+	it('empty → []', async () => {
+		vi.stubGlobal(
+			'fetch',
+			vi.fn().mockResolvedValue({ ok: true, json: async () => ({ entities: [] }) }),
+		);
+		const series = await listSeries({ db: 'd', token: 't' }, 'season1');
+		expect(series).toEqual([]);
 	});
 });

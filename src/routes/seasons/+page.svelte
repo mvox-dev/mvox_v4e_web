@@ -7,14 +7,26 @@
 	import { getToken } from '$lib/auth/storage';
 	import { PUBLIC_ENTU_DB } from '$env/static/public';
 	import { seasonsStore, hydrateSeasons } from '$lib/seasons/seasonsStore';
-	import { createSeason, createSeriesWithEvents, PartialGenerationError } from '$lib/seasons/entuSeasons';
+	import {
+		assignConductor,
+		createSeason,
+		createSeriesWithEvents,
+		deleteRehearsal,
+		deleteSeriesCascade,
+		DeleteForbiddenError,
+		listConductors,
+		listOrgMembers,
+		listRehearsals,
+		listSeries,
+		PartialGenerationError,
+		revokeConductor,
+	} from '$lib/seasons/entuSeasons';
 	import DeskSurface from '$lib/components/DeskSurface.svelte';
 	import SeasonForm from '$lib/components/seasons/SeasonForm.svelte';
 	import ConductorPanel from '$lib/components/seasons/ConductorPanel.svelte';
 	import SeriesForm from '$lib/components/seasons/SeriesForm.svelte';
 	import RehearsalList from '$lib/components/seasons/RehearsalList.svelte';
-	import type { Season, Rehearsal } from '$lib/seasons/types';
-	import type { OrgMember } from '$lib/components/seasons/ConductorPanel.svelte';
+	import type { Conductor, OrgMember, Rehearsal, Season } from '$lib/seasons/types';
 
 	// ── URL param: ?season=<id> (URL-overrides-persisted — spec §6) ────────────
 	let selectedSeasonId = $derived(page.url.searchParams.get('season'));
@@ -46,11 +58,42 @@
 	// $derived so it recomputes reactively when the user switches orgs.
 	const canManage = $derived($selectedOrgStore?.role === 'owner');
 
-	// ── Stub: empty rehearsal + conductor state until GREEN wires entuSeasons ──
+	// ── Conductor list + org-member picker — reactive on season + org change ────
+	$effect(() => {
+		const season = selectedSeason;
+		const org = $selectedOrgStore;
+		if (!season || !org) return;
+		const token = getToken() ?? '';
+		const cfg = { db: PUBLIC_ENTU_DB, token };
+		Promise.resolve(listConductors(cfg, season.id))
+			.then((list) => { if (list) conductors = list; })
+			.catch(() => {});
+		Promise.resolve(listOrgMembers(cfg, org.id))
+			.then((list) => { if (list) orgMembers = list; })
+			.catch(() => {});
+	});
+
+	// ── Rehearsals + series names — reactive on season + org change ──────────────
+	$effect(() => {
+		const season = selectedSeason;
+		const org = $selectedOrgStore;
+		if (!season || !org) return;
+		const token = getToken() ?? '';
+		const cfg = { db: PUBLIC_ENTU_DB, token };
+		Promise.resolve(listRehearsals(cfg, { orgId: org.id, seasonId: season.id }))
+			.then((list) => { if (list) rehearsals = list; })
+			.catch(() => {});
+		Promise.resolve(listSeries(cfg, season.id))
+			.then((list) => {
+				if (list) seriesNames = new Map(list.map((s) => [s.id, s.name]));
+			})
+			.catch(() => {});
+	});
+
 	let rehearsals = $state<Rehearsal[]>([]);
 	let seriesNames = $state(new Map<string, string>());
 	let orgMembers = $state<OrgMember[]>([]);
-	let conductors = $state<import('$lib/seasons/types').Conductor[]>([]);
+	let conductors = $state<Conductor[]>([]);
 
 	// ── Notice: partial-generation / partial-delete (wired in GREEN) ──────────
 	let notice = $state<string | null>(null);
@@ -103,34 +146,111 @@
 				throw err;
 			}
 		}
-		// P0.6 retry window: rights cascade takes ~1.5–3.5s/level after series create;
-		// poll hydrateSeasons up to 3 times at 500ms intervals until new events appear.
+		// Re-hydrate the season list (keeps the season selector in sync).
 		const claims = decodeJwt(token);
 		const personId = claims?.accounts?.[PUBLIC_ENTU_DB];
-		const hydrateArgs = { orgId: org?.id ?? '', personId: personId ?? '', token };
-		await hydrateSeasons(hydrateArgs);
+		await hydrateSeasons({ orgId: org?.id ?? '', personId: personId ?? '', token });
+
+		// P0.6 retry window: poll listRehearsals until new events appear or 3 retries.
+		// Rights cascade takes ~1.5–3.5s/level — poll count rather than seasons.length.
+		const orgId = org?.id ?? '';
+		const seasonId = season.id;
+		const fetchRehearsals = () =>
+			Promise.resolve(listRehearsals(cfg, { orgId, seasonId }))
+				.then((list) => { if (list) rehearsals = list; return list ?? []; })
+				.catch(() => []);
+		let current = await fetchRehearsals();
 		for (let i = 0; i < 3; i++) {
-			const state = $seasonsStore;
-			if (state.status === 'ready' && state.seasons.length > 0) break;
+			if (current.length > 0) break;
 			await new Promise((r) => setTimeout(r, 500));
-			await hydrateSeasons(hydrateArgs);
+			current = await fetchRehearsals();
 		}
 	}
 
-	function handleRehearsalCancel(_id: string) {
-		// GREEN: deleteRehearsal + optimistic removal; surface DeleteForbiddenError
+	async function handleRehearsalCancel(rehearsalId: string) {
+		const season = selectedSeason;
+		const org = $selectedOrgStore;
+		if (!season || !org) return;
+		const token = getToken() ?? '';
+		const cfg = { db: PUBLIC_ENTU_DB, token };
+		notice = null;
+		try {
+			await deleteRehearsal(cfg, rehearsalId);
+		} catch (err) {
+			if (err instanceof DeleteForbiddenError) {
+				notice = m.seasons_notice_delete_forbidden();
+				return;
+			}
+			throw err;
+		}
+		// Re-load the rehearsal list so the deleted row disappears.
+		Promise.resolve(listRehearsals(cfg, { orgId: org.id, seasonId: season.id }))
+			.then((list) => { if (list) rehearsals = list; })
+			.catch(() => {});
 	}
 
 	function handleRehearsalEdit(_id: string) {
 		// GREEN: open inline edit form for the targeted rehearsal
 	}
 
-	function handleConductorAssign(_personId: string) {
-		// GREEN: assignConductor + re-fetch conductor list
+	async function handleDeleteSeries(seriesId: string) {
+		const season = selectedSeason;
+		const org = $selectedOrgStore;
+		if (!season || !org) return;
+		const token = getToken() ?? '';
+		const cfg = { db: PUBLIC_ENTU_DB, token };
+		notice = null;
+		let result;
+		try {
+			result = await deleteSeriesCascade(cfg, seriesId);
+		} catch (err) {
+			if (err instanceof DeleteForbiddenError) {
+				notice = m.seasons_notice_delete_forbidden();
+				return;
+			}
+			throw err;
+		}
+		if (!result.seriesDeleted) {
+			// Partial failure — series still alive; surface a retry notice.
+			notice = m.seasons_notice_partial_delete({ deleted: result.deleted, total: result.deleted });
+		}
+		// Re-load rehearsals and series regardless of partial/full — remove what was deleted.
+		Promise.resolve(listRehearsals(cfg, { orgId: org.id, seasonId: season.id }))
+			.then((list) => { if (list) rehearsals = list; })
+			.catch(() => {});
+		Promise.resolve(listSeries(cfg, season.id))
+			.then((list) => {
+				if (list) seriesNames = new Map(list.map((s) => [s.id, s.name]));
+			})
+			.catch(() => {});
 	}
 
-	function handleConductorRemove(_propertyValueId: string) {
-		// GREEN: revokeConductor + re-fetch conductor list
+	async function handleConductorAssign(personId: string) {
+		const season = selectedSeason;
+		const org = $selectedOrgStore;
+		if (!season || !org) return;
+		const token = getToken() ?? '';
+		const cfg = { db: PUBLIC_ENTU_DB, token };
+		notice = null;
+		try {
+			await assignConductor(cfg, { seasonId: season.id, orgId: org.id, personId });
+		} catch (err) {
+			if (err instanceof Error && /must be an org member/i.test(err.message)) {
+				notice = m.seasons_notice_assign_not_member();
+				return;
+			}
+			throw err;
+		}
+		conductors = await listConductors(cfg, season.id);
+	}
+
+	async function handleConductorRemove(propertyValueId: string) {
+		const season = selectedSeason;
+		if (!season) return;
+		const token = getToken() ?? '';
+		const cfg = { db: PUBLIC_ENTU_DB, token };
+		await revokeConductor(cfg, { seasonId: season.id, propertyValueId });
+		conductors = await listConductors(cfg, season.id);
 	}
 </script>
 
@@ -220,6 +340,8 @@
 								{seriesNames}
 								oncancel={handleRehearsalCancel}
 								onedit={handleRehearsalEdit}
+								{canManage}
+								ondeleteseries={handleDeleteSeries}
 							/>
 						</div>
 					{:else}

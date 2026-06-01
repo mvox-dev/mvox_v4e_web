@@ -15,8 +15,12 @@
 		oncancel: (rehearsalId: string) => void;
 		/** Called when the user opens the edit form for one rehearsal. */
 		onedit: (rehearsalId: string) => void;
+		/** When true, shows the series-delete button in each group header. */
+		canManage?: boolean;
+		/** Called when the owner deletes an entire series. */
+		ondeleteseries?: (seriesId: string) => void;
 	}
-	let { rehearsals, seriesNames, oncancel, onedit }: Props = $props();
+	let { rehearsals, seriesNames, oncancel, onedit, canManage = false, ondeleteseries }: Props = $props();
 
 	/** Group rehearsals by seriesId, preserving the original sort order of first appearance. */
 	const groups = $derived.by(() => {
@@ -37,8 +41,23 @@
 
 <div data-testid="rehearsal-list" class="list-wrap">
 	{#each groups as group (group.seriesId)}
-		<div data-testid="rehearsal-group-header" class="group-header">
-			{seriesNames.get(group.seriesId) ?? group.seriesId}
+		<div class="group-header-row">
+			<div data-testid="rehearsal-group-header" class="group-header">
+				{seriesNames.get(group.seriesId) ?? group.seriesId}
+			</div>
+			{#if canManage && ondeleteseries}
+				<button
+					data-testid="series-delete"
+					type="button"
+					class="series-del-btn"
+					onclick={() => {
+						if (!window.confirm(m.seasons_confirm_delete_series_body({ n: group.rows.length }))) return;
+						ondeleteseries!(group.seriesId);
+					}}
+				>
+					{m.seasons_actions_delete()}
+				</button>
+			{/if}
 		</div>
 		{#each group.rows as rehearsal (rehearsal.id)}
 			<div
@@ -60,17 +79,12 @@
 					data-testid="rehearsal-cancel"
 					type="button"
 					class="row-btn"
-					onclick={() => oncancel(rehearsal.id)}
+					onclick={() => {
+						if (!window.confirm(m.seasons_confirm_cancel_rehearsal_body())) return;
+						oncancel(rehearsal.id);
+					}}
 				>
 					{m.seasons_actions_delete()}
-				</button>
-				<button
-					data-testid="rehearsal-edit"
-					type="button"
-					class="row-btn"
-					onclick={() => onedit(rehearsal.id)}
-				>
-					{m.seasons_actions_edit()}
 				</button>
 			</div>
 		{/each}
@@ -91,15 +105,32 @@
 		display: flex;
 		flex-direction: column;
 	}
+	.group-header-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 10px 0 3px;
+		border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+		margin-bottom: 2px;
+	}
 	.group-header {
 		font-size: 9px;
 		letter-spacing: 0.1em;
 		text-transform: uppercase;
 		font-weight: 600;
 		color: #6a5230;
-		padding: 10px 0 3px;
-		border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-		margin-bottom: 2px;
+	}
+	.series-del-btn {
+		font-size: 10px;
+		color: #c0392b;
+		background: none;
+		border: none;
+		cursor: pointer;
+		padding: 0;
+		font-family: inherit;
+		text-transform: none;
+		letter-spacing: 0;
+		font-weight: 400;
 	}
 	.row {
 		display: flex;

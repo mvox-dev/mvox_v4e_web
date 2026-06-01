@@ -14,6 +14,12 @@ vi.mock('$lib/paraglide/messages.js', () => ({
 	seasons_actions_edit: () => 'Edit',
 	seasons_empty_no_rehearsals: () => 'No rehearsals scheduled yet.',
 	seasons_empty_no_rehearsals_cta: () => 'Create a rehearsal series',
+	seasons_confirm_cancel_rehearsal: () => 'Cancel this rehearsal?',
+	seasons_confirm_cancel_rehearsal_body: () =>
+		'This rehearsal will be removed. Other rehearsals in the series are not affected.',
+	seasons_confirm_delete_series: () => 'Delete this series?',
+	seasons_confirm_delete_series_body: (params: { n: number }) =>
+		`This will delete the series and its ${params.n} rehearsals.`,
 }));
 
 afterEach(cleanup);
@@ -106,7 +112,8 @@ describe('RehearsalList', () => {
 		expect(row?.className).not.toMatch(/muted/);
 	});
 
-	it('rehearsal-cancel calls oncancel with rehearsalId', async () => {
+	it('rehearsal-cancel: confirm=true → oncancel(rehearsalId) fired', async () => {
+		vi.stubGlobal('confirm', vi.fn().mockReturnValue(true));
 		const oncancel = vi.fn();
 		const rehearsals: Rehearsal[] = [
 			{
@@ -125,12 +132,37 @@ describe('RehearsalList', () => {
 		await fireEvent.click(
 			container.querySelector('[data-testid="rehearsal-cancel"]') as HTMLButtonElement,
 		);
+		expect(window.confirm).toHaveBeenCalled();
 		expect(oncancel).toHaveBeenCalledOnce();
 		expect(oncancel).toHaveBeenCalledWith('r1');
 	});
 
-	it('rehearsal-edit calls onedit with rehearsalId', async () => {
-		const onedit = vi.fn();
+	it('rehearsal-cancel: confirm=false → oncancel NOT fired', async () => {
+		vi.stubGlobal('confirm', vi.fn().mockReturnValue(false));
+		const oncancel = vi.fn();
+		const rehearsals: Rehearsal[] = [
+			{
+				id: 'r1',
+				seriesId: 'ser1',
+				startDatetime: '2026-09-01T16:00:00.000Z',
+				durationMinutes: 90,
+			},
+		];
+		const { container } = render(RehearsalList, {
+			rehearsals,
+			seriesNames: new Map([['ser1', 'Tue']]),
+			oncancel,
+			onedit: vi.fn(),
+		});
+		await fireEvent.click(
+			container.querySelector('[data-testid="rehearsal-cancel"]') as HTMLButtonElement,
+		);
+		expect(window.confirm).toHaveBeenCalled();
+		expect(oncancel).not.toHaveBeenCalled();
+	});
+
+	it('rehearsal-edit button is NOT rendered (deferred to #87)', () => {
+		// Edit is deferred — the button must be absent to prevent no-op clicks.
 		const rehearsals: Rehearsal[] = [
 			{
 				id: 'r1',
@@ -143,13 +175,9 @@ describe('RehearsalList', () => {
 			rehearsals,
 			seriesNames: new Map([['ser1', 'Tue']]),
 			oncancel: vi.fn(),
-			onedit,
+			onedit: vi.fn(),
 		});
-		await fireEvent.click(
-			container.querySelector('[data-testid="rehearsal-edit"]') as HTMLButtonElement,
-		);
-		expect(onedit).toHaveBeenCalledOnce();
-		expect(onedit).toHaveBeenCalledWith('r1');
+		expect(container.querySelector('[data-testid="rehearsal-edit"]')).toBeNull();
 	});
 
 	it('empty rehearsals → rehearsal-empty + rehearsal-empty-cta rendered', () => {
@@ -161,5 +189,116 @@ describe('RehearsalList', () => {
 		});
 		expect(container.querySelector('[data-testid="rehearsal-empty"]')).not.toBeNull();
 		expect(container.querySelector('[data-testid="rehearsal-empty-cta"]')).not.toBeNull();
+	});
+});
+
+// T5: delete-series control (#86)
+// RED until Byrd adds canManage prop + ondeleteseries prop + series-delete button
+// in each group header.
+describe('RehearsalList — delete-series control (T5, #86)', () => {
+	const rehearsals: Rehearsal[] = [
+		{ id: 'r1', seriesId: 'ser1', startDatetime: '2026-09-01T16:00:00.000Z', durationMinutes: 90 },
+		{ id: 'r2', seriesId: 'ser1', startDatetime: '2026-09-08T16:00:00.000Z', durationMinutes: 90 },
+	];
+	const seriesNamesOne = new Map([['ser1', 'Tuesday Evening']]);
+
+	it('canManage=true: series-delete button present in group header', () => {
+		const { container } = render(RehearsalList, {
+			rehearsals,
+			seriesNames: seriesNamesOne,
+			oncancel: vi.fn(),
+			onedit: vi.fn(),
+			canManage: true,
+			ondeleteseries: vi.fn(),
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		} as any);
+		expect(container.querySelector('[data-testid="series-delete"]')).not.toBeNull();
+	});
+
+	it('canManage=false (or absent): series-delete button NOT rendered', () => {
+		const { container } = render(RehearsalList, {
+			rehearsals,
+			seriesNames: seriesNamesOne,
+			oncancel: vi.fn(),
+			onedit: vi.fn(),
+		});
+		expect(container.querySelector('[data-testid="series-delete"]')).toBeNull();
+	});
+
+	it('series-delete: confirm=true → ondeleteseries(seriesId) fired', async () => {
+		vi.stubGlobal('confirm', vi.fn().mockReturnValue(true));
+		const ondeleteseries = vi.fn();
+		const { container } = render(RehearsalList, {
+			rehearsals,
+			seriesNames: seriesNamesOne,
+			oncancel: vi.fn(),
+			onedit: vi.fn(),
+			canManage: true,
+			ondeleteseries,
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		} as any);
+
+		const btn = container.querySelector('[data-testid="series-delete"]') as HTMLButtonElement;
+		expect(btn).not.toBeNull();
+		await fireEvent.click(btn);
+
+		expect(window.confirm).toHaveBeenCalled();
+		expect(ondeleteseries).toHaveBeenCalledOnce();
+		expect(ondeleteseries).toHaveBeenCalledWith('ser1');
+	});
+
+	it('series-delete: confirm=false → ondeleteseries NOT fired', async () => {
+		vi.stubGlobal('confirm', vi.fn().mockReturnValue(false));
+		const ondeleteseries = vi.fn();
+		const { container } = render(RehearsalList, {
+			rehearsals,
+			seriesNames: seriesNamesOne,
+			oncancel: vi.fn(),
+			onedit: vi.fn(),
+			canManage: true,
+			ondeleteseries,
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		} as any);
+
+		const btn = container.querySelector('[data-testid="series-delete"]') as HTMLButtonElement;
+		expect(btn).not.toBeNull();
+		await fireEvent.click(btn);
+
+		expect(window.confirm).toHaveBeenCalled();
+		expect(ondeleteseries).not.toHaveBeenCalled();
+	});
+
+	it('series-delete confirm message includes rehearsal count', async () => {
+		vi.stubGlobal('confirm', vi.fn().mockReturnValue(false));
+		const { container } = render(RehearsalList, {
+			rehearsals, // 2 rehearsals in ser1
+			seriesNames: seriesNamesOne,
+			oncancel: vi.fn(),
+			onedit: vi.fn(),
+			canManage: true,
+			ondeleteseries: vi.fn(),
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		} as any);
+
+		const btn = container.querySelector('[data-testid="series-delete"]') as HTMLButtonElement;
+		await fireEvent.click(btn);
+
+		// Confirm message must include the rehearsal count for the series (2 rows)
+		const confirmArg = (window.confirm as ReturnType<typeof vi.fn>).mock.calls[0][0] as string;
+		expect(confirmArg).toContain('2');
+	});
+
+	it('series-delete label is seasons_actions_delete ("Delete")', () => {
+		const { container } = render(RehearsalList, {
+			rehearsals,
+			seriesNames: seriesNamesOne,
+			oncancel: vi.fn(),
+			onedit: vi.fn(),
+			canManage: true,
+			ondeleteseries: vi.fn(),
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		} as any);
+		const btn = container.querySelector('[data-testid="series-delete"]');
+		expect(btn?.textContent?.trim()).toBeTruthy();
 	});
 });

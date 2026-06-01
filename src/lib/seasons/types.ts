@@ -64,3 +64,13 @@ export interface Conductor {
 	/** The `_id` of the `_editor` property-value entry — needed for `revokeConductor`. */
 	propertyValueId: string;
 }
+
+/**
+ * A picker-eligible org member (person). Canonical location is here (types.ts);
+ * ConductorPanel.svelte re-exports it as a convenience for callers that only
+ * import the component, but `entuSeasons.listOrgMembers` uses this authoritative shape.
+ */
+export interface OrgMember {
+	personId: string;
+	name: string;
+}

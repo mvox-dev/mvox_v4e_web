@@ -202,6 +202,8 @@
 	"seasons_form_season_submit": "Izveidot sezonu",
 	"seasons_form_series_heading": "Jauna mēģinājumu sērija",
 	"seasons_form_series_submit": "Izveidot sēriju",
+	"seasons_notice_assign_not_member": "Diriģentus var iecelt tikai no organizācijas dalībniekiem.",
+	"seasons_notice_delete_forbidden": "Jums nav atļaujas to dzēst.",
 	"seasons_notice_partial_delete": "Dzēsti {deleted} no {total} mēģinājumiem. Atkārtojiet, lai pabeigtu.",
 	"seasons_notice_partial_generate": "Izveidoti {created} no {total} mēģinājumiem. Dzēsiet sēriju un mēģiniet vēlreiz.",
 	"seasons_page_title": "Mēģinājumu grafiks"

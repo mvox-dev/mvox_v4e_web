@@ -45,7 +45,10 @@ vi.mock('$lib/auth/userStore', async () => {
 			}
 		},
 		urlOrgIdStore: {
-			subscribe: (cb: (v: unknown) => void) => { cb(null); return () => {}; },
+			subscribe: (cb: (v: unknown) => void) => {
+				cb(null);
+				return () => {};
+			},
 		},
 	};
 });
