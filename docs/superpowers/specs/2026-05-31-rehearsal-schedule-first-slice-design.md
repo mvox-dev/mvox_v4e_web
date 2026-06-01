@@ -62,6 +62,15 @@ It is deliberately the smallest slice that feels like a real product: an owner o
 
 Event fields left unset (`name`, `event_type`, `location`, `description`, `duration_minutes`) fall back to the parent series' values **at read time, in the BFF** — the schema declares these as notes, not as `formula` properties. **RED trap to avoid:** do not "optimise" any inherited field into an Entu `formula` (e.g. `event_series.*.default_location`). The formula evaluator bypasses rights, and these are raw strings — projecting a `private` series' `default_description` onto an event read would leak across the rights boundary. Inheritance stays in the BFF merge.
 
+### 3.3a Execution layer — "BFF" means client-side hydration in this codebase
+
+Throughout this spec, "**BFF**" denotes our application's data-access layer. **In this codebase that layer runs client-side** (in the browser, using the signed-in user's Entu JWT from storage + `PUBLIC_ENTU_DB` from `$env/static/public`), exactly like the existing `hydrateLibrary` pattern — **not** a server `+page.server.ts` load. This is forced by Entu's IP-bound JWT (`project_entu_jwt_ip_bound`, L119): server-proxied Entu calls from Cloudflare's variable egress IPs return 401. The **auth gate** is server-side (CHORE-79 `hooks.server.ts` cookie), but **Entu data reads/writes are client-side**.
+
+Consequences for the AC below:
+- **Input validation** (date ranges, blank names, positive integers) happens in **client-side validation logic** with unit tests — there is no server 400; the helper rejects before the Entu call.
+- **Rights enforcement** is **Entu's** job: the client issues the call with the user's JWT; Entu returns 403 if the user lacks the tier. AC phrases like "non-owner → 403" mean "Entu returns 403 and the client surfaces it," not "our server checks rights."
+- The new code mirrors `src/lib/library/` (hydration helpers + a Svelte store), under a new `src/lib/seasons/` module — see the plan's file map.
+
 ### 3.3 DELETE is an `_owner`-tier capability (not `_editor`)
 
 The verified Entu permission **tier-mechanics** (live-Entu case study) define the tiers as: `_owner` = full control **+ delete** + manage rights; `_editor` = read + **edit properties** (except rights props), **no delete**; `_expander` = read + create children. The v4E README's role-table calls the conductor's access "full" — that is role-design aspiration; **the tier-mechanics are what Entu's API actually enforces, so they win.**
@@ -100,7 +109,7 @@ The series stores wall-clock local time as a string (`start_time: "19:00"`); eac
 - New top-level route **`/seasons`** = the conductor's home: create a season, see the org's seasons, drill into one.
 - **Org** comes from the existing nav picker (`selectedOrgIdStore`), as everywhere else in the app.
 - The **selected season** rides in the URL as **`?season=<id>`**, consistent with the library's existing `?work=<id>` pattern and the **URL-overrides-persisted** architecture rule.
-- The rehearsal list renders server-side (`+page.server.ts` load).
+- The rehearsal list hydrates **client-side** (mirroring `hydrateLibrary`; see §3.3a) — not a `+page.server.ts` load.
 - Past rehearsals are shown but visually de-emphasised (not hidden).
 - This slice shows **no** RSVP counts, attendance, or programme.
 
@@ -139,7 +148,7 @@ Right: same as series creator. Trigger: synchronous on series create.
 
 ### Capability 4 — View rehearsal list *(NEW — file ADMIN-7)*
 Right: `_editor`/`_owner`. Singer view out of scope.
-1. Route `/seasons` with `?season=<id>`; list rendered in `+page.server.ts`.
+1. Route `/seasons` with `?season=<id>`; list hydrated **client-side** in the page/store (§3.3a), mirroring `hydrateLibrary`.
 2. BFF queries `event` where `_parent` includes org, `event_type=rehearsal`, scoped to the selected season; ordered by `start_datetime` asc.
 3. Each row: date (locale-formatted), time, `duration_minutes`, `location` (or "—"), series name.
 4. Grouped by `event_series` (series name as section header); any standalone events under "Ungrouped."
