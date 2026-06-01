@@ -483,3 +483,44 @@ No routes, no types, no Entu client calls, no Svelte components for season/event
 `work.voicing` is fetched but v4E schema field is `original_voicing`; `work.language` fetched but schema field is `original_language`. Live DB probe needed before filter UI lands. Still open from session 26.
 
 (*MVOX:Finn*)
+
+---
+
+## 2026-06-01 — Session 29 notes
+
+### [LEARNED] seasons data layer: fully wired, three live bugs found this session
+
+`src/lib/seasons/entuSeasons.ts` is GREEN across all 10 tasks (Tasks 1–10). `src/routes/seasons/+page.svelte` exists but manage-ops stubs are unwired (handleRehearsalCancel/Edit/ConductorAssign/Remove are `// GREEN:` comments). #86 is the wiring issue.
+
+**Three bugs surfaced via research:**
+
+1. **Season-create silent failure + no feedback** (season-create bug, post-#86):
+   - `handleSeasonCreate` has no try/catch — a failing POST is an unhandled rejection, zero UI feedback.
+   - No auto-select, no notice, no form reset after success.
+   - `_type: { string: 'season' }` in `entuSeasons.ts:79` vs `_type: { reference: TYPE_IDS.season }` in seed script — seed comment says reference form required for API-key auth. Whether string form works for user JWT is unconfirmed; needs live network tab check or P0.1 probe artifact.
+
+2. **`assignConductor` duplicate-grant** (`entuSeasons.ts:416`):
+   - Bare `POST { type: '_editor', reference: personId }` with no prior-grant check.
+   - Double-assign → two property-value `_id`s; `listConductors` lists person twice; single `revokeConductor` leaves residual grant.
+   - Fix: check `listConductors` before POST, skip if already direct editor.
+
+3. **`EntuClient.setProperty` dead code risk** (`src/lib/entu/client.ts:72`):
+   - Posts to `/property` endpoint (different shape from rest of codebase). No prior-value DELETE. Zero callsites currently, but unsafe if called for "set" semantics.
+
+### [LEARNED] org-member list: no helper exists
+
+`listOrgMembers(cfg, orgId)` does not exist anywhere in `src/`. Must be added to `entuSeasons.ts`. Query: `?_type.string=member&_parent.reference={orgId}&status.string=active&props=person&limit=500`, then parallel name resolution (same pattern as `listConductors`). `OrgMember` interface already declared in `ConductorPanel.svelte:7`.
+
+### [LEARNED] `member` schema confirmed
+
+From `$ENTU_RESEARCH/docs/schema/v4E/schema.ts:277`: required `person` (ref) + required `status` (`active | archived`). Filter `status.string=active` to exclude archived members.
+
+### [LEARNED] edit-form pattern: no modal anywhere
+
+Zero `<dialog>`, modal, overlay, or popover components in codebase. House style: inline conditional `{#if}` renders a form block. `RehearsalEditForm` should mirror `SeasonForm.svelte` shape — `$state` fields pre-populated from props, `onedit(patch)` callback. `RehearsalPatch` type already defined at `entuSeasons.ts:229`.
+
+### [DEFERRED] _type string vs reference for user JWT
+
+`entuSeasons.ts` uses `{ type: '_type', string: 'season' }` for entity creates. Seed script uses `{ type: '_type', reference: TYPE_IDS.season }` with comment that reference form required for API-key auth context. Not confirmed whether string form works for browser user JWT. If it fails, the create silently 4xx (no try/catch in handleSeasonCreate). Need: P0.1 probe artifact or browser network tab check.
+
+(*MVOX:Finn*)

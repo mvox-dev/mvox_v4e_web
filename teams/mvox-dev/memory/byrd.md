@@ -173,6 +173,8 @@
 
 [PATTERN] **`panelMode` for on-demand forms.** `$state<'none'|'create'|'edit'>('none')`. `{#if panelMode==='create'}<SeasonForm oncreate>` / `{:else if panelMode==='edit'}<SeasonForm season={sel} onupdate>`. Closes on success by setting `panelMode='none'`.
 
-[LEARNED] **Branch at a3cb428** — route restructure GREEN: SeasonBar + on-demand panels + full-width stacked layout. 768/768. Ready for Bentham + PO preview.
+[LEARNED] **Branch at a3cb428** — route restructure GREEN: SeasonBar + on-demand panels + full-width stacked layout. 768/768.
+
+[LEARNED] **Session 29 final state (de1ae47 on feat/seasons-mobile):** RED-MOB.1 + YELLOW-MOB.1 GREEN — SeasonForm pre-fills description, empty-owner `+` testid renamed to `season-create-empty`. 772/772. Ready for Bentham review + PO preview redeploy. Next session: Bentham review → merge → #87 (edit rehearsal form).
 
 (*MVOX:Byrd*)

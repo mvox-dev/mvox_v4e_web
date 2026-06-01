@@ -4,6 +4,32 @@ Personal notes. Only Josquin writes here.
 
 ---
 
+## [CHECKPOINT] 2026-06-01 session 29 — rehearsal-schedule: 5 squash-merges to main + 4 preview redeploys (all GREEN)
+
+Shipped the whole rehearsal-schedule feature this session as GREEN-impl + merge-agent: first-slice (`723d09e`), seasons-nav (`1e787f3`), #86 manage-ops (`3878291`, Closes #82), conductor-dedupe+soft-warn+dead-setProperty batch (`bbfacb1`), mobile-redesign (`674b1d9`). All on a new `src/lib/seasons/` module mirroring `src/lib/library/`. Preview lives at `preview-seasons.multivox.pages.dev` (last build chunk `app.vQrtCqAM.js`); mvox.eu (prod) untouched all session.
+
+### [GOTCHA] Deploy mechanics shifted again — `pnpm exec wrangler` FAILS this session; use `pnpm dlx wrangler@4.92.0`
+Wrangler is NOT in the worktree's `node_modules` (not even a package.json dep — only referenced in the `deploy` npm script), so both bare `wrangler` and `pnpm exec wrangler` → "command not found". The repo PINS wrangler **4.92.0** (transitively via `@sveltejs/adapter-cloudflare`; grep `pnpm-lock.yaml` for `wrangler@`). Use `pnpm dlx wrangler@4.92.0 pages deploy .svelte-kit/cloudflare --project-name=multivox --branch=preview-seasons`. Creds still inline: `set -a; . ~/.config/mvox/credentials.env; set +a` (token is 53 chars, `CLOUDFLARE_API_TOKEN`). `--branch=<b>` = preview (`<hash>.multivox.pages.dev` + `<b>.multivox.pages.dev` alias); no `--branch` = prod. ALWAYS verify the alias serves the new build: `curl -s https://<branch>.multivox.pages.dev/ | grep -o 'app\.[A-Za-z0-9_-]*\.js'` and confirm it matches your local `ls .svelte-kit/cloudflare/_app/immutable/entry/ | grep ^app\.` — the deploy success line alone is not proof.
+
+### [GOTCHA] CF Pages transient `code: 8000000` on the deployments POST — retry, don't debug
+Twice this session a deploy uploaded all files + compiled the Worker fine, then failed at the `/pages/projects/multivox/deployments` POST with `code: 8000000 "An unknown error occurred. Contact support"`. Wrangler's own internal retry also failed. It is NOT auth/build/version (same token + pinned version that worked minutes before/after). Just re-run the exact deploy up to ~3×; it cleared on the 3rd attempt once, 1st attempt another time. Don't chase it as a code/credential problem.
+
+### [GOTCHA] Worktree IS shared-tree-flippable — Edits silently revert + branch HEAD moves under you
+This session's worktree (`.claude/worktrees/josquin-rehearsal-schedule`) is NOT reliably isolated (matches `project_spawn_with_worktree_isolation`). Two concrete hits: (1) an `Edit` to `entuSeasons.ts` reported SUCCESS but the bytes reverted mid-write (a shared-tree flip during the edit) — caught only by grep-verifying the change actually landed before staging. (2) My local branch HEAD silently advanced (`9ef11c3`→`b6b1173`) mid-task when Tallis committed to the shared branch. Discipline that held: after every Edit to a hot file, grep/`git diff --cached` to confirm the bytes are real BEFORE commit; before reporting "full suite green," distinguish MY failures from a teammate's in-flight RED via `git diff HEAD --name-only` (only my files?) + check the failing specs are byte-identical to HEAD (not mine). Never assert full-suite-green when a peer's RED is open on the branch — say so.
+
+### [PATTERN] Atomic GREEN commit when the RED spec for N tasks lives in ONE committed file
+Several dispatches asked for per-task commits, but Tallis's RED for Tasks 4+5 (and 6-9) was a SINGLE committed spec file. A per-task split leaves the OTHER tasks' committed tests RED at that commit = broken intermediate, forbidden by per-commit-GREEN. Correct move: ONE atomic GREEN commit covering all tasks whose RED shares the file, and surface the reason (team-lead pre-authorized this after the 4+5 case). Splitting tests isn't my lane (Tallis owns them).
+
+### [PATTERN] Entu create needs `_type` as REFERENCE not string (the real 400 bug)
+`createSeason`/`createSeriesWithEvents` posted `{type:'_type', string:'season'}` → Entu HTTP 400 (the actual create bug PO hit live). Fix: `{type:'_type', reference:'<type-entity-id>'}`. Hardcoded `TYPE_IDS` (polyphony type-entity ids from `scripts/migrations/seed-demo-seasons.ts`) with a FOLLOW-UP note to resolve per-db at runtime. This is `project_entu_create_type_reference` — mocks can't catch it (search uses `_type.string`); only live smoke-create surfaces it. Note the asymmetry: create POST uses `_type` reference; SEARCH/list queries still use `_type.string=...` (don't flip those).
+
+### [CONTRACT] src/lib/seasons/ data layer (on main @ 674b1d9)
+`entuSeasons.ts` — all client-side `{db, token}` helpers (base `${ENTU_API_BASE}${db}`): createSeason/listSeasons (now fetches+maps `description`), createSeriesWithEvents (eager event gen, DST via `recurrence.toStartDatetime`, `PartialGenerationError`), listRehearsals (two-fetch series-inheritance merge IN CODE not formula), updateRehearsal + updateSeason (self-resolving clear-then-set: GET → DELETE value-ids via `/property/{id}` → POST; best-effort non-transactional), deleteRehearsal (403→`DeleteForbiddenError`), deleteSeriesCascade (series-specific child filter), listConductors/assignConductor(idempotent)/revokeConductor(removes-all)/listOrgMembers (roles-as-rights, `_editor` filtered `property_type==='_editor' && inherited!==true`; `?? ''` on value-id is intentional — single-hop test has `_id`-less entries). `seasonsStore.ts` mirrors `libraryStore` (loading→ready|error; empty→`ready` not `no-rights` per RED-29.1; `no-rights` reserved for real 403, currently unemitted).
+
+(*MVOX:Josquin*)
+
+---
+
 ## [CHECKPOINT] 2026-05-31 session 27 — CHORE-79 (auth guard) + CHORE-72 (/about) shipped to prod through a garbling channel
 
 Two CHOREs merged + production-deployed this session, both via the two-phase preview→PO-verify→merge→prod flow. Production refs on main: `e91233a` (#79 server-side auth guard) + `a0b2fcf` (#72 /about page). Guard verified live on mvox.eu: `/library` unauth → 302 `/auth/login?redirect=%2Flibrary`; valid cookie → 200; `/about` → 200.

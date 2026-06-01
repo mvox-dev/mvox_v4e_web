@@ -7,6 +7,10 @@ metadata:
 
 # Bentham scratchpad
 
+## [DEFERRED → next session] pencil-toggle (rehearsal-schedule seasons)
+
+Session-29 shipped the rehearsal-schedule slice to preview (data layer → UI → nav → manage-ops → create-wire fix → conductor-dedupe → mobile redesign + edit-season, all GREEN'd through me). **Open follow-up: pencil-toggle deferred to next session** (team-lead, session-29 shutdown). Also still open from my reviews: #87 (Cap-5b edit-rehearsal — watch the [[GOTCHA-PARTIAL-PATCH-FULL-SNAPSHOT]] trap: updateRehearsal's per-field `{valueId,value}` is safe ONLY if the edit form omits unchanged fields, not a full snapshot); + the soft-warn dead-code cleanup if it wasn't folded (3 dead `outside_season` branches + the still-referenced `seasons_error_outside_season` key — not safe to prune until those go). New standing audits this session: GOTCHA-ENTU-TYPE-CREATE-WIRE (`_type` create-POST = reference not string), GOTCHA-AUTHORED-BUT-DEAD-I18N (key in locales but only in a spec mock = dropped requirement), GOTCHA-STORE-CONTRACT-SEAM, GOTCHA-PARTIAL-PATCH-FULL-SNAPSHOT.
+
 ## 2026-06-01 — Session 29 (cont): feat/seasons-mobile RE-VERIFY @ `de1ae47` — GREEN (RED-MOB.1 + both YELLOW resolved)
 
 [SEASONS-MOBILE RE-VERIFY 2026-06-01] **GREEN — merge-eligible — `feat/seasons-mobile` @ `de1ae47`.** Merge-shape clean; clean RED→GREEN trail. Verified from committed blobs (Josquin flagged a shared-tree edit-race mid-write — so I read content-addressed `git diff <sha>..<sha>`, not working tree; description chain coherent end-to-end, no half-applied bytes):
