@@ -12,6 +12,8 @@
 
 **Branch:** `feat/rehearsal-schedule` off clean `main` (one branch; no parallel work per `feedback_no_parallel_branches`).
 
+**GitHub issues** (filed session 28): Cap 1 → #19 (ADMIN-1, updated) · Cap 2 → #20 (ADMIN-2, updated) · Cap 3 → **#81** (ADMIN-6) · Cap 4 → **#82** (ADMIN-7) · Cap 5 → **#83** (ADMIN-8) · Cap 6 → **#84** (ADMIN-9) · Cap 7 → **#85** (ADMIN-10). The `#ADMIN-N` tags in commit messages below map to these numbers.
+
 **Quality gates per task:** `pnpm check` 0 errors · `pnpm test` green · commit only the task's staged set (verify `git diff --cached --name-only`).
 
 ---
@@ -468,7 +470,7 @@ it('assignConductor refuses a non-member', async () => {
 
 ## Task 17: Merge (Josquin)
 
-- [ ] After Bentham GREEN + team-lead approval: merge `feat/rehearsal-schedule` → `main` locally (squash; run the prepare-commit-msg hook for co-author), body `Closes #ADMIN-6 #ADMIN-7 #ADMIN-8 #ADMIN-9 #ADMIN-10` + the satisfied #19/#20 (`feedback_closes_n_pattern`). **No `Schema-Change` trailer** (schema-alignment carve-out). Push; team-lead closes issues with completion comments. No prod deploy in this slice unless PO requests a preview.
+- [ ] After Bentham GREEN + team-lead approval: merge `feat/rehearsal-schedule` → `main` locally (squash; run the prepare-commit-msg hook for co-author), body `Closes #81 #82 #83 #84 #85` + the satisfied #19 #20 (`feedback_closes_n_pattern`). **No `Schema-Change` trailer** (schema-alignment carve-out). Push; team-lead closes issues with completion comments. No prod deploy in this slice unless PO requests a preview.
 
 ---
 
