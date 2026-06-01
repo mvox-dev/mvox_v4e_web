@@ -119,8 +119,8 @@ export async function listSeasons(cfg: EntuCfg, orgId: string): Promise<Season[]
 			(raw): Season => ({
 				id: raw._id,
 				name: raw.name?.[0]?.string ?? '',
-				startDate: raw.start_date?.[0]?.date ?? '',
-				endDate: raw.end_date?.[0]?.date ?? '',
+				startDate: raw.start_date?.[0]?.date?.slice(0, 10) ?? '',
+				endDate: raw.end_date?.[0]?.date?.slice(0, 10) ?? '',
 				description: raw.description?.[0]?.string,
 			}),
 		)

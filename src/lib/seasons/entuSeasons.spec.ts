@@ -185,6 +185,82 @@ describe('listSeasons', () => {
 		await listSeasons(cfg, 'org1');
 		expect(searchUrl).toContain('description');
 	});
+
+	// ── Date normalization bug (live probe Pérotin 2026-06-01) ────────────────
+	// Entu returns date-typed values as full ISO strings ("2026-06-02T00:00:00.000Z"),
+	// NOT as bare date strings ("2026-06-02"). listSeasons must normalize to YYYY-MM-DD
+	// before returning, otherwise <input type="date"> receives the full ISO and renders blank.
+
+	it('normalizes Entu ISO date strings to YYYY-MM-DD (fix/season-date-format)', async () => {
+		// Drive the REAL producer with the REAL Entu wire format (probed 2026-06-01).
+		// Full-shape toEqual — no objectContaining shortcuts (feedback_partial_assertions_hide_bugs).
+		vi.stubGlobal(
+			'fetch',
+			vi.fn().mockResolvedValue({
+				ok: true,
+				json: async () => ({
+					entities: [
+						{
+							_id: 'sea-live',
+							name: [{ string: 'Fooz' }],
+							start_date: [{ _id: 'v1', date: '2026-06-02T00:00:00.000Z' }],
+							end_date: [{ _id: 'v2', date: '2026-07-28T00:00:00.000Z' }],
+						},
+					],
+				}),
+			}),
+		);
+		const seasons = await listSeasons(cfg, 'org1');
+		expect(seasons[0]).toEqual({
+			id: 'sea-live',
+			name: 'Fooz',
+			startDate: '2026-06-02',
+			endDate: '2026-07-28',
+		});
+	});
+
+	it('slice is idempotent: already-clean YYYY-MM-DD date passes through unchanged', async () => {
+		vi.stubGlobal(
+			'fetch',
+			vi.fn().mockResolvedValue({
+				ok: true,
+				json: async () => ({
+					entities: [
+						{
+							_id: 'sea2',
+							name: [{ string: 'Clean' }],
+							start_date: [{ date: '2027-01-15' }],
+							end_date: [{ date: '2027-06-30' }],
+						},
+					],
+				}),
+			}),
+		);
+		const seasons = await listSeasons(cfg, 'org1');
+		expect(seasons[0].startDate).toBe('2027-01-15');
+		expect(seasons[0].endDate).toBe('2027-06-30');
+	});
+
+	it('missing date field maps to empty string (existing ?? "" preserved)', async () => {
+		vi.stubGlobal(
+			'fetch',
+			vi.fn().mockResolvedValue({
+				ok: true,
+				json: async () => ({
+					entities: [
+						{
+							_id: 'sea3',
+							name: [{ string: 'Incomplete' }],
+							// start_date and end_date absent
+						},
+					],
+				}),
+			}),
+		);
+		const seasons = await listSeasons(cfg, 'org1');
+		expect(seasons[0].startDate).toBe('');
+		expect(seasons[0].endDate).toBe('');
+	});
 });
 
 // ── Task 5: createSeriesWithEvents (eager generation) ─────────────────────────
