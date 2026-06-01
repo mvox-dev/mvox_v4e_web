@@ -317,3 +317,23 @@ Two utility/a11y keys for the avatar dropdown menu. Both neutral register, no br
 | `nav_user_menu_aria` | uk | `Меню користувача` | Noun + genitive; standard Ukrainian a11y label form. |
 
 (*MVOX:Comenius*)
+
+---
+
+### New key: `seasons_form_rehearsal_edit_heading` (#87, session 30, 2026-06-01)
+
+Single new key added for the rehearsal inline edit form heading. All other needed strings already existed and were reused:
+
+- `seasons_field_duration`, `seasons_field_location`, `seasons_field_description` — field labels reused as-is
+- `seasons_form_season_save` ("Save changes") — reused for the save button in the rehearsal edit form; the value is generic enough to cover any "save changes" action (season or rehearsal)
+- `actions_cancel` ("Cancel") — reused for close-without-saving; no seasons-specific cancel key needed
+
+**[CONVENTION]** `seasons_form_season_save` is the canonical "Save changes" key for any seasons-sub-group edit form. Do NOT add a `seasons_form_rehearsal_save` sibling — the value is form-agnostic.
+
+| Key | Locale | Value | Rationale |
+|---|---|---|---|
+| `seasons_form_rehearsal_edit_heading` | et | `Muuda proovi` | verb `muuda` (imperative/inf.) + partitive object `proovi`; mirrors `seasons_form_season_edit_heading` pattern (`Muuda hooaega`). |
+| `seasons_form_rehearsal_edit_heading` | lv | `Rediģēt mēģinājumu` | infinitive + accusative; direct parallel to `Rediģēt sezonu`. |
+| `seasons_form_rehearsal_edit_heading` | uk | `Редагувати репетицію` | infinitive + accusative; direct parallel to `Редагувати сезон`. |
+
+(*MVOX:Comenius*)

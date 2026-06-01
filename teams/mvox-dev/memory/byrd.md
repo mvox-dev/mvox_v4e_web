@@ -177,4 +177,16 @@
 
 [LEARNED] **Session 29 final state (de1ae47 on feat/seasons-mobile):** RED-MOB.1 + YELLOW-MOB.1 GREEN — SeasonForm pre-fills description, empty-owner `+` testid renamed to `season-create-empty`. 772/772. Ready for Bentham review + PO preview redeploy. Next session: Bentham review → merge → #87 (edit rehearsal form).
 
+## [CHECKPOINT] 2026-06-01 — #87 UI GREEN (937c701 on feat/seasons-edit-rehearsal, session 30)
+
+[LEARNED] **Dirty-tracking pattern for edit forms.** Capture original field values into a const `orig` object at mount time. On submit, compare each field against `orig.*` and include only changed fields in the patch. This prevents the session-29 description-wipe class of bug where all fields get overwritten even when only one changed.
+
+[LEARNED] **`@const` in Svelte 5 template for derived lookup.** `{@const editRehearsal = rehearsals.find((r) => r.id === editingRehearsalId)}` inside an `{#if canManage && editingRehearsalId}` block is the clean pattern to derive a single item from a list for an inline form — no need for a `$derived` at script level.
+
+[GOTCHA] **Svelte 5 warn: "state_referenced_locally"** — using a `$props()` value directly as an initializer for `$state(...)` (e.g. `let x = $state(prop.value)`) produces a build-time warning. It's correct behavior for pre-fill forms (we want the snapshot at mount, not reactivity to prop changes). Warnings are non-blocking; `pnpm check` reports 0 errors.
+
+[GOTCHA] **Spec mock must include ALL i18n keys the component calls** — even from sub-components rendered by the page. The cancel button in `RehearsalEditForm` calls `m.actions_cancel()`; neither the RehearsalEditForm spec nor the page spec had this key. Added as mechanical GREEN fix (Byrd's responsibility per session-27 pattern).
+
+[LEARNED] **Branch at 937c701 on feat/seasons-edit-rehearsal** — 800/800 tests pass. All 4 #87 spec files GREEN. Handed off to Bentham for review.
+
 (*MVOX:Byrd*)

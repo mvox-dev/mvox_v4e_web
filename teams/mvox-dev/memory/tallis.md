@@ -442,4 +442,27 @@ Task 9 (deleteSeriesCascade — 3): cascade, partial-failure, series-specific ch
 
 [PATTERN] `entuSeasons.spec.ts` covers both Tasks 4+5 in one file. Committed as one RED commit since the file is shared; both task issue numbers cited in commit message.
 
+## [CHECKPOINT] 2026-06-01 — Session 30: #87 edit-rehearsal RED phase
+
+[DECISION] 24 new RED tests across 4 files on `feat/seasons-edit-rehearsal`. SHA `d640878`. pnpm check: 0 new errors (8 pre-existing PUBLIC_ENTU_DB env errors).
+
+Files changed:
+- `src/lib/seasons/types.ts` — Rehearsal gains `description?`; RehearsalRaw value arrays carry `_id?`
+- `src/lib/seasons/entuSeasons.ts` — RehearsalPatch refactored to plain values (no value-ids); updateRehearsal stub throws "not implemented"
+- `src/lib/seasons/entuSeasons.spec.ts` — Task 7 tests updated for new contract (3 tests); +3 listRehearsals description tests; +5 updateRehearsal self-resolve tests
+- `src/lib/components/seasons/RehearsalList.spec.ts` — replaced deferred placeholder with 3 edit-affordance tests (canManage=true shows edit, =false hides, click calls onedit)
+- `src/lib/components/seasons/RehearsalEditForm.spec.ts` — new, 9 tests: 5 pre-population, 4 dirty-tracking/onsave
+- `src/lib/components/seasons/RehearsalEditForm.svelte` — minimal stub (renders nothing but testid stub; no thrown error; pnpm check 0 warnings)
+- `src/routes/seasons/page.spec.ts` — added updateRehearsal to mock; 5 page integration tests (edit opens form, submit calls updateRehearsal+re-fetch, regression guard, sibling guard, non-owner gate)
+
+[PATTERN] "empty patch → no fetch calls" test: use `expect(fetchMock).not.toHaveBeenCalled()` rather than filtering by method — cleaner and avoids type assertion headaches.
+
+[PATTERN] `.filter()` on `fetchMock.mock.calls` for GET detection: use `(fetchMock.mock.calls as any[]).filter((c: unknown[]) => !(c[1] as { method?: string } | undefined)?.method)` — the typed tuple destructure pattern fails strict TS on vi.fn() mock.calls.
+
+[GOTCHA] Task 7 "updateRehearsal" tests encoded the OLD `{ valueId, value }` caller contract. Must be replaced (not just commented out) in the same RED commit — leaving contradictory tests is a spec-purity violation (per session-8 pattern).
+
+[DECISION] 1 forward guard passes immediately: "rehearsal-edit button absent for non-owner" — RehearsalList already gates `canManage=false` for the cancel button, so the non-owner case passes without Byrd touching the component.
+
+[RESOLUTION CALLOUT] RehearsalEditForm.svelte is a stub — no rendered fields. Byrd must create the full implementation. RehearsalList also needs the edit button added. Page needs route wiring (edit state, form open/close, updateRehearsal call).
+
 (*MVOX:Tallis*)

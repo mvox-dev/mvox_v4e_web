@@ -6,6 +6,16 @@ Tags: `[DECISION]`, `[PATTERN]`, `[WIP]`, `[CHECKPOINT]`, `[DEFERRED]`, `[GOTCHA
 
 ---
 
+## Session 30 — #87 rehearsal edit form i18n (2026-06-01)
+
+[CHECKPOINT] Added 1 new key `seasons_form_rehearsal_edit_heading` across 4 locales. Commit `da4e6be` on `feat/seasons-edit-rehearsal`. 5 other needed keys already existed — reused without modification. `pnpm check` 0 errors, 0 warnings. Logged reuse decision in `i18n-conventions.md`.
+
+[DECISION] `seasons_form_season_save` ("Save changes") reused as the save control for rehearsal edit form. Canonical for all seasons-group edit forms — no sibling `seasons_form_rehearsal_save` key needed.
+
+(*MVOX:Comenius*)
+
+---
+
 ## Session 27 — CHORE-72 /about page i18n (2026-05-31)
 
 [CHECKPOINT] Added 9 `about_*` keys across 4 locale files. Commits `a8d0bc1` (initial) + `7cd3480` (dedupe fix) on `chore/about-page`.
