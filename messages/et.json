@@ -168,6 +168,8 @@
 	"nav_tab_roster": "Liikmed",
 	"nav_tab_settings": "Seaded",
 	"nav_user_menu_aria": "Kasutaja menüü",
+	"seasons_a11y_create_season": "Loo hooaeg",
+	"seasons_a11y_edit_season": "Muuda valitud hooaega",
 	"seasons_actions_confirm": "Kinnita",
 	"seasons_actions_delete": "Kustuta",
 	"seasons_actions_edit": "Muuda",
@@ -198,7 +200,9 @@
 	"seasons_field_name": "Nimi",
 	"seasons_field_start_date": "Alguskuupäev",
 	"seasons_field_start_time": "Algusaeg",
+	"seasons_form_season_edit_heading": "Muuda hooaega",
 	"seasons_form_season_heading": "Uus hooaeg",
+	"seasons_form_season_save": "Salvesta muudatused",
 	"seasons_form_season_submit": "Loo hooaeg",
 	"seasons_form_series_heading": "Uus prooviseeria",
 	"seasons_form_series_submit": "Loo seeria",
@@ -207,6 +211,7 @@
 	"seasons_notice_delete_forbidden": "Sul pole õigust seda kustutada.",
 	"seasons_notice_partial_delete": "Kustutati {deleted} / {total} proovist. Korda lõpetamiseks.",
 	"seasons_notice_partial_generate": "Loodi {created} / {total} proovist. Kustuta seeria ja proovi uuesti.",
+	"seasons_notice_update_failed": "Muudatuste salvestamine ebaõnnestus — palun proovi uuesti.",
 	"seasons_page_title": "Proovide ajakava",
 	"seasons_warning_outside_season": "Tähelepanu: see seeria ulatub hooaja kuupäevadest välja."
 }

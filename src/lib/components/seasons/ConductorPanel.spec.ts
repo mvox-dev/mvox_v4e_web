@@ -142,7 +142,9 @@ describe('ConductorPanel', () => {
 		const select = container.querySelector(
 			'[data-testid="conductor-picker-select"]',
 		) as HTMLSelectElement;
-		const options = Array.from(select.querySelectorAll('option')).map((o) => o.value).filter(Boolean);
+		const options = Array.from(select.querySelectorAll('option'))
+			.map((o) => o.value)
+			.filter(Boolean);
 		// p4 offered; p3 NOT offered (already a conductor)
 		expect(options).toContain('p4');
 		expect(options).not.toContain('p3');

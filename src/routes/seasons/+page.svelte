@@ -20,13 +20,16 @@
 		listSeries,
 		PartialGenerationError,
 		revokeConductor,
+		updateSeason,
 	} from '$lib/seasons/entuSeasons';
 	import DeskSurface from '$lib/components/DeskSurface.svelte';
+	import SeasonBar from '$lib/components/seasons/SeasonBar.svelte';
 	import SeasonForm from '$lib/components/seasons/SeasonForm.svelte';
 	import ConductorPanel from '$lib/components/seasons/ConductorPanel.svelte';
 	import SeriesForm from '$lib/components/seasons/SeriesForm.svelte';
 	import RehearsalList from '$lib/components/seasons/RehearsalList.svelte';
 	import type { Conductor, OrgMember, Rehearsal, Season } from '$lib/seasons/types';
+	import type { SeasonPatch } from '$lib/seasons/entuSeasons';
 
 	// ── URL param: ?season=<id> (URL-overrides-persisted — spec §6) ────────────
 	let selectedSeasonId = $derived(page.url.searchParams.get('season'));
@@ -95,8 +98,11 @@
 	let orgMembers = $state<OrgMember[]>([]);
 	let conductors = $state<Conductor[]>([]);
 
-	// ── Notice: partial-generation / partial-delete (wired in GREEN) ──────────
+	// ── Notice: partial-generation / partial-delete / update feedback ────────
 	let notice = $state<string | null>(null);
+
+	// ── Panel mode: controls which SeasonForm (if any) is open ────────────────
+	let panelMode = $state<'none' | 'create' | 'edit'>('none');
 
 	// ── Season selector: write ?season=<id> to URL ────────────────────────────
 	function selectSeason(id: string) {
@@ -125,8 +131,28 @@
 		const claims = decodeJwt(token);
 		const personId = claims?.accounts?.[PUBLIC_ENTU_DB];
 		await hydrateSeasons({ orgId: org?.id ?? '', personId: personId ?? '', token });
-		// Auto-select the new season so its chip becomes active.
+		// Auto-select the new season and close the create panel.
+		panelMode = 'none';
 		selectSeason(newId);
+	}
+
+	async function handleSeasonEdit(patch: SeasonPatch) {
+		const season = selectedSeason;
+		if (!season) return;
+		const org = $selectedOrgStore;
+		const token = getToken() ?? '';
+		const cfg = { db: PUBLIC_ENTU_DB, token };
+		notice = null;
+		try {
+			await updateSeason(cfg, season.id, patch);
+		} catch {
+			notice = m.seasons_notice_update_failed();
+			return;
+		}
+		const claims = decodeJwt(token);
+		const personId = claims?.accounts?.[PUBLIC_ENTU_DB];
+		await hydrateSeasons({ orgId: org?.id ?? '', personId: personId ?? '', token });
+		panelMode = 'none';
 	}
 
 	async function handleSeriesCreate(payload: import('$lib/components/seasons/SeriesForm.svelte').SeriesCreatePayload) {
@@ -272,29 +298,12 @@
 			<div class="page-title">{m.seasons_page_title()}</div>
 		</div>
 
-		<!-- Season selector (rendered when seasons are available) -->
-		{#if $seasonsStore.status === 'ready'}
-			<div data-testid="season-selector" class="season-selector">
-				{#each $seasonsStore.seasons as season (season.id)}
-					<button
-						data-testid="season-selector-item"
-						type="button"
-						class="season-chip"
-						class:sel={selectedSeasonId === season.id}
-						onclick={() => selectSeason(season.id)}
-					>
-						{season.name}
-					</button>
-				{/each}
-			</div>
-		{/if}
-
-		<!-- Notice region: partial-generation / partial-delete feedback -->
+		<!-- Notice region -->
 		{#if notice}
 			<div data-testid="seasons-notice" class="notice">{notice}</div>
 		{/if}
 
-		<!-- Loading / error states (mirror library page) -->
+		<!-- Loading / error states -->
 		{#if $seasonsStore.status === 'loading'}
 			<div data-testid="seasons-loading" class="state-msg">{m.common_loading()}</div>
 		{:else if $seasonsStore.status === 'error'}
@@ -302,64 +311,82 @@
 		{:else if $seasonsStore.status === 'no-rights'}
 			<div data-testid="seasons-viewer" class="state-msg">{m.seasons_empty_no_seasons_viewer()}</div>
 		{:else if $seasonsStore.status === 'ready' && $seasonsStore.seasons.length === 0}
-			<!-- No seasons yet — show CTA to owner only -->
+			<!-- No seasons yet -->
 			{#if canManage}
-				<div data-testid="seasons-empty-owner" class="create-panel">
+				<div data-testid="seasons-empty-owner" class="stacked-section">
 					<p class="state-msg">{m.seasons_empty_no_seasons()}</p>
-					<div data-testid="season-form-wrap" class="form-wrap">
-						<SeasonForm oncreate={handleSeasonCreate} />
-					</div>
+					{#if panelMode === 'create'}
+						<div data-testid="season-form-wrap" class="form-wrap">
+							<SeasonForm oncreate={handleSeasonCreate} />
+						</div>
+					{/if}
+					<button
+						data-testid="season-create-empty"
+						type="button"
+						class="inline-create-btn"
+						aria-label={m.seasons_a11y_create_season()}
+						onclick={() => { panelMode = 'create'; }}
+					>+</button>
 				</div>
 			{:else}
 				<div data-testid="seasons-empty-viewer" class="state-msg">{m.seasons_empty_no_seasons_viewer()}</div>
 			{/if}
 		{:else if $seasonsStore.status === 'ready'}
-			<!-- Main conductor view: season selected -->
-			<div class="conductor-layout">
+			<!-- SeasonBar: horizontal scrollable tag row with inline edit + create -->
+			<SeasonBar
+				seasons={$seasonsStore.seasons}
+				selectedId={selectedSeasonId ?? ($seasonsStore.seasons[0]?.id ?? '')}
+				{canManage}
+				onselect={selectSeason}
+				onedit={() => { panelMode = 'edit'; }}
+				oncreate={() => { panelMode = 'create'; }}
+			/>
 
-				<!-- Left column: owner controls (SeasonForm + ConductorPanel) -->
-				{#if canManage}
-					<div data-testid="owner-controls" class="owner-col">
-						<div data-testid="season-form-wrap" class="form-wrap">
-							<SeasonForm oncreate={handleSeasonCreate} />
-						</div>
-						{#if selectedSeason}
-							<div data-testid="conductor-panel-wrap" class="panel-wrap">
-								<ConductorPanel
-									{conductors}
-									members={orgMembers}
-									{canManage}
-									onassign={handleConductorAssign}
-									onremove={handleConductorRemove}
-								/>
-							</div>
-						{/if}
-					</div>
-				{/if}
-
-				<!-- Right column: series creation + rehearsal list -->
-				<div class="content-col">
-					{#if selectedSeason}
-						<div data-testid="series-form-wrap" class="form-wrap">
-							<SeriesForm season={selectedSeason} oncreate={handleSeriesCreate} />
-						</div>
-						<div data-testid="rehearsal-list-wrap" class="list-wrap">
-							<RehearsalList
-								{rehearsals}
-								{seriesNames}
-								oncancel={handleRehearsalCancel}
-								onedit={handleRehearsalEdit}
-								{canManage}
-								ondeleteseries={handleDeleteSeries}
-							/>
-						</div>
-					{:else}
-						<div data-testid="no-season-selected" class="state-msg">
-							{m.seasons_empty_no_seasons()}
-						</div>
-					{/if}
+			<!-- On-demand season panels (one at a time) -->
+			{#if panelMode === 'create'}
+				<div data-testid="season-form-wrap" class="stacked-section">
+					<SeasonForm oncreate={handleSeasonCreate} />
 				</div>
-			</div>
+			{:else if panelMode === 'edit' && selectedSeason}
+				<div data-testid="season-form-wrap" class="stacked-section">
+					<SeasonForm season={selectedSeason} onupdate={handleSeasonEdit} />
+				</div>
+			{/if}
+
+			<!-- Stacked full-width: conductor panel, series form, rehearsal list -->
+			{#if canManage && selectedSeason}
+				<div data-testid="owner-controls" class="stacked-section">
+					<div data-testid="conductor-panel-wrap" class="panel-wrap">
+						<ConductorPanel
+							{conductors}
+							members={orgMembers}
+							{canManage}
+							onassign={handleConductorAssign}
+							onremove={handleConductorRemove}
+						/>
+					</div>
+				</div>
+			{/if}
+
+			{#if selectedSeason}
+				<div data-testid="series-form-wrap" class="stacked-section">
+					<SeriesForm season={selectedSeason} oncreate={handleSeriesCreate} />
+				</div>
+				<div data-testid="rehearsal-list-wrap" class="stacked-section">
+					<RehearsalList
+						{rehearsals}
+						{seriesNames}
+						oncancel={handleRehearsalCancel}
+						onedit={handleRehearsalEdit}
+						{canManage}
+						ondeleteseries={handleDeleteSeries}
+					/>
+				</div>
+			{:else}
+				<div data-testid="no-season-selected" class="state-msg">
+					{m.seasons_empty_no_seasons()}
+				</div>
+			{/if}
 		{/if}
 
 	</div>
@@ -391,28 +418,6 @@
 		letter-spacing: -0.01em;
 		margin-top: 2px;
 	}
-	.season-selector {
-		display: flex;
-		gap: 6px;
-		flex-wrap: wrap;
-		padding: 10px 28px;
-		border-bottom: 1px dashed rgba(0, 0, 0, 0.15);
-	}
-	.season-chip {
-		font-size: 11px;
-		padding: 3px 10px;
-		border: 1px solid #b8a986;
-		border-radius: 2px;
-		background: #fbf9f3;
-		color: #2a2620;
-		cursor: pointer;
-		font-family: inherit;
-	}
-	.season-chip.sel {
-		background: #2a2620;
-		color: #fbf9f3;
-		border-color: #2a2620;
-	}
 	.notice {
 		margin: 10px 28px;
 		padding: 8px 12px;
@@ -428,27 +433,23 @@
 		color: #998a6a;
 		font-style: italic;
 	}
-	.conductor-layout {
-		display: flex;
-		gap: 28px;
-		padding: 20px 28px;
-		align-items: flex-start;
+	/* Stacked full-width sections — mobile-first, no horizontal squish */
+	.stacked-section {
+		padding: 12px 16px;
+		border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
 	}
-	.owner-col {
-		flex-shrink: 0;
-		width: 260px;
-		display: flex;
-		flex-direction: column;
-		gap: 16px;
-	}
-	.content-col {
-		flex: 1;
-		min-width: 0;
-		display: flex;
-		flex-direction: column;
-		gap: 16px;
-	}
-	.form-wrap, .panel-wrap, .list-wrap, .create-panel {
+	.form-wrap, .panel-wrap {
 		display: contents;
+	}
+	.inline-create-btn {
+		font-size: 16px;
+		padding: 2px 10px;
+		border: 1.5px solid #b8a986;
+		border-radius: 14px;
+		background: #fbf9f3;
+		color: #6a5230;
+		cursor: pointer;
+		font-family: inherit;
+		margin-top: 8px;
 	}
 </style>

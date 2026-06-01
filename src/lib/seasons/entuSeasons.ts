@@ -107,7 +107,7 @@ export async function createSeason(cfg: EntuCfg, input: CreateSeasonInput): Prom
 
 export async function listSeasons(cfg: EntuCfg, orgId: string): Promise<Season[]> {
 	const res = await fetch(
-		`${ENTU_API_BASE}${cfg.db}/entity?_type.string=season&_parent.reference=${orgId}&props=name,start_date,end_date&limit=200`,
+		`${ENTU_API_BASE}${cfg.db}/entity?_type.string=season&_parent.reference=${orgId}&props=name,start_date,end_date,description&limit=200`,
 		{ headers: authHeaders(cfg.token) },
 	);
 	if (!res.ok) {
@@ -121,6 +121,7 @@ export async function listSeasons(cfg: EntuCfg, orgId: string): Promise<Season[]
 				name: raw.name?.[0]?.string ?? '',
 				startDate: raw.start_date?.[0]?.date ?? '',
 				endDate: raw.end_date?.[0]?.date ?? '',
+				description: raw.description?.[0]?.string,
 			}),
 		)
 		.sort((a, b) => a.startDate.localeCompare(b.startDate));
@@ -473,7 +474,8 @@ export async function revokeConductor(cfg: EntuCfg, input: RevokeConductorInput)
 	if (!res.ok) throw new Error(`revokeConductor lookup failed: ${res.status}`);
 	const body = (await res.json()) as { entity?: SeasonRaw };
 	const grants = (body.entity?._editor ?? []).filter(
-		(e) => e.reference === input.personId && e.property_type === '_editor' && typeof e._id === 'string',
+		(e) =>
+			e.reference === input.personId && e.property_type === '_editor' && typeof e._id === 'string',
 	);
 
 	for (const grant of grants) {
@@ -543,6 +545,85 @@ export async function listSeries(cfg: EntuCfg, seasonId: string): Promise<Rehear
 			endDate: raw.end_date?.[0]?.date ?? '',
 		}),
 	);
+}
+
+// ── updateSeason (self-resolving clear-then-set) ──────────────────────────────
+
+/**
+ * Patch payload for a single season. Only provided fields are updated;
+ * absent fields are untouched. Unlike `updateRehearsal`, the caller does NOT
+ * need to pass property-value ids — `updateSeason` resolves them itself via
+ * a GET on the season entity.
+ */
+export interface SeasonPatch {
+	name?: string;
+	startDate?: string;
+	endDate?: string;
+	description?: string;
+}
+
+/**
+ * Update a season's fields using self-resolving clear-then-set: GET the
+ * current season, resolve existing value-ids for patched fields, DELETE them,
+ * then POST the new values. Fields absent from the patch are untouched.
+ */
+export async function updateSeason(
+	cfg: EntuCfg,
+	seasonId: string,
+	patch: SeasonPatch,
+): Promise<void> {
+	const headers = authHeaders(cfg.token);
+	const base = `${ENTU_API_BASE}${cfg.db}`;
+
+	// Entu property name + value-type per patch key.
+	const fieldMap = {
+		name: 'name',
+		startDate: 'start_date',
+		endDate: 'end_date',
+		description: 'description',
+	} as const;
+	const valueTypeMap = {
+		name: 'string',
+		description: 'string',
+		startDate: 'date',
+		endDate: 'date',
+	} as const;
+
+	const keys = (Object.keys(patch) as Array<keyof SeasonPatch>).filter(
+		(k) => patch[k] !== undefined,
+	);
+	if (keys.length === 0) return; // empty patch — no GET-driven mutation needed
+
+	// Self-resolve: GET the season once to find the existing value-ids to clear.
+	const getRes = await fetch(
+		`${base}/entity/${seasonId}?props=name,start_date,end_date,description`,
+		{ headers },
+	);
+	if (!getRes.ok) throw new Error(`updateSeason lookup failed: ${getRes.status}`);
+	const body = (await getRes.json()) as {
+		entity?: Record<string, Array<{ _id: string }> | undefined>;
+	};
+	const entity = body.entity ?? {};
+
+	// Per-field clear-then-set is best-effort, not transactional: if a field's DELETE
+	// lands but its POST then fails, that field is left CLEARED on the season (no
+	// rollback). The throw surfaces the failure; a re-hydrate shows the cleared field
+	// so the user can re-enter it. Acceptable for this single-editor admin flow.
+	for (const key of keys) {
+		const prop = fieldMap[key];
+		// Clear: DELETE each existing value-id for this property (none → skip, just POST).
+		for (const value of entity[prop] ?? []) {
+			const delRes = await fetch(`${base}/property/${value._id}`, { method: 'DELETE', headers });
+			if (!delRes.ok) throw new Error(`updateSeason delete failed: ${delRes.status}`);
+		}
+		// Set: POST the new value with the correct value-type key.
+		const postRes = await fetch(`${base}/entity/${seasonId}`, {
+			method: 'POST',
+			headers,
+			body: JSON.stringify([{ type: prop, [valueTypeMap[key]]: patch[key] }]),
+		});
+		if (!postRes.ok) throw new Error(`updateSeason POST failed: ${postRes.status}`);
+	}
 }
 
 // Re-export types consumed by tests (avoids separate import in spec)

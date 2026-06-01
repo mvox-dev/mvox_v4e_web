@@ -168,6 +168,8 @@
 	"nav_tab_roster": "Учасники",
 	"nav_tab_settings": "Налаштування",
 	"nav_user_menu_aria": "Меню користувача",
+	"seasons_a11y_create_season": "Створити сезон",
+	"seasons_a11y_edit_season": "Редагувати вибраний сезон",
 	"seasons_actions_confirm": "Підтвердити",
 	"seasons_actions_delete": "Видалити",
 	"seasons_actions_edit": "Редагувати",
@@ -198,7 +200,9 @@
 	"seasons_field_name": "Назва",
 	"seasons_field_start_date": "Дата початку",
 	"seasons_field_start_time": "Час початку",
+	"seasons_form_season_edit_heading": "Редагувати сезон",
 	"seasons_form_season_heading": "Новий сезон",
+	"seasons_form_season_save": "Зберегти зміни",
 	"seasons_form_season_submit": "Створити сезон",
 	"seasons_form_series_heading": "Нова серія репетицій",
 	"seasons_form_series_submit": "Створити серію",
@@ -207,6 +211,7 @@
 	"seasons_notice_delete_forbidden": "У вас немає дозволу на видалення.",
 	"seasons_notice_partial_delete": "Видалено {deleted} з {total} репетицій. Повторіть для завершення.",
 	"seasons_notice_partial_generate": "Створено {created} з {total} репетицій. Видаліть серію та спробуйте ще раз.",
+	"seasons_notice_update_failed": "Не вдалося зберегти зміни — будь ласка, спробуйте ще раз.",
 	"seasons_page_title": "Розклад репетицій",
 	"seasons_warning_outside_season": "Увага: ця серія виходить за межі дат сезону."
 }

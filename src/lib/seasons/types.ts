@@ -7,6 +7,7 @@ export interface SeasonRaw {
 	name?: Array<{ string: string }>;
 	start_date?: Array<{ date: string }>;
 	end_date?: Array<{ date: string }>;
+	description?: Array<{ string: string }>;
 	_parent?: Array<{ reference: string }>;
 	// `_id` is the property-value id needed for revokeConductor (DELETE /property/{_id}).
 	_editor?: Array<{ _id?: string; reference: string; property_type?: string; inherited?: boolean }>;
@@ -16,6 +17,7 @@ export interface Season {
 	name: string;
 	startDate: string;
 	endDate: string;
+	description?: string;
 }
 
 export interface SeriesRaw {

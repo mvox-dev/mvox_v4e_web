@@ -5,6 +5,7 @@ import {
 	createSeriesWithEvents,
 	listRehearsals,
 	updateRehearsal,
+	updateSeason,
 	deleteRehearsal,
 	deleteSeriesCascade,
 	listConductors,
@@ -148,6 +149,41 @@ describe('listSeasons', () => {
 			startDate: '2026-09-01',
 			endDate: '2027-05-31',
 		});
+	});
+
+	it('maps description from raw Season (description round-trip — RED-MOB.1)', async () => {
+		// listSeasons must fetch + map the description field so it round-trips to
+		// SeasonForm edit mode. Without this, description is always undefined and
+		// the form pre-fills '' → patch wipes the description on save.
+		vi.stubGlobal(
+			'fetch',
+			vi.fn().mockResolvedValue({
+				ok: true,
+				json: async () => ({
+					entities: [
+						{
+							_id: 'sea1',
+							name: [{ string: 'Autumn 26' }],
+							start_date: [{ date: '2026-09-01' }],
+							end_date: [{ date: '2027-05-31' }],
+							description: [{ string: 'Our autumn concert season' }],
+						},
+					],
+				}),
+			}),
+		);
+		const seasons = await listSeasons(cfg, 'org1');
+		expect(seasons[0].description).toBe('Our autumn concert season');
+	});
+
+	it('listSeasons query includes description in props', async () => {
+		let searchUrl = '';
+		vi.stubGlobal('fetch', vi.fn().mockImplementation((url: string) => {
+			searchUrl = url;
+			return Promise.resolve({ ok: true, json: async () => ({ entities: [] }) });
+		}));
+		await listSeasons(cfg, 'org1');
+		expect(searchUrl).toContain('description');
 	});
 });
 
@@ -790,9 +826,15 @@ describe('listConductors — dedupe', () => {
 					});
 				}
 				if (url.includes('/entity/p_cond')) {
-					return Promise.resolve({ ok: true, json: async () => ({ entity: { _id: 'p_cond', name: [{ string: 'Jane C.' }] } }) });
+					return Promise.resolve({
+						ok: true,
+						json: async () => ({ entity: { _id: 'p_cond', name: [{ string: 'Jane C.' }] } }),
+					});
 				}
-				return Promise.resolve({ ok: true, json: async () => ({ entity: { _id: 'p_other', name: [{ string: 'Bob O.' }] } }) });
+				return Promise.resolve({
+					ok: true,
+					json: async () => ({ entity: { _id: 'p_other', name: [{ string: 'Bob O.' }] } }),
+				});
 			}),
 		);
 		const list = await listConductors({ db: 'd', token: 't' }, 'season1');
@@ -836,7 +878,9 @@ describe('revokeConductor', () => {
 
 		// Must have issued exactly 3 DELETEs — one per p_cond's grant; p_other untouched
 		expect(deleted).toHaveLength(3);
-		expect(deleted.every((u) => u.includes('ev-1') || u.includes('ev-2') || u.includes('ev-3'))).toBe(true);
+		expect(
+			deleted.every((u) => u.includes('ev-1') || u.includes('ev-2') || u.includes('ev-3')),
+		).toBe(true);
 		expect(deleted.some((u) => u.includes('ev-4'))).toBe(false);
 	});
 
@@ -1019,5 +1063,116 @@ describe('listSeries', () => {
 		);
 		const series = await listSeries({ db: 'd', token: 't' }, 'season1');
 		expect(series).toEqual([]);
+	});
+});
+
+// ── updateSeason (self-resolving clear-then-set) ──────────────────────────────
+
+describe('updateSeason', () => {
+	/** Build a mock fetch that returns a season entity with given value-ids,
+	 *  records DELETEs and POSTs, and resolves all calls successfully. */
+	function makeMockFetch(nameValueId = 'nv-1', startValueId = 'sv-1', endValueId = 'ev-1') {
+		const deleted: string[] = [];
+		const posts: Array<{ url: string; body: unknown }> = [];
+		const fetchMock = vi
+			.fn()
+			.mockImplementation((url: string, init?: { method?: string; body?: string }) => {
+				if (init?.method === 'DELETE') {
+					deleted.push(url);
+					return Promise.resolve({ ok: true, json: async () => ({}) });
+				}
+				if (init?.method === 'POST') {
+					posts.push({ url, body: JSON.parse(init.body ?? '[]') });
+					return Promise.resolve({ ok: true, json: async () => ({}) });
+				}
+				// GET season — return entity with existing value-ids
+				return Promise.resolve({
+					ok: true,
+					json: async () => ({
+						entity: {
+							_id: 'season1',
+							name: [{ _id: nameValueId, string: 'Old Name' }],
+							start_date: [{ _id: startValueId, date: '2026-09-01' }],
+							end_date: [{ _id: endValueId, date: '2027-05-31' }],
+						},
+					}),
+				});
+			});
+		return { fetchMock, deleted, posts };
+	}
+
+	it('patching name → DELETE old name value then POST new name; other fields untouched', async () => {
+		const { fetchMock, deleted, posts } = makeMockFetch();
+		vi.stubGlobal('fetch', fetchMock);
+
+		await updateSeason({ db: 'd', token: 't' }, 'season1', { name: 'Autumn 2027' });
+
+		// Must DELETE the existing name property value
+		expect(deleted).toHaveLength(1);
+		expect(deleted[0]).toContain('nv-1');
+		// Must POST the new name value to the season entity
+		expect(posts).toHaveLength(1);
+		expect(posts[0].url).toContain('season1');
+		const body = posts[0].body as Array<{ type: string; string?: string }>;
+		expect(body).toEqual(expect.arrayContaining([{ type: 'name', string: 'Autumn 2027' }]));
+		// start_date and end_date must NOT be touched
+		expect(deleted.some((u) => u.includes('sv-1') || u.includes('ev-1'))).toBe(false);
+	});
+
+	it('patching multiple fields → DELETE+POST each independently', async () => {
+		const { fetchMock, deleted, posts } = makeMockFetch('nv-x', 'sv-x', 'ev-x');
+		vi.stubGlobal('fetch', fetchMock);
+
+		await updateSeason({ db: 'd', token: 't' }, 'season1', {
+			name: 'New Name',
+			startDate: '2026-10-01',
+		});
+
+		// 2 DELETEs (name + start_date), 2 POSTs
+		expect(deleted).toHaveLength(2);
+		expect(deleted.some((u) => u.includes('nv-x'))).toBe(true);
+		expect(deleted.some((u) => u.includes('sv-x'))).toBe(true);
+		expect(posts).toHaveLength(2);
+		// end_date NOT touched
+		expect(deleted.some((u) => u.includes('ev-x'))).toBe(false);
+	});
+
+	it('empty patch → no DELETE or POST (GET-only, no mutations)', async () => {
+		const { fetchMock, deleted, posts } = makeMockFetch();
+		vi.stubGlobal('fetch', fetchMock);
+
+		await updateSeason({ db: 'd', token: 't' }, 'season1', {});
+
+		expect(deleted).toHaveLength(0);
+		expect(posts).toHaveLength(0);
+	});
+
+	it('GET uses the seasonId in the URL', async () => {
+		const fetchMock = vi.fn().mockResolvedValue({
+			ok: true,
+			json: async () => ({ entity: { _id: 'sea-abc', name: [], start_date: [], end_date: [] } }),
+		});
+		vi.stubGlobal('fetch', fetchMock);
+
+		await updateSeason({ db: 'd', token: 't' }, 'sea-abc', { name: 'X' }).catch(() => {});
+		// First call must be a GET to the season entity (self-resolve step)
+		const firstUrl: string = fetchMock.mock.calls[0][0];
+		expect(firstUrl).toContain('sea-abc');
+	});
+
+	it('maps field names correctly: startDate→start_date, endDate→end_date', async () => {
+		const { fetchMock, posts } = makeMockFetch('nv-2', 'sv-2', 'ev-2');
+		vi.stubGlobal('fetch', fetchMock);
+
+		await updateSeason({ db: 'd', token: 't' }, 'season1', {
+			startDate: '2026-10-01',
+			endDate: '2027-06-01',
+		});
+
+		const allProps = posts.flatMap((p) => p.body as Array<{ type: string; date?: string }>);
+		expect(allProps.some((p) => p.type === 'start_date')).toBe(true);
+		expect(allProps.some((p) => p.type === 'end_date')).toBe(true);
+		// Must not use camelCase property names
+		expect(allProps.some((p) => p.type === 'startDate' || p.type === 'endDate')).toBe(false);
 	});
 });

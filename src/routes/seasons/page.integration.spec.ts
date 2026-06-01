@@ -7,7 +7,7 @@
  * and the auth/navigation modules are mocked. This ensures a future store/route
  * contract drift (e.g. emitting wrong state on empty) is caught end-to-end.
  */
-import { render, cleanup } from '@testing-library/svelte';
+import { render, cleanup, fireEvent } from '@testing-library/svelte';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import Page from './+page.svelte';
 
@@ -82,6 +82,8 @@ vi.mock('$lib/paraglide/messages.js', () => ({
 	seasons_actions_delete: () => 'Delete',
 	seasons_actions_confirm: () => 'Confirm',
 	seasons_actions_edit: () => 'Edit',
+	seasons_a11y_edit_season: () => 'Edit selected season',
+	seasons_a11y_create_season: () => 'Create season',
 	seasons_empty_no_rehearsals: () => 'No rehearsals scheduled yet.',
 	seasons_empty_no_rehearsals_cta: () => 'Create a rehearsal series',
 	seasons_notice_partial_generate: () => 'Some rehearsals could not be created.',
@@ -142,11 +144,17 @@ describe('/seasons page — empty-owner seam integration (RED-29.1)', () => {
 		const state = get(seasonsStore);
 		expect(state.status).toBe('ready');
 
-		// Route should show the owner-empty branch with SeasonForm, not the viewer branch
+		// Route shows the owner-empty branch; form opens on demand via + button.
 		expect(container.querySelector('[data-testid="seasons-empty-owner"]')).not.toBeNull();
-		expect(container.querySelector('[data-testid="season-form-wrap"]')).not.toBeNull();
 		expect(container.querySelector('[data-testid="seasons-viewer"]')).toBeNull();
 		expect(container.querySelector('[data-testid="seasons-empty-viewer"]')).toBeNull();
+
+		// Open the create form via the empty-owner + button (season-create-empty, distinct from SeasonBar's season-create)
+		const createBtn = container.querySelector('[data-testid="season-create-empty"]') as HTMLButtonElement;
+		expect(createBtn).not.toBeNull();
+		await fireEvent.click(createBtn);
+		await new Promise((r) => setTimeout(r, 20));
+		expect(container.querySelector('[data-testid="season-form-wrap"]')).not.toBeNull();
 	});
 
 	it('listSeasons → [] + non-owner → seasons-empty-viewer, no SeasonForm', async () => {

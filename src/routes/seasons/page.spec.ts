@@ -72,6 +72,12 @@ vi.mock('$lib/paraglide/messages.js', () => ({
 	seasons_notice_assign_not_member: () => 'That person is not an org member.',
 	seasons_notice_delete_forbidden: () => 'You do not have permission to delete this.',
 	seasons_notice_create_failed: () => 'Could not create season. Please try again.',
+	seasons_notice_update_failed: () => 'Could not save season. Please try again.',
+	seasons_form_season_edit_heading: () => 'Edit season',
+	seasons_form_season_save: () => 'Save changes',
+	seasons_a11y_edit_season: () => 'Edit selected season',
+	seasons_a11y_create_season: () => 'Create season',
+	seasons_warning_outside_season: () => 'Dates are outside the season range.',
 	common_loading: () => 'Loading…',
 	common_error: () => 'Something went wrong.',
 }));
@@ -106,6 +112,7 @@ vi.mock('$lib/seasons/entuSeasons', async () => {
 		revokeConductor: vi.fn(),
 		deleteRehearsal: vi.fn(),
 		deleteSeriesCascade: vi.fn(),
+		updateSeason: vi.fn(),
 	};
 });
 
@@ -114,6 +121,7 @@ import { selectedOrgStore } from '$lib/auth/userStore';
 import {
 	createSeriesWithEvents,
 	createSeason,
+	updateSeason,
 	listSeasons,
 	listRehearsals,
 	listSeries,
@@ -139,6 +147,7 @@ const mockAssignConductor = vi.mocked(assignConductor);
 const mockRevokeConductor = vi.mocked(revokeConductor);
 const mockDeleteRehearsal = vi.mocked(deleteRehearsal);
 const mockDeleteSeriesCascade = vi.mocked(deleteSeriesCascade);
+const mockUpdateSeason = vi.mocked(updateSeason);
 
 const readySeasonsState = {
 	status: 'ready' as const,
@@ -180,11 +189,12 @@ describe('/seasons page — forward guards', () => {
 		expect(container.querySelector('[data-testid="seasons-viewer"]')).not.toBeNull();
 	});
 
-	it('season-selector rendered when ready with seasons', () => {
+	it('season-bar rendered when ready with seasons', () => {
 		(seasonsStore as ReturnType<typeof import('svelte/store').writable>).set(readySeasonsState);
 		const { container } = render(Page);
-		expect(container.querySelector('[data-testid="season-selector"]')).not.toBeNull();
-		expect(container.querySelector('[data-testid="season-selector-item"]')?.textContent).toContain(
+		// SeasonBar replaces the old season-selector chip row.
+		expect(container.querySelector('[data-testid="season-bar"]')).not.toBeNull();
+		expect(container.querySelector('[data-testid="season-tag"]')?.textContent).toContain(
 			'Autumn 2026',
 		);
 	});
@@ -327,7 +337,7 @@ describe('/seasons page — season-create wiring', () => {
 	it('SeasonForm oncreate → route calls createSeason with payload + re-hydrates', async () => {
 		mockCreateSeason.mockResolvedValue('new-season-id');
 		mockHydrate.mockResolvedValue(undefined);
-		// Owner with no seasons so SeasonForm is visible (seasons-empty-owner branch)
+		// Owner with no seasons — SeasonForm opens on demand via the + button
 		(selectedOrgStore as ReturnType<typeof import('svelte/store').writable>).set({
 			id: 'org1',
 			label: 'EFK',
@@ -339,8 +349,15 @@ describe('/seasons page — season-create wiring', () => {
 			seasons: [],
 		});
 		const { container } = render(Page);
+		await new Promise((r) => setTimeout(r, 20));
 
-		// SeasonForm must be visible in the empty-owner branch
+		// Open the create form via the empty-owner + button (season-create-empty)
+		const createBtn = container.querySelector('[data-testid="season-create-empty"]') as HTMLButtonElement;
+		expect(createBtn).not.toBeNull();
+		await fireEvent.click(createBtn);
+		await new Promise((r) => setTimeout(r, 20));
+
+		// SeasonForm must now be visible
 		const nameInput = container.querySelector('[data-testid="season-name"]') as HTMLInputElement;
 		expect(nameInput).not.toBeNull();
 
@@ -385,9 +402,7 @@ describe('/seasons page — conductor wiring (T2, #86)', () => {
 	});
 
 	it('ConductorPanel receives conductor list from listConductors when season is selected', async () => {
-		mockListConductors.mockResolvedValue([
-			{ personId: 'p1', name: 'Jane C.' },
-		]);
+		mockListConductors.mockResolvedValue([{ personId: 'p1', name: 'Jane C.' }]);
 		(selectedOrgStore as ReturnType<typeof import('svelte/store').writable>).set(ownerOrg);
 		(seasonsStore as ReturnType<typeof import('svelte/store').writable>).set(readySeasonsState);
 
@@ -452,9 +467,7 @@ describe('/seasons page — conductor wiring (T2, #86)', () => {
 	});
 
 	it('onremove → calls revokeConductor with personId, then re-fetches conductors', async () => {
-		mockListConductors.mockResolvedValue([
-			{ personId: 'p1', name: 'Jane C.' },
-		]);
+		mockListConductors.mockResolvedValue([{ personId: 'p1', name: 'Jane C.' }]);
 		(selectedOrgStore as ReturnType<typeof import('svelte/store').writable>).set(ownerOrg);
 		(seasonsStore as ReturnType<typeof import('svelte/store').writable>).set(readySeasonsState);
 
@@ -839,7 +852,13 @@ describe('/seasons page — season-create error handling (fix)', () => {
 		});
 
 		const { container } = render(Page);
-		await new Promise((r) => setTimeout(r, 50));
+		await new Promise((r) => setTimeout(r, 20));
+
+		// Open the create form via the empty-owner + button (season-create-empty)
+		await fireEvent.click(
+			container.querySelector('[data-testid="season-create-empty"]') as HTMLButtonElement,
+		);
+		await new Promise((r) => setTimeout(r, 20));
 
 		const nameInput = container.querySelector('[data-testid="season-name"]') as HTMLInputElement;
 		const startInput = container.querySelector(
@@ -869,7 +888,13 @@ describe('/seasons page — season-create error handling (fix)', () => {
 		});
 
 		const { container } = render(Page);
-		await new Promise((r) => setTimeout(r, 50));
+		await new Promise((r) => setTimeout(r, 20));
+
+		// Open the create form via the empty-owner + button (season-create-empty)
+		await fireEvent.click(
+			container.querySelector('[data-testid="season-create-empty"]') as HTMLButtonElement,
+		);
+		await new Promise((r) => setTimeout(r, 20));
 
 		const nameInput = container.querySelector('[data-testid="season-name"]') as HTMLInputElement;
 		const startInput = container.querySelector(
@@ -888,5 +913,140 @@ describe('/seasons page — season-create error handling (fix)', () => {
 		expect(mockGoto).toHaveBeenCalled();
 		const lastCall = mockGoto.mock.calls[mockGoto.mock.calls.length - 1][0] as string;
 		expect(lastCall).toContain('new-sea-id');
+	});
+});
+
+// ── Route restructure: SeasonBar + on-demand panels (feat/seasons-mobile) ────
+
+describe('/seasons page — route restructure (mobile redesign)', () => {
+	const ownerOrg = { id: 'org1', label: 'EFK', initials: 'EFK', role: 'owner' };
+
+	beforeEach(() => {
+		mockListRehearsals.mockResolvedValue([]);
+		mockListSeries.mockResolvedValue([]);
+		mockListConductors.mockResolvedValue([]);
+		mockListOrgMembers.mockResolvedValue([]);
+		mockHydrate.mockResolvedValue(undefined);
+		mockUpdateSeason.mockResolvedValue(undefined);
+	});
+
+	it('SeasonBar rendered with season list and canManage from owner org', async () => {
+		(selectedOrgStore as ReturnType<typeof import('svelte/store').writable>).set(ownerOrg);
+		(seasonsStore as ReturnType<typeof import('svelte/store').writable>).set(readySeasonsState);
+
+		const { container } = render(Page);
+		await new Promise((r) => setTimeout(r, 50));
+
+		// SeasonBar must be present in the owner/ready state
+		expect(container.querySelector('[data-testid="season-bar"]')).not.toBeNull();
+	});
+
+	it('default owner view: season-form NOT open by default (no always-on create form)', async () => {
+		// The route no longer shows SeasonForm always-on in owner-controls.
+		// It only opens on demand via the SeasonBar + / edit buttons.
+		(selectedOrgStore as ReturnType<typeof import('svelte/store').writable>).set(ownerOrg);
+		(seasonsStore as ReturnType<typeof import('svelte/store').writable>).set(readySeasonsState);
+
+		const { container } = render(Page);
+		await new Promise((r) => setTimeout(r, 50));
+
+		// SeasonForm must NOT be rendered in the default ready/selected view
+		expect(container.querySelector('[data-testid="season-form"]')).toBeNull();
+	});
+
+	it('SeasonBar oncreate (＋) → create-mode SeasonForm opens (season-submit present)', async () => {
+		(selectedOrgStore as ReturnType<typeof import('svelte/store').writable>).set(ownerOrg);
+		(seasonsStore as ReturnType<typeof import('svelte/store').writable>).set(readySeasonsState);
+
+		const { container } = render(Page);
+		await new Promise((r) => setTimeout(r, 50));
+
+		// Click the + create button in SeasonBar
+		const createBtn = container.querySelector('[data-testid="season-create"]') as HTMLButtonElement;
+		expect(createBtn).not.toBeNull();
+		await fireEvent.click(createBtn);
+		await new Promise((r) => setTimeout(r, 20));
+
+		// Create-mode SeasonForm must now be open
+		expect(container.querySelector('[data-testid="season-form"]')).not.toBeNull();
+		expect(container.querySelector('[data-testid="season-submit"]')).not.toBeNull();
+		// Edit-mode save button must NOT be present (wrong mode)
+		expect(container.querySelector('[data-testid="season-form-save"]')).toBeNull();
+	});
+
+	it('SeasonBar onedit (✏️) → edit-mode SeasonForm opens (season-form-save present)', async () => {
+		(selectedOrgStore as ReturnType<typeof import('svelte/store').writable>).set(ownerOrg);
+		(seasonsStore as ReturnType<typeof import('svelte/store').writable>).set(readySeasonsState);
+
+		const { container } = render(Page);
+		await new Promise((r) => setTimeout(r, 50));
+
+		// Click the ✏️ edit button on the selected season tag
+		const editBtn = container.querySelector('[data-testid="season-tag-edit"]') as HTMLButtonElement;
+		expect(editBtn).not.toBeNull();
+		await fireEvent.click(editBtn);
+		await new Promise((r) => setTimeout(r, 20));
+
+		// Edit-mode SeasonForm must now be open
+		expect(container.querySelector('[data-testid="season-form"]')).not.toBeNull();
+		expect(container.querySelector('[data-testid="season-form-save"]')).not.toBeNull();
+		// Create-mode submit must NOT be present (wrong mode)
+		expect(container.querySelector('[data-testid="season-submit"]')).toBeNull();
+	});
+
+	it('edit save → updateSeason called + listSeasons re-fetches + edit panel closes', async () => {
+		mockUpdateSeason.mockResolvedValue(undefined);
+		mockListSeasons.mockResolvedValue([
+			{ id: 'sea1', name: 'Updated Name', startDate: '2026-09-01', endDate: '2027-05-31' },
+		]);
+		(selectedOrgStore as ReturnType<typeof import('svelte/store').writable>).set(ownerOrg);
+		(seasonsStore as ReturnType<typeof import('svelte/store').writable>).set(readySeasonsState);
+
+		const { container } = render(Page);
+		await new Promise((r) => setTimeout(r, 50));
+
+		// Open edit panel
+		const editBtn = container.querySelector('[data-testid="season-tag-edit"]') as HTMLButtonElement;
+		await fireEvent.click(editBtn);
+		await new Promise((r) => setTimeout(r, 20));
+
+		// Change the name and save
+		const nameInput = container.querySelector('[data-testid="season-name"]') as HTMLInputElement;
+		await fireEvent.input(nameInput, { target: { value: 'Updated Name' } });
+		const saveBtn = container.querySelector(
+			'[data-testid="season-form-save"]',
+		) as HTMLButtonElement;
+		await fireEvent.click(saveBtn);
+		await new Promise((r) => setTimeout(r, 50));
+
+		// updateSeason must have been called with the season id + patch
+		expect(mockUpdateSeason).toHaveBeenCalled();
+		expect(mockUpdateSeason.mock.calls[0][1]).toBe('sea1');
+		expect(mockUpdateSeason.mock.calls[0][2]).toMatchObject({ name: 'Updated Name' });
+		// Edit panel must close after save
+		expect(container.querySelector('[data-testid="season-form"]')).toBeNull();
+	});
+
+	it('one panel at a time — opening create closes edit panel if open', async () => {
+		(selectedOrgStore as ReturnType<typeof import('svelte/store').writable>).set(ownerOrg);
+		(seasonsStore as ReturnType<typeof import('svelte/store').writable>).set(readySeasonsState);
+
+		const { container } = render(Page);
+		await new Promise((r) => setTimeout(r, 50));
+
+		// Open edit panel first
+		const editBtn = container.querySelector('[data-testid="season-tag-edit"]') as HTMLButtonElement;
+		await fireEvent.click(editBtn);
+		await new Promise((r) => setTimeout(r, 20));
+		expect(container.querySelector('[data-testid="season-form-save"]')).not.toBeNull();
+
+		// Now click create — edit panel should close, create panel opens
+		const createBtn = container.querySelector('[data-testid="season-create"]') as HTMLButtonElement;
+		await fireEvent.click(createBtn);
+		await new Promise((r) => setTimeout(r, 20));
+
+		// Create mode open; edit mode gone
+		expect(container.querySelector('[data-testid="season-submit"]')).not.toBeNull();
+		expect(container.querySelector('[data-testid="season-form-save"]')).toBeNull();
 	});
 });

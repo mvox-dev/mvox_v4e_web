@@ -2,8 +2,9 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import { validateSeason } from '$lib/seasons/validation';
+	import type { Season } from '$lib/seasons/types';
 
-	/** Payload emitted on submit once validation passes. */
+	/** Payload emitted on create-mode submit once validation passes. */
 	export interface SeasonCreatePayload {
 		name: string;
 		startDate: string;
@@ -11,16 +12,44 @@
 		description: string;
 	}
 
-	interface Props {
-		/** Called with the validated payload on successful submit. */
-		oncreate: (payload: SeasonCreatePayload) => void;
+	/** Patch emitted on edit-mode submit once validation passes. */
+	export interface SeasonPatch {
+		name: string;
+		startDate: string;
+		endDate: string;
+		description: string;
 	}
-	let { oncreate }: Props = $props();
+
+	interface Props {
+		/**
+		 * When provided, the form renders in edit mode: fields pre-filled from
+		 * this season, heading and submit label change, and `onupdate` fires on submit.
+		 * When absent, the form renders in create mode (existing behaviour).
+		 */
+		season?: Season;
+		/** Create mode: called with the new season payload on successful submit. */
+		oncreate?: (payload: SeasonCreatePayload) => void;
+		/** Edit mode: called with the patch payload on successful submit. */
+		onupdate?: (patch: SeasonPatch) => void;
+	}
+	let { season, oncreate, onupdate }: Props = $props();
+
+	const editMode = $derived(season !== undefined);
 
 	let name = $state('');
 	let startDate = $state('');
 	let endDate = $state('');
 	let description = $state('');
+
+	// Pre-fill fields when a season is provided (edit mode) or when it changes.
+	$effect(() => {
+		if (season) {
+			name = season.name;
+			startDate = season.startDate;
+			endDate = season.endDate;
+			description = season.description ?? '';
+		}
+	});
 
 	/** Field-keyed validation error — null when no error. */
 	let fieldError = $state<{ field: string; message: string } | null>(null);
@@ -43,12 +72,18 @@
 			return;
 		}
 		fieldError = null;
-		oncreate({ name, startDate, endDate, description });
+		if (editMode) {
+			onupdate?.({ name, startDate, endDate, description });
+		} else {
+			oncreate?.({ name, startDate, endDate, description });
+		}
 	}
 </script>
 
 <form data-testid="season-form" onsubmit={handleSubmit}>
-	<h2 class="form-heading">{m.seasons_form_season_heading()}</h2>
+	<h2 class="form-heading">
+		{editMode ? m.seasons_form_season_edit_heading() : m.seasons_form_season_heading()}
+	</h2>
 
 	<label class="field-label" for="season-name">{m.seasons_field_name()}</label>
 	<input
@@ -95,8 +130,12 @@
 		oninput={(e) => { description = (e.target as HTMLTextAreaElement).value; }}
 	></textarea>
 
-	<button data-testid="season-submit" type="submit" class="submit-btn">
-		{m.seasons_form_season_submit()}
+	<button
+		data-testid={editMode ? 'season-form-save' : 'season-submit'}
+		type="submit"
+		class="submit-btn"
+	>
+		{editMode ? m.seasons_form_season_save() : m.seasons_form_season_submit()}
 	</button>
 </form>
 

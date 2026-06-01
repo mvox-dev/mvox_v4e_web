@@ -168,6 +168,8 @@
 	"nav_tab_roster": "Dalībnieki",
 	"nav_tab_settings": "Iestatījumi",
 	"nav_user_menu_aria": "Lietotāja izvēlne",
+	"seasons_a11y_create_season": "Izveidot sezonu",
+	"seasons_a11y_edit_season": "Rediģēt izvēlēto sezonu",
 	"seasons_actions_confirm": "Apstiprināt",
 	"seasons_actions_delete": "Dzēst",
 	"seasons_actions_edit": "Rediģēt",
@@ -198,7 +200,9 @@
 	"seasons_field_name": "Nosaukums",
 	"seasons_field_start_date": "Sākuma datums",
 	"seasons_field_start_time": "Sākuma laiks",
+	"seasons_form_season_edit_heading": "Rediģēt sezonu",
 	"seasons_form_season_heading": "Jauna sezona",
+	"seasons_form_season_save": "Saglabāt izmaiņas",
 	"seasons_form_season_submit": "Izveidot sezonu",
 	"seasons_form_series_heading": "Jauna mēģinājumu sērija",
 	"seasons_form_series_submit": "Izveidot sēriju",
@@ -207,6 +211,7 @@
 	"seasons_notice_delete_forbidden": "Jums nav atļaujas to dzēst.",
 	"seasons_notice_partial_delete": "Dzēsti {deleted} no {total} mēģinājumiem. Atkārtojiet, lai pabeigtu.",
 	"seasons_notice_partial_generate": "Izveidoti {created} no {total} mēģinājumiem. Dzēsiet sēriju un mēģiniet vēlreiz.",
+	"seasons_notice_update_failed": "Izmaiņas saglabāt neizdevās — lūdzu, mēģiniet vēlreiz.",
 	"seasons_page_title": "Mēģinājumu grafiks",
 	"seasons_warning_outside_season": "Ievērojiet: šī sērija pārsniedz sezonas datumus."
 }
