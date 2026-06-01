@@ -75,6 +75,16 @@
 				<span data-testid="rehearsal-location" class="row-location">
 					{rehearsal.location ?? '—'}
 				</span>
+				{#if canManage}
+					<button
+						data-testid="rehearsal-edit"
+						type="button"
+						class="row-btn"
+						onclick={() => onedit(rehearsal.id)}
+					>
+						{m.seasons_actions_edit()}
+					</button>
+				{/if}
 				<button
 					data-testid="rehearsal-cancel"
 					type="button"

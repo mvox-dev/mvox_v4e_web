@@ -80,6 +80,9 @@ vi.mock('$lib/paraglide/messages.js', () => ({
 	seasons_warning_outside_season: () => 'Dates are outside the season range.',
 	common_loading: () => 'Loading…',
 	common_error: () => 'Something went wrong.',
+	// RehearsalEditForm keys
+	seasons_form_rehearsal_edit_heading: () => 'Edit rehearsal',
+	actions_cancel: () => 'Cancel',
 }));
 
 // Seasons store mock — writable so tests can both set state directly AND run
@@ -113,6 +116,7 @@ vi.mock('$lib/seasons/entuSeasons', async () => {
 		deleteRehearsal: vi.fn(),
 		deleteSeriesCascade: vi.fn(),
 		updateSeason: vi.fn(),
+		updateRehearsal: vi.fn(),
 	};
 });
 
@@ -122,6 +126,7 @@ import {
 	createSeriesWithEvents,
 	createSeason,
 	updateSeason,
+	updateRehearsal,
 	listSeasons,
 	listRehearsals,
 	listSeries,
@@ -148,6 +153,7 @@ const mockRevokeConductor = vi.mocked(revokeConductor);
 const mockDeleteRehearsal = vi.mocked(deleteRehearsal);
 const mockDeleteSeriesCascade = vi.mocked(deleteSeriesCascade);
 const mockUpdateSeason = vi.mocked(updateSeason);
+const mockUpdateRehearsal = vi.mocked(updateRehearsal);
 
 const readySeasonsState = {
 	status: 'ready' as const,
@@ -1103,5 +1109,208 @@ describe('/seasons page — pencil toggle (#pencil-toggle)', () => {
 
 		expect(container.querySelector('[data-testid="season-form"]')).toBeNull();
 		expect(container.querySelector('[data-testid="season-form-save"]')).toBeNull();
+	});
+});
+
+// ── #87: edit-rehearsal page integration ──────────────────────────────────────
+//
+// RED until Byrd (RehearsalEditForm inline block) + Josquin (updateRehearsal self-resolve)
+// implement GREEN. These tests drive the FULL route-level wiring.
+
+describe('/seasons page — edit-rehearsal (#87)', () => {
+	const ownerOrg = { id: 'org1', label: 'EFK', initials: 'EFK', role: 'owner' };
+	const rehearsal = {
+		id: 'r1',
+		seriesId: 'ser1',
+		startDatetime: '2026-09-01T16:00:00.000Z',
+		durationMinutes: 90,
+		location: 'Church Hall',
+		description: 'Bring scores',
+	};
+	const series = {
+		id: 'ser1',
+		name: 'Tuesday Evening',
+		intervalDays: 7,
+		startTime: '19:00',
+		durationMinutes: 90,
+		startDate: '2026-09-02',
+		endDate: '2027-05-30',
+	};
+
+	beforeEach(() => {
+		mockListRehearsals.mockResolvedValue([rehearsal]);
+		mockListSeries.mockResolvedValue([series]);
+		mockListConductors.mockResolvedValue([]);
+		mockListOrgMembers.mockResolvedValue([]);
+		mockUpdateRehearsal.mockResolvedValue(undefined);
+		mockHydrate.mockResolvedValue(undefined);
+	});
+
+	it('clicking rehearsal-edit opens RehearsalEditForm for THAT rehearsal (owner-gated)', async () => {
+		// Owner-gated: edit control present; clicking it opens the inline edit form.
+		(selectedOrgStore as ReturnType<typeof import('svelte/store').writable>).set(ownerOrg);
+		(seasonsStore as ReturnType<typeof import('svelte/store').writable>).set(readySeasonsState);
+
+		const { container } = render(Page);
+		await new Promise((r) => setTimeout(r, 50));
+
+		const editBtn = container.querySelector(
+			'[data-testid="rehearsal-edit"]',
+		) as HTMLButtonElement;
+		expect(editBtn).not.toBeNull();
+
+		await fireEvent.click(editBtn);
+		await new Promise((r) => setTimeout(r, 20));
+
+		// RehearsalEditForm must appear in the DOM
+		expect(container.querySelector('[data-testid="rehearsal-edit-form"]')).not.toBeNull();
+	});
+
+	it('rehearsal-edit button absent for non-owner (canManage=false)', async () => {
+		// Non-owner view: edit button must not be rendered
+		(seasonsStore as ReturnType<typeof import('svelte/store').writable>).set(readySeasonsState);
+		// selectedOrgStore is null (non-owner) — set in global beforeEach
+
+		const { container } = render(Page);
+		await new Promise((r) => setTimeout(r, 50));
+
+		expect(container.querySelector('[data-testid="rehearsal-edit"]')).toBeNull();
+	});
+
+	it('submitting a single-field change calls updateRehearsal then re-fetches listRehearsals', async () => {
+		// After the user submits the edit form, updateRehearsal must be called
+		// and listRehearsals must be re-called to re-render the updated row.
+		mockListRehearsals
+			.mockResolvedValueOnce([rehearsal]) // initial load
+			.mockResolvedValue([
+				{ ...rehearsal, location: 'New Room' }, // post-edit reload
+			]);
+
+		(selectedOrgStore as ReturnType<typeof import('svelte/store').writable>).set(ownerOrg);
+		(seasonsStore as ReturnType<typeof import('svelte/store').writable>).set(readySeasonsState);
+
+		const { container } = render(Page);
+		await new Promise((r) => setTimeout(r, 50));
+
+		// Open the edit form
+		const editBtn = container.querySelector(
+			'[data-testid="rehearsal-edit"]',
+		) as HTMLButtonElement;
+		await fireEvent.click(editBtn);
+		await new Promise((r) => setTimeout(r, 20));
+
+		// Change the location field and save
+		const locInput = container.querySelector(
+			'[data-testid="rehearsal-edit-location"]',
+		) as HTMLInputElement;
+		expect(locInput).not.toBeNull();
+		await fireEvent.input(locInput, { target: { value: 'New Room' } });
+
+		const saveBtn = container.querySelector(
+			'[data-testid="rehearsal-edit-save"]',
+		) as HTMLButtonElement;
+		await fireEvent.click(saveBtn);
+		await new Promise((r) => setTimeout(r, 50));
+
+		// updateRehearsal must have been called
+		expect(mockUpdateRehearsal).toHaveBeenCalledOnce();
+		expect(mockUpdateRehearsal.mock.calls[0][1]).toBe('r1');
+		// Patch must carry only the changed field
+		expect(mockUpdateRehearsal.mock.calls[0][2]).toMatchObject({ location: 'New Room' });
+		// listRehearsals must be re-called after save (re-render)
+		expect(mockListRehearsals.mock.calls.length).toBeGreaterThan(1);
+	});
+
+	it('REGRESSION GUARD: editing only start_datetime does NOT wipe description or location', async () => {
+		// Session-29 description-wipe class of bug: a caller that passes value-ids must
+		// not accidentally overwrite fields it didn't intend to change.
+		// With self-resolving updateRehearsal + dirty-tracking form, only the changed
+		// field appears in the patch → the server-side self-resolve does NOT touch
+		// description or location because those keys are absent from the patch.
+		mockUpdateRehearsal.mockResolvedValue(undefined);
+		mockListRehearsals
+			.mockResolvedValueOnce([rehearsal])
+			.mockResolvedValue([rehearsal]); // same rehearsal (description + location intact)
+
+		(selectedOrgStore as ReturnType<typeof import('svelte/store').writable>).set(ownerOrg);
+		(seasonsStore as ReturnType<typeof import('svelte/store').writable>).set(readySeasonsState);
+
+		const { container } = render(Page);
+		await new Promise((r) => setTimeout(r, 50));
+
+		const editBtn = container.querySelector(
+			'[data-testid="rehearsal-edit"]',
+		) as HTMLButtonElement;
+		await fireEvent.click(editBtn);
+		await new Promise((r) => setTimeout(r, 20));
+
+		// Change ONLY the start_datetime
+		const dtInput = container.querySelector(
+			'[data-testid="rehearsal-edit-start-datetime"]',
+		) as HTMLInputElement;
+		expect(dtInput).not.toBeNull();
+		await fireEvent.input(dtInput, { target: { value: '2026-09-08T16:00:00.000Z' } });
+
+		const saveBtn = container.querySelector(
+			'[data-testid="rehearsal-edit-save"]',
+		) as HTMLButtonElement;
+		await fireEvent.click(saveBtn);
+		await new Promise((r) => setTimeout(r, 50));
+
+		expect(mockUpdateRehearsal).toHaveBeenCalledOnce();
+		const patch = mockUpdateRehearsal.mock.calls[0][2] as Record<string, unknown>;
+		// Patch must carry start_datetime and MUST NOT carry description or location
+		expect(patch).toHaveProperty('start_datetime');
+		expect(patch).not.toHaveProperty('description');
+		expect(patch).not.toHaveProperty('location');
+	});
+
+	it('sibling rehearsals untouched: updating r1 does not reload or modify r2', async () => {
+		// Two rehearsals in the same series. Editing r1 must not affect r2's displayed data.
+		const sibling = {
+			id: 'r2',
+			seriesId: 'ser1',
+			startDatetime: '2026-09-08T16:00:00.000Z',
+			durationMinutes: 90,
+			location: 'Church Hall',
+			description: 'Sibling notes',
+		};
+		mockListRehearsals
+			.mockResolvedValueOnce([rehearsal, sibling])
+			.mockResolvedValue([
+				{ ...rehearsal, location: 'New Room' },
+				sibling, // sibling unchanged
+			]);
+		mockUpdateRehearsal.mockResolvedValue(undefined);
+
+		(selectedOrgStore as ReturnType<typeof import('svelte/store').writable>).set(ownerOrg);
+		(seasonsStore as ReturnType<typeof import('svelte/store').writable>).set(readySeasonsState);
+
+		const { container } = render(Page);
+		await new Promise((r) => setTimeout(r, 50));
+
+		// Two rows present initially
+		expect(container.querySelectorAll('[data-testid="rehearsal-row"]').length).toBe(2);
+
+		// Click edit on the first row (r1)
+		const editBtns = container.querySelectorAll('[data-testid="rehearsal-edit"]');
+		await fireEvent.click(editBtns[0] as HTMLButtonElement);
+		await new Promise((r) => setTimeout(r, 20));
+
+		const locInput = container.querySelector(
+			'[data-testid="rehearsal-edit-location"]',
+		) as HTMLInputElement;
+		await fireEvent.input(locInput, { target: { value: 'New Room' } });
+		const saveBtn = container.querySelector(
+			'[data-testid="rehearsal-edit-save"]',
+		) as HTMLButtonElement;
+		await fireEvent.click(saveBtn);
+		await new Promise((r) => setTimeout(r, 50));
+
+		// updateRehearsal called with r1's id only
+		expect(mockUpdateRehearsal.mock.calls[0][1]).toBe('r1');
+		// r2 still present after reload
+		const rows = container.querySelectorAll('[data-testid="rehearsal-row"]');
+		expect(rows.length).toBe(2);
 	});
 });

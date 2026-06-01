@@ -46,9 +46,10 @@ export interface RehearsalRaw {
 	_id: string;
 	name?: Array<{ string: string }>;
 	event_type?: Array<{ string: string }>;
-	start_datetime?: Array<{ datetime: string }>;
-	duration_minutes?: Array<{ number: number }>;
-	location?: Array<{ string: string }>;
+	start_datetime?: Array<{ _id?: string; datetime: string }>;
+	duration_minutes?: Array<{ _id?: string; number: number }>;
+	location?: Array<{ _id?: string; string: string }>;
+	description?: Array<{ _id?: string; string: string }>;
 	_parent?: Array<{ reference: string }>;
 }
 export interface Rehearsal {
@@ -57,6 +58,7 @@ export interface Rehearsal {
 	startDatetime: string;
 	durationMinutes: number;
 	location?: string;
+	description?: string;
 	name?: string;
 }
 

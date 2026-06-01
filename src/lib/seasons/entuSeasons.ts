@@ -191,7 +191,7 @@ export async function listRehearsals(
 ): Promise<Rehearsal[]> {
 	const { orgId, seasonId } = input;
 	const res = await fetch(
-		`${ENTU_API_BASE}${cfg.db}/entity?_type.string=event&event_type.string=rehearsal&_parent.reference=${seasonId}&props=name,event_type,start_datetime,duration_minutes,location,_parent&limit=500`,
+		`${ENTU_API_BASE}${cfg.db}/entity?_type.string=event&event_type.string=rehearsal&_parent.reference=${seasonId}&props=name,event_type,start_datetime,duration_minutes,location,description,_parent&limit=500`,
 		{ headers: authHeaders(cfg.token) },
 	);
 	if (!res.ok) {
@@ -235,6 +235,7 @@ export async function listRehearsals(
 					raw.duration_minutes?.[0]?.number ?? series?.duration_minutes?.[0]?.number ?? 0,
 				location: raw.location?.[0]?.string ?? series?.default_location?.[0]?.string,
 				name: raw.name?.[0]?.string,
+				description: raw.description?.[0]?.string,
 			};
 		})
 		.sort((a, b) => a.startDatetime.localeCompare(b.startDatetime));
@@ -243,15 +244,17 @@ export async function listRehearsals(
 // ── Task 7: updateRehearsal ───────────────────────────────────────────────────
 
 /**
- * Patch payload for a single rehearsal. Each field carries both the new value
- * AND the existing property-value `_id` (needed for DELETE-then-POST replace
- * semantics — `project_entu_post_appends_multi_value`).
+ * Patch payload for a single rehearsal. Caller supplies plain values only —
+ * no value-ids. `updateRehearsal` self-resolves existing property-value ids
+ * internally (mirrors `updateSeason`). Fields absent from the patch are NOT touched.
+ *
+ * Decision: option (a) per #87 — self-resolving clear-then-set caller contract.
  */
 export interface RehearsalPatch {
-	start_datetime?: { valueId: string; value: string };
-	duration_minutes?: { valueId: string; value: number };
-	location?: { valueId: string | null; value: string };
-	description?: { valueId: string | null; value: string };
+	start_datetime?: string;
+	duration_minutes?: number;
+	location?: string;
+	description?: string;
 }
 
 export async function updateRehearsal(
@@ -262,41 +265,54 @@ export async function updateRehearsal(
 	const headers = authHeaders(cfg.token);
 	const base = `${ENTU_API_BASE}${cfg.db}`;
 
-	// Replace semantics per field: if a value already exists (valueId), DELETE it
-	// first, then POST the new value (Entu POST appends — clear-then-set).
-	const applyField = async (valueId: string | null, prop: EntuProp): Promise<void> => {
-		if (valueId !== null) {
-			const delRes = await fetch(`${base}/property/${valueId}`, { method: 'DELETE', headers });
-			if (!delRes.ok) throw new Error(`property delete failed: ${delRes.status}`);
+	// Entu property name + value-type per patch key.
+	const fieldMap = {
+		start_datetime: 'start_datetime',
+		duration_minutes: 'duration_minutes',
+		location: 'location',
+		description: 'description',
+	} as const;
+	const valueTypeMap = {
+		start_datetime: 'datetime',
+		duration_minutes: 'number',
+		location: 'string',
+		description: 'string',
+	} as const;
+
+	const keys = (Object.keys(patch) as Array<keyof RehearsalPatch>).filter(
+		(k) => patch[k] !== undefined,
+	);
+	if (keys.length === 0) return; // empty patch — no GET-driven mutation needed
+
+	// Self-resolve: GET the event once to find the existing value-ids to clear.
+	const getRes = await fetch(
+		`${base}/entity/${eventId}?props=start_datetime,duration_minutes,location,description`,
+		{ headers },
+	);
+	if (!getRes.ok) throw new Error(`updateRehearsal lookup failed: ${getRes.status}`);
+	const body = (await getRes.json()) as {
+		entity?: Record<string, Array<{ _id: string }> | undefined>;
+	};
+	const entity = body.entity ?? {};
+
+	// Per-field clear-then-set is best-effort, not transactional: if a field's DELETE
+	// lands but its POST then fails, that field is left CLEARED on the event (no
+	// rollback). The throw surfaces the failure; a re-hydrate shows the cleared field
+	// so the user can re-enter it. Acceptable for this single-editor admin flow.
+	for (const key of keys) {
+		const prop = fieldMap[key];
+		// Clear: DELETE each existing value-id for this property (none → skip, just POST).
+		for (const value of entity[prop] ?? []) {
+			const delRes = await fetch(`${base}/property/${value._id}`, { method: 'DELETE', headers });
+			if (!delRes.ok) throw new Error(`updateRehearsal delete failed: ${delRes.status}`);
 		}
+		// Set: POST the new value with the correct value-type key.
 		const postRes = await fetch(`${base}/entity/${eventId}`, {
 			method: 'POST',
 			headers,
-			body: JSON.stringify([prop]),
+			body: JSON.stringify([{ type: prop, [valueTypeMap[key]]: patch[key] }]),
 		});
-		if (!postRes.ok) throw new Error(`property POST failed: ${postRes.status}`);
-	};
-
-	if (patch.start_datetime) {
-		await applyField(patch.start_datetime.valueId, {
-			type: 'start_datetime',
-			datetime: patch.start_datetime.value,
-		});
-	}
-	if (patch.duration_minutes) {
-		await applyField(patch.duration_minutes.valueId, {
-			type: 'duration_minutes',
-			number: patch.duration_minutes.value,
-		});
-	}
-	if (patch.location) {
-		await applyField(patch.location.valueId, { type: 'location', string: patch.location.value });
-	}
-	if (patch.description) {
-		await applyField(patch.description.valueId, {
-			type: 'description',
-			string: patch.description.value,
-		});
+		if (!postRes.ok) throw new Error(`updateRehearsal POST failed: ${postRes.status}`);
 	}
 }
 

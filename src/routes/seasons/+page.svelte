@@ -21,6 +21,7 @@
 		PartialGenerationError,
 		revokeConductor,
 		updateSeason,
+		updateRehearsal,
 	} from '$lib/seasons/entuSeasons';
 	import DeskSurface from '$lib/components/DeskSurface.svelte';
 	import SeasonBar from '$lib/components/seasons/SeasonBar.svelte';
@@ -28,6 +29,7 @@
 	import ConductorPanel from '$lib/components/seasons/ConductorPanel.svelte';
 	import SeriesForm from '$lib/components/seasons/SeriesForm.svelte';
 	import RehearsalList from '$lib/components/seasons/RehearsalList.svelte';
+	import RehearsalEditForm from '$lib/components/seasons/RehearsalEditForm.svelte';
 	import type { Conductor, OrgMember, Rehearsal, Season } from '$lib/seasons/types';
 	import type { SeasonPatch } from '$lib/seasons/entuSeasons';
 
@@ -103,6 +105,8 @@
 
 	// ── Panel mode: controls which SeasonForm (if any) is open ────────────────
 	let panelMode = $state<'none' | 'create' | 'edit'>('none');
+	// Per-rehearsal inline edit state (null = no form open).
+	let editingRehearsalId = $state<string | null>(null);
 
 	// ── Season selector: write ?season=<id> to URL ────────────────────────────
 	function selectSeason(id: string) {
@@ -224,8 +228,29 @@
 			.catch(() => {});
 	}
 
-	function handleRehearsalEdit(_id: string) {
-		// GREEN: open inline edit form for the targeted rehearsal
+	function handleRehearsalEdit(id: string) {
+		// Toggle: tapping edit again on the same rehearsal closes the form.
+		editingRehearsalId = editingRehearsalId === id ? null : id;
+	}
+
+	async function handleRehearsalSave(rehearsalId: string, patch: import('$lib/seasons/entuSeasons').RehearsalPatch) {
+		const season = selectedSeason;
+		const org = $selectedOrgStore;
+		if (!season || !org) return;
+		const token = getToken() ?? '';
+		const cfg = { db: PUBLIC_ENTU_DB, token };
+		notice = null;
+		try {
+			await updateRehearsal(cfg, rehearsalId, patch);
+		} catch {
+			notice = m.seasons_notice_update_failed();
+			return;
+		}
+		editingRehearsalId = null;
+		// Re-load the rehearsal list so the updated row reflects the new values.
+		Promise.resolve(listRehearsals(cfg, { orgId: org.id, seasonId: season.id }))
+			.then((list) => { if (list) rehearsals = list; })
+			.catch(() => {});
 	}
 
 	async function handleDeleteSeries(seriesId: string) {
@@ -383,6 +408,18 @@
 						ondeleteseries={handleDeleteSeries}
 					/>
 				</div>
+				{#if canManage && editingRehearsalId}
+					{@const editRehearsal = rehearsals.find((r) => r.id === editingRehearsalId)}
+					{#if editRehearsal}
+						<div data-testid="rehearsal-edit-form-wrap" class="stacked-section">
+							<RehearsalEditForm
+								rehearsal={editRehearsal}
+								onsave={(patch) => handleRehearsalSave(editingRehearsalId!, patch)}
+								oncancel={() => { editingRehearsalId = null; }}
+							/>
+						</div>
+					{/if}
+				{/if}
 			{:else}
 				<div data-testid="no-season-selected" class="state-msg">
 					{m.seasons_empty_no_seasons()}

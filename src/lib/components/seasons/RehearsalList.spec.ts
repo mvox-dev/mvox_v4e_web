@@ -161,15 +161,32 @@ describe('RehearsalList', () => {
 		expect(oncancel).not.toHaveBeenCalled();
 	});
 
-	it('rehearsal-edit button is NOT rendered (deferred to #87)', () => {
-		// Edit is deferred — the button must be absent to prevent no-op clicks.
+	// ── #87: edit affordance ─────────────────────────────────────────────────────
+
+	it('canManage=true: rehearsal-edit button present on each row', () => {
+		// Owner-gated: edit control is present when canManage=true.
 		const rehearsals: Rehearsal[] = [
-			{
-				id: 'r1',
-				seriesId: 'ser1',
-				startDatetime: '2026-09-01T16:00:00.000Z',
-				durationMinutes: 90,
-			},
+			{ id: 'r1', seriesId: 'ser1', startDatetime: '2026-09-01T16:00:00.000Z', durationMinutes: 90 },
+			{ id: 'r2', seriesId: 'ser1', startDatetime: '2026-09-08T16:00:00.000Z', durationMinutes: 90 },
+		];
+		const { container } = render(RehearsalList, {
+			rehearsals,
+			seriesNames: new Map([['ser1', 'Tue']]),
+			oncancel: vi.fn(),
+			onedit: vi.fn(),
+			canManage: true,
+			ondeleteseries: vi.fn(),
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		} as any);
+		const editBtns = container.querySelectorAll('[data-testid="rehearsal-edit"]');
+		// One edit button per rehearsal row
+		expect(editBtns.length).toBe(2);
+	});
+
+	it('canManage=false (or absent): rehearsal-edit button NOT rendered', () => {
+		// Non-owner: edit control must be absent (owner-gated).
+		const rehearsals: Rehearsal[] = [
+			{ id: 'r1', seriesId: 'ser1', startDatetime: '2026-09-01T16:00:00.000Z', durationMinutes: 90 },
 		];
 		const { container } = render(RehearsalList, {
 			rehearsals,
@@ -178,6 +195,27 @@ describe('RehearsalList', () => {
 			onedit: vi.fn(),
 		});
 		expect(container.querySelector('[data-testid="rehearsal-edit"]')).toBeNull();
+	});
+
+	it('rehearsal-edit click: onedit(rehearsalId) called with the correct rehearsal id', async () => {
+		const onedit = vi.fn();
+		const rehearsals: Rehearsal[] = [
+			{ id: 'r-edit-1', seriesId: 'ser1', startDatetime: '2026-09-01T16:00:00.000Z', durationMinutes: 90 },
+		];
+		const { container } = render(RehearsalList, {
+			rehearsals,
+			seriesNames: new Map([['ser1', 'Tue']]),
+			oncancel: vi.fn(),
+			onedit,
+			canManage: true,
+			ondeleteseries: vi.fn(),
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		} as any);
+		await fireEvent.click(
+			container.querySelector('[data-testid="rehearsal-edit"]') as HTMLButtonElement,
+		);
+		expect(onedit).toHaveBeenCalledOnce();
+		expect(onedit).toHaveBeenCalledWith('r-edit-1');
 	});
 
 	it('empty rehearsals → rehearsal-empty + rehearsal-empty-cta rendered', () => {

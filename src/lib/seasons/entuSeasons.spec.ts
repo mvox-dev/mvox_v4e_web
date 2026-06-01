@@ -468,22 +468,35 @@ describe('listRehearsals', () => {
 	});
 });
 
-// ── Task 7: updateRehearsal (edit one — DELETE-then-POST replace) ──────────────
+// ── Task 7: updateRehearsal (edit one — DELETE-then-POST replace) ────────────
+//
+// UPDATED IN #87: old tests used the value-id caller contract; new contract is
+// self-resolving (plain values only — mirroring updateSeason). These three tests
+// are replaced/superseded by the #87 describe block below; kept here in condensed
+// form for regression coverage of the basic path.
 
-describe('updateRehearsal', () => {
-	it('patching location issues DELETE of old value then POST of new value', async () => {
+describe('updateRehearsal (Task 7, updated for self-resolving contract — #87)', () => {
+	it('patching location: GET event, DELETE old value-id, POST new value', async () => {
+		// Self-resolving: caller passes plain value; fn must GET event to find value-id.
 		const calls: Array<{ url: string; method?: string; body?: string }> = [];
 		vi.stubGlobal(
 			'fetch',
 			vi.fn().mockImplementation((url: string, init?: { method?: string; body?: string }) => {
 				calls.push({ url, method: init?.method ?? 'GET', body: init?.body });
-				return Promise.resolve({ ok: true, json: async () => ({}) });
+				if (init?.method === 'DELETE' || init?.method === 'POST') {
+					return Promise.resolve({ ok: true, json: async () => ({}) });
+				}
+				// GET event: return entity with existing location value-id
+				return Promise.resolve({
+					ok: true,
+					json: async () => ({
+						entity: { _id: 'event1', location: [{ _id: 'prop-loc-1', string: 'Old Room' }] },
+					}),
+				});
 			}),
 		);
-		await updateRehearsal({ db: 'd', token: 't' }, 'event1', {
-			location: { valueId: 'prop-loc-1', value: 'New Room' },
-		});
-		// Must DELETE the existing property value first
+		await updateRehearsal({ db: 'd', token: 't' }, 'event1', { location: 'New Room' });
+		// Must DELETE the resolved property value
 		const del = calls.find((c) => c.method === 'DELETE');
 		expect(del?.url).toContain('prop-loc-1');
 		// Then POST the new value to the entity
@@ -493,35 +506,43 @@ describe('updateRehearsal', () => {
 		expect(body).toEqual(expect.arrayContaining([{ type: 'location', string: 'New Room' }]));
 	});
 
-	it('patching one field does not touch siblings (separate entity ids)', async () => {
+	it('patching one field does not touch sibling entity ids', async () => {
 		// updateRehearsal for event1 must not issue any call to event2's URL
 		const urls: string[] = [];
 		vi.stubGlobal(
 			'fetch',
-			vi.fn().mockImplementation((url: string, _init?: unknown) => {
+			vi.fn().mockImplementation((url: string, init?: { method?: string }) => {
 				urls.push(url);
-				return Promise.resolve({ ok: true, json: async () => ({}) });
+				if (init?.method === 'DELETE' || init?.method === 'POST') {
+					return Promise.resolve({ ok: true, json: async () => ({}) });
+				}
+				return Promise.resolve({
+					ok: true,
+					json: async () => ({ entity: { _id: 'event1', location: [{ _id: 'lv-1' }] } }),
+				});
 			}),
 		);
-		await updateRehearsal({ db: 'd', token: 't' }, 'event1', {
-			location: { valueId: 'prop-loc-1', value: 'New Room' },
-		});
+		await updateRehearsal({ db: 'd', token: 't' }, 'event1', { location: 'New Room' });
 		expect(urls.every((u) => !u.includes('event2'))).toBe(true);
 	});
 
-	it('patching a field with null valueId (new property) skips the DELETE', async () => {
+	it('field absent from entity (new property): skip DELETE, only POST', async () => {
+		// Entity has no existing location → no DELETE, just POST the new value.
 		const calls: Array<{ method?: string }> = [];
 		vi.stubGlobal(
 			'fetch',
 			vi.fn().mockImplementation((_url: string, init?: { method?: string }) => {
 				calls.push({ method: init?.method ?? 'GET' });
-				return Promise.resolve({ ok: true, json: async () => ({}) });
+				return Promise.resolve({
+					ok: true,
+					json: async () => ({
+						// location absent — new property, no value-id to delete
+						entity: { _id: 'event1' },
+					}),
+				});
 			}),
 		);
-		// valueId null means the property doesn't exist yet — no DELETE, just POST
-		await updateRehearsal({ db: 'd', token: 't' }, 'event1', {
-			location: { valueId: null, value: 'New Room' },
-		});
+		await updateRehearsal({ db: 'd', token: 't' }, 'event1', { location: 'New Room' });
 		expect(calls.some((c) => c.method === 'DELETE')).toBe(false);
 		expect(calls.some((c) => c.method === 'POST')).toBe(true);
 	});
@@ -1174,5 +1195,257 @@ describe('updateSeason', () => {
 		expect(allProps.some((p) => p.type === 'end_date')).toBe(true);
 		// Must not use camelCase property names
 		expect(allProps.some((p) => p.type === 'startDate' || p.type === 'endDate')).toBe(false);
+	});
+});
+
+// ── #87: listRehearsals description mapping ───────────────────────────────────
+
+describe('listRehearsals — description field (#87)', () => {
+	it('maps description from event raw data onto Rehearsal', async () => {
+		// Rehearsal.description must be carried through from the raw event's
+		// description property. Without this mapping the edit form can't pre-fill it.
+		vi.stubGlobal(
+			'fetch',
+			vi.fn().mockImplementation((url: string) => {
+				if (url.includes('/entity/series1')) {
+					return Promise.resolve({
+						ok: true,
+						json: async () => ({
+							entity: { _id: 'series1', duration_minutes: [{ number: 90 }] },
+						}),
+					});
+				}
+				return Promise.resolve({
+					ok: true,
+					json: async () => ({
+						entities: [
+							{
+								_id: 'e1',
+								event_type: [{ string: 'rehearsal' }],
+								start_datetime: [{ datetime: '2026-09-01T16:00:00.000Z' }],
+								duration_minutes: [{ number: 90 }],
+								description: [{ _id: 'desc-val-1', string: 'Bring scores' }],
+								_parent: [{ reference: 'series1' }],
+							},
+						],
+					}),
+				});
+			}),
+		);
+		const r = await listRehearsals({ db: 'd', token: 't' }, { orgId: 'org1', seasonId: 'season1' });
+		expect(r[0].description).toBe('Bring scores');
+	});
+
+	it('description is undefined when the event has no description property', async () => {
+		vi.stubGlobal(
+			'fetch',
+			vi.fn().mockImplementation((url: string) => {
+				if (url.includes('/entity/series1')) {
+					return Promise.resolve({
+						ok: true,
+						json: async () => ({
+							entity: { _id: 'series1', duration_minutes: [{ number: 90 }] },
+						}),
+					});
+				}
+				return Promise.resolve({
+					ok: true,
+					json: async () => ({
+						entities: [
+							{
+								_id: 'e1',
+								event_type: [{ string: 'rehearsal' }],
+								start_datetime: [{ datetime: '2026-09-01T16:00:00.000Z' }],
+								duration_minutes: [{ number: 90 }],
+								// description absent — must map to undefined, not ''
+								_parent: [{ reference: 'series1' }],
+							},
+						],
+					}),
+				});
+			}),
+		);
+		const r = await listRehearsals({ db: 'd', token: 't' }, { orgId: 'org1', seasonId: 'season1' });
+		expect(r[0].description).toBeUndefined();
+	});
+
+	it('listRehearsals query props param includes description', async () => {
+		// The search URL must request the description field so Entu returns it.
+		let searchUrl = '';
+		vi.stubGlobal(
+			'fetch',
+			vi.fn().mockImplementation((url: string) => {
+				if (!url.includes('/entity/')) {
+					// entity search (not entity/{id})
+					searchUrl = url;
+				}
+				return Promise.resolve({ ok: true, json: async () => ({ entities: [] }) });
+			}),
+		);
+		await listRehearsals({ db: 'd', token: 't' }, { orgId: 'o', seasonId: 's' });
+		expect(searchUrl).toContain('description');
+	});
+});
+
+// ── #87: updateRehearsal self-resolving refactor ──────────────────────────────
+//
+// Design decision (team-lead, option (a)): updateRehearsal self-resolves value-ids,
+// mirroring updateSeason. New caller contract = plain values, no value-ids.
+// Internally: GET event → find existing property-value _id for each patched field →
+// DELETE old value → POST new value. Fields absent from patch are NOT touched.
+//
+// This is the AC "integration test driving the REAL update path (mock fetch, NOT helper)".
+
+describe('updateRehearsal (#87) — self-resolving contract', () => {
+	/**
+	 * Build a mock fetch that returns an event entity carrying the given value-ids,
+	 * records DELETEs and POSTs, and resolves all calls successfully.
+	 */
+	function makeRehearsalFetch(opts: {
+		startDatetimeValueId?: string;
+		durationValueId?: string;
+		locationValueId?: string;
+		descriptionValueId?: string;
+	} = {}) {
+		const deleted: string[] = [];
+		const posts: Array<{ url: string; body: unknown }> = [];
+		const fetchMock = vi
+			.fn()
+			.mockImplementation((url: string, init?: { method?: string; body?: string }) => {
+				if (init?.method === 'DELETE') {
+					deleted.push(url);
+					return Promise.resolve({ ok: true, json: async () => ({}) });
+				}
+				if (init?.method === 'POST') {
+					posts.push({ url, body: JSON.parse(init.body ?? '[]') });
+					return Promise.resolve({ ok: true, json: async () => ({}) });
+				}
+				// GET event — return entity with existing value-ids per opts
+				const entity: Record<string, Array<{ _id: string }>> = {};
+				if (opts.startDatetimeValueId) {
+					entity['start_datetime'] = [{ _id: opts.startDatetimeValueId }];
+				}
+				if (opts.durationValueId) {
+					entity['duration_minutes'] = [{ _id: opts.durationValueId }];
+				}
+				if (opts.locationValueId) {
+					entity['location'] = [{ _id: opts.locationValueId }];
+				}
+				if (opts.descriptionValueId) {
+					entity['description'] = [{ _id: opts.descriptionValueId }];
+				}
+				return Promise.resolve({
+					ok: true,
+					json: async () => ({ entity: { _id: 'event-x', ...entity } }),
+				});
+			});
+		return { fetchMock, deleted, posts };
+	}
+
+	it('single-field patch: 1 GET (event), 1 DELETE (resolved value-id), 1 POST; other fields untouched', async () => {
+		// Patch only start_datetime — must NOT touch duration/location/description.
+		const { fetchMock, deleted, posts } = makeRehearsalFetch({
+			startDatetimeValueId: 'sdt-val-1',
+			durationValueId: 'dur-val-1',
+			locationValueId: 'loc-val-1',
+			descriptionValueId: 'desc-val-1',
+		});
+		vi.stubGlobal('fetch', fetchMock);
+
+		await updateRehearsal({ db: 'd', token: 't' }, 'event1', {
+			start_datetime: '2026-09-08T16:00:00.000Z',
+		});
+
+		// Exactly 1 GET to self-resolve (calls without a method or with method 'GET')
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const gets = (fetchMock.mock.calls as any[]).filter(
+			(c: unknown[]) => !(c[1] as { method?: string } | undefined)?.method,
+		);
+		expect(gets).toHaveLength(1);
+		expect((gets[0][0] as string)).toContain('event1');
+
+		// DELETE must target the resolved start_datetime value-id
+		expect(deleted).toHaveLength(1);
+		expect(deleted[0]).toContain('sdt-val-1');
+
+		// POST must carry the new start_datetime value
+		expect(posts).toHaveLength(1);
+		expect(posts[0].url).toContain('event1');
+		const body = posts[0].body as Array<{ type: string; datetime?: string }>;
+		expect(body).toEqual(
+			expect.arrayContaining([{ type: 'start_datetime', datetime: '2026-09-08T16:00:00.000Z' }]),
+		);
+
+		// duration/location/description value-ids must NOT be DELETEd
+		expect(deleted.some((u) => u.includes('dur-val-1'))).toBe(false);
+		expect(deleted.some((u) => u.includes('loc-val-1'))).toBe(false);
+		expect(deleted.some((u) => u.includes('desc-val-1'))).toBe(false);
+	});
+
+	it('multi-field patch: 1 GET, DELETE+POST each patched field; absent fields untouched', async () => {
+		// Patch start_datetime + location → 1 GET, 2 DELETEs, 2 POSTs.
+		// duration + description absent from patch → NOT touched.
+		const { fetchMock, deleted, posts } = makeRehearsalFetch({
+			startDatetimeValueId: 'sdt-val-2',
+			durationValueId: 'dur-val-2',
+			locationValueId: 'loc-val-2',
+			descriptionValueId: 'desc-val-2',
+		});
+		vi.stubGlobal('fetch', fetchMock);
+
+		await updateRehearsal({ db: 'd', token: 't' }, 'event2', {
+			start_datetime: '2026-09-15T16:00:00.000Z',
+			location: 'New Hall',
+		});
+
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const gets = (fetchMock.mock.calls as any[]).filter(
+			(c: unknown[]) => !(c[1] as { method?: string } | undefined)?.method,
+		);
+		expect(gets).toHaveLength(1);
+		expect(deleted).toHaveLength(2);
+		expect(deleted.some((u) => u.includes('sdt-val-2'))).toBe(true);
+		expect(deleted.some((u) => u.includes('loc-val-2'))).toBe(true);
+		expect(posts).toHaveLength(2);
+		// duration + description untouched
+		expect(deleted.some((u) => u.includes('dur-val-2'))).toBe(false);
+		expect(deleted.some((u) => u.includes('desc-val-2'))).toBe(false);
+	});
+
+	it('field absent from entity (new property): skip DELETE, only POST', async () => {
+		// location not on entity yet → no DELETE, only POST the new value
+		const { fetchMock, deleted, posts } = makeRehearsalFetch({
+			startDatetimeValueId: 'sdt-val-3',
+			// locationValueId absent — entity has no location to clear
+		});
+		vi.stubGlobal('fetch', fetchMock);
+
+		await updateRehearsal({ db: 'd', token: 't' }, 'event3', { location: 'First Location' });
+
+		expect(deleted).toHaveLength(0);
+		expect(posts).toHaveLength(1);
+		const body = posts[0].body as Array<{ type: string; string?: string }>;
+		expect(body).toEqual(expect.arrayContaining([{ type: 'location', string: 'First Location' }]));
+	});
+
+	it('empty patch → no fetch calls at all (early return, no GET)', async () => {
+		const fetchMock = vi.fn();
+		vi.stubGlobal('fetch', fetchMock);
+
+		await updateRehearsal({ db: 'd', token: 't' }, 'event4', {});
+
+		expect(fetchMock).not.toHaveBeenCalled();
+	});
+
+	it('sibling guard: updateRehearsal for event1 issues NO calls to event2 URL', async () => {
+		const { fetchMock } = makeRehearsalFetch({ startDatetimeValueId: 'sdt-5' });
+		vi.stubGlobal('fetch', fetchMock);
+
+		await updateRehearsal({ db: 'd', token: 't' }, 'event1', {
+			start_datetime: '2026-09-22T16:00:00.000Z',
+		});
+
+		const allUrls = (fetchMock.mock.calls as Array<[string, unknown]>).map(([url]) => url);
+		expect(allUrls.every((u) => !u.includes('event2'))).toBe(true);
 	});
 });
