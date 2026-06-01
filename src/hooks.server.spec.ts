@@ -49,4 +49,23 @@ describe('auth guard hook', () => {
 	});
 });
 
+// /seasons protected route (#82, feat/seasons-nav)
+// isProtectedPath is a catch-all (allowlist of public paths); /seasons is already
+// protected by the current implementation. This test pins the contract explicitly
+// so future changes to the public-path list can't accidentally expose /seasons.
+describe('/seasons route guard', () => {
+	it('unauthenticated GET /seasons → 302 to /auth/login?redirect=/seasons', async () => {
+		await expect(handle({ event: mockEvent('/seasons'), resolve })).rejects.toMatchObject({
+			status: 302,
+			location: '/auth/login?redirect=%2Fseasons',
+		});
+	});
+
+	it('valid cookie on /seasons → pass through', async () => {
+		resolve.mockClear();
+		await handle({ event: mockEvent('/seasons', valid), resolve });
+		expect(resolve).toHaveBeenCalledOnce();
+	});
+});
+
 // (*MVOX:Tallis*)

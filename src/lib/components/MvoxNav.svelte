@@ -5,15 +5,16 @@
 	import OrgPicker from './OrgPicker.svelte';
 	import type { OrgPickerMode } from '$lib/auth/userStore';
 
-	type Tab = 'agenda' | 'library' | 'roster' | 'notices' | 'settings';
+	type Tab = 'agenda' | 'library' | 'roster' | 'notices' | 'settings' | 'seasons';
 	const TAB_LABELS: Record<Tab, () => string> = {
 		agenda: m.nav_tab_agenda,
 		library: m.nav_tab_library,
 		roster: m.nav_tab_roster,
 		notices: m.nav_tab_notices,
 		settings: m.nav_tab_settings,
+		seasons: m.nav_tab_rehearsals,
 	};
-	const TABS: Tab[] = ['agenda', 'library', 'roster', 'notices', 'settings'];
+	const TABS: Tab[] = ['agenda', 'library', 'roster', 'notices', 'settings', 'seasons'];
 	const {
 		signedIn = false,
 		currentTab = 'agenda' as Tab,
@@ -110,20 +111,32 @@
 			<!-- Desktop inline tab row — hidden on mobile, visible at sm+ -->
 			<div data-testid="nav-inline-tabs" class="hidden sm:flex gap-3">
 				{#each TABS as tab (tab)}
-					<span
-						data-testid="nav-inline-tab-{tab}"
-						class="font-sans text-[11.5px] {tab === currentTab
-							? 'text-ink font-semibold border-b-2 border-ink pb-1'
-							: 'text-ink-3 font-medium'} inline-flex items-center gap-1"
-					>
-						{TAB_LABELS[tab]()}
-						{#if tab === 'library' && tab === currentTab}
-							<span
-								class="font-sans text-[7px] tracking-wider py-px px-1 bg-ink text-paper rounded-sm font-semibold"
-								>{m.nav_chip_librarian()}</span
-							>
-						{/if}
-					</span>
+					{#if tab === 'seasons'}
+						<a
+							data-testid="nav-inline-tab-{tab}"
+							href="/seasons"
+							class="font-sans text-[11.5px] {tab === currentTab
+								? 'text-ink font-semibold border-b-2 border-ink pb-1'
+								: 'text-ink-3 font-medium'} inline-flex items-center gap-1 no-underline"
+						>
+							{TAB_LABELS[tab]()}
+						</a>
+					{:else}
+						<span
+							data-testid="nav-inline-tab-{tab}"
+							class="font-sans text-[11.5px] {tab === currentTab
+								? 'text-ink font-semibold border-b-2 border-ink pb-1'
+								: 'text-ink-3 font-medium'} inline-flex items-center gap-1"
+						>
+							{TAB_LABELS[tab]()}
+							{#if tab === 'library' && tab === currentTab}
+								<span
+									class="font-sans text-[7px] tracking-wider py-px px-1 bg-ink text-paper rounded-sm font-semibold"
+									>{m.nav_chip_librarian()}</span
+								>
+							{/if}
+						</span>
+					{/if}
 				{/each}
 			</div>
 

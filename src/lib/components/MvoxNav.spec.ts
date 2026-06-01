@@ -169,7 +169,7 @@ describe('MvoxNav — responsive layout (CHORE-76)', () => {
 		expect(hamburger?.className).toContain('sm:hidden');
 	});
 
-	it('AC2 — clicking hamburger opens collapsed menu listing all 5 tab labels', async () => {
+	it('AC2 — clicking hamburger opens collapsed menu listing all 6 tab labels', async () => {
 		const { container } = render(MvoxNav, { props: signedInProps });
 		const hamburger = container.querySelector(
 			'[data-testid="nav-tab-menu-trigger"]',
@@ -178,11 +178,11 @@ describe('MvoxNav — responsive layout (CHORE-76)', () => {
 		await fireEvent.click(hamburger);
 		const menu = container.querySelector('[data-testid="nav-tab-menu"]');
 		expect(menu).not.toBeNull();
-		// All 5 tab labels must appear in the opened dropdown.
+		// All 6 tab labels must appear in the opened dropdown (5 existing + seasons).
 		// We check for the paraglide message keys' output — not hardcoded strings,
 		// but verify the tab entries exist structurally via data-testid pattern.
 		const tabItems = menu?.querySelectorAll('[data-testid^="nav-tab-menu-item-"]');
-		expect(tabItems?.length).toBe(5);
+		expect(tabItems?.length).toBe(6);
 	});
 
 	// AC2 — librarian chip co-locates with the library entry in the collapsed menu
@@ -207,9 +207,9 @@ describe('MvoxNav — responsive layout (CHORE-76)', () => {
 		const { container } = render(MvoxNav, { props: signedInProps });
 		const inlineTabRow = container.querySelector('[data-testid="nav-inline-tabs"]');
 		expect(inlineTabRow).not.toBeNull();
-		// All 5 tabs must be present inside the inline row
+		// All 6 tabs must be present inside the inline row (5 existing + seasons)
 		const inlineItems = inlineTabRow?.querySelectorAll('[data-testid^="nav-inline-tab-"]');
-		expect(inlineItems?.length).toBe(5);
+		expect(inlineItems?.length).toBe(6);
 	});
 
 	// AC4 — OrgPicker chip does not force horizontal overflow on narrow viewports.
@@ -334,5 +334,55 @@ describe('MvoxNav — responsive layout (CHORE-76)', () => {
 		const orgArea = container.querySelector('[data-testid="nav-org-area"]');
 		expect(orgArea).not.toBeNull();
 		expect(orgArea?.className).toContain('min-w-0');
+	});
+});
+
+// /seasons nav tab (feat/seasons-nav)
+// RED until Byrd adds 'seasons' to the TABS array + TAB_LABELS in MvoxNav.svelte.
+describe('MvoxNav — /seasons tab (#82)', () => {
+	const signedInProps = {
+		signedIn: true,
+		currentTab: 'agenda' as const,
+		orgLabel: 'EFK',
+		orgInitials: 'EF',
+		userInitial: 'A',
+		userName: 'Alice',
+	};
+
+	it('inline tab row contains a nav-inline-tab-seasons element linking to /seasons', () => {
+		const { container } = render(MvoxNav, { props: signedInProps });
+		const tab = container.querySelector('[data-testid="nav-inline-tab-seasons"]');
+		expect(tab).not.toBeNull();
+		// Must be a link to /seasons
+		expect(tab?.tagName.toLowerCase()).toBe('a');
+		expect(tab?.getAttribute('href')).toBe('/seasons');
+	});
+
+	it('inline tab label contains the nav_tab_rehearsals message ("Rehearsals")', () => {
+		const { container } = render(MvoxNav, { props: signedInProps });
+		const tab = container.querySelector('[data-testid="nav-inline-tab-seasons"]');
+		expect(tab?.textContent?.trim()).toBeTruthy();
+		// Real paraglide output for nav_tab_rehearsals is "Rehearsals"
+		expect(tab?.textContent).toContain('Rehearsals');
+	});
+
+	it('hamburger menu lists 6 tabs (5 existing + seasons)', async () => {
+		const { container } = render(MvoxNav, { props: signedInProps });
+		const hamburger = container.querySelector(
+			'[data-testid="nav-tab-menu-trigger"]',
+		) as HTMLButtonElement;
+		await fireEvent.click(hamburger);
+		const menu = container.querySelector('[data-testid="nav-tab-menu"]');
+		const tabItems = menu?.querySelectorAll('[data-testid^="nav-tab-menu-item-"]');
+		expect(tabItems?.length).toBe(6);
+	});
+
+	it('hamburger menu contains nav-tab-menu-item-seasons', async () => {
+		const { container } = render(MvoxNav, { props: signedInProps });
+		const hamburger = container.querySelector(
+			'[data-testid="nav-tab-menu-trigger"]',
+		) as HTMLButtonElement;
+		await fireEvent.click(hamburger);
+		expect(container.querySelector('[data-testid="nav-tab-menu-item-seasons"]')).not.toBeNull();
 	});
 });
