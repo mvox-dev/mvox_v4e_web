@@ -1,8 +1,16 @@
 [
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1780265768832@finn\",\"from\":\"team-lead\",\"reason\":\"Session 27 wind-down. Two CHOREs shipped (#79 auth guard, #72 /about). Thanks for the audits. Save anything worth keeping to your scratchpad first, then ack. Next session is a design/mapping session (rehearsal/concert/season/rsvp) — you'll likely lead a schema audit.\",\"timestamp\":\"2026-05-31T22:16:08.832Z\"}",
-    "timestamp": "2026-05-31T22:16:08.832Z",
+    "text": "[2026-05-31 22:47]\n\n## Research Request\n- **From:** Palestrina (team-lead)\n- **Story:** general — session-28 design/mapping kickoff\n- **Urgency:** blocking (this grounds the brainstorm with PO)\n- **Question:** Two-part audit of the rehearsal/concert/season/rsvp domain.\n\n**Part A — Current v4E schema shape (source of truth):**\nRead `$ENTU_RESEARCH/docs/schema/v4E/schema.ts` (default `~/projects/entu-research/docs/schema/v4E/`; the README too if helpful). For EACH of these entity types, report whether it exists in the CURRENT v4E schema and its exact shape (properties, types, parent/reference relationships, any formulas, `_sharing`/rights defaults):\n- `season`\n- `event` (and any `event_type` enum/distinction for rehearsal vs concert)\n- `event_series`\n- `rsvp`\n- `attendance`\n- `repertoire_item`\n- `program_item`\n- any related: `member`, `person`, `section`, `organization` (just the bits that these 7 reference)\n\nFlag explicitly where the current schema.ts DIFFERS from the polyphony-era design captured in our memory (seasons_events / participation / programs) — memory is polyphony-era; mvox is v4E-clean.\n\n**Part B — What mvox already has wired:**\nGrep the mvox repo (`~/workspace/src/`) for ANY existing routes, components, types, server endpoints, or i18n keys touching season/event/rehearsal/concert/rsvp/attendance/repertoire/program. I expect near-zero, but confirm. Report file paths + 1-line description of each hit (or \"none found\").\n\n### Context\nSession 28 is a design/mapping session (PO directive) for the rehearsal/concert/season/rsvp feature surface. We have a big head start in team memory (polyphony-era design), but I need to know what actually landed in v4E schema.ts vs that memory, and the current mvox wiring state, before I brainstorm the feature surface with the PO. Structured markdown report back to me, raw data — I'll draw the conclusions. Thanks Finn.",
+    "summary": "Research request: v4E season/event/rsvp schema audit",
+    "timestamp": "2026-05-31T22:47:59.780Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1780272732625@finn\",\"from\":\"team-lead\",\"reason\":\"Session 28 design/mapping complete — spec + plan + issues all shipped. Wrapping the team. Thanks for the fast, thorough schema audit that grounded the whole design. If you have any [LEARNED]/[DEFERRED]/[WARNING] worth keeping, jot it to your scratchpad first, then ack.\",\"timestamp\":\"2026-06-01T00:12:12.625Z\"}",
+    "timestamp": "2026-06-01T00:12:12.625Z",
     "type": "message",
     "read": true
   }

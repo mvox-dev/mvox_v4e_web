@@ -43,3 +43,26 @@ PO approved F2, resolved F1+F3. Revised clean draft sent. Awaiting explicit PO g
 All 23 issues open on mvox-dev/mvox_v4e_web (#1–#23). Session ended cleanly after PO go-ahead.
 
 **[DEFERRED]** A4 + C4 (attendance history, programme history) — parked ⚪, deferred to v2.
+
+### [CHECKPOINT] 2026-06-01 — Session 28 complete, rehearsal-schedule first-slice issues filed
+
+Design/mapping session for conductor/admin rehearsal-schedule slice. Spec approved at `4c4b1ab` (`docs/superpowers/specs/2026-05-31-rehearsal-schedule-first-slice-design.md`).
+
+**Issues updated/filed:**
+- #19 ADMIN-1 (create season) — AC replaced with spec §7 Cap 1
+- #20 ADMIN-2 (create event) — scoped to rehearsal series only, triggers #81
+- #81 ADMIN-6 (generate event instances eager) — NEW; DST regression test required
+- #82 ADMIN-7 (view rehearsal list) — NEW; conductor primary screen at `/seasons?season=<id>`
+- #83 ADMIN-8 (cancel/edit single instance) — NEW; gating probe §8 #1 (delete rights)
+- #84 ADMIN-9 (delete series cascade) — NEW; gating probe §8 #1 (delete rights)
+- #85 ADMIN-10 (assign/manage season conductors) — NEW; gating probe §8 #4 (grant wire + inherited flag)
+
+**[GOTCHA] Cap 7 gating probes — must resolve before GREEN on #83/#84/#85:**
+- Probe §8 #1: Pérotin confirms DELETE is `_owner`-tier on live playground
+- Probe §8 #4: does `inherited: true` appear on cascaded rights in season GET? (if absent → AC5 list-conductors needs fallback: subtract org `_owner` person-ids from season `_editor` list); also: grant/revoke wire shape; creator-auto-`_owner` mechanic
+
+**[PATTERN] Cap 7 roles-as-rights:** conductor = direct `_editor` grant on season; no `conductors` property; list = entries without `inherited: true` flag; display name via separate `GET /entity/{personId}` (same as ADMIN-5 pattern).
+
+**[DEFERRED]** Pure-conductor delete rights — conductor-only persona (no org `_owner`) cannot cancel rehearsals (DELETE is `_owner`-tier). Needs PO decision: grant `_owner` on season (scoped), or BFF elevated-op. Surface when pure-conductor persona becomes real.
+
+(*MVOX:Victoria*)

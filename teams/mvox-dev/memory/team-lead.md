@@ -1,6 +1,64 @@
 # Palestrina — Team Lead Scratchpad
 
-### [NEXT SESSION] 2026-05-31 end-of-session-27 — session-27 → session-28
+### [NEXT SESSION] 2026-06-01 end-of-session-28 — session-28 → session-29
+
+**Headline: A pure DESIGN/MAPPING session (PO directive), executed cleanly end-to-end. Mapped the rehearsal/concert/season/rsvp domain, then brainstormed + specced + planned the FIRST buildable slice — "Lay out the rehearsal schedule" (conductor/admin-first). Output: domain map → APPROVED spec → 17-task implementation plan → 7 GitHub issues (#81–#85 new). ZERO implementation code, by design. Session 29 IS the implementation session: opens with PO authorizing Pérotin's Phase-0 rights probes, then the TDD chain on `feat/rehearsal-schedule`.**
+
+## ⭐ Session-29 first real work: implement the rehearsal-schedule slice
+
+- **Spec (approved, source of truth):** `docs/superpowers/specs/2026-05-31-rehearsal-schedule-first-slice-design.md` (@ `4c4b1ab`+; exec-layer fix `5280022`).
+- **Plan (17 tasks, team TDD chain):** `docs/superpowers/plans/2026-06-01-rehearsal-schedule-first-slice-plan.md` (@ `bf9eed4`).
+- **Branch:** `feat/rehearsal-schedule` off clean main. **One branch only** (`feedback_no_parallel_branches`).
+- **OPENING MOVE = Phase 0 (Pérotin live rights probes) — GATING.** Spawn Pérotin; he needs PO **"I authorize this run"** (`feedback_authorization_gate`) before any live mutation. Probes P0.1–P0.6 confirm: delete tier (`_editor` can't delete? expect confirmed), conductor-grant wire, the `inherited:true` flag (gating for "list conductors"), revoke-drops-cascade, creator-auto-owner?, propagation lag (~1.5–3.5s/level). **Tasks 8/9/10 (delete + conductors) CANNOT go GREEN until P0 report lands.** Pure-logic Tasks 1–2 (recurrence/DST + validation) + Task 3 (types) + Task 4 (createSeason) can start in parallel — not probe-gated.
+- **7 capabilities ↔ issues:** create-season #19 · create-series #20 · generate-events #81 · view-list #82 · cancel/edit #83 · delete-series #84 · conductors #85. (#83/#84/#85 carry the gating-probe callouts.)
+
+## Key design decisions locked this session (all in the spec; Bentham GREEN end-to-end, verified vs schema.ts + live-Entu case study)
+
+1. **No v4E schema change** — builds to already-landed shapes (schema-alignment carve-out; NO Schema-Change trailer on the impl PR).
+2. **DELETE is `_owner`-tier, NOT `_editor`** (Entu tier-mechanics > README "full" aspiration). Demo persona (admin+conductor) deletes via org-`_owner` cascade. Cap 5a + Cap 6 = `_owner`; Cap 5b edit = `_editor`.
+3. **Conductors = roles-as-rights** (PO chose Model A): conductor = DIRECT `_editor` grant on the season, NO `conductors` property. List = `_editor` entries WITHOUT `inherited:true` (Entu materialises cascade with the flag). Assign = `_owner` op (managing rights), user-rights-default not elevated. Membership-pairing enforced (assignee must be active org member).
+4. **Eager materialisation** — series create synchronously POSTs ~35 event rows; partial-failure = no rollback, report count + retry. Cancel = hard delete (no status field); no series-regeneration in v1.
+5. **DST-correct times** — series stores wall-clock "HH:MM"; generate computes UTC via Europe/Tallinn (hardcoded v1, per-org tz deferred). Winter+summer-both-19:00 regression test baked into AC.
+6. **Execution layer = CLIENT-SIDE hydration, NOT server BFF** (spec §3.3a) — Entu data ops run in-browser (hydrateLibrary pattern, PUBLIC_ENTU_DB + storage JWT) due to IP-bound JWT (L119). "BFF" in the spec = client-side data layer. New code under `src/lib/seasons/` mirrors `src/lib/library/`. Rights are Entu-enforced (403 surfaced by client); input validation is client-side.
+
+## Process notes / what worked
+
+- **Visual companion was a big win** — PO explicitly loved the "no-stress scrollable canvas; nothing scrolls past unreachable." Launched on tailnet (`--host 0.0.0.0 --url-host ai-mvox-eu.tailccff13.ts.net`, port 55333). Used for: domain map, event_series explainer, first-slice boundary, refinements, Model-A/B fork, AND the full rendered spec (wrote a `/tmp/spec_render.py` md→html converter since no pandoc/marked installed — reuse if still present, else re-author; it's small). **Keep leaning visual for this PO.** (`feedback_visual_companion_tailnet_default` validated again.)
+- **Bentham pre-implementation review caught two real things** the spec would've shipped wrong: delete=`_owner`-tier (not `_editor`), and the multi-parent sibling-sweep on cascade-delete. Both fixed pre-plan. Verify-before-assert (L121, lifted to arch-decisions this session) paid off — Bentham hash-verified the committed blob before each verdict.
+- **Victoria's AC review** caught 3 Cap-7 gaps (direct-vs-inherited distinction, unassign→already-created-events edge, display-name resolution). All folded in; gap-2 decided = option A (residual rights left intact, accepted v1).
+- **Clean session**: State B fresh start, no `-2` ghosts. Agents spawned: finn, bentham, victoria (NO implementers, NO perotin — design session). Shut down via waterfall at wrap.
+
+## Stewardship done this session
+
+- **Lifted L121 (verify-before-assert) + L122 (freeze-spec-before-chain) to `architecture-decisions.md`** (`307c451`, Bentham authored). Clears the deferred stewardship item from the session-27 seed.
+
+## Production health at session close (NO deploy this session — design only)
+
+- `mvox.eu` unchanged: `/` 200, `/about` 200, `/library` 302→`/auth/login` (CHORE-79 guard). Build chunks unchanged.
+- **main: `bf9eed4`** (origin matches; was `cd69b9c` at session start). 8 commits this session, all docs/spec/plan/memory — NO source code touched.
+- Tests unchanged (613 unit at last ship). Polyphony Entu db unchanged (607 librarian-bundle entities under EFK Library `6a12036c4ff8277cd4306b26`).
+
+## Carry-forward backlog (after the rehearsal-schedule slice ships)
+
+- **#80** DRY safeRedirectTarget import (~5-line Byrd; YELLOW-79.1).
+- **/about real content** — lorem→real copy + et/lv/uk translations when PO provides.
+- **#73** overdue red+bold (blocked on lending); **CHORE-C** test infra (MSW+Playwright, 9 tasks, heavy — `docs/superpowers/plans/2026-05-23-chore-53-c-test-infra.md`); **#54** client error capture; **#44** CF Pages git-deploy; **#49** Biome lint; **#6** Email (blocked PO SPF/DKIM).
+- Possible memory next session: the **client-side-execution-layer** reconciliation (L119 → spec §3.3a) may warrant softening CLAUDE.md's auth/BFF description to match reality (flagged session-27 L119, still pending).
+- Stale branches (unchanged): local `chore/per-commit-green-arch-decision`, `chore/seed-librarian-bundle`, `feat/phase-b-live-wiring`; remote `origin/feat/phase-a-migration`, `origin/fix/phase-a-partial-failure-recovery`.
+
+## Expected first action session 29
+
+1. Read this seed + skim the spec + plan (both committed; self-contained).
+2. Verify prod health (`curl -sI` /, /about, /library) + `main` at `bf9eed4` local==origin.
+3. Spawn finn + bentham (always-on) + **Pérotin** (data-manager — Phase 0 probes are his) + tallis (RED). Byrd/Josquin/Comenius on demand as the chain progresses.
+4. **Confirm with PO + get "I authorize this run"**, then dispatch Pérotin Phase 0 (P0.1–P0.6). In parallel, team-lead creates `feat/rehearsal-schedule` branch; dispatch Tallis RED on the NON-gated Tasks 1–2 (recurrence/DST + validation).
+5. After P0 report: relay any AC adjustment to Tallis, then proceed through the TDD chain Tasks 4→17.
+
+(*MVOX:Palestrina*)
+
+---
+
+### [PROCESSED 2026-06-01 session-28] 2026-05-31 end-of-session-27 — session-27 → session-28
 
 **Headline: A "ship two CHOREs through a badly flaky tool-channel" session. CHORE-79 (server-side auth guard, hybrid) + CHORE-72 (/about page) both shipped end-to-end to mvox.eu. Filed #80 (DRY follow-up). Saved a core product-motivation memory. NEXT SESSION IS A DESIGN/MAPPING SESSION (PO directive): map the rehearsal / concert / season / RSVP functionality — NOT a coding session to start.**
 

@@ -1,44 +1,50 @@
-# Task List Snapshot — 2026-05-31 end-of-session-27
+# Task List Snapshot — 2026-06-01 end-of-session-28
 
-State at session-27 close.
+State at session-28 close.
 
 ## Active tasks (in-flight)
 
-None. All session-27 work shipped.
+None. Session 28 was a design/mapping session; all six process tasks completed.
 
 ## Pending tasks (deferred)
 
-None tracked in the harness task list. Next session's work (rehearsal/concert/season/rsvp mapping) is a fresh design/requirements effort — see `team-lead.md [NEXT SESSION]` seed.
+None in the harness task list. Session-29's work (implement the rehearsal-schedule slice) is fully captured in the implementation plan, not the harness task list — see `team-lead.md [NEXT SESSION]` seed.
 
-## Session-27 task history (all completed)
+## Session-28 task history (all completed)
 
-CHORE-79 (server-side auth guard, hybrid):
-- #23 RED (Tallis) → #24 GREEN (Josquin) → #25 REVIEW (Bentham) → #26 PREVIEW+MERGE (Josquin). Shipped `e91233a`.
-- Folded-in logout-greet fix: #30 RED (Tallis) → #28 GREEN (Byrd, performLogout resets userStore) → #29 REVIEW (Bentham).
+Brainstorming → spec → plan process (team-lead owned):
+1. Explore project context (Finn schema audit + Victoria issue baseline) ✅
+2. Offer visual companion to PO ✅
+3. Brainstorm conductor/admin feature surface with PO ✅
+4. Present design + get PO approval ✅
+5. Write + self-review first-slice spec, PO review ✅ (approved)
+6. Transition to writing-plans (implementation plan) ✅
 
-CHORE-72 (/about page):
-- #31 RED (Tallis) → #36 i18n+dedupe (Comenius) → #32 GREEN-align (Byrd) → #35 REVIEW (Bentham) → #34 PREVIEW+MERGE (Josquin). Shipped `a0b2fcf`.
+## Produced this session (all committed + pushed to origin)
 
-(Task IDs got non-sequential due to mid-chain reorders + the harness task list clearing once mid-session — IDs are not authoritative; GitHub + git history are the durable record.)
+- **Spec:** `docs/superpowers/specs/2026-05-31-rehearsal-schedule-first-slice-design.md` — APPROVED. Bentham GREEN end-to-end.
+- **Plan:** `docs/superpowers/plans/2026-06-01-rehearsal-schedule-first-slice-plan.md` — 17 tasks + Pérotin Phase-0 probe gate.
+- **Stewardship:** L121 + L122 lifted to `architecture-decisions.md`.
+- **Commits (8):** `307c451` (L121/L122) → `8a5887a` `fb4e840` `008427f` `4c4b1ab` `5280022` (spec iterations) → `35c7cd2` `bf9eed4` (plan). main @ `bf9eed4`, origin matches.
 
-## Shipped this session
+## GitHub issues for the slice (filed/updated session 28 by Victoria)
 
-- **#79** server-side auth guard — `e91233a`, live (`app.DIpxe8VD.js`)
-- **#72** /about page — `a0b2fcf`, live (`app.BlDa5F1S.js` + `start.B2QecvaZ.js`)
-- **#80** filed (DRY safeRedirectTarget follow-up — not started)
-- docs/memory commits `9957f66` + `fa3f2f3` (main tip)
+| Capability | Issue |
+|---|---|
+| Create season | #19 (ADMIN-1, updated) |
+| Create rehearsal series | #20 (ADMIN-2, updated) |
+| Generate events (eager) | #81 (ADMIN-6) |
+| View rehearsal list | #82 (ADMIN-7) |
+| Cancel/edit single instance | #83 (ADMIN-8) — gating probe |
+| Delete series (cascade) | #84 (ADMIN-9) — gating probe |
+| Assign/manage conductors | #85 (ADMIN-10) — gating probe; xref #23 |
 
-## Carry-forward GH backlog
+## Next session focus
 
-- **#80** DRY login-page safeRedirectTarget import (~5-line Byrd; YELLOW-79.1 deferred)
-- **#73** overdue red+bold (blocked on lending)
-- **#54** client error capture; **#44** CF Pages git-deploy; **#49** Biome lint; **#6** Email (blocked PO SPF/DKIM)
-- **CHORE-C** test infra (MSW+Playwright, 9 tasks, heavy)
-- **/about real content** — swap lorem→real copy + et/lv/uk translations when PO provides
-- Stewardship: promote L121 (verify-before-assert) + L122 (freeze-spec-before-chain) to architecture-decisions.md / Brilliant
+**Implement the rehearsal-schedule first slice** — TDD chain on `feat/rehearsal-schedule`. Opens with PO authorizing Pérotin's Phase-0 rights probes (gates Tasks 8/9/10). Non-gated Tasks 1–4 can start in parallel. See `team-lead.md [NEXT SESSION]` seed for the full kickoff sequence.
 
-## Next session focus (PO directive)
+## Carry-forward GH backlog (unchanged)
 
-**Map rehearsal/concert/season/rsvp functionality** — design/requirements, NOT coding. Big head start in memory (project_polyphony_seasons_events / participation / programs). Lead with Finn audit of current v4E schema + brainstorm with PO + Victoria requirements.
+- **#80** DRY login safeRedirectTarget; **/about** real content; **#73** overdue red+bold (blocked lending); **#54** client error capture; **#44** CF Pages git-deploy; **#49** Biome lint; **#6** Email (blocked PO SPF/DKIM); **CHORE-C** test infra (heavy).
 
 (*MVOX:Palestrina*)

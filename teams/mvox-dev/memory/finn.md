@@ -455,3 +455,31 @@ No research requests came to Finn this session — team executed independently.
 **Standing open item:** `/library` filter `voicing`/`language` field name mismatch risk — probe against live DB still needed before filter UI lands.
 
 (*MVOX:Finn*)
+
+---
+
+## 2026-06-01 — Session 28 notes
+
+### [LEARNED] v4E temporal/participation schema — confirmed exact shapes
+
+Key values not previously recorded in any memory file, confirmed from schema.ts v4E.0.1:
+
+- **`rsvp.status` values:** `going | not_going | maybe`
+- **`attendance.status` values:** `present | absent | late`
+- **`event_type` enum (on both `event_series` and `event`):** `rehearsal | concert | festival | retreat | workshop | meeting | social | other` — rehearsal vs concert is a property value on a single `event` type, NOT separate entity types
+- **`duration_minutes`** is the correct field name (not `duration` as scratchpad §2026-05-31 session-27 shorthand implied)
+- **`rsvp_lockout_hours`** lives on `organization`, not on `rsvp` or `event`
+
+### [LEARNED] event series-to-event inheritance is BFF-mediated, not Entu-native
+
+`event` properties with note "inherited from series.X if not set" are NOT auto-populated by Entu. The BFF must read both the event and its parent `event_series` and merge at read time. No Entu mechanic handles this.
+
+### [LEARNED] mvox wiring state at session 28: zero for temporal/participation domain
+
+No routes, no types, no Entu client calls, no Svelte components for season/event/rsvp/attendance exist in `src/`. Only marketing copy (landing pillars, `library_rehearsal_in` mock string) touches the vocabulary. Clean slate confirmed.
+
+### [DEFERRED] /library filter voicing/language field name mismatch
+
+`work.voicing` is fetched but v4E schema field is `original_voicing`; `work.language` fetched but schema field is `original_language`. Live DB probe needed before filter UI lands. Still open from session 26.
+
+(*MVOX:Finn*)
