@@ -35,6 +35,12 @@
 	/** Field-keyed validation error — null when no error. */
 	let fieldError = $state<{ field: string; message: string } | null>(null);
 
+	/** Non-blocking soft warning: series dates extend outside the season window. */
+	const outsideSeason = $derived(
+		(startDate !== '' && startDate < season.startDate) ||
+		(endDate !== '' && endDate > season.endDate),
+	);
+
 	function errorMessage(code: string): string {
 		// If-chain so each m.* is only accessed when that specific code fires —
 		// prevents Vitest strict-mock eager-access failures on unmocked keys.
@@ -42,7 +48,6 @@
 		if (code === 'end_before_start') return m.seasons_error_end_before_start();
 		if (code === 'interval_too_small') return m.seasons_error_interval_too_small();
 		if (code === 'duration_too_small') return m.seasons_error_duration_too_small();
-		if (code === 'outside_season') return m.seasons_error_outside_season();
 		return code;
 	}
 
@@ -153,6 +158,12 @@
 		oninput={(e) => { location = (e.target as HTMLInputElement).value; }}
 	/>
 
+	{#if outsideSeason}
+		<div data-testid="series-season-warning" class="field-warning">
+			{m.seasons_warning_outside_season()}
+		</div>
+	{/if}
+
 	<button data-testid="series-submit" type="submit" class="submit-btn">
 		{m.seasons_form_series_submit()}
 	</button>
@@ -197,6 +208,16 @@
 		font-size: 10px;
 		color: #c0392b;
 		margin-top: 2px;
+	}
+	.field-warning {
+		display: block;
+		font-size: 10px;
+		color: #b8860b;
+		margin-top: 8px;
+		padding: 4px 6px;
+		background: #fef9e7;
+		border: 1px solid #e0c060;
+		border-radius: 2px;
 	}
 	.submit-btn {
 		margin-top: 14px;

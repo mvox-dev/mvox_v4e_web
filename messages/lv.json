@@ -207,5 +207,6 @@
 	"seasons_notice_delete_forbidden": "Jums nav atļaujas to dzēst.",
 	"seasons_notice_partial_delete": "Dzēsti {deleted} no {total} mēģinājumiem. Atkārtojiet, lai pabeigtu.",
 	"seasons_notice_partial_generate": "Izveidoti {created} no {total} mēģinājumiem. Dzēsiet sēriju un mēģiniet vēlreiz.",
-	"seasons_page_title": "Mēģinājumu grafiks"
+	"seasons_page_title": "Mēģinājumu grafiks",
+	"seasons_warning_outside_season": "Ievērojiet: šī sērija pārsniedz sezonas datumus."
 }

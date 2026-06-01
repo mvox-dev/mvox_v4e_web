@@ -207,5 +207,6 @@
 	"seasons_notice_delete_forbidden": "У вас немає дозволу на видалення.",
 	"seasons_notice_partial_delete": "Видалено {deleted} з {total} репетицій. Повторіть для завершення.",
 	"seasons_notice_partial_generate": "Створено {created} з {total} репетицій. Видаліть серію та спробуйте ще раз.",
-	"seasons_page_title": "Розклад репетицій"
+	"seasons_page_title": "Розклад репетицій",
+	"seasons_warning_outside_season": "Увага: ця серія виходить за межі дат сезону."
 }

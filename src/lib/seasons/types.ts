@@ -61,8 +61,9 @@ export interface Rehearsal {
 export interface Conductor {
 	personId: string;
 	name: string;
-	/** The `_id` of the `_editor` property-value entry — needed for `revokeConductor`. */
-	propertyValueId: string;
+	// propertyValueId dropped — revoke now goes by personId (all grants for that person
+	// are revoked by GET+filter+DELETE, handling the dedupe case where Entu POST appended
+	// multiple _editor grants for the same person).
 }
 
 /**

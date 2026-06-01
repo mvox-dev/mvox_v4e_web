@@ -68,20 +68,4 @@ export class EntuClient {
 		const body = (await res.json()) as { entities: EntuEntity[] };
 		return body.entities;
 	}
-
-	async setProperty(entityId: string, prop: string, value: string): Promise<{ _id: string }> {
-		const url = `${this.baseUrl}${this.db}/property`;
-		const res = await fetch(url, {
-			method: 'POST',
-			headers: {
-				...this.authHeaders(),
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({ entity: entityId, type: prop, string: value }),
-		});
-		if (!res.ok) {
-			throw new Error(`Entu setProperty failed: ${res.status}`);
-		}
-		return res.json() as Promise<{ _id: string }>;
-	}
 }

@@ -18,12 +18,15 @@
 		canManage: boolean;
 		/** Called when the owner assigns a conductor (personId). */
 		onassign: (personId: string) => void;
-		/** Called when the owner removes a conductor (propertyValueId for DELETE). */
-		onremove: (propertyValueId: string) => void;
+		/** Called when the owner removes a conductor (personId — all grants for that person revoked). */
+		onremove: (personId: string) => void;
 	}
 	let { conductors, members, canManage, onassign, onremove }: Props = $props();
 
 	let pickerValue = $state('');
+
+	/** Members not yet assigned as conductors — filters the picker to prevent duplicates. */
+	const available = $derived(members.filter((mbr) => !conductors.some((c) => c.personId === mbr.personId)));
 </script>
 
 <section data-testid="conductor-panel" class="panel">
@@ -33,7 +36,7 @@
 		<p data-testid="conductors-empty" class="empty-text">{m.seasons_conductors_empty()}</p>
 	{:else}
 		<ul data-testid="conductors-list" class="conductor-list">
-			{#each conductors as conductor (conductor.propertyValueId)}
+			{#each conductors as conductor (conductor.personId)}
 				<li class="conductor-row">
 					<span class="conductor-name">{conductor.name}</span>
 					{#if canManage}
@@ -41,7 +44,7 @@
 							data-testid="conductor-remove"
 							type="button"
 							class="remove-btn"
-							onclick={() => onremove(conductor.propertyValueId)}
+							onclick={() => onremove(conductor.personId)}
 						>
 							{m.seasons_conductors_remove()}
 						</button>
@@ -60,7 +63,7 @@
 				onchange={(e) => { pickerValue = (e.target as HTMLSelectElement).value; }}
 			>
 				<option value="">{m.seasons_conductors_add()}</option>
-				{#each members as member (member.personId)}
+				{#each available as member (member.personId)}
 					<option value={member.personId}>{member.name}</option>
 				{/each}
 			</select>

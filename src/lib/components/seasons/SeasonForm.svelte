@@ -32,7 +32,6 @@
 		if (code === 'end_before_start') return m.seasons_error_end_before_start();
 		if (code === 'interval_too_small') return m.seasons_error_interval_too_small();
 		if (code === 'duration_too_small') return m.seasons_error_duration_too_small();
-		if (code === 'outside_season') return m.seasons_error_outside_season();
 		return code;
 	}
 

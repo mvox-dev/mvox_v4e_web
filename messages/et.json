@@ -207,5 +207,6 @@
 	"seasons_notice_delete_forbidden": "Sul pole õigust seda kustutada.",
 	"seasons_notice_partial_delete": "Kustutati {deleted} / {total} proovist. Korda lõpetamiseks.",
 	"seasons_notice_partial_generate": "Loodi {created} / {total} proovist. Kustuta seeria ja proovi uuesti.",
-	"seasons_page_title": "Proovide ajakava"
+	"seasons_page_title": "Proovide ajakava",
+	"seasons_warning_outside_season": "Tähelepanu: see seeria ulatub hooaja kuupäevadest välja."
 }

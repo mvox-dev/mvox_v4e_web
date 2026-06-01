@@ -630,10 +630,8 @@ describe('listConductors', () => {
 			}),
 		);
 		const list = await listConductors({ db: 'd', token: 't' }, 'season1');
-		// propertyValueId is the _editor entry's _id — needed by revokeConductor (YELLOW-D1)
-		expect(list).toEqual([
-			{ personId: 'p_cond', name: 'Jane C.', propertyValueId: 'editor-value-1' },
-		]);
+		// propertyValueId dropped — revoke now goes by personId (all grants for that person)
+		expect(list).toEqual([{ personId: 'p_cond', name: 'Jane C.' }]);
 	});
 
 	it('returns empty array when no direct _editor entries exist', async () => {
@@ -738,25 +736,134 @@ describe('assignConductor', () => {
 		const body = posts[0].body as Array<{ type: string; reference?: string }>;
 		expect(body).toEqual(expect.arrayContaining([{ type: '_editor', reference: 'p_cond' }]));
 	});
+
+	it('idempotent — skips POST if personId already has an _editor grant on the season', async () => {
+		// p_cond is already in _editor; assignConductor must NOT post a second grant.
+		const posts: string[] = [];
+		vi.stubGlobal(
+			'fetch',
+			vi.fn().mockImplementation((url: string, init?: { method?: string }) => {
+				if (init?.method === 'POST') posts.push(url);
+				// member search — found
+				if (url.includes('_type.string=member')) {
+					return Promise.resolve({ ok: true, json: async () => ({ entities: [{ _id: 'mem1' }] }) });
+				}
+				// season GET — already has p_cond as _editor
+				return Promise.resolve({
+					ok: true,
+					json: async () => ({
+						entity: {
+							_id: 'season1',
+							_editor: [{ _id: 'ev-1', reference: 'p_cond', property_type: '_editor' }],
+						},
+					}),
+				});
+			}),
+		);
+		await assignConductor(
+			{ db: 'd', token: 't' },
+			{ seasonId: 'season1', orgId: 'org1', personId: 'p_cond' },
+		);
+		// No POST should be issued because p_cond already has a grant
+		expect(posts).toHaveLength(0);
+	});
+});
+
+describe('listConductors — dedupe', () => {
+	it('returns ONE entry per person even when Entu has multiple _editor grants', async () => {
+		vi.stubGlobal(
+			'fetch',
+			vi.fn().mockImplementation((url: string) => {
+				if (url.includes('/entity/season1')) {
+					return Promise.resolve({
+						ok: true,
+						json: async () => ({
+							entity: {
+								_id: 'season1',
+								_editor: [
+									{ _id: 'ev-1', reference: 'p_cond', property_type: '_editor' }, // grant 1
+									{ _id: 'ev-2', reference: 'p_cond', property_type: '_editor' }, // duplicate
+									{ _id: 'ev-3', reference: 'p_other', property_type: '_editor' }, // different person
+								],
+							},
+						}),
+					});
+				}
+				if (url.includes('/entity/p_cond')) {
+					return Promise.resolve({ ok: true, json: async () => ({ entity: { _id: 'p_cond', name: [{ string: 'Jane C.' }] } }) });
+				}
+				return Promise.resolve({ ok: true, json: async () => ({ entity: { _id: 'p_other', name: [{ string: 'Bob O.' }] } }) });
+			}),
+		);
+		const list = await listConductors({ db: 'd', token: 't' }, 'season1');
+		// Only one entry for p_cond despite two grants; plus one for p_other
+		expect(list).toHaveLength(2);
+		expect(list.filter((c) => c.personId === 'p_cond')).toHaveLength(1);
+	});
 });
 
 describe('revokeConductor', () => {
-	it('DELETEs the _editor property VALUE by propertyValueId (not the person entity)', async () => {
+	it('DELETEs ALL _editor property-value entries for the given personId', async () => {
+		// Person p_cond has 3 _editor grants (duplicate from double-assign bug).
+		// revokeConductor must DELETE all 3.
+		const deleted: string[] = [];
+		vi.stubGlobal(
+			'fetch',
+			vi.fn().mockImplementation((url: string, init?: { method?: string }) => {
+				if (init?.method === 'DELETE') {
+					deleted.push(url);
+					return Promise.resolve({ ok: true, json: async () => ({}) });
+				}
+				// GET season: return 3 _editor entries for p_cond
+				return Promise.resolve({
+					ok: true,
+					json: async () => ({
+						entity: {
+							_id: 'season1',
+							_editor: [
+								{ _id: 'ev-1', reference: 'p_cond', property_type: '_editor' },
+								{ _id: 'ev-2', reference: 'p_cond', property_type: '_editor' }, // duplicate
+								{ _id: 'ev-3', reference: 'p_cond', property_type: '_editor' }, // duplicate
+								{ _id: 'ev-4', reference: 'p_other', property_type: '_editor' }, // different person — untouched
+							],
+						},
+					}),
+				});
+			}),
+		);
+
+		await revokeConductor({ db: 'd', token: 't' }, { seasonId: 'season1', personId: 'p_cond' });
+
+		// Must have issued exactly 3 DELETEs — one per p_cond's grant; p_other untouched
+		expect(deleted).toHaveLength(3);
+		expect(deleted.every((u) => u.includes('ev-1') || u.includes('ev-2') || u.includes('ev-3'))).toBe(true);
+		expect(deleted.some((u) => u.includes('ev-4'))).toBe(false);
+	});
+
+	it('revokes only property-value entries (DELETE /property/{id}, not /entity/)', async () => {
 		const deleted: string[] = [];
 		vi.stubGlobal(
 			'fetch',
 			vi.fn().mockImplementation((url: string, init?: { method?: string }) => {
 				if (init?.method === 'DELETE') deleted.push(url);
-				return Promise.resolve({ ok: true, json: async () => ({}) });
+				return Promise.resolve({
+					ok: true,
+					json: async () => ({
+						entity: {
+							_id: 'season1',
+							_editor: [{ _id: 'ev-x', reference: 'p1', property_type: '_editor' }],
+						},
+					}),
+				});
 			}),
 		);
-		await revokeConductor(
-			{ db: 'd', token: 't' },
-			{ seasonId: 'season1', propertyValueId: 'prop-val-42' },
-		);
-		// Wire shape: DELETE /property/{propertyValueId} (not /entity/)
+
+		await revokeConductor({ db: 'd', token: 't' }, { seasonId: 'season1', personId: 'p1' });
+
+		// Wire shape: DELETE /property/{id} not /entity/{id}
 		expect(deleted).toHaveLength(1);
-		expect(deleted[0]).toContain('prop-val-42');
+		expect(deleted[0]).toContain('/property/');
+		expect(deleted[0]).not.toContain('/entity/');
 	});
 });
 

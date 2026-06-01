@@ -22,7 +22,7 @@ vi.mock('$lib/paraglide/messages.js', () => ({
 	seasons_error_blank: () => 'Required',
 	seasons_error_interval_too_small: () => 'Must be at least 1 day',
 	seasons_error_duration_too_small: () => 'Must be at least 1 minute',
-	seasons_error_outside_season: () => "Must fall within the season's dates",
+	seasons_warning_outside_season: () => 'Dates are outside the season range.',
 }));
 
 afterEach(cleanup);
@@ -108,30 +108,36 @@ describe('SeriesForm', () => {
 		expect(oncreate).not.toHaveBeenCalled();
 	});
 
-	it('series startDate before season start → shows error-start-date (outside_season)', async () => {
+	it('outside-season dates → series-season-warning shown AND oncreate still fires (soft warn, not hard block)', async () => {
+		// PO decision: outside-season dates are a non-blocking warning. Submit must succeed.
 		const oncreate = vi.fn();
 		const { container } = render(SeriesForm, { season, oncreate });
 
-		await fillForm(container, { startDate: '2026-08-01' }); // before 2026-09-01
+		await fillForm(container, { startDate: '2026-08-01', endDate: '2027-06-30' }); // both outside
 		await fireEvent.click(
 			container.querySelector('[data-testid="series-submit"]') as HTMLButtonElement,
 		);
 
-		expect(container.querySelector('[data-testid="error-start-date"]')).not.toBeNull();
-		expect(oncreate).not.toHaveBeenCalled();
+		// Warning shown (not an error — no hard block)
+		expect(container.querySelector('[data-testid="series-season-warning"]')).not.toBeNull();
+		// Submit still fires — outside-season is NOT a hard validation error
+		expect(oncreate).toHaveBeenCalledOnce();
+		// Hard error elements must NOT be shown
+		expect(container.querySelector('[data-testid="error-start-date"]')).toBeNull();
+		expect(container.querySelector('[data-testid="error-end-date"]')).toBeNull();
 	});
 
-	it('series endDate after season end → shows error-end-date (outside_season)', async () => {
+	it('in-range dates → no series-season-warning', async () => {
 		const oncreate = vi.fn();
 		const { container } = render(SeriesForm, { season, oncreate });
 
-		await fillForm(container, { endDate: '2027-06-30' }); // after 2027-05-31
+		await fillForm(container); // default dates are within season
 		await fireEvent.click(
 			container.querySelector('[data-testid="series-submit"]') as HTMLButtonElement,
 		);
 
-		expect(container.querySelector('[data-testid="error-end-date"]')).not.toBeNull();
-		expect(oncreate).not.toHaveBeenCalled();
+		expect(container.querySelector('[data-testid="series-season-warning"]')).toBeNull();
+		expect(oncreate).toHaveBeenCalledOnce();
 	});
 
 	it('submit valid → calls oncreate with full payload including event_type: rehearsal', async () => {

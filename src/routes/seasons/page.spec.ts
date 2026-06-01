@@ -386,7 +386,7 @@ describe('/seasons page — conductor wiring (T2, #86)', () => {
 
 	it('ConductorPanel receives conductor list from listConductors when season is selected', async () => {
 		mockListConductors.mockResolvedValue([
-			{ personId: 'p1', name: 'Jane C.', propertyValueId: 'pv-1' },
+			{ personId: 'p1', name: 'Jane C.' },
 		]);
 		(selectedOrgStore as ReturnType<typeof import('svelte/store').writable>).set(ownerOrg);
 		(seasonsStore as ReturnType<typeof import('svelte/store').writable>).set(readySeasonsState);
@@ -451,9 +451,9 @@ describe('/seasons page — conductor wiring (T2, #86)', () => {
 		expect(mockListConductors).toHaveBeenCalled();
 	});
 
-	it('onremove → calls revokeConductor with propertyValueId, then re-fetches conductors', async () => {
+	it('onremove → calls revokeConductor with personId, then re-fetches conductors', async () => {
 		mockListConductors.mockResolvedValue([
-			{ personId: 'p1', name: 'Jane C.', propertyValueId: 'pv-1' },
+			{ personId: 'p1', name: 'Jane C.' },
 		]);
 		(selectedOrgStore as ReturnType<typeof import('svelte/store').writable>).set(ownerOrg);
 		(seasonsStore as ReturnType<typeof import('svelte/store').writable>).set(readySeasonsState);
@@ -469,7 +469,8 @@ describe('/seasons page — conductor wiring (T2, #86)', () => {
 		await new Promise((r) => setTimeout(r, 50));
 
 		expect(mockRevokeConductor).toHaveBeenCalledOnce();
-		expect(mockRevokeConductor.mock.calls[0][1]).toMatchObject({ propertyValueId: 'pv-1' });
+		// revokeConductor now takes personId (not propertyValueId)
+		expect(mockRevokeConductor.mock.calls[0][1]).toMatchObject({ personId: 'p1' });
 		// After revoke, listConductors must be re-fetched
 		expect(mockListConductors).toHaveBeenCalled();
 	});

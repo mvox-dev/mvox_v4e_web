@@ -86,26 +86,4 @@ describe('EntuClient', () => {
 		const calledUrl = fetchMock.mock.calls[0][0] as string;
 		expect(calledUrl).not.toContain('limit=');
 	});
-
-	it('setProperty() POSTs to /property with content-type and body', async () => {
-		const fetchMock = vi
-			.fn()
-			.mockResolvedValue(new Response(JSON.stringify({ _id: 'prop-1' }), { status: 200 }));
-		vi.stubGlobal('fetch', fetchMock);
-
-		const c = new EntuClient(baseConfig);
-		await c.setProperty('entity-1', 'name', 'Acme');
-
-		expect(fetchMock).toHaveBeenCalledWith(
-			'https://api.entu.app/polyphony/property',
-			expect.objectContaining({
-				method: 'POST',
-				headers: expect.objectContaining({
-					Authorization: 'Bearer jwt-abc',
-					'Content-Type': 'application/json',
-				}),
-				body: JSON.stringify({ entity: 'entity-1', type: 'name', string: 'Acme' }),
-			}),
-		);
-	});
 });

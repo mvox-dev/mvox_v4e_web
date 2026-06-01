@@ -373,8 +373,8 @@ export interface AssignConductorInput {
 
 export interface RevokeConductorInput {
 	seasonId: string;
-	/** The `_editor` property-value `_id` to DELETE (not the person entity id). */
-	propertyValueId: string;
+	/** The person entity id — all _editor grants for this person on the season are revoked. */
+	personId: string;
 }
 
 /**
@@ -399,15 +399,20 @@ export async function listConductors(cfg: EntuCfg, seasonId: string): Promise<Co
 	);
 
 	// Single-hop name resolution: one GET /entity/{personId} per conductor (Cap7).
-	// propertyValueId = the _editor entry's _id, needed for revokeConductor (YELLOW-D1).
+	// Dedupe by personId in case Entu POST appended duplicate _editor grants.
+	const seen = new Set<string>();
+	const uniqueEditors = directEditors.filter((e) => {
+		if (seen.has(e.reference)) return false;
+		seen.add(e.reference);
+		return true;
+	});
 	return Promise.all(
-		directEditors.map(async (entry): Promise<Conductor> => {
+		uniqueEditors.map(async (entry): Promise<Conductor> => {
 			const pRes = await fetch(`${base}/entity/${entry.reference}?props=name`, { headers });
 			const pBody = (await pRes.json()) as { entity?: { name?: Array<{ string: string }> } };
 			return {
 				personId: entry.reference,
 				name: pBody.entity?.name?.[0]?.string ?? '',
-				propertyValueId: entry._id ?? '',
 			};
 		}),
 	);
@@ -432,6 +437,16 @@ export async function assignConductor(cfg: EntuCfg, input: AssignConductorInput)
 		throw new Error(`${input.personId} must be an org member before becoming a conductor`);
 	}
 
+	// Idempotent: if the person already holds a direct _editor grant on the season,
+	// skip the POST (Entu POST appends, so a re-assign would mint a duplicate grant).
+	const seasonRes = await fetch(`${base}/entity/${input.seasonId}?props=_editor`, { headers });
+	if (!seasonRes.ok) throw new Error(`season lookup failed: ${seasonRes.status}`);
+	const seasonBody = (await seasonRes.json()) as { entity?: SeasonRaw };
+	const alreadyGranted = (seasonBody.entity?._editor ?? []).some(
+		(e) => e.reference === input.personId && e.property_type === '_editor',
+	);
+	if (alreadyGranted) return;
+
 	// Grant: roles-as-rights — POST a direct _editor reference on the season.
 	const grantRes = await fetch(`${base}/entity/${input.seasonId}`, {
 		method: 'POST',
@@ -442,18 +457,29 @@ export async function assignConductor(cfg: EntuCfg, input: AssignConductorInput)
 }
 
 /**
- * Revokes a conductor grant by DELETEing the `_editor` property value on the season.
- * The `propertyValueId` is the `_id` of the property value entry, not the person entity.
+ * Revoke a conductor: delete ALL of the person's direct `_editor` grants on the
+ * season (`DELETE /property/{id}` per value-id, not `/entity/`). Removing every
+ * matching grant cleans up any duplicates; idempotent with assignConductor's
+ * check-then-skip.
  */
 export async function revokeConductor(cfg: EntuCfg, input: RevokeConductorInput): Promise<void> {
-	// Property-VALUE delete, NOT /entity/ — conflating the two 404s
-	// (project_entu_wire_shape_entity_vs_property). The propertyValueId is the
-	// `_id` of the `_editor` array entry, carried from the listConductors view.
-	const res = await fetch(`${ENTU_API_BASE}${cfg.db}/property/${input.propertyValueId}`, {
-		method: 'DELETE',
-		headers: authHeaders(cfg.token),
-	});
-	if (!res.ok) throw new Error(`revokeConductor failed: ${res.status}`);
+	const headers = authHeaders(cfg.token);
+	const base = `${ENTU_API_BASE}${cfg.db}`;
+
+	// Read the season's _editor entries, then DELETE every property-VALUE granted to
+	// this person (there may be duplicates from the prior double-assign bug). Wire is
+	// DELETE /property/{valueId}, NOT /entity/ (project_entu_wire_shape_entity_vs_property).
+	const res = await fetch(`${base}/entity/${input.seasonId}?props=_editor`, { headers });
+	if (!res.ok) throw new Error(`revokeConductor lookup failed: ${res.status}`);
+	const body = (await res.json()) as { entity?: SeasonRaw };
+	const grants = (body.entity?._editor ?? []).filter(
+		(e) => e.reference === input.personId && e.property_type === '_editor' && typeof e._id === 'string',
+	);
+
+	for (const grant of grants) {
+		const delRes = await fetch(`${base}/property/${grant._id}`, { method: 'DELETE', headers });
+		if (!delRes.ok) throw new Error(`revokeConductor delete failed: ${delRes.status}`);
+	}
 }
 
 // ── T1: listOrgMembers ────────────────────────────────────────────────────────

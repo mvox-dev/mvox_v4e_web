@@ -34,7 +34,10 @@ export function validateSeries(
 		startDate: string;
 		endDate: string;
 	},
-	season: { startDate: string; endDate: string },
+	// `_season` is kept in the signature (SeriesForm passes it) but no longer read:
+	// outside-season dates are a soft, non-blocking WARNING surfaced in the UI, not a
+	// validation error (PO decision). validateSeries only hard-blocks intrinsic faults.
+	_season: { startDate: string; endDate: string },
 ): ValidationResult {
 	if (!/\S/.test(series.name)) {
 		return { ok: false, field: 'name', code: 'blank' };
@@ -47,13 +50,6 @@ export function validateSeries(
 	}
 	if (series.endDate < series.startDate) {
 		return { ok: false, field: 'endDate', code: 'end_before_start' };
-	}
-	// Series window must sit within the season window; boundaries are inclusive.
-	if (series.startDate < season.startDate) {
-		return { ok: false, field: 'startDate', code: 'outside_season' };
-	}
-	if (series.endDate > season.endDate) {
-		return { ok: false, field: 'endDate', code: 'outside_season' };
 	}
 	return { ok: true };
 }

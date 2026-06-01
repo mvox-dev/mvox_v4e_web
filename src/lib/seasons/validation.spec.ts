@@ -49,18 +49,12 @@ describe('validateSeries', () => {
 			code: 'interval_too_small',
 		});
 	});
-	it('rejects series start before season start', () => {
-		expect(validateSeries({ ...base, startDate: '2026-08-01' }, season)).toEqual({
-			ok: false,
-			field: 'startDate',
-			code: 'outside_season',
-		});
+	it('outside-season startDate is now ok (soft warn, not hard block)', () => {
+		// PO decision: outside-season dates are a non-blocking warning, not a validation error.
+		expect(validateSeries({ ...base, startDate: '2026-08-01' }, season).ok).toBe(true);
 	});
-	it('rejects series end after season end', () => {
-		expect(validateSeries({ ...base, endDate: '2027-06-30' }, season)).toMatchObject({
-			ok: false,
-			code: 'outside_season',
-		});
+	it('outside-season endDate is now ok (soft warn, not hard block)', () => {
+		expect(validateSeries({ ...base, endDate: '2027-06-30' }, season).ok).toBe(true);
 	});
 	it('accepts a valid series', () => {
 		expect(validateSeries(base, season).ok).toBe(true);

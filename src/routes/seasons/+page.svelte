@@ -253,12 +253,12 @@
 		conductors = await listConductors(cfg, season.id);
 	}
 
-	async function handleConductorRemove(propertyValueId: string) {
+	async function handleConductorRemove(personId: string) {
 		const season = selectedSeason;
 		if (!season) return;
 		const token = getToken() ?? '';
 		const cfg = { db: PUBLIC_ENTU_DB, token };
-		await revokeConductor(cfg, { seasonId: season.id, propertyValueId });
+		await revokeConductor(cfg, { seasonId: season.id, personId });
 		conductors = await listConductors(cfg, season.id);
 	}
 </script>
