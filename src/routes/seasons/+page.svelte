@@ -337,8 +337,9 @@
 				seasons={$seasonsStore.seasons}
 				selectedId={selectedSeasonId ?? ($seasonsStore.seasons[0]?.id ?? '')}
 				{canManage}
+				editing={panelMode === 'edit'}
 				onselect={selectSeason}
-				onedit={() => { panelMode = 'edit'; }}
+				onedit={() => { panelMode = panelMode === 'edit' ? 'none' : 'edit'; }}
 				oncreate={() => { panelMode = 'create'; }}
 			/>
 

@@ -1050,3 +1050,58 @@ describe('/seasons page — route restructure (mobile redesign)', () => {
 		expect(container.querySelector('[data-testid="season-form-save"]')).toBeNull();
 	});
 });
+
+// ── Pencil-toggle: onedit toggles edit panel open/close ───────────────────────
+
+describe('/seasons page — pencil toggle (#pencil-toggle)', () => {
+	const ownerOrg = { id: 'org1', label: 'EFK', initials: 'EFK', role: 'owner' };
+
+	beforeEach(() => {
+		mockListRehearsals.mockResolvedValue([]);
+		mockListSeries.mockResolvedValue([]);
+		mockListConductors.mockResolvedValue([]);
+		mockListOrgMembers.mockResolvedValue([]);
+		mockHydrate.mockResolvedValue(undefined);
+	});
+
+	it('tapping pencil with panel closed opens edit (season-form visible)', async () => {
+		(selectedOrgStore as ReturnType<typeof import('svelte/store').writable>).set(ownerOrg);
+		(seasonsStore as ReturnType<typeof import('svelte/store').writable>).set(readySeasonsState);
+
+		const { container } = render(Page);
+		await new Promise((r) => setTimeout(r, 50));
+
+		// Panel closed by default
+		expect(container.querySelector('[data-testid="season-form"]')).toBeNull();
+
+		// First tap — opens edit panel
+		const editBtn = container.querySelector('[data-testid="season-tag-edit"]') as HTMLButtonElement;
+		expect(editBtn).not.toBeNull();
+		await fireEvent.click(editBtn);
+		await new Promise((r) => setTimeout(r, 20));
+
+		expect(container.querySelector('[data-testid="season-form"]')).not.toBeNull();
+		expect(container.querySelector('[data-testid="season-form-save"]')).not.toBeNull();
+	});
+
+	it('tapping pencil again with edit panel open CLOSES it (toggle — panelMode back to none)', async () => {
+		(selectedOrgStore as ReturnType<typeof import('svelte/store').writable>).set(ownerOrg);
+		(seasonsStore as ReturnType<typeof import('svelte/store').writable>).set(readySeasonsState);
+
+		const { container } = render(Page);
+		await new Promise((r) => setTimeout(r, 50));
+
+		// Open edit panel
+		const editBtn = container.querySelector('[data-testid="season-tag-edit"]') as HTMLButtonElement;
+		await fireEvent.click(editBtn);
+		await new Promise((r) => setTimeout(r, 20));
+		expect(container.querySelector('[data-testid="season-form-save"]')).not.toBeNull();
+
+		// Second tap — closes edit panel (toggle)
+		await fireEvent.click(editBtn);
+		await new Promise((r) => setTimeout(r, 20));
+
+		expect(container.querySelector('[data-testid="season-form"]')).toBeNull();
+		expect(container.querySelector('[data-testid="season-form-save"]')).toBeNull();
+	});
+});

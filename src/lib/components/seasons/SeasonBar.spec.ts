@@ -154,3 +154,42 @@ describe('SeasonBar', () => {
 		expect(container.querySelector('[data-testid="season-create"]')).toBeNull();
 	});
 });
+
+// ── SeasonBar editing prop (pencil-toggle active state) ───────────────────────
+
+describe('SeasonBar — editing active state', () => {
+	it('editing=true → season-tag-edit carries "editing" class (active/mirror state per L118)', () => {
+		// Route passes editing={panelMode === 'edit'}. When the edit panel is open,
+		// the pencil button must reflect the active state via a CSS class.
+		// L118: assert class presence, not computed display.
+		const { container } = render(SeasonBar, {
+			seasons,
+			selectedId: 'sea1',
+			canManage: true,
+			editing: true,
+			onselect: vi.fn(),
+			onedit: vi.fn(),
+			oncreate: vi.fn(),
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		} as any);
+		const editBtn = container.querySelector('[data-testid="season-tag-edit"]') as HTMLButtonElement;
+		expect(editBtn).not.toBeNull();
+		expect(editBtn.className).toMatch(/editing/);
+	});
+
+	it('editing=false (or absent) → season-tag-edit does NOT carry "editing" class', () => {
+		const { container } = render(SeasonBar, {
+			seasons,
+			selectedId: 'sea1',
+			canManage: true,
+			editing: false,
+			onselect: vi.fn(),
+			onedit: vi.fn(),
+			oncreate: vi.fn(),
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		} as any);
+		const editBtn = container.querySelector('[data-testid="season-tag-edit"]') as HTMLButtonElement;
+		expect(editBtn).not.toBeNull();
+		expect(editBtn.className).not.toMatch(/editing/);
+	});
+});

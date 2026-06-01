@@ -11,6 +11,8 @@
 		selectedId: string;
 		/** True when the current user is _owner-tier — controls edit/create visibility. */
 		canManage: boolean;
+		/** True when the edit form is currently open — mirrors the pencil button state. */
+		editing?: boolean;
 		/** Called when a season tag is tapped. */
 		onselect: (id: string) => void;
 		/** Called when the ✏️ edit button on the selected tag is clicked. */
@@ -18,7 +20,7 @@
 		/** Called when the + create button is clicked. */
 		oncreate: () => void;
 	}
-	let { seasons, selectedId, canManage, onselect, onedit, oncreate }: Props = $props();
+	let { seasons, selectedId, canManage, editing = false, onselect, onedit, oncreate }: Props = $props();
 </script>
 
 <div data-testid="season-bar" class="bar">
@@ -39,6 +41,7 @@
 					data-testid="season-tag-edit"
 					type="button"
 					class="edit-btn"
+					class:is-editing={editing}
 					aria-label={m.seasons_a11y_edit_season()}
 					onclick={() => onedit()}
 				>
@@ -105,6 +108,12 @@
 		cursor: pointer;
 		flex-shrink: 0;
 		line-height: 1;
+	}
+	.edit-btn.is-editing {
+		background: #2a2620;
+		color: #fbf9f3;
+		border-radius: 4px;
+		transform: scaleX(-1);
 	}
 	.create-btn {
 		font-family: inherit;
