@@ -24,16 +24,32 @@ type EntuProp =
 	| { type: string; datetime: string }
 	| { type: string; number: number };
 
-// Entu's create endpoint requires `_type` posted as a REFERENCE to the type-entity
-// id, not `{ string: 'season' }` — the string form returns HTTP 400. These ids are
-// the polyphony type entities (verified working from scripts seed-demo-seasons.ts).
-// FOLLOW-UP: resolve these per-db at runtime (GET ?_type.string=entity&name.string=<type>)
-// instead of hardcoding polyphony ids — tracked separately.
-const TYPE_IDS = {
-	season: '69c7ea528489bfcb0e81a044',
-	event_series: '6a0d2e8490c8df7a1cc7deb1',
-	event: '69c7ea548489bfcb0e81a0a2',
-} as const;
+const typeIdCache = new Map<string, string>();
+
+export async function resolveTypeId(cfg: EntuCfg, typeName: string): Promise<string> {
+	const key = `${cfg.db}:${typeName}`;
+	const cached = typeIdCache.get(key);
+	if (cached) return cached;
+
+	const res = await fetch(
+		`${ENTU_API_BASE}${cfg.db}/entity?_type.string=entity&name.string=${encodeURIComponent(typeName)}&props=_id&limit=1`,
+		{ headers: authHeaders(cfg.token) },
+	);
+	if (!res.ok) {
+		throw new Error(`resolveTypeId failed: ${res.status}`);
+	}
+	const body = (await res.json()) as { entities?: Array<{ _id: string }> };
+	const id = body.entities?.[0]?._id;
+	if (!id) {
+		throw new Error(`type definition not found: '${typeName}' in db '${cfg.db}'`);
+	}
+	typeIdCache.set(key, id);
+	return id;
+}
+
+export function resetTypeIdCache(): void {
+	typeIdCache.clear();
+}
 
 export interface CreateSeasonInput {
 	orgId: string;
@@ -95,8 +111,9 @@ async function createEntity(cfg: EntuCfg, props: EntuProp[]): Promise<string> {
 }
 
 export async function createSeason(cfg: EntuCfg, input: CreateSeasonInput): Promise<string> {
+	const seasonTypeId = await resolveTypeId(cfg, 'season');
 	return createEntity(cfg, [
-		{ type: '_type', reference: TYPE_IDS.season },
+		{ type: '_type', reference: seasonTypeId },
 		{ type: '_parent', reference: input.orgId },
 		{ type: '_sharing', string: 'public' },
 		{ type: 'name', string: input.name },
@@ -131,9 +148,12 @@ export async function createSeriesWithEvents(
 	cfg: EntuCfg,
 	input: CreateSeriesInput,
 ): Promise<CreateSeriesResult> {
+	const eventSeriesTypeId = await resolveTypeId(cfg, 'event_series');
+	const eventTypeId = await resolveTypeId(cfg, 'event');
+
 	// 1. Create the event_series entity (private; parented to org + season).
 	const seriesProps: EntuProp[] = [
-		{ type: '_type', reference: TYPE_IDS.event_series },
+		{ type: '_type', reference: eventSeriesTypeId },
 		{ type: '_sharing', string: 'private' },
 		{ type: '_parent', reference: input.orgId },
 		{ type: '_parent', reference: input.seasonId },
@@ -157,7 +177,7 @@ export async function createSeriesWithEvents(
 	const eventIds: string[] = [];
 	for (const date of dates) {
 		const eventProps: EntuProp[] = [
-			{ type: '_type', reference: TYPE_IDS.event },
+			{ type: '_type', reference: eventTypeId },
 			{ type: '_sharing', string: 'private' },
 			{ type: '_parent', reference: input.orgId },
 			{ type: '_parent', reference: input.seasonId },

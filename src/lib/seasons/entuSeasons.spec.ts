@@ -14,19 +14,85 @@ import {
 	listOrgMembers,
 	listSeries,
 	DeleteForbiddenError,
+	resolveTypeId,
+	resetTypeIdCache,
 } from './entuSeasons';
 
 const cfg = { db: 'testdb', token: 'jwt' };
 beforeEach(() => vi.restoreAllMocks());
 
+// ── resolveTypeId ───────────────────────────────────────────────────────────
+
+describe('resolveTypeId', () => {
+	beforeEach(() => resetTypeIdCache());
+
+	it('fetches the type-definition entity by name and returns its _id', async () => {
+		vi.stubGlobal(
+			'fetch',
+			vi.fn().mockResolvedValue({
+				ok: true,
+				json: async () => ({ entities: [{ _id: 'type-season-id' }], count: 1 }),
+			}),
+		);
+		const id = await resolveTypeId(cfg, 'season');
+		expect(id).toBe('type-season-id');
+		const url: string = (fetch as unknown as ReturnType<typeof vi.fn>).mock.calls[0][0];
+		expect(url).toContain('_type.string=entity');
+		expect(url).toContain('name.string=season');
+		expect(url).toContain('testdb');
+	});
+
+	it('memoizes: second call with same db+typeName does NOT fetch again', async () => {
+		const fetchMock = vi.fn().mockResolvedValue({
+			ok: true,
+			json: async () => ({ entities: [{ _id: 'cached-id' }], count: 1 }),
+		});
+		vi.stubGlobal('fetch', fetchMock);
+		await resolveTypeId(cfg, 'event');
+		await resolveTypeId(cfg, 'event');
+		expect(fetchMock).toHaveBeenCalledTimes(1);
+	});
+
+	it('different db produces a separate cache entry', async () => {
+		const fetchMock = vi.fn().mockResolvedValue({
+			ok: true,
+			json: async () => ({ entities: [{ _id: 'id-for-db' }], count: 1 }),
+		});
+		vi.stubGlobal('fetch', fetchMock);
+		await resolveTypeId({ db: 'db-a', token: 't' }, 'season');
+		await resolveTypeId({ db: 'db-b', token: 't' }, 'season');
+		expect(fetchMock).toHaveBeenCalledTimes(2);
+	});
+
+	it('throws when no type-definition entity is found', async () => {
+		vi.stubGlobal(
+			'fetch',
+			vi.fn().mockResolvedValue({
+				ok: true,
+				json: async () => ({ entities: [], count: 0 }),
+			}),
+		);
+		await expect(resolveTypeId(cfg, 'nonexistent')).rejects.toThrow(
+			"type definition not found: 'nonexistent' in db 'testdb'",
+		);
+	});
+});
+
 // ── Task 4: createSeason + listSeasons ────────────────────────────────────────
 
 describe('createSeason', () => {
 	it('POSTs the entity with public sharing and returns _id', async () => {
-		const fetchMock = vi
-			.fn()
-			.mockResolvedValue({ ok: true, json: async () => ({ _id: 'season1' }) });
+		const fetchMock = vi.fn().mockImplementation((url: string) => {
+			if (url.includes('_type.string=entity')) {
+				return Promise.resolve({
+					ok: true,
+					json: async () => ({ entities: [{ _id: 'resolved-season-type' }] }),
+				});
+			}
+			return Promise.resolve({ ok: true, json: async () => ({ _id: 'season1' }) });
+		});
 		vi.stubGlobal('fetch', fetchMock);
+		resetTypeIdCache();
 		const id = await createSeason(cfg, {
 			orgId: 'org1',
 			name: '2026/27',
@@ -34,13 +100,13 @@ describe('createSeason', () => {
 			endDate: '2027-05-31',
 		});
 		expect(id).toBe('season1');
-		const body = JSON.parse(fetchMock.mock.calls[0][1].body);
-		// Entu create POSTs an array of property objects incl. _type, _parent, _sharing
-		// _type must be a REFERENCE to the type-entity id (not string: 'season')
-		// Type id verified from seed-demo-seasons.ts; Josquin adds TYPE_IDS const.
+		const createCall = fetchMock.mock.calls.find(
+			(c) => !(c[0] as string).includes('_type.string=entity'),
+		)!;
+		const body = JSON.parse((createCall[1] as { body: string }).body);
 		expect(body).toEqual(
 			expect.arrayContaining([
-				{ type: '_type', reference: '69c7ea528489bfcb0e81a044' },
+				{ type: '_type', reference: 'resolved-season-type' },
 				{ type: '_parent', reference: 'org1' },
 				{ type: '_sharing', string: 'public' },
 				{ type: 'name', string: '2026/27' },
@@ -51,15 +117,27 @@ describe('createSeason', () => {
 	});
 
 	it('POSTs to the correct Entu entity-create URL', async () => {
-		const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ _id: 'x' }) });
+		const fetchMock = vi.fn().mockImplementation((url: string) => {
+			if (url.includes('_type.string=entity')) {
+				return Promise.resolve({
+					ok: true,
+					json: async () => ({ entities: [{ _id: 'type-id' }] }),
+				});
+			}
+			return Promise.resolve({ ok: true, json: async () => ({ _id: 'x' }) });
+		});
 		vi.stubGlobal('fetch', fetchMock);
+		resetTypeIdCache();
 		await createSeason(cfg, {
 			orgId: 'org1',
 			name: 'S',
 			startDate: '2026-09-01',
 			endDate: '2027-05-31',
 		});
-		const url: string = fetchMock.mock.calls[0][0];
+		const createCall = fetchMock.mock.calls.find(
+			(c) => !(c[0] as string).includes('_type.string=entity'),
+		)!;
+		const url: string = createCall[0] as string;
 		expect(url).toContain('testdb');
 		expect(url).toContain('entity');
 	});
@@ -67,8 +145,17 @@ describe('createSeason', () => {
 	it('throws when Entu returns ok: false', async () => {
 		vi.stubGlobal(
 			'fetch',
-			vi.fn().mockResolvedValue({ ok: false, status: 403, json: async () => ({}) }),
+			vi.fn().mockImplementation((url: string) => {
+				if (url.includes('_type.string=entity')) {
+					return Promise.resolve({
+						ok: true,
+						json: async () => ({ entities: [{ _id: 'type-id' }] }),
+					});
+				}
+				return Promise.resolve({ ok: false, status: 403, json: async () => ({}) });
+			}),
 		);
+		resetTypeIdCache();
 		await expect(
 			createSeason(cfg, {
 				orgId: 'org1',
@@ -267,12 +354,23 @@ describe('listSeasons', () => {
 
 describe('createSeriesWithEvents', () => {
 	it('generates one event per occurrence with DST-correct datetimes', async () => {
-		const calls: unknown[] = [];
+		resetTypeIdCache();
+		const createCalls: unknown[] = [];
 		vi.stubGlobal(
 			'fetch',
-			vi.fn().mockImplementation((_u: unknown, init: { body: string }) => {
-				calls.push(JSON.parse(init.body));
-				return Promise.resolve({ ok: true, json: async () => ({ _id: `e${calls.length}` }) });
+			vi.fn().mockImplementation((url: string, init?: { body: string }) => {
+				if (url.includes('_type.string=entity')) {
+					const typeName = url.match(/name\.string=([^&]+)/)?.[1] ?? '';
+					return Promise.resolve({
+						ok: true,
+						json: async () => ({ entities: [{ _id: `resolved-${typeName}` }] }),
+					});
+				}
+				createCalls.push(JSON.parse(init!.body));
+				return Promise.resolve({
+					ok: true,
+					json: async () => ({ _id: `e${createCalls.length}` }),
+				});
 			}),
 		);
 		const res = await createSeriesWithEvents(
@@ -285,13 +383,12 @@ describe('createSeriesWithEvents', () => {
 				startTime: '19:00',
 				durationMinutes: 120,
 				startDate: '2026-09-01',
-				endDate: '2026-09-08', // 2 occurrences, Sep = EEST (UTC+3)
+				endDate: '2026-09-08',
 			},
 		);
 		expect(res.eventIds).toHaveLength(2);
-		// first POST is the series entity, then 2 event entities
-		expect(calls).toHaveLength(3);
-		const evDatetimes = (calls as Array<Array<{ type: string; datetime?: string }>>)
+		expect(createCalls).toHaveLength(3);
+		const evDatetimes = (createCalls as Array<Array<{ type: string; datetime?: string }>>)
 			.slice(1)
 			.flat()
 			.filter((p) => p.type === 'start_datetime')
@@ -300,14 +397,22 @@ describe('createSeriesWithEvents', () => {
 	});
 
 	it('returns seriesId from the first POST response', async () => {
-		let callCount = 0;
+		resetTypeIdCache();
+		let createCount = 0;
 		vi.stubGlobal(
 			'fetch',
-			vi.fn().mockImplementation((_u: unknown, _init: unknown) => {
-				callCount++;
+			vi.fn().mockImplementation((url: string) => {
+				if (url.includes('_type.string=entity')) {
+					const typeName = url.match(/name\.string=([^&]+)/)?.[1] ?? '';
+					return Promise.resolve({
+						ok: true,
+						json: async () => ({ entities: [{ _id: `resolved-${typeName}` }] }),
+					});
+				}
+				createCount++;
 				return Promise.resolve({
 					ok: true,
-					json: async () => ({ _id: callCount === 1 ? 'series-abc' : `ev${callCount}` }),
+					json: async () => ({ _id: createCount === 1 ? 'series-abc' : `ev${createCount}` }),
 				});
 			}),
 		);
@@ -321,21 +426,29 @@ describe('createSeriesWithEvents', () => {
 				startTime: '10:00',
 				durationMinutes: 60,
 				startDate: '2026-09-01',
-				endDate: '2026-09-01', // 1 occurrence
+				endDate: '2026-09-01',
 			},
 		);
 		expect(res.seriesId).toBe('series-abc');
 	});
 
 	it('POSTs series with _sharing=private and correct parents', async () => {
-		const calls: Array<
+		resetTypeIdCache();
+		const createCalls: Array<
 			Array<{ type: string; string?: string; reference?: string; number?: number }>
 		> = [];
 		vi.stubGlobal(
 			'fetch',
-			vi.fn().mockImplementation((_u: unknown, init: { body: string }) => {
-				calls.push(JSON.parse(init.body));
-				return Promise.resolve({ ok: true, json: async () => ({ _id: `id${calls.length}` }) });
+			vi.fn().mockImplementation((url: string, init?: { body: string }) => {
+				if (url.includes('_type.string=entity')) {
+					const typeName = url.match(/name\.string=([^&]+)/)?.[1] ?? '';
+					return Promise.resolve({
+						ok: true,
+						json: async () => ({ entities: [{ _id: `resolved-${typeName}` }] }),
+					});
+				}
+				createCalls.push(JSON.parse(init!.body));
+				return Promise.resolve({ ok: true, json: async () => ({ _id: `id${createCalls.length}` }) });
 			}),
 		);
 		await createSeriesWithEvents(
@@ -351,11 +464,10 @@ describe('createSeriesWithEvents', () => {
 				endDate: '2026-09-01',
 			},
 		);
-		const seriesProps = calls[0];
+		const seriesProps = createCalls[0];
 		expect(seriesProps).toEqual(
 			expect.arrayContaining([
-				// _type must be reference to event_series type-entity id (not string form)
-				{ type: '_type', reference: '6a0d2e8490c8df7a1cc7deb1' },
+				{ type: '_type', reference: 'resolved-event_series' },
 				{ type: '_sharing', string: 'private' },
 				{ type: '_parent', reference: 'org1' },
 				{ type: '_parent', reference: 'seas1' },
@@ -364,12 +476,20 @@ describe('createSeriesWithEvents', () => {
 	});
 
 	it('POSTs events with _sharing=private and all three parents (org+season+series)', async () => {
-		const calls: Array<Array<{ type: string; string?: string; reference?: string }>> = [];
+		resetTypeIdCache();
+		const createCalls: Array<Array<{ type: string; string?: string; reference?: string }>> = [];
 		vi.stubGlobal(
 			'fetch',
-			vi.fn().mockImplementation((_u: unknown, init: { body: string }) => {
-				calls.push(JSON.parse(init.body));
-				return Promise.resolve({ ok: true, json: async () => ({ _id: `id${calls.length}` }) });
+			vi.fn().mockImplementation((url: string, init?: { body: string }) => {
+				if (url.includes('_type.string=entity')) {
+					const typeName = url.match(/name\.string=([^&]+)/)?.[1] ?? '';
+					return Promise.resolve({
+						ok: true,
+						json: async () => ({ entities: [{ _id: `resolved-${typeName}` }] }),
+					});
+				}
+				createCalls.push(JSON.parse(init!.body));
+				return Promise.resolve({ ok: true, json: async () => ({ _id: `id${createCalls.length}` }) });
 			}),
 		);
 		await createSeriesWithEvents(
@@ -385,13 +505,11 @@ describe('createSeriesWithEvents', () => {
 				endDate: '2026-09-01',
 			},
 		);
-		// calls[0] = series, calls[1] = first event
-		const seriesId = 'id1'; // returned by first mock call
-		const eventProps = calls[1];
+		const seriesId = 'id1';
+		const eventProps = createCalls[1];
 		expect(eventProps).toEqual(
 			expect.arrayContaining([
-				// _type must be reference to event type-entity id (not string form)
-				{ type: '_type', reference: '69c7ea548489bfcb0e81a0a2' },
+				{ type: '_type', reference: 'resolved-event' },
 				{ type: '_sharing', string: 'private' },
 				{ type: '_parent', reference: 'org1' },
 				{ type: '_parent', reference: 'seas1' },
@@ -401,12 +519,20 @@ describe('createSeriesWithEvents', () => {
 	});
 
 	it('winter DST: Jan 19:00 EET → 17:00 UTC', async () => {
-		const calls: Array<Array<{ type: string; datetime?: string }>> = [];
+		resetTypeIdCache();
+		const createCalls: Array<Array<{ type: string; datetime?: string }>> = [];
 		vi.stubGlobal(
 			'fetch',
-			vi.fn().mockImplementation((_u: unknown, init: { body: string }) => {
-				calls.push(JSON.parse(init.body));
-				return Promise.resolve({ ok: true, json: async () => ({ _id: `id${calls.length}` }) });
+			vi.fn().mockImplementation((url: string, init?: { body: string }) => {
+				if (url.includes('_type.string=entity')) {
+					const typeName = url.match(/name\.string=([^&]+)/)?.[1] ?? '';
+					return Promise.resolve({
+						ok: true,
+						json: async () => ({ entities: [{ _id: `resolved-${typeName}` }] }),
+					});
+				}
+				createCalls.push(JSON.parse(init!.body));
+				return Promise.resolve({ ok: true, json: async () => ({ _id: `id${createCalls.length}` }) });
 			}),
 		);
 		await createSeriesWithEvents(
@@ -419,10 +545,10 @@ describe('createSeriesWithEvents', () => {
 				startTime: '19:00',
 				durationMinutes: 60,
 				startDate: '2026-01-06',
-				endDate: '2026-01-06', // EET = UTC+2
+				endDate: '2026-01-06',
 			},
 		);
-		const dt = calls[1].find((p) => p.type === 'start_datetime')?.datetime;
+		const dt = createCalls[1].find((p) => p.type === 'start_datetime')?.datetime;
 		expect(dt).toBe('2026-01-06T17:00:00.000Z');
 	});
 });
