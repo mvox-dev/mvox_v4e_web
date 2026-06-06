@@ -524,3 +524,51 @@ Zero `<dialog>`, modal, overlay, or popover components in codebase. House style:
 `entuSeasons.ts` uses `{ type: '_type', string: 'season' }` for entity creates. Seed script uses `{ type: '_type', reference: TYPE_IDS.season }` with comment that reference form required for API-key auth context. Not confirmed whether string form works for browser user JWT. If it fails, the create silently 4xx (no try/catch in handleSeasonCreate). Need: P0.1 probe artifact or browser network tab check.
 
 (*MVOX:Finn*)
+
+---
+
+## 2026-06-06 — Session 30 notes
+
+### [LEARNED] #87 edit-single-rehearsal scope (RED brief groundwork)
+
+Audited for team-lead's Tallis dispatch. Key findings:
+
+- `updateRehearsal` (entuSeasons.ts:257) is GREEN (Task 7) but **dangling — zero app callsites**.
+- `RehearsalPatch` requires `{ valueId, value }` per field; callers can't supply valueIds because `listRehearsals` never fetches them. Issue body recommends option (a): self-resolve inside `updateRehearsal`.
+- `Rehearsal` type (`types.ts:54`) missing `description` field entirely.
+- No edit button rendered in `RehearsalList.svelte` rows — `onedit` prop exists and is wired from page but no button calls it.
+- `handleRehearsalEdit` in `+page.svelte:227` is an empty stub.
+- No `RehearsalEditForm.svelte` — needs creating, mirror `SeasonForm.svelte` inline `{#if}` shape.
+- i18n gaps: ~4 new keys needed (`seasons_form_rehearsal_edit_heading`, `seasons_field_duration`, `seasons_field_location`, `seasons_field_description`). `seasons_actions_edit`, `seasons_form_season_save`, `seasons_notice_update_failed` already exist and are reusable.
+
+### [LEARNED] Entu feature request status (all stalled as of 2026-06-06)
+
+12 open items across 3 repos, zero maintainer responses:
+- `entu/api` #39 (account-linking RFC) — stalled since 2026-05-18
+- `entu/api` #40 (login_hint passthrough) — stalled since 2026-05-23
+- `entu/research` #50 (3rd-party browser-direct case study PR) — open, 0 reviews since 2026-05-23; 13/14 entu/research PRs are MERGED
+- `entu/www` #2–#10 (9 docs issues) — all stalled since 2026-05-17/18/19
+
+**Key pattern:** entu/research PRs merge; entu/api issues and entu/www issues don't get responses. PR-not-issue strategy confirmed for docs work.
+
+### [LEARNED] entu/www PR groundwork: we have push access, no fork needed
+
+`push: true` on `entu/www`. Default branch: `main`. Site generator: VitePress. English docs in `src/`; Estonian mirror in `src/et/`. Files touched for #2–#10 PR:
+- `src/overview/entities/index.md` — issues #2, #10
+- `src/api/formulas/index.md` — issues #3, #4, #8, #9
+- `src/api/properties/index.md` — issue #6
+- `src/api/authentication/index.md` — issue #7
+- `src/configuration/entity-types/index.md` — issue #5 (confirm `reference_query` section before editing)
+
+All verbatim doc text drafted and delivered to team-lead in session-30 research report.
+
+### [LEARNED] Entu API current state (live probe 2026-06-06)
+
+From live `GET https://api.entu.app/openapi`:
+- **No bulk/batch endpoint** — serial `DELETE /property/{id}` only, confirmed unchanged
+- **No rate limit documentation** — zero 429 responses in spec, no Retry-After/X-RateLimit headers
+- **`_sharing` not inherited via `_inheritrights`** — docs explicitly enumerate `_viewer/_expander/_editor/_owner` as the only 4 that inherit; absence of `_sharing` = `private` default; DELETE of `_sharing: public` is sufficient, no POST `private` needed
+- **GET `limit` no documented ceiling** — default 100, `maximum` constraint absent from schema; `limit=1000` undocumented risk; empirical probe recommended; our polyphony experience: `limit=500` confirmed safe
+- **New since session-6:** `POST /{db}/entity/{_id}/duplicate` endpoint with `count` param (1–100 copies)
+
+(*MVOX:Finn*)

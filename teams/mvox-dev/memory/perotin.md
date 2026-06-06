@@ -615,4 +615,50 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
   Full edition entity at 6a12036e4ff8277cd4306bc0 has: name, publisher, voicing, year, edition_type — NO isbn property.
   Task 4 EntuEdition.isbn field maps to license_note, not isbn, in the real data.
 
+## Session 30 — 2026-06-06
+
+### Date-format probe (EFK season 6a1d6b6210cc20db24e7ce58)
+
+[PROBE-RESULT] Entu date-typed property wire shape (read side):
+  Entity: season 6a1d6b6210cc20db24e7ce58 (renamed "Fooz" by UI bug)
+  start_date[0]: { "_id": "6a1e017e10cc20db24e7cf71", "date": "2026-06-02T00:00:00.000Z" }
+  end_date[0]:   { "_id": "6a1e017f10cc20db24e7cf72", "date": "2026-07-28T00:00:00.000Z" }
+  name[0]:       { "_id": "6a1e017d10cc20db24e7cf70", "string": "Fooz" }
+  Envelope: { entity: { start_date: [{_id, date}], ... } }
+
+[GOTCHA] date-typed value carries key `date` (NOT `datetime`) with full ISO 8601 UTC string
+  ("2026-06-02T00:00:00.000Z"), NOT plain YYYY-MM-DD. `<input type="date">` requires plain
+  YYYY-MM-DD → field renders blank. Fix is READ-side normalization only:
+  `value.date?.slice(0, 10)` before binding. POST continues sending plain YYYY-MM-DD (Entu
+  accepts and stores as full ISO internally). Array length = 1 on both (no double-appends).
+
+### _sharing inherit-vs-default probe (external-team consult)
+
+[PROBE-RESULT] _sharing materialization rule (empirically confirmed, controlled re-probe):
+  At CREATE time: if parent _sharing is `public` or `domain` → Entu materializes that value
+  as a real stored property on the child (own _id, independently mutable).
+  If parent _sharing is `private` (or absent, or no parent) → child gets NO _sharing property
+  written (ABSENT = private by default).
+
+[GOTCHA] Earlier probe (session 30 first run) was confounded: `season` type entity itself
+  carries `_sharing: domain` on its type-def. Orphan baseline proved type-def _sharing is
+  NOT copied to instances — ABSENT on fresh GET regardless of type-def value.
+  Source of create-time copy is the PARENT entity's sharing, not the type-def.
+
+[DECISION] _inheritrights flag is irrelevant to _sharing materialization — tested true/false
+  under both private and public parents, identical results in both cases.
+
+[DECISION] DELETE /property/{sharing_id} leaves _sharing permanently ABSENT — no async
+  re-materialization from parent (confirmed 2s-later GET). ABSENT = private (403 anonymous).
+  Bulk restrict via DELETE-only is sufficient; no follow-up POST needed.
+
+[GOTCHA] DELETE idempotency: already-deleted property _id → 404 "Property not found".
+  Bulk scripts must GET-before-DELETE; skip if _sharing array already absent.
+
+[DECISION] Throughput: ~8 sequential calls/sec, no 429 across 30 calls. 6,352 entities × 2
+  ops (GET + DELETE) ≈ 26 min sequential at observed rate. No rate-limit headers seen.
+
+[CHECKPOINT] Session 30 teardowns: all probe entities confirmed 404.
+  First probe: 5/5. Re-probe: 12/12.
+
 (*MVOX:Perotin*)

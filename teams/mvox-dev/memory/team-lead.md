@@ -1,6 +1,59 @@
 # Palestrina — Team Lead Scratchpad
 
-### [NEXT SESSION] 2026-06-01 end-of-session-29 — session-29 → session-30
+### [NEXT SESSION] 2026-06-06 end-of-session-30 — session-30 → session-31
+
+**Headline: Three features shipped to preview + one bugfix + a major Entu ecosystem push. Pencil-toggle merged (b3a1a6a), #87 edit-a-single-rehearsal merged (49e625d, 801→804 tests), season date-format bug root-caused via live probe + fixed (ddf4451). Then pivoted to Entu platform work: filed a 9-issue docs PR (entu/www#11, Closes #2–#10), a `_sharing` clarification PR (#13, Closes #12), a date-format wire discrepancy (entu/api#41), and the "product-native AI consultant agents" idea seed (entu/api#42). Fielded a live consult for the esmuseum team (bulk-restrict 6,352 entities) — ran clean, zero errors, data point back (limit=1000 works). Production mvox.eu untouched all session; everything on `preview-seasons.multivox.pages.dev`.**
+
+## ⭐ Session-31 first actions
+
+1. **PO re-test season dates** — the date-format fix (ddf4451) is live on preview (`app.x27TVohe.js`). PO hasn't confirmed the fix yet. Season "Fooz" at 2026-06-02→2026-07-28 should now show dates in the edit form and save correctly.
+2. **Close satisfied issues** — `#83` (cancel/edit single rehearsal) and `#84` (delete series cascade) and `#85` (conductors) were delivered via `#86` (manage-ops wiring) in session 29. Audit `gh issue list` and close what's done per `feedback_closes_n_pattern`. `#82` (view rehearsal list) was closed by the session-29 merge. `#87` closed automatically via `Closes #87` trailer.
+3. **#88** (runtime type-id resolution) is the natural next code task — hardcoded polyphony `TYPE_IDS` in `entuSeasons.ts` need to resolve per-db by name.
+4. **Check Entu PR/issue responses** — `entu/www` PR #11 (9-issue docs) + PR #13 (`_sharing` clarification) + `entu/api` #41 (date format) + #42 (idea seed). Any movement from Argo?
+5. **esmuseum follow-up** — their Phase 2 ran clean (posted results on mitselek/esmuseum-map-app#41). No action unless they have follow-up questions.
+
+## What shipped to main this session
+
+| SHA | What |
+|---|---|
+| `d95508e` | chore: recover session-29 trailing scratchpad notes (4 agent deltas orphaned by prior session) |
+| `b3a1a6a` | feat(seasons): pencil-toggle — toggle edit panel + mirrored is-editing state |
+| `49e625d` | feat(seasons): edit a single rehearsal — inline form + dirty-tracking + self-resolving updateRehearsal. Closes #87 |
+| `e7f7d49` | chore: session-30 scratchpads — #87 edit-rehearsal chain notes |
+| `ddf4451` | fix(seasons): normalize listSeasons ISO dates to YYYY-MM-DD for date inputs |
+
+main: `ddf4451` (origin matches). Tests: **804/804** unit, `pnpm check` 0. Preview: `preview-seasons.multivox.pages.dev` build `app.x27TVohe.js`. Prod: `mvox.eu` untouched.
+
+## Entu ecosystem work this session
+
+| Artifact | Repo | Status |
+|---|---|---|
+| PR #11 — 9-issue docs batch (Closes #2–#10) | entu/www | open, awaiting merge |
+| PR #13 — `_sharing` not inherited (Closes #12) | entu/www | open, awaiting merge |
+| Issue #41 — date-format wire discrepancy | entu/api | open |
+| Issue #42 — product-native AI consultant agents idea | entu/api | open, PO's framework-research team to design the roster |
+| esmuseum consult — VR bulk-restrict | mitselek/esmuseum-map-app#41 | closed, Phase 2 ran clean |
+
+## New discoveries this session
+
+- **Entu `date` round-trips as full ISO** (`2026-06-02T00:00:00.000Z`, not `YYYY-MM-DD`) — docs say YYYY-MM-DD; filed entu/api#41. Our fix: `listSeasons` slices to 10 chars. Saved as `project_entu_sharing_create_time` memory.
+- **`_sharing` create-time materialisation** — non-private parent `_sharing` is copied onto child at create (own `_id`, not a pointer); private parent → no `_sharing` written (default private). NOT live-inherited; type-def `_sharing` does NOT propagate. Saved as memory.
+- **Worktree `.env` gotcha** — fresh worktrees from main lack the gitignored `.env`; `pnpm check` fails on PUBLIC_ENTU_DB. Fix: `cp .env.example .env`. Josquin flagged; all chains this session did it.
+- **Session-29 scratchpad orphaning** — the session-29 shutdown committed from a different worktree; 4 agent scratchpad deltas were left uncommitted in the primary tree. Recovered at session-30 startup. **Lesson: at shutdown, verify the scratchpad commit includes ALL modified memory files across worktrees, not just the tree the shutdown runs from.**
+
+## Carry-forward backlog
+
+- **#88** runtime type-id resolution (polyphony TYPE_IDS hardcoded → resolve by name per-db)
+- **#86** manage-ops wiring audit (close satisfied sub-issues #83/#84/#85)
+- **#80** DRY safeRedirectTarget; **/about** real content; **#73** overdue red+bold; **#54** client error capture; **#44** CF Pages git-deploy; **#49** Biome lint; **#6** Email (blocked PO SPF/DKIM); **CHORE-C** test infra
+- **Stale branches** (carry-forward): local `chore/per-commit-green-arch-decision`, `chore/seed-librarian-bundle`, `feat/phase-b-live-wiring`, `chore/probe-rights-mechanics`, `chore/seed-demo-seasons`; remote `origin/feat/seasons-mobile`, `origin/chore/probe-rights-mechanics`, `origin/chore/seed-demo-seasons`
+- **Stale worktrees** (carry-forward): 6 `comenius-*` detached worktrees from session 29 (safe to prune — content is on main via squash-merges)
+
+(*MVOX:Palestrina*)
+
+---
+
+### [PROCESSED 2026-06-06 session-30] 2026-06-01 end-of-session-29 — session-29 → session-30
 
 **Headline: The IMPLEMENTATION session. Shipped the rehearsal-schedule first slice end-to-end to a live preview, seeded EFK demo data, then iterated hard on PO live-testing feedback (every bug was found by hands-on clicking, not unit tests). main advanced `89632a4` → `674b1d9` (origin matches). One change is mid-flight and DEFERRED to session 30 by PO: the season-tag pencil TOGGLE + mirrored active state — RED is committed and pushed, awaiting GREEN.**
 

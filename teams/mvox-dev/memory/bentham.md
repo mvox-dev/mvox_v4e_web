@@ -7,6 +7,18 @@ metadata:
 
 # Bentham scratchpad
 
+## 2026-06-01 — Session 30: fix/season-date-format @ `ea2cdcb` — GREEN
+
+[SEASON-DATE-FORMAT 2026-06-01] **GREEN — merge-eligible — `fix/season-date-format` @ `ea2cdcb`** (1-line data-mapping bugfix, RED `f07a8d3` Tallis → GREEN `ea2cdcb` Josquin). listSeasons mapped Entu `date`-typed values straight through; Entu returns them as FULL ISO (`'2026-06-02T00:00:00.000Z'`), so `<input type="date">` rendered blank + edits didn't round-trip. Fix: `?.date?.slice(0,10) ?? ''` on startDate+endDate. Test-pinned 3 cases (real ISO→clean, already-clean idempotent, missing→''), full-shape toEqual, drives real listSeasons via stubbed fetch on probed wire shape.
+
+[GOTCHA-ENTU-DATE-ISO-NOT-BARE 2026-06-01] **Standing audit: Entu returns `date`-typed property values as full ISO datetime strings (`YYYY-MM-DDTHH:MM:SS.sssZ`), NOT bare `YYYY-MM-DD`.** Any read-mapper handing a `date` value to an `<input type="date">` (needs bare YYYY-MM-DD), to a lexicographic string compare against a bare date, or to `Date.parse(x + 'Txx:xx:xxZ')` (double-suffix → NaN) is buggy. Normalize at the mapper with `?.date?.slice(0,10) ?? ''`. This fix's reach was wider than the reported symptom: besides the blank date input, it silently repaired (a) `recurrence.ts` `Date.parse(startDate + 'T00:00:00Z')` → would've been `'...ZT00:00:00Z'`→NaN→broken occurrence gen; (b) SeriesForm outside-season warning + validation.ts `endDate < startDate` clean-vs-ISO lexicographic compares (boundary mis-eval). Review trigger: any new listX mapper reading an Entu `date`-typed prop must slice(0,10) if any consumer needs a bare date or does string/Date math on it. Companion to GOTCHA-ENTU-TYPE-CREATE-WIRE — both are "the Entu wire shape isn't what the naive read assumes."
+
+(*MVOX:Bentham*)
+
+## 2026-06-01 — Session 30: feat/seasons-pencil-toggle @ `56e6f3f` — GREEN (no findings)
+
+[PENCIL-TOGGLE 2026-06-01] GREEN, merge-eligible, RED `f761ca4` → GREEN `56e6f3f`. ✏️ on selected season tag toggles edit panel (panelMode 'edit'?'none':'edit') + mirror state (`editing={panelMode==='edit'}` → `class:is-editing`). 2 source files, +14/-2. CSS `.edit-btn.is-editing` plain style (scaleX(-1) flip) — no overflow/responsive triggers. 4 tests both-direction (class-presence ×2 + route toggle open/close driving real panelMode). Nothing new for the pad — existing patterns followed.
+
 ## 2026-06-01 — Session 30: #87 edit-rehearsal full chain @ `937c701` — GREEN + YELLOW-87.1 (dead i18n keys)
 
 [#87 BRANCH-REVIEW 2026-06-01] **GREEN — merge-eligible — `feat/seasons-edit-rehearsal` @ `937c701`** (4-commit chain RED `d640878`→data `232e9da`→i18n `da4e6be`→UI `937c701`). Merge-shape clean (`937c701..origin/main` empty). One YELLOW (dead i18n keys, hygiene). Verified from blobs.

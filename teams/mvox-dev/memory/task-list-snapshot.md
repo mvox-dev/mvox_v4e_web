@@ -1,62 +1,46 @@
-# Task List Snapshot — 2026-06-01 end-of-session-29
+# Task List Snapshot — 2026-06-06 end-of-session-30
 
-State at session-29 close.
+State at session-30 close.
 
 ## Active tasks (in-flight)
 
-**Pencil-toggle — at RED, DEFERRED to session 30 by PO.** Branch `feat/seasons-pencil-toggle` off main `674b1d9`. RED commit `f761ca4` pushed (tests only). Next step = Byrd GREEN. Full brief in `team-lead.md [NEXT SESSION]` seed (the ⭐ FIRST ACTION block).
+None. All session-30 work completed and merged.
 
 ## Pending tasks (deferred)
 
-None in the harness task list. Session-29 work was driven through the TDD chain + PO live-testing iterations, not the harness task list.
+None in the harness task list. Next work lives in `team-lead.md [NEXT SESSION]` seed.
 
-## What shipped this session (rehearsal-schedule first slice → live preview)
+## Session-30 task history (all completed)
 
-main advanced `89632a4` → `674b1d9` (origin matches). Key commits:
-- `723d09e` — first slice (create season/series, eager events, view list)
-- `1e787f3` — `/seasons` nav tab + protected-route guard
-- `3878291` — manage-ops wiring (#86): conductors, cancel, delete-series + rehearsal read-path (#82)
-- `47be076` — `_type`-as-reference create fix (Entu 400)
-- `bbfacb1` — conductor dedupe (3-layer) + soft-warn season dates + remove dead setProperty
-- `674b1d9` — mobile redesign: SeasonBar + on-demand panels + edit-season + responsive stacking
+1. Pencil-toggle GREEN (Byrd) → Bentham GREEN → Josquin merge (b3a1a6a) → preview redeploy ✅
+2. #87 edit-a-single-rehearsal full TDD chain: Tallis RED → Josquin data → Comenius i18n → Byrd UI → YELLOW-87.1 fix → Bentham GREEN → Josquin merge (49e625d) → preview redeploy ✅ Closes #87
+3. Season date-format bug: systematic debug → Pérotin live probe → Tallis RED → Josquin GREEN → Bentham GREEN → merge (ddf4451) → preview redeploy ✅
+4. Entu docs PRs: entu/www PR #11 (Closes #2–#10) + PR #13 (Closes #12) ✅ (awaiting Argo merge)
+5. Entu API issues: #41 (date-format) + #42 (product-native agents idea seed) ✅ filed
+6. esmuseum consult: 5 questions answered, verified, posted on mitselek/esmuseum-map-app#41 ✅
 
-Live at `preview-seasons.multivox.pages.dev` (build `app.vQrtCqAM.js`). **mvox.eu production untouched.**
+## Produced this session (all committed + pushed to origin)
 
-## EFK demo seed (live in polyphony Entu db)
+- **5 commits on main** (d95508e → b3a1a6a → 49e625d → e7f7d49 → ddf4451)
+- **2 PRs on entu/www** (#11 + #13)
+- **2 issues on entu/api** (#41 + #42)
+- **1 consult answer** on mitselek/esmuseum-map-app#41
+- main @ `ddf4451`, origin matches, 804/804, preview `app.x27TVohe.js`
 
-Org EFK `69c7f8718489bfcb0e81b065`: season 2026/27 + Tuesday series → 16 events (DST flip 2026-10-27 verified). Recorded on `chore/seed-demo-seasons` (`2dd6f46`, Pérotin scratchpad).
+## GitHub issues — close-out audit needed session 31
 
-## GitHub issues — slice capabilities
-
-| Capability | Issue | State |
+| Issue | Status | Notes |
 |---|---|---|
-| Create season | #19 | done (live) |
-| Create rehearsal series | #20 | done (live) |
-| Generate events (eager) | #81 | done (live) |
-| View rehearsal list | #82 | done (live, read-path fixed) |
-| Cancel/edit single instance | #83 | cancel done; edit-one = **#87** open |
-| Delete series (cascade) | #84 | done (live) |
-| Assign/manage conductors | #85 | done (live, dedupe-correct) |
-| Manage-ops wiring umbrella | #86 | delivered |
-| Edit single rehearsal (Cap 5b) | #87 | **open** — UI wiring of `updateRehearsal` |
-| Runtime type-id resolution | #88 | **open** — TYPE_IDS hardcoded |
-
-**Action session 30:** `gh issue list` audit — close #83/#84/#85 portions satisfied by #86 (`feedback_closes_n_pattern`).
-
-## Memory written this session
-
-- `project_entu_create_type_reference`
-- `partial-assertions-and-seams-hide-real-bugs`
-- updated `spawn-agents-with-worktree-isolation`
-
-## Next session focus
-
-1. **Finish the pencil-toggle** (Byrd GREEN → Bentham → Josquin merge → redeploy preview → ping PO). RED is primed at `f761ca4`.
-2. Close satisfied GH issues; **#87** (edit one rehearsal) is the natural next capability.
-3. Eventually promote the slice from `preview-seasons` to `mvox.eu` when PO is satisfied.
+| #82 view rehearsal list | CLOSED (session 29) | — |
+| #83 cancel/edit single rehearsal | OPEN | delivered via #86 (cancel) + #87 (edit); close? |
+| #84 delete series cascade | OPEN | delivered via #86; close? |
+| #85 assign/manage conductors | OPEN | delivered via #86; close? |
+| #86 manage-ops wiring | OPEN | audit coverage vs #83/#84/#85 |
+| #87 edit single rehearsal | CLOSED (this session) | — |
+| #88 runtime type-id resolution | OPEN | natural next code task |
 
 ## Carry-forward GH backlog (unchanged)
 
-- **#80** DRY safeRedirectTarget; **/about** real content; **#73** overdue red+bold (blocked lending); **#54** client error capture; **#44** CF Pages git-deploy; **#49** Biome lint; **#6** Email (blocked PO SPF/DKIM); **CHORE-C** test infra (heavy).
+- **#80** DRY login safeRedirectTarget; **/about** real content; **#73** overdue red+bold (blocked lending); **#54** client error capture; **#44** CF Pages git-deploy; **#49** Biome lint; **#6** Email (blocked PO SPF/DKIM); **CHORE-C** test infra (heavy).
 
 (*MVOX:Palestrina*)

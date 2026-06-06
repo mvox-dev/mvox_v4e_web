@@ -4,6 +4,28 @@ Personal notes. Only Josquin writes here.
 
 ---
 
+## [CHECKPOINT] 2026-06-01 session 30 — pencil-toggle + #87 edit-rehearsal + date-format fix: 3 merges + 1 data-GREEN + 3 preview redeploys
+
+Acted as GREEN-impl + merge-agent. Main went `d95508e → b3a1a6a` (pencil-toggle squash) `→ 49e625d` (#87 edit-rehearsal, Closes #87) `→ ... e7f7d49 → ddf4451` (season date-format fix). Preview-seasons redeployed each time; last verified chunk `app.x27TVohe.js`. Prod mvox.eu untouched all session. My data-GREEN: #87 `updateRehearsal` self-resolving (commit `232e9da`) + the date-format slice (`ea2cdcb`).
+
+### [GOTCHA] Two STALE-ARTIFACT check-REDs that are NOT defects — fix them, don't report them as blockers
+Both surfaced this session as `pnpm check` errors on a clean merge/GREEN that the source branch had passed:
+1. **Stale gitignored Paraglide** (`src/lib/paraglide/messages.js`) — on the pencil-toggle merge, check RED'd with 54 "Property 'seasons_*' does not exist on type messages". `messages/en.json` HAS the keys; the generated `messages.js` is a gitignored build PRODUCT and my local copy was stale. Fix: `pnpm build` (regenerates Paraglide). ALWAYS build before trusting check on a merge that touches `messages/*.json`.
+2. **Worktree missing `.env`** — fresh worktrees (`seasons-edit-rehearsal`, `season-date-format`) have NO `.env`, so `$env/static/public` type omits `PUBLIC_ENTU_DB` → 8 check errors across userStore/library/landing/auth/seasons (none in my edits). `PUBLIC_ENTU_DB` only lives in `.env.example`. Fix: `cp .env.example .env` (gitignored, never staged) + `svelte-kit sync`. Confirm pre-existing by stash-checking the pristine RED baseline before attributing. Do this PROACTIVELY on entering any fresh worktree.
+
+### [GOTCHA] `pnpm test <path>` does NOT filter — runs the WHOLE suite (incl. Playwright)
+`pnpm test src/lib/seasons/entuSeasons.spec.ts` ran all 100 files + Playwright (the `test` script = `vitest run && playwright test`; the path arg is ignored/passed-through oddly). To run ONE spec: `pnpm exec vitest run <path>`. For the unit-only gate: `pnpm test:unit` (= `vitest run`, no Playwright). The 2 pre-existing Playwright baseline failures (frontend-scaffolding + tailwind, the CHORE-C/YELLOW-B.2 set) are NOT regressions — gate on `pnpm test:unit` + `pnpm check`, not the combined `pnpm test`.
+
+### [GOTCHA] `state_referenced_locally` warnings (×8) in `RehearsalEditForm.svelte` are EXPECTED, not errors
+Byrd's edit form snapshots the `rehearsal` prop into local `$state` on mount (intentional for an edit form). `pnpm check` reports them as WARNINGS; "check 0" in dispatches means 0 ERRORS, which holds. Not my lane to alter (.svelte). Don't treat warnings as a merge blocker.
+
+### [PATTERN] Consumer-audit a read-shape change before shipping (date-format fix)
+Dispatch asked to flag any consumer needing the full-ISO season date. Grepped all `Season.startDate/.endDate` readers: the `slice(0,10)` clean form is not just safe but FIXES latent string-compare bugs (`validation.ts` `endDate < startDate`, `SeriesForm.svelte` `startDate < season.startDate`) — a bare `YYYY-MM-DD` form input compared against a full-ISO season date mis-sorts (the `T00:00…` suffix lands after the bare date). `<input type=date>` REQUIRES the bare form. Cheap grep, real finding.
+
+(*MVOX:Josquin*)
+
+---
+
 ## [CHECKPOINT] 2026-06-01 session 29 — rehearsal-schedule: 5 squash-merges to main + 4 preview redeploys (all GREEN)
 
 Shipped the whole rehearsal-schedule feature this session as GREEN-impl + merge-agent: first-slice (`723d09e`), seasons-nav (`1e787f3`), #86 manage-ops (`3878291`, Closes #82), conductor-dedupe+soft-warn+dead-setProperty batch (`bbfacb1`), mobile-redesign (`674b1d9`). All on a new `src/lib/seasons/` module mirroring `src/lib/library/`. Preview lives at `preview-seasons.multivox.pages.dev` (last build chunk `app.vQrtCqAM.js`); mvox.eu (prod) untouched all session.

@@ -1,81 +1,8 @@
 [
   {
     "from": "team-lead",
-    "text": "[2026-06-01 01:24] Excellent manifest — thorough and well-reasoned. Decisions on your three questions, then go:\n\n1. **Prefix → `seasons_`** (your recommendation). It matches the module, spec, and plan; consistency with the code wins over retrofitting a never-used `events_` convention. Add a one-line note to `i18n-conventions.md` documenting `seasons_` as the events-domain sub-group for this slice.\n2. **Shared field labels → keep under `seasons_field_*`** (your default). No premature hoist to `common_field_*`; we refactor if real cross-feature reuse emerges.\n3. **`seasons_eyebrow` = \"Season\"** is fine as a static eyebrow label — Byrd will confirm during the Task 15 route whether the route uses it or the DB season name; if unused it's harmless. Keep it.\n\nAlso approved: single `seasons_error_outside_season` key (field-level targeting disambiguates); the `{n}` plural handling per the no-ICU-plural convention (your et/lv/uk partitive/genitive choices are sound). The partial-failure notices, page title, confirmations — all good.\n\n**One accuracy check before you commit:** cross-reference your four `seasons_error_*` keys against the ACTUAL `code` strings emitted by `src/lib/seasons/validation.ts` (now GREEN at `6fdef24`) — not just the plan's Task 2 sketch. The keys must match the real codes (`blank`, `end_before_start`, `interval_too_small`, `outside_season` — confirm exact spelling) so Byrd can map `code → m.seasons_error_<code>()` cleanly.\n\n**Then commit** the `seasons_*` set across all four locales (en real + et/lv/uk real translations, keys in sync) + the i18n-conventions.md note.\n\n**Worktree + concurrency:** work in your own worktree at `origin/feat/rehearsal-schedule`. Josquin is committing `seasonsStore.ts` to the same branch in parallel — disjoint from your `messages/*.json`, so if your push is rejected (non-fast-forward), `git fetch && git rebase origin/feat/rehearsal-schedule` (clean) and push again. Handoff to me with tip SHA when committed — that unblocks Byrd's components.",
-    "summary": "Manifest approved with decisions — create the keys",
-    "timestamp": "2026-06-01T01:24:54.718Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-06-01 06:01] Quick i18n fix from Bentham's review (YELLOW-29.2). The RehearsalList edit button currently shows `m.seasons_actions_confirm()` (\"Confirm\") as its label — wrong for an edit action.\n\n**Sync:** `git fetch origin && git reset --hard origin/feat/rehearsal-schedule` → tip `33d9cb3`. Own worktree; push to origin.\n\n**Add `seasons_actions_edit` ×4 locales** (en `Edit`; et/lv/uk your call — et `Muuda`, lv `Rediģēt`, uk `Редагувати` if those fit your conventions). Keep all 4 files in sync (37 `seasons_*` keys each after this). Byrd will swap the label to `m.seasons_actions_edit()` in his route GREEN.\n\n**Concurrency:** Tallis is committing RED test updates to the same branch in parallel — disjoint from `messages/*.json`, so rebase-on-reject (`git fetch && git rebase origin/feat/rehearsal-schedule`). Commit `i18n(#82): add seasons_actions_edit key (YELLOW-29.2)`, push, handoff with tip SHA.",
-    "summary": "YELLOW-29.2: add seasons_actions_edit key x4",
-    "timestamp": "2026-06-01T06:02:05.491Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-06-01 08:59] New small dispatch — the `/seasons` route shipped but has no nav link. We're adding a nav tab. Need the i18n key.\n\n**Sync:** `git fetch origin && git checkout feat/seasons-nav` (new branch off main `723d09e`) or work in your own worktree at `origin/feat/seasons-nav`. Push there.\n\n**Add a nav-tab key** following the existing `nav_tab_*` convention. Propose the key + label — my default is `nav_tab_rehearsals` = en `Rehearsals` (conductor-facing; the route is the rehearsal schedule home). If you'd prefer `Seasons` or another framing, say so. ×4 locales (et/lv/uk real). Keep in sync with the existing nav keys.\n\nCommit `i18n(#82): nav_tab_rehearsals key ×4`, push to `origin/feat/seasons-nav`, handoff with tip SHA + the exact key name so Tallis/Byrd can wire it. Quick one.",
-    "summary": "Nav tab i18n key for /seasons",
-    "timestamp": "2026-06-01T09:01:08.704Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-06-01 09:46] One i18n key for #86 T2 (conductor wiring). The route needs a notice for the defensive case where assigning a conductor fails the membership-pairing gate.\n\n**Sync:** `git fetch origin && git reset --hard origin/feat/seasons-manage-ops` → tip `74d2f64`. Own worktree; push to `origin/feat/seasons-manage-ops`.\n\n**Add `seasons_notice_assign_not_member` ×4** — en default e.g. `Only organisation members can be assigned as conductors.` (your phrasing/et/lv/uk). Keep the 4 locale files in sync. Byrd will use `m.seasons_notice_assign_not_member()` in the route's `handleConductorAssign` catch.\n\nCommit `i18n(#86): seasons_notice_assign_not_member ×4`, push, handoff with tip SHA. Byrd's T2 GREEN runs in parallel (route, disjoint from `messages/*.json`) — rebase-on-reject if needed. Quick one.",
-    "summary": "Add seasons_notice_assign_not_member key (#86 T2)",
-    "timestamp": "2026-06-01T09:47:14.439Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-06-01 10:20] One more notice key for #86 T4 (cancel wiring) + reusable for T5 (delete-series). The data layer throws `DeleteForbiddenError` on an Entu 403 (delete is `_owner`-tier); the route surfaces a notice.\n\n**Sync:** `git fetch origin && git reset --hard origin/feat/seasons-manage-ops` → tip `074d709`. Own worktree; push.\n\n**Add `seasons_notice_delete_forbidden` ×4** — en default e.g. `You don't have permission to delete this.` (your phrasing/et/lv/uk). Generic enough to cover both cancel-one-rehearsal and delete-series. Keep 4 locales in sync.\n\nCommit `i18n(#86): seasons_notice_delete_forbidden ×4`, push, handoff with tip SHA. Tallis's T4 RED runs in parallel (disjoint from `messages/*.json`) — rebase-on-reject. Quick one.",
-    "summary": "Add seasons_notice_delete_forbidden key (#86 T4)",
-    "timestamp": "2026-06-01T10:20:21.349Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-06-01 11:51] One i18n key for the live season-create bug fix. `handleSeasonCreate` had no error surfacing (the Entu 400 died as an unhandled rejection); we're adding a notice.\n\n**Sync:** `git fetch origin && git reset --hard origin/fix/seasons-create-wire` → tip `3878291`. Own worktree; push to `origin/fix/seasons-create-wire`.\n\n**Add `seasons_notice_create_failed` ×4** — en e.g. `Couldn't create that — please try again.` (your phrasing/et/lv/uk). Generic enough for a failed season/series create. Keep 4 locales in sync.\n\nCommit `i18n(fix): seasons_notice_create_failed ×4`, push, handoff with tip SHA. Tallis's RED runs in parallel (disjoint `messages/*.json`) — rebase-on-reject. Quick one.",
-    "summary": "Add seasons_notice_create_failed key (live-bug fix)",
-    "timestamp": "2026-06-01T11:51:39.029Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-06-01 12:40] One key for the next batch piece — the season-date constraint is being softened from a hard error to a non-blocking warning (PO decision).\n\n**Sync:** `git fetch origin && git reset --hard origin/fix/conductor-dedupe` → latest tip. Own worktree; push to `origin/fix/conductor-dedupe`.\n\n**Add `seasons_warning_outside_season` ×4** — en e.g. `Heads up: this series extends beyond the season's dates.` (your phrasing/et/lv/uk). This is an informational, non-blocking notice shown on the SeriesForm when the series dates fall outside the season window. Keep 4 locales in sync.\n\nCommit `i18n(fix): seasons_warning_outside_season ×4`, push, handoff with tip SHA. (Note: Byrd is finishing the conductor-picker GREEN on this branch — disjoint `messages/*.json`, so rebase-on-reject if needed.) Quick one.",
-    "summary": "Add seasons_warning_outside_season key (soft-warn)",
-    "timestamp": "2026-06-01T12:40:56.302Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-06-01 14:08] i18n for the mobile-seasons redesign (`feat/seasons-mobile`). The /seasons page is becoming: a season bar (tags + ✏️-on-selected-tag + ＋) with on-demand forms; plus a new **edit-season** capability.\n\n**Sync:** `git fetch origin && git reset --hard origin/feat/seasons-mobile` → tip `bbfacb1`. Own worktree; push.\n\n**Propose a small `seasons_*` key set** for the redesign (send me the list to confirm before committing), covering:\n- **Edit-season form:** a heading (e.g. `seasons_form_season_edit_heading` = \"Edit season\") + a save button (`seasons_form_season_save` = \"Save changes\"). (Create-season reuses the existing `seasons_form_season_heading` / `seasons_form_season_submit`.)\n- **On-demand buttons / a11y labels** for the season bar icons: create-season ＋ and edit-season ✏️ need accessible labels (e.g. `seasons_a11y_create_season` = \"Create season\", `seasons_a11y_edit_season` = \"Edit selected season\"). And the \"＋ New rehearsal series\" toggle button (reuse `seasons_form_series_heading` or a new `seasons_action_new_series`?).\n- Anything else you'd add for the on-demand flow.\n\nen + et/lv/uk. Send the proposed list → I confirm → you commit `i18n(seasons): mobile-redesign keys`. (Tallis is adding updateSeason specs in parallel — disjoint files.)",
-    "summary": "Propose i18n keys for mobile-seasons redesign",
-    "timestamp": "2026-06-01T14:08:59.927Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-06-01 14:10] Approved exactly as proposed — all 4 keys + both reuse decisions (series-button reuses `seasons_form_series_heading`, edit reuses `seasons_actions_edit`). The a11y-labels-must-be-self-contained reasoning is right.\n\nCommit the 4: `seasons_a11y_create_season`, `seasons_a11y_edit_season`, `seasons_form_season_edit_heading`, `seasons_form_season_save` (×4 locales, your translations). Commit `i18n(seasons): mobile-redesign keys (edit-season + a11y)`, push to `origin/feat/seasons-mobile`, handoff with tip SHA. (Tallis's updateSeason specs are on the same branch — disjoint `messages/*.json`, rebase-on-reject.) Thanks.",
-    "summary": "Approved — commit the 4 mobile-redesign keys",
-    "timestamp": "2026-06-01T14:10:12.916Z",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-06-01 14:37] One more key for the edit-season error path (mirrors the create-failed notice — an edit shouldn't silently fail). Branch `feat/seasons-mobile`.\n\n**Sync:** `git fetch origin && git reset --hard origin/feat/seasons-mobile` → latest tip. Own worktree; push.\n\n**Add `seasons_notice_update_failed` ×4** — en e.g. `Couldn't save your changes — please try again.` (your phrasing/et/lv/uk; pair it with the existing `seasons_notice_create_failed` style). Keep 4 locales in sync.\n\nCommit `i18n(seasons): seasons_notice_update_failed ×4`, push, handoff with tip SHA. (Byrd's doing the route GREEN in parallel — disjoint `messages/*.json`, rebase-on-reject.) Quick one.",
-    "summary": "Add seasons_notice_update_failed key",
-    "timestamp": "2026-06-01T14:38:02.967Z",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1780755238020@comenius\",\"from\":\"team-lead\",\"reason\":\"Session 30 wrap. Save any findings to your scratchpad before acknowledging.\",\"timestamp\":\"2026-06-06T14:13:58.020Z\"}",
+    "timestamp": "2026-06-06T14:13:58.020Z",
     "type": "message",
     "read": true
   }

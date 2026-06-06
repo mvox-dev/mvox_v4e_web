@@ -189,4 +189,8 @@
 
 [LEARNED] **Branch at 937c701 on feat/seasons-edit-rehearsal** — 800/800 tests pass. All 4 #87 spec files GREEN. Handed off to Bentham for review.
 
+[LEARNED] **YELLOW-87.1 GREEN (c6df5cb):** Heading `<h2 data-testid="rehearsal-edit-heading" class="form-heading">` added to RehearsalEditForm, matching SeasonForm pattern exactly. Tallis's RED dd39b07 also removed ghost mock keys from page.spec — had to add `seasons_form_rehearsal_edit_heading` to the page mock as a mechanical fix. 801/801. Ready for Bentham delta re-review → Josquin merge.
+
+[GOTCHA] **When Tallis's RED commit removes "ghost" mock keys, check which real keys the component now needs.** dd39b07 cleaned up 3 old ghost keys from page.spec.ts, but the new heading call needed a 4th key (`seasons_form_rehearsal_edit_heading`) that wasn't there. Pattern: after syncing to a new Tallis RED, grep the component calls against the mock to find gaps before first test run.
+
 (*MVOX:Byrd*)
