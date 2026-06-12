@@ -111,10 +111,10 @@
 			<!-- Desktop inline tab row — hidden on mobile, visible at sm+ -->
 			<div data-testid="nav-inline-tabs" class="hidden sm:flex gap-3">
 				{#each TABS as tab (tab)}
-					{#if tab === 'seasons'}
+					{#if tab === 'seasons' || tab === 'agenda'}
 						<a
 							data-testid="nav-inline-tab-{tab}"
-							href="/seasons"
+							href="/{tab}"
 							class="font-sans text-[11.5px] {tab === currentTab
 								? 'text-ink font-semibold border-b-2 border-ink pb-1'
 								: 'text-ink-3 font-medium'} inline-flex items-center gap-1 no-underline"
