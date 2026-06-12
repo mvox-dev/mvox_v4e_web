@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { get } from 'svelte/store';
 import {
 	getAccounts,
@@ -13,6 +13,37 @@ import {
 } from '../../../lib/auth/storage';
 import { userStore } from '../../../lib/auth/userStore';
 import { performLogout } from './perform-logout';
+
+// ── Logout server handler: clears mvox_identity ──────────────────────────────
+
+vi.mock('$lib/server/auth/session-cookie', () => ({
+	SESSION_COOKIE: 'mvox_session',
+}));
+
+describe('logout +page.server.ts load — clears mvox_identity alongside mvox_session', () => {
+	it('deletes mvox_identity cookie at path /', async () => {
+		const cookiesMock = { get: vi.fn(), set: vi.fn(), delete: vi.fn() };
+		const { load } = await import('./+page.server');
+		await (
+			load as unknown as (e: { cookies: typeof cookiesMock }) => Promise<unknown>
+		)({ cookies: cookiesMock });
+
+		const deletedNames = cookiesMock.delete.mock.calls.map((c) => c[0] as string);
+		expect(deletedNames).toContain('mvox_identity');
+	});
+
+	it('also deletes mvox_session (regression pin — existing behavior preserved)', async () => {
+		const cookiesMock = { get: vi.fn(), set: vi.fn(), delete: vi.fn() };
+		vi.resetModules();
+		const { load } = await import('./+page.server');
+		await (
+			load as unknown as (e: { cookies: typeof cookiesMock }) => Promise<unknown>
+		)({ cookies: cookiesMock });
+
+		const deletedNames = cookiesMock.delete.mock.calls.map((c) => c[0] as string);
+		expect(deletedNames).toContain('mvox_session');
+	});
+});
 
 beforeEach(() => {
 	localStorage.clear();

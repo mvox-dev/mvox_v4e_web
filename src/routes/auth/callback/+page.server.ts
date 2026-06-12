@@ -2,7 +2,12 @@ import type { ServerLoad } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
 import { dev } from '$app/environment';
 import { PUBLIC_ENTU_DB } from '$env/static/public';
+import { MVOX_SESSION_SECRET } from '$env/static/private';
+import { ENTU_API_BASE } from '$lib/entu-config';
 import { SESSION_COOKIE, sessionCookieOptions } from '$lib/server/auth/session-cookie';
+import { signIdentity } from '$lib/server/auth/identity-cookie';
+
+const IDENTITY_COOKIE = 'mvox_identity';
 
 export const load: ServerLoad = async ({ url, cookies }) => {
 	const key = url.searchParams.get('key');
@@ -11,9 +16,47 @@ export const load: ServerLoad = async ({ url, cookies }) => {
 		throw redirect(303, '/auth/login?error=missing_session_token');
 	}
 
-	// Set the server-side session cookie (CHORE-79). Value = the Entu JWT, so the
-	// hooks guard can decode `exp`. The client still writes localStorage from `data`.
+	// Server-side Entu exchange: verify the key and extract personId
+	let personId: string;
+	try {
+		const res = await fetch(`${ENTU_API_BASE}auth?db=${encodeURIComponent(PUBLIC_ENTU_DB)}`, {
+			headers: {
+				Authorization: `Bearer ${key}`,
+				Accept: 'application/json',
+			},
+		});
+
+		if (!res.ok) {
+			console.error(`Entu exchange failed: ${res.status}`);
+			throw redirect(303, '/auth/login?error=server_exchange_failed');
+		}
+
+		const data = (await res.json()) as { accounts?: Record<string, string> };
+		const pid = data.accounts?.[PUBLIC_ENTU_DB];
+
+		if (!pid) {
+			console.error('Entu exchange: accounts missing db entry');
+			throw redirect(303, '/auth/login?error=server_exchange_failed');
+		}
+
+		personId = pid;
+	} catch (err) {
+		// Re-throw redirects (they are throw-based in SvelteKit)
+		if (err && typeof err === 'object' && 'status' in err) throw err;
+		console.error('Entu exchange error:', err);
+		throw redirect(303, '/auth/login?error=server_exchange_failed');
+	}
+
+	// Set the server-side session cookie (CHORE-79).
 	cookies.set(SESSION_COOKIE, key, sessionCookieOptions(!dev));
+
+	// Mint the HMAC-signed identity cookie with the server-verified personId
+	const nowS = Math.floor(Date.now() / 1000);
+	const identityValue = await signIdentity(
+		{ personId, iat: nowS, exp: nowS + 48 * 60 * 60 },
+		MVOX_SESSION_SECRET,
+	);
+	cookies.set(IDENTITY_COOKIE, identityValue, sessionCookieOptions(!dev));
 
 	return {
 		sessionToken: key,
