@@ -697,17 +697,18 @@ Zero `.svelte` / `.ts` files touched. Zero tests rewritten (specs assert key inv
 
 (*MVOX:Palestrina*)
 
-## Primary-tree-stays-on-main protocol (git collision elimination)
+## Single-tree serialization protocol (git collision elimination)
 
-**Decision** (PO directive, 2026-06-12 session 32, after 3 shared-tree branch flips in one day):
+**Decision** (PO directive, 2026-06-12 session 32, after 3 shared-tree branch flips in one day; supersedes the same-day "primary-tree-stays-on-main + agent worktrees" draft — PO: worktrees have never produced a clean session; they generate split-brain rather than preventing it):
 
-1. **The primary tree (`~/workspace`) stays on `main`. Always.** No agent — team-lead included — checks out any other branch there.
-2. **The single active feature branch lives ONLY in agent worktrees** (EnterWorktree → `git fetch origin` → checkout). Push to origin; the squash-merge to main runs `git checkout main` only inside a worktree or after every other actor is idle.
-3. **No `chore/*` branches.** Probes, seeds, findings docs, specs, plans, scratchpads commit DIRECTLY to `main` — they are additive artifacts with no review gate (generalizes the session-17 direct-to-main data-commit pattern).
-4. End-of-chain hygiene: feature branch deleted local+remote at merge; no branch outlives its chain.
+1. **One tree.** All work happens in the shared primary tree (`~/workspace`). NO agent worktrees, no EnterWorktree, no `isolation: "worktree"`.
+2. **One branch at a time.** The tree sits on `main` between chains and on the single active feature branch during a chain. Nothing else is ever checked out; no other branch exists.
+3. **One actor at a time.** TDD chain tasks are strictly serial (session-24 Level 2) — the agent holding the current task is the ONLY actor running git or writing files. This includes team-lead: no doc/spec/plan commits while a chain is mid-flight. Specs + plans commit to main BEFORE the feature branch is created; everything else batches until the merge closes and the tree is back on main.
+4. **No `chore/*` branches.** Probes, seeds, findings, scratchpads commit DIRECTLY to `main`, and run BETWEEN chains, never alongside one.
+5. End-of-chain hygiene: feature branch deleted local+remote at merge; `git branch -a` between chains shows exactly `main` + `origin/main`.
 
-**Rationale:** every shared-tree incident to date (sessions 14, 22, 24, 32) reduces to "two actors assumed different branches in one tree." Serializing branches helped; eliminating non-main checkouts from the shared tree removes the failure mode entirely rather than defending against it. Recovery dances (cherry-pick rescues, restore-checkouts) are themselves collision-prone — prevention over recovery, fail loudly if a checkout is attempted.
+**Rationale:** every shared-tree incident to date (sessions 14, 22, 24, 29, 32) reduces to two actors assuming different tree states. Serializing actors AND collapsing to one tree removes the failure mode structurally; worktree isolation was tried (sessions 29-32) and empirically leaked every time (branches created in the wrong tree, scratchpads split across trees, stale worktrees pinning branches).
 
-**Bentham standing trigger:** any dispatch/plan instructing a checkout of a non-main branch in the primary tree is RED.
+**Bentham standing trigger:** any dispatch/plan that instructs worktree use, creates a `chore/*` branch, or schedules concurrent tree actors is RED.
 
 (*MVOX:Palestrina*)
