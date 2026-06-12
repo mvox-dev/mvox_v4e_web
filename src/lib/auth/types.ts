@@ -33,7 +33,7 @@ export type Org = {
 export type UserState =
 	| { status: 'loading' }
 	| { status: 'signed-out' }
-	| { status: 'ready'; name: string; initial: string; orgs: Org[] }
+	| { status: 'ready'; name: string; initial: string; personId: string; orgs: Org[] }
 	| { status: 'error'; reason: string };
 
 /**

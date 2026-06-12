@@ -2,12 +2,29 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import type { AgendaItem } from '$lib/agenda/agendaData';
+	import type { MyRsvp, RsvpStatus } from '$lib/rsvp/rsvpData';
+	import RsvpControl from './RsvpControl.svelte';
 
 	interface Props {
 		items: AgendaItem[];
 		errors?: string[];
+		/** eventId → MyRsvp — provided by the page after RSVP load. */
+		rsvpMap?: Map<string, MyRsvp>;
+		/** orgId → memberId|null — provided after member-id lookup per org. */
+		memberMap?: Map<string, string | null>;
+		/** itemId → error message — row-level RSVP errors surfaced by the page. */
+		rowErrors?: Map<string, string>;
+		/** Called when the user changes (or clears) the RSVP on a row. */
+		onrsvpchange?: (item: AgendaItem, newStatus: RsvpStatus | null) => void;
 	}
-	const { items, errors = [] }: Props = $props();
+	const {
+		items,
+		errors = [],
+		rsvpMap = new Map(),
+		memberMap = new Map(),
+		rowErrors = new Map(),
+		onrsvpchange,
+	}: Props = $props();
 
 	// Tallinn IANA timezone — Europe/Tallinn (UTC+3 in summer, UTC+2 in winter)
 	const TZ = 'Europe/Tallinn';
@@ -74,17 +91,35 @@
 				{group.header}
 			</div>
 			{#each group.rows as item (item.id)}
+				{@const rsvp = rsvpMap.get(item.id) ?? null}
+				{@const memberId = memberMap.get(item.orgId)}
+				{@const memberResolved = memberMap.has(item.orgId)}
+				{@const rowError = rowErrors.get(item.id) ?? null}
 				<div data-testid="agenda-row-{item.id}" class="row">
-					<span data-testid="agenda-row-time" class="row-time">
-						{timeFmt.format(new Date(item.startDatetime))}
-					</span>
-					<span data-testid="agenda-row-duration" class="row-duration">
-						{m.agenda_duration_min({ minutes: item.durationMinutes })}
-					</span>
-					<span class="row-name">{item.name ?? ''}</span>
-					<span data-testid="agenda-org-chip" class="org-chip">{item.orgLabel}</span>
-					{#if item.location}
-						<span data-testid="agenda-row-location" class="row-location">{item.location}</span>
+					<div class="row-main">
+						<span data-testid="agenda-row-time" class="row-time">
+							{timeFmt.format(new Date(item.startDatetime))}
+						</span>
+						<span data-testid="agenda-row-duration" class="row-duration">
+							{m.agenda_duration_min({ minutes: item.durationMinutes })}
+						</span>
+						<span class="row-name">{item.name ?? ''}</span>
+						<span data-testid="agenda-org-chip" class="org-chip">{item.orgLabel}</span>
+						{#if item.location}
+							<span data-testid="agenda-row-location" class="row-location">{item.location}</span>
+						{/if}
+					</div>
+					{#if memberResolved}
+						<div class="row-rsvp">
+							<RsvpControl
+								status={rsvp?.status ?? null}
+								disabled={memberId === null}
+								onchange={(s) => onrsvpchange?.(item, s)}
+							/>
+						</div>
+					{/if}
+					{#if rowError}
+						<div data-testid="agenda-row-error-{item.id}" class="row-error">{rowError}</div>
 					{/if}
 				</div>
 			{/each}
@@ -121,11 +156,17 @@
 
 	.row {
 		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		padding: 6px 0;
+		border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
+	}
+
+	.row-main {
+		display: flex;
 		align-items: center;
 		flex-wrap: wrap;
 		gap: 8px;
-		padding: 6px 0;
-		border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
 		font-size: 11px;
 	}
 
@@ -165,6 +206,16 @@
 		font-size: 10px;
 		color: #6a5230;
 		flex-shrink: 0;
+	}
+
+	.row-rsvp {
+		padding-left: 2px;
+	}
+
+	.row-error {
+		font-size: 10px;
+		color: #c0392b;
+		font-style: italic;
 	}
 
 	.empty-state {

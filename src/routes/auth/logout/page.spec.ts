@@ -38,7 +38,7 @@ describe('performLogout', () => {
 
 	it('resets userStore to signed-out so SPA nav does not greet the logged-out user', () => {
 		// Arrange: simulate an authenticated in-memory store (no hydrateUserStore needed)
-		userStore.set({ status: 'ready', name: 'Maire L.', initial: 'M', orgs: [] });
+		userStore.set({ status: 'ready', name: 'Maire L.', initial: 'M', personId: 'p1', orgs: [] });
 		expect(get(userStore).status).toBe('ready');
 
 		// Act

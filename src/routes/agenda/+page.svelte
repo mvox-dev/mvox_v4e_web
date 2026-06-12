@@ -1,18 +1,38 @@
-<!-- src/routes/agenda/+page.svelte — singer unified agenda -->
+<!-- src/routes/agenda/+page.svelte — singer unified agenda + RSVP -->
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import { userStore } from '$lib/auth/userStore';
 	import { getToken } from '$lib/auth/storage';
 	import { PUBLIC_ENTU_DB } from '$env/static/public';
 	import { listAgenda } from '$lib/agenda/agendaData';
-	import type { AgendaResult } from '$lib/agenda/agendaData';
+	import type { AgendaItem, AgendaResult } from '$lib/agenda/agendaData';
+	import {
+		listMyRsvps,
+		findMyMemberId,
+		createRsvp,
+		updateRsvpStatus,
+		deleteRsvp,
+	} from '$lib/rsvp/rsvpData';
+	import type { MyRsvp, RsvpStatus } from '$lib/rsvp/rsvpData';
 	import AgendaList from '$lib/components/agenda/AgendaList.svelte';
+	import RsvpControl from '$lib/components/agenda/RsvpControl.svelte';
 	import DeskSurface from '$lib/components/DeskSurface.svelte';
 
-	// ── Reactive agenda result state ────────────────────────────────────────────
+	// ── Agenda + RSVP state ──────────────────────────────────────────────────────
 	let result = $state<AgendaResult | null>(null);
+	// eventId → MyRsvp (from listMyRsvps)
+	let rsvpMap = $state(new Map<string, MyRsvp>());
+	// orgId → memberId | null (from findMyMemberId per org)
+	let memberMap = $state(new Map<string, string | null>());
+	// Per-item row-level error (itemId → error message | null)
+	let rowErrors = $state(new Map<string, string>());
 
-	// ── Hydrate when user becomes ready ─────────────────────────────────────────
+	// ── Hydrate when user becomes ready — YELLOW-10.1 staleness guard ────────────
+	// A monotonically-increasing request counter guards against stale completions:
+	// if the effect re-runs (user store changes), any in-flight promise from the
+	// previous run is ignored when it eventually resolves.
+	let currentRequestId = 0;
+
 	$effect(() => {
 		const user = $userStore;
 		if (user.status !== 'ready') return;
@@ -20,14 +40,109 @@
 
 		const token = getToken() ?? '';
 		const cfg = { db: PUBLIC_ENTU_DB, token };
+		const personId = user.personId;
+
+		// Stamp THIS call's id before any async work
+		const myId = ++currentRequestId;
+
+		// ── Phase 1: listAgenda ──────────────────────────────────────────────────
 		listAgenda(cfg, user.orgs, new Date())
 			.then((r) => {
+				// Staleness guard: if a newer call already resolved, discard this one
+				if (myId !== currentRequestId) return;
 				result = r;
+
+				// ── Phase 2: parallel RSVP + member lookups after agenda resolves ──
+				const distinctOrgIds = [...new Set(r.items.map((item) => item.orgId))];
+
+				Promise.all([
+					listMyRsvps(cfg, personId).then((rsvps) => {
+						if (myId !== currentRequestId) return;
+						const m = new Map<string, MyRsvp>();
+						for (const rsvp of rsvps) m.set(rsvp.eventId, rsvp);
+						rsvpMap = m;
+					}),
+					...distinctOrgIds.map((orgId) =>
+						findMyMemberId(cfg, personId, orgId).then((memberId) => {
+							if (myId !== currentRequestId) return;
+							// Assign new Map to trigger reactivity
+							memberMap = new Map([...memberMap, [orgId, memberId]]);
+						}),
+					),
+				]).catch(() => {
+					// RSVP load failure is non-fatal — agenda content still shows
+				});
 			})
 			.catch(() => {
+				if (myId !== currentRequestId) return;
 				result = { items: [], errors: user.orgs.map((o) => o.label) };
 			});
 	});
+
+	// ── RSVP change handler: optimistic update + revert-on-error ─────────────────
+	async function handleRsvpChange(item: AgendaItem, newStatus: RsvpStatus | null) {
+		const token = getToken() ?? '';
+		const cfg = { db: PUBLIC_ENTU_DB, token };
+
+		// Read current state for optimistic bookkeeping
+		const existing = rsvpMap.get(item.id) ?? null;
+		const memberId = memberMap.get(item.orgId) ?? null;
+
+		// Optimistic update
+		const nextMap = new Map(rsvpMap);
+		if (newStatus === null) {
+			nextMap.delete(item.id);
+		} else {
+			nextMap.set(item.id, {
+				rsvpId: existing?.rsvpId ?? '__optimistic__',
+				eventId: item.id,
+				status: newStatus,
+			});
+		}
+		rsvpMap = nextMap;
+
+		// Clear any prior row error
+		const nextErrors = new Map(rowErrors);
+		nextErrors.delete(item.id);
+		rowErrors = nextErrors;
+
+		try {
+			if (newStatus === null && existing) {
+				// Delete
+				await deleteRsvp(cfg, existing.rsvpId);
+			} else if (newStatus !== null && existing) {
+				// Update
+				await updateRsvpStatus(cfg, existing.rsvpId, newStatus);
+			} else if (newStatus !== null && !existing) {
+				// Create — needs memberId
+				if (!memberId) throw new Error('no member');
+				const user = $userStore;
+				const personId = user.status === 'ready' ? user.personId : '';
+				const newId = await createRsvp(cfg, {
+					personId,
+					eventId: item.id,
+					memberId,
+					status: newStatus,
+				});
+				// Replace optimistic entry with real id
+				rsvpMap = new Map([
+					...rsvpMap,
+					[item.id, { rsvpId: newId, eventId: item.id, status: newStatus }],
+				]);
+			}
+		} catch {
+			// Revert to previous state on failure
+			const revertMap = new Map(rsvpMap);
+			if (existing) {
+				revertMap.set(item.id, existing);
+			} else {
+				revertMap.delete(item.id);
+			}
+			rsvpMap = revertMap;
+			// Surface row-level error
+			rowErrors = new Map([...rowErrors, [item.id, m.rsvp_error()]]);
+		}
+	}
 </script>
 
 <DeskSurface>
@@ -48,13 +163,20 @@
 				{m.agenda_empty_no_orgs()}
 			</div>
 
-		<!-- Ready: orgs present — show list (even while result is null / still loading) -->
+		<!-- Ready: orgs present — show list (loading skeleton while result is null) -->
 		{:else if $userStore.status === 'ready'}
 			{#if result === null}
 				<div data-testid="agenda-loading" class="state-msg">{m.agenda_title()}</div>
 			{:else}
 				<div class="list-section">
-					<AgendaList items={result.items} errors={result.errors} />
+					<AgendaList
+						items={result.items}
+						errors={result.errors}
+						rsvpMap={rsvpMap}
+						memberMap={memberMap}
+						rowErrors={rowErrors}
+						onrsvpchange={handleRsvpChange}
+					/>
 				</div>
 			{/if}
 		{/if}

@@ -18,6 +18,7 @@ beforeEach(() => {
 		status: 'ready',
 		name: 'Test',
 		initial: 'T',
+		personId: 'p1',
 		orgs: [
 			{ id: 'org-1', label: 'EFK Library', initials: 'EL' },
 			{ id: 'org-2', label: 'Other Org', initials: 'OO' },

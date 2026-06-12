@@ -105,6 +105,7 @@ describe('MvoxNav — orgPickerMode', () => {
 			status: 'ready',
 			name: 'Test',
 			initial: 'T',
+			personId: 'p1',
 			orgs: [
 				{ id: 'a', label: 'A', initials: 'A' },
 				{ id: 'b', label: 'B', initials: 'B' },

@@ -108,7 +108,7 @@ export async function hydrateUserStore(): Promise<void> {
 			});
 		}
 
-		userStore.set({ status: 'ready', name, initial, orgs: Array.from(orgMap.values()) });
+		userStore.set({ status: 'ready', name, initial, personId, orgs: Array.from(orgMap.values()) });
 	} catch (err) {
 		userStore.set({ status: 'error', reason: err instanceof Error ? err.message : String(err) });
 	}

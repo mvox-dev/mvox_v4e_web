@@ -212,6 +212,7 @@ describe('selectedOrgStore — fallback chain', () => {
 			status: 'ready',
 			name: 'T',
 			initial: 'T',
+			personId: 'p1',
 			orgs: [
 				{ id: 'org-1', label: 'One', initials: 'O' },
 				{ id: 'org-2', label: 'Two', initials: 'T' },
@@ -225,7 +226,7 @@ describe('selectedOrgStore — fallback chain', () => {
 	});
 
 	it('returns null when ready but orgs is empty', () => {
-		userStore.userStore.set({ status: 'ready', name: 'T', initial: 'T', orgs: [] });
+		userStore.userStore.set({ status: 'ready', name: 'T', initial: 'T', personId: 'p1', orgs: [] });
 		expect(get(userStore.selectedOrgStore)).toBeNull();
 	});
 
@@ -276,6 +277,7 @@ describe('selectOrg — two-write on user change', () => {
 			status: 'ready',
 			name: 'T',
 			initial: 'T',
+			personId: 'p1',
 			orgs: [
 				{ id: 'org-1', label: 'One', initials: 'O' },
 				{ id: 'org-2', label: 'Two', initials: 'T' },
@@ -500,7 +502,7 @@ describe('pickerModeStore — derived from orgs.length', () => {
 	});
 
 	it('placeholder when 0 orgs', () => {
-		userStore.userStore.set({ status: 'ready', name: 'T', initial: 'T', orgs: [] });
+		userStore.userStore.set({ status: 'ready', name: 'T', initial: 'T', personId: 'p1', orgs: [] });
 		expect(get(userStore.pickerModeStore)).toBe('placeholder');
 	});
 
@@ -509,6 +511,7 @@ describe('pickerModeStore — derived from orgs.length', () => {
 			status: 'ready',
 			name: 'T',
 			initial: 'T',
+			personId: 'p1',
 			orgs: [{ id: 'a', label: 'A', initials: 'A' }],
 		});
 		expect(get(userStore.pickerModeStore)).toBe('static');
@@ -519,6 +522,7 @@ describe('pickerModeStore — derived from orgs.length', () => {
 			status: 'ready',
 			name: 'T',
 			initial: 'T',
+			personId: 'p1',
 			orgs: [
 				{ id: 'a', label: 'A', initials: 'A' },
 				{ id: 'b', label: 'B', initials: 'B' },
@@ -556,6 +560,7 @@ describe('selectedOrgIdStore + urlOrgIdStore (CHORE-74)', () => {
 			status: 'ready',
 			name: 'Test',
 			initial: 'T',
+			personId: 'p1',
 			orgs: [
 				{ id: 'org-a', label: 'Org A', initials: 'A', role: 'owner' },
 				{ id: 'org-b', label: 'Org B', initials: 'B', role: undefined },
@@ -570,6 +575,7 @@ describe('selectedOrgIdStore + urlOrgIdStore (CHORE-74)', () => {
 			status: 'ready',
 			name: 'Test',
 			initial: 'T',
+			personId: 'p1',
 			orgs: [
 				{ id: 'org-a', label: 'Org A', initials: 'A', role: 'owner' },
 				{ id: 'org-b', label: 'Org B', initials: 'B', role: undefined },
@@ -585,6 +591,7 @@ describe('selectedOrgIdStore + urlOrgIdStore (CHORE-74)', () => {
 			status: 'ready',
 			name: 'Test',
 			initial: 'T',
+			personId: 'p1',
 			orgs: [
 				{ id: 'org-a', label: 'Org A', initials: 'A', role: 'owner' },
 				{ id: 'org-b', label: 'Org B', initials: 'B', role: undefined },
@@ -602,6 +609,7 @@ describe('selectedOrgIdStore + urlOrgIdStore (CHORE-74)', () => {
 			status: 'ready',
 			name: 'Test',
 			initial: 'T',
+			personId: 'p1',
 			orgs: [{ id: 'org-x', label: 'Org X', initials: 'X', role: 'owner' }],
 		});
 		urlOrgIdStore.set('org-x');
@@ -614,6 +622,7 @@ describe('selectedOrgIdStore + urlOrgIdStore (CHORE-74)', () => {
 			status: 'ready',
 			name: 'Test',
 			initial: 'T',
+			personId: 'p1',
 			orgs: [
 				{ id: 'org-a', label: 'Org A', initials: 'A', role: 'owner' },
 				{ id: 'org-b', label: 'Org B', initials: 'B', role: undefined },
