@@ -694,4 +694,28 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
   Implication: slices 2–3 elevated ops design is sound. Each invocation mints fresh JWT,
   uses within same handler body. No cross-invocation JWT caching (IP-bound → unsafe to cache).
 
+## Session 32 continued — probe-member-rights-vis (2026-06-12)
+
+[GOTCHA] entu_api_key on a polyphony person entity = anonymous JWT (accounts:{}).
+  Seeded persons have no Entu OAuth accounts. API key injection produces a JWT with no
+  user binding — accounts list is empty. This is NOT a member-tier JWT; it's an anonymous
+  floor-credential. Cannot synthesise a real member JWT without Entu OAuth login in the dev db.
+
+[PROBE-RESULT] member-tier-rights-visibility — COMPLETE 2026-06-12
+  Q1 — public season _editor list visible to anon tier? NO. Rights props absent on 200 response.
+  Q2 — org _owner list visible to anon tier? NO. 403 on org (domain sharing + no account).
+  Q3 — anon JWT create rsvp under own person? NO. 403 "No user". Structural: needs account binding.
+       Design inference: real Entu OAuth member CAN create rsvp (creator:self = _owner on person = parent write).
+  Q4 — POST _viewer grant on rsvp as owner? YES. 200. Confirmed mechanically sound.
+       But anonymous (_viewer grantee with no account) still gets 403 on the private entity.
+  Cleanup: probe rsvp deleted (404), entu_api_key prop deleted. No live artifacts.
+  Findings doc: docs/migration/findings/member-tier-rights-visibility-2026-06-12.md
+
+[DECISION] Grants-at-write for slice-2b: NOT VIABLE for MVP.
+  Reason: enumerating conductors requires elevated read (member can't see _editor on season);
+  granting _viewer on singer's rsvp by BFF service key requires _editor on the rsvp (not held
+  by service key unless explicitly granted — compounding the chain).
+  Correct path: BFF elevated read-only report (already in spec §6) aggregates rsvps across
+  rights boundary. No per-rsvp conductor grants needed. Simpler, fewer elevated ops.
+
 (*MVOX:Perotin*)
