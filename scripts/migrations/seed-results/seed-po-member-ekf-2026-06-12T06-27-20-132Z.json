@@ -1,0 +1,38 @@
+{
+  "dryRun": false,
+  "startedAt": "2026-06-12T06:27:20.132Z",
+  "po_person_id": "69bcfd8e9c031ab8e6ce8079",
+  "efk_org_id": "69c7f8718489bfcb0e81b065",
+  "existingMemberCount": 0,
+  "action": "created",
+  "createdMemberId": "6a2ba6c84cd971291c5d5320",
+  "error": null,
+  "verifiedEntity": {
+    "_id": "6a2ba6c84cd971291c5d5320",
+    "_parent": [
+      {
+        "_id": "6a2ba6c84cd971291c5d5322",
+        "reference": "69c7f8718489bfcb0e81b065",
+        "property_type": "_parent",
+        "string": "Eesti Filharmoonia Kammerkoor",
+        "entity_type": "organization"
+      }
+    ],
+    "person": [
+      {
+        "_id": "6a2ba6c84cd971291c5d5323",
+        "reference": "69bcfd8e9c031ab8e6ce8079",
+        "property_type": "person",
+        "string": "Mihkel Putrinš",
+        "entity_type": "person"
+      }
+    ],
+    "status": [
+      {
+        "_id": "6a2ba6c84cd971291c5d5324",
+        "string": "active"
+      }
+    ]
+  },
+  "completedAt": "2026-06-12T06:27:20.542Z"
+}
