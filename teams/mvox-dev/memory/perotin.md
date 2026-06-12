@@ -661,4 +661,37 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
 [CHECKPOINT] Session 30 teardowns: all probe entities confirmed 404.
   First probe: 5/5. Re-probe: 12/12.
 
+## Session 32 — 2026-06-12
+
+### probe-cf-jwt-binding (task #10)
+
+[WIP] Branch chore/probe-cf-jwt-binding at 01176a3 (pushed). Worker scaffolded, deploy blocked.
+
+[GOTCHA] CLOUDFLARE_API_TOKEN in credentials.env is Pages:Edit only — no Workers:Script:Edit.
+  Raw /accounts/{id}/workers/scripts → 10000 auth error. Token is valid, scope is wrong.
+  PO must add Workers Scripts:Edit (+ Workers Routes:Edit) to the existing token OR issue a new one.
+  New token value goes into credentials.env as CLOUDFLARE_WORKERS_API_TOKEN (or replaces existing).
+
+[CHECKPOINT] Probe worker designed:
+  - mode 1 (default): mint JWT from ENTU_API_KEY secret within invocation → use same JWT immediately
+    returns { mode:'same-invocation', mintOk, mintLatencyMs, useOk, useStatus, useLatencyMs }
+  - mode 2 (?stale=1): accept JWT via X-Stale-Token header (cross-IP failure demo)
+    returns { mode:'stale', mintOk:null, useOk, useStatus, ... }
+  Files:
+    scripts/migrations/probes/probe-cf-jwt-binding/worker.ts
+    scripts/migrations/probes/probe-cf-jwt-binding/wrangler.json
+  Next: wrangler secret put ENTU_API_KEY → wrangler deploy → ≥5 calls → stale contrast → delete
+
+[PROBE-RESULT] probe-cf-jwt-binding — COMPLETE 2026-06-12
+  Platform: CF Pages Functions (_worker.js deploy) — Workers runtime, same egress as CF Workers.
+  Deploy path: Pages Functions used instead of standalone Worker (token scope limitation — see GOTCHA above).
+  Same-invocation: 7/7 mintOk=true, useOk=true, useStatus=200. Hypothesis CONFIRMED.
+  Stale-JWT contrast: 1/1 useOk=false, useStatus=401. Cross-IP binding confirmed.
+  Mint latency: 32–319 ms (cold-start outlier call 2), warm median ~88 ms.
+  Use latency: 78–149 ms, median ~83 ms.
+  Findings doc: docs/migration/findings/cf-worker-jwt-binding-2026-06-12.md
+  Teardown: ENTU_API_KEY secret + Pages project probe-jwt-binding both deleted. No live artifacts.
+  Implication: slices 2–3 elevated ops design is sound. Each invocation mints fresh JWT,
+  uses within same handler body. No cross-invocation JWT caching (IP-bound → unsafe to cache).
+
 (*MVOX:Perotin*)
