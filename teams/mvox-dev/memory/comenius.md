@@ -6,6 +6,34 @@ Tags: `[DECISION]`, `[PATTERN]`, `[WIP]`, `[CHECKPOINT]`, `[DEFERRED]`, `[GOTCHA
 
 ---
 
+## Session 31 — #8 rsvp i18n Task 1 (2026-06-12)
+
+[CHECKPOINT] Added 6 `rsvp_*` keys across 4 locales. Commit `ff77b97` on `feat/rsvp-singer`. `pnpm check` 0 errors, 8 pre-existing warnings. Reused the `comenius-agenda-i18n` worktree (checked out `feat/rsvp-singer` there — branch switch works cleanly in existing worktree with `node_modules` present).
+
+[DECISION] `rsvp_late` disambiguation: must read as "coming but will arrive late" NOT "too late to RSVP". Solutions per locale: et `"Tulen hilja"` (1st-sg future + adverb `hilja`); lv `"Ar kavēšanos"` (with lateness — arrival-intent idiom); uk `"Запізнюся"` (1st-sg future of `запізнюватися` = to be late in arriving — unambiguously prospective).
+
+[DECISION] `rsvp_going`/`rsvp_not_going`: et verb-form ("Tulen"/"Ei tule") mirrors Estonian button-label convention of using 1st-sg present; lv/uk future-of-бути ("Būšu"/"Nebūšu", "Буду"/"Не буду") — "I'll be there" idiom is the natural event confirmation in these locales.
+
+(*MVOX:Comenius*)
+
+---
+
+## Session 31 — #10 agenda i18n Task 1 (2026-06-12)
+
+[CHECKPOINT] Added 5 `agenda_*` keys across 4 locales. Commit `50dc92e` on `feat/agenda`. `pnpm check` 0 errors, 8 pre-existing warnings (in RehearsalEditForm.svelte — not i18n). Branch pushed as new remote.
+
+[DECISION] `agenda_title`: et `Kava` / lv `Programma` / uk `Програма` — reuses nav tab values (already in locale files). Consistent across tab and page heading.
+
+[DECISION] `agenda_duration_min`: en/et/lv all use `{minutes} min` — `min` is a universally legible abbreviation in these languages. Ukrainian uses `{minutes} хв` — standard Ukrainian minute abbreviation (`хвилина`).
+
+[TRANSLATION] Empty-state register: et uses informal 2nd-sg (`Sa pole`) consistent with Estonian UI standard; lv formal plural (`Jūs vēl neesat`); uk formal 2nd-pl (`Ви ще не є`). Ask-admin CTA: et `Küsi ... kutset` (imperative sg + partitive); lv `Lūdziet uzaicinājumu savam kora administratoram`; uk `Зверніться до адміністратора хору за запрошенням`.
+
+[CONVENTION] Worktree-install gotcha: fresh worktree has no `node_modules`; must run `pnpm install` before `pnpm build`. The `pnpm check` gate order still holds: build first, then check.
+
+(*MVOX:Comenius*)
+
+---
+
 ## Session 30 — #87 rehearsal edit form i18n (2026-06-01)
 
 [CHECKPOINT] Added 1 new key `seasons_form_rehearsal_edit_heading` across 4 locales. Commit `da4e6be` on `feat/seasons-edit-rehearsal`. 5 other needed keys already existed — reused without modification. `pnpm check` 0 errors, 0 warnings. Logged reuse decision in `i18n-conventions.md`.

@@ -465,4 +465,41 @@ Files changed:
 
 [RESOLUTION CALLOUT] RehearsalEditForm.svelte is a stub — no rendered fields. Byrd must create the full implementation. RehearsalList also needs the edit button added. Page needs route wiring (edit state, form open/close, updateRehearsal call).
 
+## [CHECKPOINT] 2026-06-12 — Slice-1 #10 agenda RED phase (Tasks 2)
+
+[DECISION] 24 tests written across 3 spec files on `feat/agenda`. SHA `613ffc9`. 19 RED, 5 forward guards pass. pnpm check: 0 errors.
+
+Files created:
+- `src/lib/agenda/agendaData.ts` — stub (throws 'not implemented')
+- `src/lib/agenda/agendaData.spec.ts` — 5 tests: merge+sort+annotate, ended-season filter, upcoming boundary, per-org failure isolation, empty-orgs short-circuit
+- `src/lib/components/agenda/AgendaList.svelte` — minimal stub (renders empty div with data-testid="agenda-list")
+- `src/lib/components/agenda/AgendaList.spec.ts` — 15 tests: date-group headers (Europe/Tallinn), row content (time/duration/name/org-chip/location), empty state, partial-error notice
+- `src/routes/agenda/+page.svelte` — minimal stub (renders data-testid="agenda-loading")
+- `src/routes/agenda/page.spec.ts` — 4 tests: ready+orgs→listAgenda called, ready+no-orgs→empty message, loading skeleton
+
+[PATTERN] AgendaList.svelte stub: avoid `void items; void errors;` pattern (generates Svelte state_referenced_locally warnings). Use template comment `<!-- stub: items.length={items.length} ... -->` to consume props in a reactive context with 0 warnings.
+
+[PATTERN] Forward guards in this RED: 5 tests pass immediately because the stub satisfies trivial negative assertions (no location when absent = empty div has no location element; no rows when empty = empty div has no rows; no partial-error when no errors = empty div has no partial-error; loading skeleton = stub already renders agenda-loading; no-empty-orgs-message when orgs present = stub renders nothing).
+
+[GOTCHA] page.spec.ts: `listAgenda` is called by a `$effect` inside the page component which only fires after the store changes post-render. Josquin/Byrd must ensure the `$effect` is synchronously observable to vi.mocked. If test ordering matters, use `await vi.waitFor(...)` in the GREEN phase.
+
+## [CHECKPOINT] 2026-06-12 — Slice-2a #8 RSVP RED phase (Task 2)
+
+[DECISION] 40 tests across 3 spec files on `feat/rsvp-singer`. SHA `92a59ea`. 35 RED, 5 forward guards. pnpm check: 0 errors.
+
+Files created/modified:
+- `src/lib/rsvp/rsvpData.ts` — stub (all helpers throw 'not implemented', `resetMemberIdCache` is no-op)
+- `src/lib/rsvp/rsvpData.spec.ts` — 22 tests: listMyRsvps (4), findMyMemberId (5 incl. memoization), createRsvp (5 incl. no _sharing), updateRsvpStatus (4 incl. call-order assertion), deleteRsvp (2)
+- `src/lib/components/agenda/RsvpControl.svelte` — minimal stub (renders empty div)
+- `src/lib/components/agenda/RsvpControl.spec.ts` — 10 tests: 4-buttons, labels, aria-pressed, onchange(status)/onchange(null), disabled+hint
+- `src/routes/agenda/page.spec.ts` — extended: +5 RSVP wiring tests incl. YELLOW-10.1 staleness guard
+
+[GOTCHA] URL-assertion tests on stubs that throw before fetch: must await the call (not `.catch(() => {})`) OR assert `fetchMock.toHaveBeenCalled()` first. `mock.calls[0]` is undefined if no fetch was issued (stub throws before reaching fetch).
+
+[GOTCHA] Inline `import` inside an `it()` body is invalid TS ("can only be used at the top level"). Type the resolver fn and Promise explicitly at the closure level and import the type at top level.
+
+[PATTERN] YELLOW-10.1 staleness test: structure is a contract forward-guard — the assertion currently passes trivially (stub does nothing). It becomes a genuine regression guard once Byrd's `$effect` cleanup is in place. Test presence is the contract, not a RED signal.
+
+[PATTERN] Disabled-button click in happy-dom: `fireEvent.click(null)` throws "Unable to fire a click event". Use `if (btn && !btn.disabled)` guard in tests where the click is conditional on button existence.
+
 (*MVOX:Tallis*)

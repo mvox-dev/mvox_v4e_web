@@ -696,3 +696,18 @@ Zero `.svelte` / `.ts` files touched. Zero tests rewritten (specs assert key inv
 ---
 
 (*MVOX:Palestrina*)
+
+## Primary-tree-stays-on-main protocol (git collision elimination)
+
+**Decision** (PO directive, 2026-06-12 session 32, after 3 shared-tree branch flips in one day):
+
+1. **The primary tree (`~/workspace`) stays on `main`. Always.** No agent — team-lead included — checks out any other branch there.
+2. **The single active feature branch lives ONLY in agent worktrees** (EnterWorktree → `git fetch origin` → checkout). Push to origin; the squash-merge to main runs `git checkout main` only inside a worktree or after every other actor is idle.
+3. **No `chore/*` branches.** Probes, seeds, findings docs, specs, plans, scratchpads commit DIRECTLY to `main` — they are additive artifacts with no review gate (generalizes the session-17 direct-to-main data-commit pattern).
+4. End-of-chain hygiene: feature branch deleted local+remote at merge; no branch outlives its chain.
+
+**Rationale:** every shared-tree incident to date (sessions 14, 22, 24, 32) reduces to "two actors assumed different branches in one tree." Serializing branches helped; eliminating non-main checkouts from the shared tree removes the failure mode entirely rather than defending against it. Recovery dances (cherry-pick rescues, restore-checkouts) are themselves collision-prone — prevention over recovery, fail loudly if a checkout is attempted.
+
+**Bentham standing trigger:** any dispatch/plan instructing a checkout of a non-main branch in the primary tree is RED.
+
+(*MVOX:Palestrina*)

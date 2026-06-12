@@ -337,3 +337,70 @@ Single new key added for the rehearsal inline edit form heading. All other neede
 | `seasons_form_rehearsal_edit_heading` | uk | `Редагувати репетицію` | infinitive + accusative; direct parallel to `Редагувати сезон`. |
 
 (*MVOX:Comenius*)
+
+---
+
+### New key group: `agenda_*` (#10, Task 1, session 31, 2026-06-12)
+
+5 keys for the `/agenda` unified singer view. Commit `50dc92e` on `feat/agenda`.
+
+**`agenda_title`**: reuses the existing nav-tab values (`Kava` / `Programma` / `Програма`) — page heading and tab should match; no new translation needed.
+
+**`agenda_duration_min`**: en/et/lv use `{minutes} min`; uk uses `{minutes} хв`. The abbreviation `хв` (хвилина) is standard in Ukrainian UI contexts; `min` is an accepted loanword but `хв` is more idiomatic.
+
+**`agenda_empty_no_orgs`**: empty state when user has no orgs. Register: et informal 2nd-sg (`Sa pole ... Küsi`), lv formal plural (`Jūs vēl neesat ... Lūdziet`), uk formal 2nd-pl (`Ви ще не є ... Зверніться`). Matches each locale's established UI register (see auth keys for precedent).
+
+**`agenda_empty_no_rehearsals`**: et `Tulevasi proove pole` — adj. `tulevasi` (upcoming, adj.pl.) + `proove` (rehearsals, partitive pl.) + `pole` (there aren't); lv `Nav gaidāmo mēģinājumu` — `gaidāmo` (expected/awaited, gen.pl.); uk `Немає запланованих репетицій` — `запланованих` (scheduled, gen.pl.) + `репетицій` (rehearsals, gen.pl.).
+
+**`agenda_partial_error`**: et `Proovide laadimine ebaõnnestus: {orgs}` (verbal-noun pattern); lv `Neizdevās ielādēt mēģinājumus: {orgs}` (verb-first past tense, acc.pl. object); uk `Не вдалося завантажити репетиції для: {orgs}` (impersonal past + infinitive, acc.pl. object; `для:` for `for:`).
+
+| Key | Locale | Value | Rationale |
+|---|---|---|---|
+| `agenda_duration_min` | uk | `{minutes} хв` | Standard Ukrainian abbreviation; `min` accepted but `хв` more idiomatic. |
+| `agenda_empty_no_orgs` | et | `Sa pole veel ühegi koori liige. Küsi oma koori administraatorilt kutset.` | Informal 2nd-sg; `administraatorilt kutset` = ask admin for an invite (elative + partitive). |
+| `agenda_empty_no_orgs` | lv | `Jūs vēl neesat nevienā korī. Lūdziet uzaicinājumu savam kora administratoram.` | Formal plural; `Lūdziet` imperative pl.; `savam kora administratoram` = your choir's admin (dative). |
+| `agenda_empty_no_orgs` | uk | `Ви ще не є членом жодного хору. Зверніться до адміністратора хору за запрошенням.` | Formal 2nd-pl; `Зверніться` = contact/turn to (imperative pl.); `за запрошенням` = for an invite (instrumental). |
+| `agenda_empty_no_rehearsals` | et | `Tulevasi proove pole.` | `tulevasi` (upcoming, adj.); partitive plural `proove`; `pole` (neg. existential). |
+| `agenda_empty_no_rehearsals` | lv | `Nav gaidāmo mēģinājumu.` | `gaidāmo` (awaited/expected, gen.pl.); `Nav` neg. existential. |
+| `agenda_empty_no_rehearsals` | uk | `Немає запланованих репетицій.` | `запланованих` (scheduled, gen.pl.adj.); `репетицій` (rehearsals, gen.pl.); `Немає` neg. existential. |
+| `agenda_partial_error` | et | `Proovide laadimine ebaõnnestus: {orgs}` | Verbal-noun structure; `proovide laadimine` = loading of rehearsals. |
+| `agenda_partial_error` | lv | `Neizdevās ielādēt mēģinājumus: {orgs}` | Verb-first (impersonal past); `mēģinājumus` acc.pl. object. |
+| `agenda_partial_error` | uk | `Не вдалося завантажити репетиції для: {orgs}` | Impersonal past + infinitive; `репетиції` acc.pl.; `для:` mirrors English `for:`. |
+
+(*MVOX:Comenius*)
+
+---
+
+### New key group: `rsvp_*` (#8, Task 1, session 31, 2026-06-12)
+
+6 keys for the 4-state RSVP control. Commit `ff77b97` on `feat/rsvp-singer`.
+
+**Key `rsvp_late` — disambiguation critical.** Must read as "I'm coming but will arrive late" (forward attendance intent), NOT "the RSVP window has closed". Solutions chosen:
+- et: `"Tulen hilja"` — 1st-sg present `tulen` (I come/will come) + adverb `hilja` (late). The subject "I" + verb makes it personal intent. `hilja` as standalone would be opaque; the verb makes the meaning unambiguous.
+- lv: `"Ar kavēšanos"` — "with lateness/delay". Standard Latvian idiom for announcing one's late arrival. `kavēšanās` = lateness/delay; `ar` = with. Short and natural for a button.
+- uk: `"Запізнюся"` — 1st-sg future of `запізнюватися` (to arrive late). Inherently prospective — means "I will be late [in arriving]". Cannot be read as a past-deadline notice.
+
+**`rsvp_going`/`rsvp_not_going` register:** et uses 1st-sg present verb form (`Tulen`/`Ei tule` — "I come"/"I'm not coming"), consistent with Estonian button-label convention; lv/uk use future of "to be" (`Būšu`/`Nebūšu`, `Буду`/`Не буду` — "I'll be there"/"I won't be there") — the natural event-attendance idiom in those locales.
+
+| Key | Locale | Value | Rationale |
+|---|---|---|---|
+| `rsvp_going` | et | `Tulen` | 1st-sg present "I come/am coming"; Estonian RSVP confirmation. |
+| `rsvp_going` | lv | `Būšu` | 1st-sg future of `būt` "I'll be there"; natural Latvian event confirmation. |
+| `rsvp_going` | uk | `Буду` | 1st-sg future of `бути` "I'll be there"; natural Ukrainian event confirmation. |
+| `rsvp_not_going` | et | `Ei tule` | Negated 1st-sg "I'm not coming"; direct pair of `Tulen`. |
+| `rsvp_not_going` | lv | `Nebūšu` | Neg. future "I won't be there"; direct pair of `Būšu`. |
+| `rsvp_not_going` | uk | `Не буду` | Neg. future "I won't be there"; direct pair of `Буду`. |
+| `rsvp_late` | et | `Tulen hilja` | 1st-sg verb + adverb; unambiguously personal arrival-intent. |
+| `rsvp_late` | lv | `Ar kavēšanos` | "With lateness" — arrival-intent idiom in Latvian. |
+| `rsvp_late` | uk | `Запізнюся` | 1st-sg future of `запізнюватися`; prospective by grammar. |
+| `rsvp_maybe` | et | `Võib-olla` | Standard Estonian "maybe". |
+| `rsvp_maybe` | lv | `Varbūt` | Standard Latvian "maybe". |
+| `rsvp_maybe` | uk | `Можливо` | Standard Ukrainian "maybe". |
+| `rsvp_not_member` | et | `Sa pole selle koori liige — RSVP pole saadaval.` | Informal 2nd-sg, matches agenda register. |
+| `rsvp_not_member` | lv | `Jūs neesat šī kora loceklis — RSVP nav pieejams.` | Formal plural; `loceklis` = member (masc.sg.nom.); `nav pieejams` = unavailable. |
+| `rsvp_not_member` | uk | `Ви не є членом цього хору — RSVP недоступний.` | Formal 2nd-pl; `недоступний` = unavailable (adj. masc. agreeing with `RSVP`). |
+| `rsvp_error` | et | `RSVP salvestamine ebaõnnestus. Palun proovi uuesti.` | Verbal-noun pattern for error (matches `agenda_partial_error` style). |
+| `rsvp_error` | lv | `Neizdevās saglabāt RSVP. Lūdzu, mēģiniet vēlreiz.` | Verb-first impersonal past; matches `auth_callback_failed` style. |
+| `rsvp_error` | uk | `Не вдалося зберегти RSVP. Будь ласка, спробуйте ще раз.` | Impersonal past + infinitive; matches existing error patterns. |
+
+(*MVOX:Comenius*)
