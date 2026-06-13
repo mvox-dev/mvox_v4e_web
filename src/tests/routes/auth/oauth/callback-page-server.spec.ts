@@ -1,9 +1,18 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
-import { verifyIdentity } from '../../../../lib/server/auth/identity-cookie';
+import { verifyIdentity, signIdentity } from '../../../../lib/server/auth/identity-cookie';
 
 vi.mock('$env/static/public', () => ({ PUBLIC_ENTU_DB: 'testdb' }));
 vi.mock('$env/static/private', () => ({ MVOX_SESSION_SECRET: 'test-secret-32-bytes-placeholder!' }));
 vi.mock('$app/environment', () => ({ dev: false }));
+
+// Partial mock: keep verifyIdentity real; allow signIdentity to be overridden per-test.
+vi.mock('../../../../lib/server/auth/identity-cookie', async (importOriginal) => {
+	const real = await importOriginal<typeof import('../../../../lib/server/auth/identity-cookie')>();
+	return {
+		...real,
+		signIdentity: vi.fn(real.signIdentity),
+	};
+});
 
 // Load is imported AFTER the vi.mock calls (hoisted above) so the module resolves
 // with the env stubs in place.
@@ -131,7 +140,7 @@ describe('/auth/callback server load — server-side Entu exchange + identity co
 		expect(payload).toEqual({ personId: 'person-77' });
 	});
 
-	it('exchange 401 → NO cookies set; throws redirect 303 to /auth/login?error=server_exchange_failed', async () => {
+	it('exchange 401 → NO cookies set; throws redirect 303 to /auth/login?error=exchange_http_401', async () => {
 		vi.stubGlobal(
 			'fetch',
 			vi.fn().mockResolvedValue({ ok: false, status: 401, json: async () => ({}) }),
@@ -144,12 +153,12 @@ describe('/auth/callback server load — server-side Entu exchange + identity co
 				url,
 				cookies: cookiesMock,
 			}),
-		).rejects.toMatchObject({ status: 303, location: expect.stringContaining('server_exchange_failed') });
+		).rejects.toMatchObject({ status: 303, location: expect.stringContaining('exchange_http_401') });
 
 		expect(cookiesMock.set).not.toHaveBeenCalled();
 	});
 
-	it('exchange 200 but accounts lacks the db → same loud failure: no cookies + redirect', async () => {
+	it('exchange 200 but accounts lacks the db → no cookies + redirect to error=exchange_no_account', async () => {
 		vi.stubGlobal(
 			'fetch',
 			vi.fn().mockResolvedValue({
@@ -165,9 +174,27 @@ describe('/auth/callback server load — server-side Entu exchange + identity co
 				url,
 				cookies: cookiesMock,
 			}),
-		).rejects.toMatchObject({ status: 303, location: expect.stringContaining('server_exchange_failed') });
+		).rejects.toMatchObject({ status: 303, location: expect.stringContaining('exchange_no_account') });
 
 		expect(cookiesMock.set).not.toHaveBeenCalled();
+	});
+
+	it('exchange 200 + valid accounts but signIdentity throws → redirect to error=identity_sign_failed', async () => {
+		stubEntuExchangeOk('person-77');
+		vi.mocked(signIdentity).mockRejectedValueOnce(new Error('Buffer is not defined'));
+		const cookiesMock = makeCookies();
+		const url = new URL('https://multivox.pages.dev/auth/callback?key=tok-sign-fail');
+
+		await expect(
+			(load as unknown as (e: { url: URL; cookies: typeof cookiesMock }) => Promise<unknown>)({
+				url,
+				cookies: cookiesMock,
+			}),
+		).rejects.toMatchObject({ status: 303, location: expect.stringContaining('identity_sign_failed') });
+
+		// mvox_session may or may not be set before the throw — the identity cookie must NOT be set
+		const setCalls = cookiesMock.set.mock.calls.map((c) => c[0] as string);
+		expect(setCalls).not.toContain('mvox_identity');
 	});
 
 	it('missing ?key param → existing redirect behavior unchanged (regression pin)', async () => {

@@ -28,7 +28,7 @@ export const load: ServerLoad = async ({ url, cookies }) => {
 
 		if (!res.ok) {
 			console.error(`Entu exchange failed: ${res.status}`);
-			throw redirect(303, '/auth/login?error=server_exchange_failed');
+			throw redirect(303, `/auth/login?error=exchange_http_${res.status}`);
 		}
 
 		const data = (await res.json()) as { accounts?: Record<string, string> };
@@ -36,27 +36,27 @@ export const load: ServerLoad = async ({ url, cookies }) => {
 
 		if (!pid) {
 			console.error('Entu exchange: accounts missing db entry');
-			throw redirect(303, '/auth/login?error=server_exchange_failed');
+			throw redirect(303, '/auth/login?error=exchange_no_account');
 		}
 
 		personId = pid;
+
+		// Mint the HMAC-signed identity cookie with the server-verified personId
+		const nowS = Math.floor(Date.now() / 1000);
+		const identityValue = await signIdentity(
+			{ personId, iat: nowS, exp: nowS + 48 * 60 * 60 },
+			MVOX_SESSION_SECRET,
+		);
+
+		// Atomic: set BOTH cookies only after signIdentity succeeds (YELLOW-EC.1)
+		cookies.set(SESSION_COOKIE, key, sessionCookieOptions(!dev));
+		cookies.set(IDENTITY_COOKIE, identityValue, sessionCookieOptions(!dev));
 	} catch (err) {
 		// Re-throw redirects (they are throw-based in SvelteKit)
 		if (err && typeof err === 'object' && 'status' in err) throw err;
 		console.error('Entu exchange error:', err);
-		throw redirect(303, '/auth/login?error=server_exchange_failed');
+		throw redirect(303, '/auth/login?error=identity_sign_failed');
 	}
-
-	// Set the server-side session cookie (CHORE-79).
-	cookies.set(SESSION_COOKIE, key, sessionCookieOptions(!dev));
-
-	// Mint the HMAC-signed identity cookie with the server-verified personId
-	const nowS = Math.floor(Date.now() / 1000);
-	const identityValue = await signIdentity(
-		{ personId, iat: nowS, exp: nowS + 48 * 60 * 60 },
-		MVOX_SESSION_SECRET,
-	);
-	cookies.set(IDENTITY_COOKIE, identityValue, sessionCookieOptions(!dev));
 
 	return {
 		sessionToken: key,
