@@ -159,6 +159,17 @@ export function parseTally(raw: string | undefined): RsvpTally {
 	}
 }
 
+export function applyTallyDelta(
+	tally: RsvpTally,
+	oldStatus: RsvpStatus | null,
+	newStatus: RsvpStatus | null,
+): RsvpTally {
+	const next = { ...tally };
+	if (oldStatus) next[oldStatus] = Math.max(0, next[oldStatus] - 1);
+	if (newStatus) next[newStatus] = next[newStatus] + 1;
+	return next;
+}
+
 export async function deleteRsvp(cfg: EntuCfg, rsvpId: string): Promise<void> {
 	const res = await fetch(`${ENTU_API_BASE}${cfg.db}/entity/${rsvpId}`, {
 		method: 'DELETE',

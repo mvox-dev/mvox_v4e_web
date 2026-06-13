@@ -7,6 +7,7 @@ import {
 	deleteRsvp,
 	resetMemberIdCache,
 	parseTally,
+	applyTallyDelta,
 } from './rsvpData';
 import type { RsvpTally } from './rsvpData';
 import { resetTypeIdCache } from '$lib/seasons/entuSeasons';
@@ -559,5 +560,61 @@ describe('parseTally (#slice-2b)', () => {
 
 	it('returns all-zeros on empty string', () => {
 		expect(parseTally('')).toEqual(ZEROS);
+	});
+});
+
+// ── applyTallyDelta (#slice-2b-opt) ───────────────────────────────────────────
+
+describe('applyTallyDelta (#slice-2b-opt)', () => {
+	const base: RsvpTally = { going: 2, not_going: 1, maybe: 3, late: 0 };
+
+	it('null→going: increments going, others unchanged', () => {
+		expect(applyTallyDelta(base, null, 'going')).toEqual({
+			going: 3,
+			not_going: 1,
+			maybe: 3,
+			late: 0,
+		});
+	});
+
+	it('going→maybe: decrements going, increments maybe', () => {
+		expect(applyTallyDelta(base, 'going', 'maybe')).toEqual({
+			going: 1,
+			not_going: 1,
+			maybe: 4,
+			late: 0,
+		});
+	});
+
+	it('going→null: decrements going only (clearing RSVP)', () => {
+		expect(applyTallyDelta(base, 'going', null)).toEqual({
+			going: 1,
+			not_going: 1,
+			maybe: 3,
+			late: 0,
+		});
+	});
+
+	it('maybe→late: decrements maybe, increments late', () => {
+		expect(applyTallyDelta(base, 'maybe', 'late')).toEqual({
+			going: 2,
+			not_going: 1,
+			maybe: 2,
+			late: 1,
+		});
+	});
+
+	it('null→null: no-op — returns same values unchanged', () => {
+		expect(applyTallyDelta(base, null, null)).toEqual(base);
+	});
+
+	it('clamp: going=0, going→maybe → going stays 0 (not negative), maybe+1', () => {
+		const zeroGoing: RsvpTally = { going: 0, not_going: 1, maybe: 2, late: 0 };
+		expect(applyTallyDelta(zeroGoing, 'going', 'maybe')).toEqual({
+			going: 0,
+			not_going: 1,
+			maybe: 3,
+			late: 0,
+		});
 	});
 });

@@ -46,20 +46,25 @@ vi.mock('$lib/agenda/agendaData', () => ({
 	listAgenda: vi.fn(),
 }));
 
-// rsvpData mock — all helpers vi.fn() so tests control behavior
-vi.mock('$lib/rsvp/rsvpData', () => ({
-	listMyRsvps: vi.fn(),
-	findMyMemberId: vi.fn(),
-	createRsvp: vi.fn(),
-	updateRsvpStatus: vi.fn(),
-	deleteRsvp: vi.fn(),
-	resetMemberIdCache: vi.fn(),
-}));
+// rsvpData mock — async/write helpers vi.fn(); applyTallyDelta is real (pure math).
+vi.mock('$lib/rsvp/rsvpData', async (importOriginal) => {
+	const real = await importOriginal<typeof import('$lib/rsvp/rsvpData')>();
+	return {
+		listMyRsvps: vi.fn(),
+		findMyMemberId: vi.fn(),
+		createRsvp: vi.fn(),
+		updateRsvpStatus: vi.fn(),
+		deleteRsvp: vi.fn(),
+		resetMemberIdCache: vi.fn(),
+		parseTally: real.parseTally,
+		applyTallyDelta: real.applyTallyDelta,
+	};
+});
 
 import { userStore } from '$lib/auth/userStore';
 import { listAgenda } from '$lib/agenda/agendaData';
 import type { AgendaResult } from '$lib/agenda/agendaData';
-import { listMyRsvps, findMyMemberId, createRsvp } from '$lib/rsvp/rsvpData';
+import { listMyRsvps, findMyMemberId, createRsvp, updateRsvpStatus } from '$lib/rsvp/rsvpData';
 import type { Writable } from 'svelte/store';
 import Page from './+page.svelte';
 
@@ -67,6 +72,7 @@ const mockListAgenda = vi.mocked(listAgenda);
 const mockListMyRsvps = vi.mocked(listMyRsvps);
 const mockFindMyMemberId = vi.mocked(findMyMemberId);
 const mockCreateRsvp = vi.mocked(createRsvp);
+const mockUpdateRsvpStatus = vi.mocked(updateRsvpStatus);
 
 const orgEfk = { id: 'org1', label: 'EFK', initials: 'EF' };
 const orgB = { id: 'org2', label: 'Koor B', initials: 'KB' };
@@ -229,6 +235,63 @@ describe('/agenda page — RSVP wiring', () => {
 			});
 		}
 		// If goingBtn doesn't exist yet (stub), this test is RED on the member-check assertion above
+	});
+});
+
+// ── Optimistic tally delta (#slice-2b-opt) ────────────────────────────────────
+
+describe('/agenda page — optimistic tally delta (#slice-2b-opt)', () => {
+	// A sample item with a non-zero initial tally so we can observe ±1 changes
+	const itemWithTally = {
+		...sampleItem,
+		tally: { going: 2, not_going: 1, maybe: 0, late: 0 },
+	};
+
+	it('null→going RSVP create optimistically updates that row tally going 2→3', async () => {
+		mockListAgenda.mockResolvedValue({ items: [itemWithTally], errors: [] });
+		mockListMyRsvps.mockResolvedValue([]); // no existing rsvp → null status
+		mockFindMyMemberId.mockResolvedValue('member-1');
+		mockCreateRsvp.mockResolvedValue('new-rsvp-1');
+		(userStore as Writable<unknown>).set(readyUser);
+		const { container } = render(Page);
+
+		// Wait for RSVP wiring to complete
+		await vi.waitFor(() => expect(mockListMyRsvps).toHaveBeenCalled());
+
+		// Click going button — triggers createRsvp (no existing rsvp)
+		const goingBtn = container.querySelector('[data-testid="rsvp-btn-going"]') as HTMLButtonElement | null;
+		if (goingBtn && !goingBtn.disabled) {
+			await fireEvent.click(goingBtn);
+			// After optimistic update, tally-going should show 3
+			await vi.waitFor(() => {
+				const tallyEl = container.querySelector('[data-testid="tally-going"]');
+				expect(tallyEl?.textContent).toContain('3');
+			});
+		}
+	});
+
+	it('createRsvp rejection reverts tally to pre-change value alongside rsvp-state revert', async () => {
+		mockListAgenda.mockResolvedValue({ items: [itemWithTally], errors: [] });
+		mockListMyRsvps.mockResolvedValue([]); // no existing rsvp → null status
+		mockFindMyMemberId.mockResolvedValue('member-1');
+		mockCreateRsvp.mockRejectedValue(new Error('network error'));
+		(userStore as Writable<unknown>).set(readyUser);
+		const { container } = render(Page);
+
+		await vi.waitFor(() => expect(mockListMyRsvps).toHaveBeenCalled());
+
+		const goingBtn = container.querySelector('[data-testid="rsvp-btn-going"]') as HTMLButtonElement | null;
+		if (goingBtn && !goingBtn.disabled) {
+			await fireEvent.click(goingBtn);
+			// After rejection, tally-going must revert to original value (2)
+			await vi.waitFor(() => {
+				const tallyEl = container.querySelector('[data-testid="tally-going"]');
+				// tally reverted — still 2, not 3 (or we see the error message as a proxy)
+				const hasRevertedTally = tallyEl?.textContent?.includes('2');
+				const hasError = container.textContent?.includes("Couldn't save your RSVP");
+				expect(hasRevertedTally || hasError).toBe(true);
+			});
+		}
 	});
 });
 

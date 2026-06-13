@@ -2,7 +2,7 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import type { AgendaItem } from '$lib/agenda/agendaData';
-	import type { MyRsvp, RsvpStatus } from '$lib/rsvp/rsvpData';
+	import type { MyRsvp, RsvpStatus, RsvpTally } from '$lib/rsvp/rsvpData';
 	import RsvpControl from './RsvpControl.svelte';
 	import RsvpTallyBadge from './RsvpTallyBadge.svelte';
 
@@ -15,6 +15,8 @@
 		memberMap?: Map<string, string | null>;
 		/** itemId → error message — row-level RSVP errors surfaced by the page. */
 		rowErrors?: Map<string, string>;
+		/** itemId → optimistically-updated RsvpTally — overrides item.tally for display. */
+		tallyMap?: Map<string, RsvpTally>;
 		/** Called when the user changes (or clears) the RSVP on a row. */
 		onrsvpchange?: (item: AgendaItem, newStatus: RsvpStatus | null) => void;
 	}
@@ -24,6 +26,7 @@
 		rsvpMap = new Map(),
 		memberMap = new Map(),
 		rowErrors = new Map(),
+		tallyMap = new Map(),
 		onrsvpchange,
 	}: Props = $props();
 
@@ -109,7 +112,7 @@
 						{#if item.location}
 							<span data-testid="agenda-row-location" class="row-location">{item.location}</span>
 						{/if}
-						<RsvpTallyBadge tally={item.tally} />
+						<RsvpTallyBadge tally={tallyMap.get(item.id) ?? item.tally} />
 					</div>
 					{#if memberResolved}
 						<div class="row-rsvp">

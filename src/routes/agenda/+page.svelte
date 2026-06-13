@@ -12,10 +12,10 @@
 		createRsvp,
 		updateRsvpStatus,
 		deleteRsvp,
+		applyTallyDelta,
 	} from '$lib/rsvp/rsvpData';
-	import type { MyRsvp, RsvpStatus } from '$lib/rsvp/rsvpData';
+	import type { MyRsvp, RsvpStatus, RsvpTally } from '$lib/rsvp/rsvpData';
 	import AgendaList from '$lib/components/agenda/AgendaList.svelte';
-	import RsvpControl from '$lib/components/agenda/RsvpControl.svelte';
 	import DeskSurface from '$lib/components/DeskSurface.svelte';
 
 	// ── Agenda + RSVP state ──────────────────────────────────────────────────────
@@ -26,6 +26,8 @@
 	let memberMap = $state(new Map<string, string | null>());
 	// Per-item row-level error (itemId → error message | null)
 	let rowErrors = $state(new Map<string, string>());
+	// itemId → optimistically-updated tally — overrides item.tally for display
+	let tallyMap = $state(new Map<string, RsvpTally>());
 
 	// ── Hydrate when user becomes ready — YELLOW-10.1 staleness guard ────────────
 	// A monotonically-increasing request counter guards against stale completions:
@@ -51,6 +53,8 @@
 				// Staleness guard: if a newer call already resolved, discard this one
 				if (myId !== currentRequestId) return;
 				result = r;
+				// Seed tallyMap from the freshly-loaded items (clears any prior optimistic state)
+				tallyMap = new Map(r.items.map((item) => [item.id, { ...item.tally }]));
 
 				// ── Phase 2: parallel RSVP + member lookups after agenda resolves ──
 				const distinctOrgIds = [...new Set(r.items.map((item) => item.orgId))];
@@ -87,8 +91,12 @@
 		// Read current state for optimistic bookkeeping
 		const existing = rsvpMap.get(item.id) ?? null;
 		const memberId = memberMap.get(item.orgId) ?? null;
+		const oldStatus = existing?.status ?? null;
 
-		// Optimistic update
+		// Capture current tally for potential revert
+		const currentTally = tallyMap.get(item.id) ?? { ...item.tally };
+
+		// ── Optimistic RSVP status update ───────────────────────────────────────
 		const nextMap = new Map(rsvpMap);
 		if (newStatus === null) {
 			nextMap.delete(item.id);
@@ -100,6 +108,12 @@
 			});
 		}
 		rsvpMap = nextMap;
+
+		// ── Optimistic tally delta ───────────────────────────────────────────────
+		tallyMap = new Map([
+			...tallyMap,
+			[item.id, applyTallyDelta(currentTally, oldStatus, newStatus)],
+		]);
 
 		// Clear any prior row error
 		const nextErrors = new Map(rowErrors);
@@ -131,7 +145,7 @@
 				]);
 			}
 		} catch {
-			// Revert to previous state on failure
+			// Revert RSVP status to previous state
 			const revertMap = new Map(rsvpMap);
 			if (existing) {
 				revertMap.set(item.id, existing);
@@ -139,6 +153,8 @@
 				revertMap.delete(item.id);
 			}
 			rsvpMap = revertMap;
+			// Revert tally to pre-change value
+			tallyMap = new Map([...tallyMap, [item.id, currentTally]]);
 			// Surface row-level error
 			rowErrors = new Map([...rowErrors, [item.id, m.rsvp_error()]]);
 		}
@@ -175,6 +191,7 @@
 						rsvpMap={rsvpMap}
 						memberMap={memberMap}
 						rowErrors={rowErrors}
+						tallyMap={tallyMap}
 						onrsvpchange={handleRsvpChange}
 					/>
 				</div>
