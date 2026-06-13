@@ -1,46 +1,51 @@
-# Task List Snapshot — 2026-06-06 end-of-session-30
+# Task List Snapshot — 2026-06-13 end-of-session-32
 
-State at session-30 close.
+State at session-32 close.
 
 ## Active tasks (in-flight)
 
-None. All session-30 work completed and merged.
+None. All session-32 work completed and merged.
 
-## Pending tasks (deferred)
+## Pending — next session
 
-None in the harness task list. Next work lives in `team-lead.md [NEXT SESSION]` seed.
+**Slice 3 — invite & join** (the last MVP piece; PO left it for session 33). Brainstorm → spec → plan → team TDD chain. Details in `team-lead.md [NEXT SESSION]` seed (⭐ section). Key constraint: the `/invite/<token>` unauthed-landing problem — solve client-side / token-self-describing, NOT server-side identity (Entu aud=IP wall).
 
-## Session-30 task history (all completed)
+## Session-32 completed (all merged to main, preview-only; prod untouched)
 
-1. Pencil-toggle GREEN (Byrd) → Bentham GREEN → Josquin merge (b3a1a6a) → preview redeploy ✅
-2. #87 edit-a-single-rehearsal full TDD chain: Tallis RED → Josquin data → Comenius i18n → Byrd UI → YELLOW-87.1 fix → Bentham GREEN → Josquin merge (49e625d) → preview redeploy ✅ Closes #87
-3. Season date-format bug: systematic debug → Pérotin live probe → Tallis RED → Josquin GREEN → Bentham GREEN → merge (ddf4451) → preview redeploy ✅
-4. Entu docs PRs: entu/www PR #11 (Closes #2–#10) + PR #13 (Closes #12) ✅ (awaiting Argo merge)
-5. Entu API issues: #41 (date-format) + #42 (product-native agents idea seed) ✅ filed
-6. esmuseum consult: 5 questions answered, verified, posted on mitselek/esmuseum-map-app#41 ✅
+1. #88 runtime type-id resolution (`36c453d`) — full TDD chain
+2. Slice-1 `/agenda` unified agenda (`8d93f4d`)
+3. Slice-2a singer RSVP 4-state (`6965c41`)
+4. #89 stale-JWT cleanup (`0d67bb7`) — ultracode workflow design
+5. Trusted-identity stack REVERTED (`f819d68`) — aud=IP dead end
+6. Slice-2b conductor+singer formula tally (`eaa3c1b`)
+7. Slice-2b-opt instant optimistic tally delta (`8878419`)
 
-## Produced this session (all committed + pushed to origin)
+main @ `8878419`, origin matches, 915/915 tests, check 0, preview `66f32e39`.
 
-- **5 commits on main** (d95508e → b3a1a6a → 49e625d → e7f7d49 → ddf4451)
-- **2 PRs on entu/www** (#11 + #13)
-- **2 issues on entu/api** (#41 + #42)
-- **1 consult answer** on mitselek/esmuseum-map-app#41
-- main @ `ddf4451`, origin matches, 804/804, preview `app.x27TVohe.js`
+## Upstream / cross-repo (open)
 
-## GitHub issues — close-out audit needed session 31
-
-| Issue | Status | Notes |
+| Item | Repo | Status |
 |---|---|---|
-| #82 view rehearsal list | CLOSED (session 29) | — |
-| #83 cancel/edit single rehearsal | OPEN | delivered via #86 (cancel) + #87 (edit); close? |
-| #84 delete series cascade | OPEN | delivered via #86; close? |
-| #85 assign/manage conductors | OPEN | delivered via #86; close? |
-| #86 manage-ops wiring | OPEN | audit coverage vs #83/#84/#85 |
-| #87 edit single rehearsal | CLOSED (this session) | — |
-| #88 runtime type-id resolution | OPEN | natural next code task |
+| #52 rsvp tally formulas | entu/research | MERGED `52c2c16` (+ applied live `35f30ec`) |
+| #51 rsvp `late` enum | entu/research | MERGED `f746d2e` |
+| #50 case-study (PO's) | entu/research | CI green, OPEN for PO review/merge |
+| #14 formula-behaviour doc-request | entu/www | OPEN |
+| #11, #13 docs PRs; entu/api #41, #42 | entu/www, entu/api | OPEN, awaiting Argo |
+
+## MVP scorecard
+
+| Slice | State |
+|---|---|
+| 1 agenda | ✅ live |
+| 2a singer RSVP | ✅ live |
+| 2b conductor/singer tally | ✅ live |
+| 2b+ instant tally | ✅ live |
+| 3 invite & join | ⬜ next session |
 
 ## Carry-forward GH backlog (unchanged)
 
-- **#80** DRY login safeRedirectTarget; **/about** real content; **#73** overdue red+bold (blocked lending); **#54** client error capture; **#44** CF Pages git-deploy; **#49** Biome lint; **#6** Email (blocked PO SPF/DKIM); **CHORE-C** test infra (heavy).
+- Audit/close epic-A issues #7/#8/#9 (delivered by slices 1+2a) per `feedback_closes_n_pattern` — not done this session.
+- Badge tooltip i18n (tiny); #80 DRY; /about real content; #73; #54; #44 CF git-deploy; #49 Biome; #6 Email (blocked PO SPF/DKIM).
+- Dead CF secret `MVOX_SESSION_SECRET` (trusted-identity reverted) — deletable, low priority.
 
 (*MVOX:Palestrina*)

@@ -1,6 +1,83 @@
 # Palestrina — Team Lead Scratchpad
 
-### [NEXT SESSION] 2026-06-06 end-of-session-30 — session-30 → session-31
+### [NEXT SESSION] 2026-06-13 end-of-session-32 — session-32 → session-33
+
+**Headline: The MVP push. Defined the MVP (rehearsal-attendance loop) and shipped slices 1, 2a, 2b + 2b-optimistic-polish to preview — the loop works end-to-end (agenda → RSVP → conductor/singer see the tally, instantly). Plus #88 (runtime type-ids) and #89 (stale-JWT cleanup). Survived a big auth detour: tried "trusted-identity-at-issuance" (server-side OAuth-key exchange), which was DOA because Entu tokens are aud=IP-bound (a constraint already in our own memory — I missed it; 4 deploy cycles to rediscover). Fully reverted it. The conductor tally instead uses Entu FORMULAS (sentinel refs + `_referrer COUNT` + a CONCAT'd `rsvp_tally` JSON string) — no server, no identity. Adopted the single-tree git protocol (no worktrees, no chore branches, one actor at a time). Production mvox.eu untouched all session; everything on `preview-seasons.multivox.pages.dev`.**
+
+## ⭐ Session-33 first action: SLICE 3 — invite & join (the last MVP piece)
+
+PO explicitly left this for next session. It's the cleanest of the three (pure client-side; the auth/identity question is settled — DON'T try server-side identity). Brainstorm → spec → plan → chain.
+- **Scope (from MVP spec §4 slice 3):** admin creates an `invitation` (email, optional sections, token, 30-day expiry) → app shows a copyable `/invite/<token>` link → singer opens it, OAuth signs in, accepts → BFF-mediated bilateral consent: create `application` (singer consent, immediately consumed) → create `member` (multi-parent org+sections, status active) → delete invitation + application. Expired token → clear error page. NO email sending (#6 blocked on PO SPF/DKIM) — copy-the-link.
+- **Schema check first:** `invitation` + `member` shapes already exist in v4E (Finn audit 2026-06-12 — no gaps). `invitation` token is the URL access mechanism. Verify the live polyphony types have what's needed (Pérotin probe before building, per "probe don't guess").
+- **Watch:** the `/invite/<token>` landing must resolve the org/email for a NOT-yet-authed visitor. invitation is private under org → an unauthed reader can't read it. This is the one tricky bit — likely needs the token to self-describe (encode org name) OR a careful think. Do NOT reach for server-side identity (aud=IP wall). Brainstorm this with the PO.
+
+## What shipped this session (all on main, preview-only; prod untouched)
+
+| SHA | What |
+|---|---|
+| `36c453d` | #88 runtime type-id resolution (resolveTypeId replaces hardcoded TYPE_IDS) |
+| `8d93f4d` | slice-1 `/agenda` unified rehearsal list across orgs |
+| `6965c41` | slice-2a singer RSVP (4-state going/not_going/maybe/late) |
+| `0d67bb7` | #89 stale-JWT cleanup (expired/401 → signed-out, not error) |
+| `f819d68` | REVERT of the trusted-identity stack (restore client login) |
+| `eaa3c1b` | slice-2b conductor+singer RSVP tally (formula-based) |
+| `8878419` | slice-2b-opt optimistic tally delta (instant, no reload) |
+
+main @ `8878419` (origin matches). Tests **915/915**, check 0. Preview build `66f32e39`. **PO has NOT yet confirmed the final instant-tally live-test** — ask at session-33 open.
+
+## The auth detour — DEAD END, don't repeat (this is the session's big lesson)
+
+- Entu tokens are `aud=IP`-bound (memory `project_entu_jwt_ip_bound`, now hardened with a session-32 recurrence note). **Any server-side use of a user's token/key is impossible** — the server's egress IP ≠ the browser's, so the exchange returns an anonymous/empty-accounts token. This killed "trusted identity at issuance."
+- The whole trusted-identity stack (server exchange in the OAuth callback, `identity-cookie.ts` HMAC, `MVOX_SESSION_SECRET`) was reverted (`f819d68`). Login is back to the proven client-side flow.
+- **Implication for slice-3 + anything needing "who is this server-side":** you can't. Use formulas (aggregates), client-side reads (user's own token in-browser), or rethink the data model. NEVER a server-side token exchange.
+- Diagnostic trail that nailed it: self-describing error codes on the callback (exchange_http_/exchange_no_account/exchange_no_claim) — kept those as a permanent error-surface improvement before the revert; they're gone with the revert but the technique is logged.
+
+## The formula tally (how slice-2b works — reusable pattern)
+
+Conductor RSVP tally with NO server/BFF/identity, via Entu formulas (which bypass rights → safe for AGGREGATES only):
+- `rsvp` type has 4 sentinel ref props (`going_ref`…`late_ref`), each set to the event `_id` only when status matches (writer keeps them mutually exclusive: set one, clear three on change).
+- `event` type has 4 count formulas (`_referrer.rsvp.going_ref COUNT`…) + `rsvp_tally` (CONCAT of the four into a JSON string).
+- Client reads `event.rsvp_tally`, JSON.parses, displays. Conductor reads with own token (counts are public). rsvp stays private. **Counts only — never WHO (that would leak).**
+- LIVE on polyphony (Pérotin applied the prop-defs `35f30ec`, verified 3/3). v4E #52 merged (`52c2c16`).
+- Probe-verified formula facts (live, 2026-06-13): no value-filtered COUNT (sentinels are the floor); single-formula count+concat impossible (COUNT is whole-stack reducer); formula-reads-formula WORKS (tally reads the 4 counts); arithmetic on formula-derived values is broken (string-concat — never `+`/`*` on formula props). Findings: `docs/migration/findings/formula-*-2026-06-13.md`.
+
+## Single-tree git protocol (NEW — PO directive, replaces worktrees)
+
+After 3 shared-tree branch flips, PO killed agent worktrees entirely. Codified in `architecture-decisions.md` (@ `215936f`) + memory `feedback_no_parallel_branches`:
+- **One tree** (`~/workspace`), NO worktrees/EnterWorktree. **One branch** at a time (tree on main between chains, on the feature branch during). **One actor** at a time (incl. team-lead — no doc commits mid-chain; specs/plans commit to main BEFORE the branch is created).
+- **No `chore/*` branches** — probes/seeds/findings/scratchpads commit DIRECTLY to main, BETWEEN chains. Bentham REDs any dispatch violating this.
+- This held clean all session after adoption. Keep it.
+
+## Entu ecosystem work this session
+
+| Artifact | Repo | Status |
+|---|---|---|
+| #51 — add `late` to rsvp status enum | entu/research | MERGED (`f746d2e`) |
+| #52 — rsvp sentinel refs + event tally formulas | entu/research | MERGED (`52c2c16`) |
+| #50 — case-study 3rd-party-frontend (PO's, 3 wks old) | entu/research | CI fixed + green; OPEN for PO review/merge |
+| #14 — doc-change-request: formula-reads-formula, COUNT whole-stack, arithmetic-on-formula-values bug | entu/www | OPEN |
+| (carry-forward from session 30) #11 + #13 docs PRs, entu/api #41 + #42 | entu/www + entu/api | OPEN, awaiting Argo |
+
+Note: a recurring SPEC.md prettier-format breakage on entu/research main blocked CI for ALL PRs; folded the fix into #52 + #50. If a new entu/research PR's CI fails on format, check SPEC.md / run `pnpm format:check` locally first.
+
+## Backlog after slice-3
+
+- **Badge tooltip i18n** (tiny) — RsvpTallyBadge `title` attrs are English-only; Bentham flagged as a separate i18n pass.
+- **#88-adjacent / #80 DRY safeRedirectTarget / /about real content / #73 / #54 / #44 CF Pages git-deploy / #49 Biome / #6 Email (blocked SPF/DKIM)** — unchanged carry-forward.
+- **Issues to audit/close:** #7/#8/#9 (epic A — agenda/RSVP) substantially delivered by slices 1+2a; audit `gh issue list` and close per `feedback_closes_n_pattern`. (Didn't get to this — the MVP build consumed the session.)
+- `MVOX_SESSION_SECRET` CF Pages secret is now dead (trusted-identity reverted) — can delete from CF dashboard, low priority.
+
+## Expected first action session 33
+
+1. Read this seed. Verify main `8878419` (origin==local), prod mvox.eu health unchanged.
+2. Spawn finn + bentham (always-on) + tallis. Ask PO if the instant-tally live-test passed; if not, debug that first.
+3. **Slice-3 brainstorm** — lead with the `/invite/<token>` unauthed-landing problem (the one hard bit; do NOT reach for server-side identity). Finn re-confirms invitation/member/application live shapes; Pérotin probes if needed. Then spec → plan → chain.
+
+(*MVOX:Palestrina*)
+
+---
+
+### [PROCESSED 2026-06-12 session-32] 2026-06-06 end-of-session-30 — session-30 → session-31
 
 **Headline: Three features shipped to preview + one bugfix + a major Entu ecosystem push. Pencil-toggle merged (b3a1a6a), #87 edit-a-single-rehearsal merged (49e625d, 801→804 tests), season date-format bug root-caused via live probe + fixed (ddf4451). Then pivoted to Entu platform work: filed a 9-issue docs PR (entu/www#11, Closes #2–#10), a `_sharing` clarification PR (#13, Closes #12), a date-format wire discrepancy (entu/api#41), and the "product-native AI consultant agents" idea seed (entu/api#42). Fielded a live consult for the esmuseum team (bulk-restrict 6,352 entities) — ran clean, zero errors, data point back (limit=1000 works). Production mvox.eu untouched all session; everything on `preview-seasons.multivox.pages.dev`.**
 
