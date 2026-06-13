@@ -520,4 +520,23 @@ Files created/modified:
 
 [PATTERN] `vi.unstubAllGlobals()` in `afterEach` to clear `vi.stubGlobal('fetch', ...)` stubs — `vi.restoreAllMocks()` does NOT clear stub globals.
 
+## [CHECKPOINT] 2026-06-13 — Session 32: multiple auth RED phases + slice-2b RED
+
+[DECISION] Session 32 was high-velocity RED work across many branches (all single-tree). Summary:
+- `fix/stale-jwt-cleanup` SHA `837cde4`: 11 RED (isTokenExpired boundaries + hydrateUserStore 10-row matrix). Fixture audit: all existing JWTs have far-future exp, no patches needed.
+- `fix/auth-callback-error-codes` SHA `46873e3`: 3 RED (exchange_http_401, exchange_no_account, identity_sign_failed). vi.mock partial override pattern for signIdentity.
+- `fix/server-exchange-accounts-shape` SHA `c43793c`: 5 RED (all happy paths → exchange_no_account from array-indexing; probed array shape).
+- `fix/server-exchange-token-claims` SHA `26191e0`: 8 RED (token-claims shape; makeToken() helper using Buffer.from().base64url).
+- `fix/revert-trusted-identity` SHA `22096cd`: 2 RED (restore known-good callback spec; delete identity-cookie.spec.ts). pnpm check 0 even without identity-cookie.ts deleted (Josquin deletes in GREEN).
+- `feat/conductor-tally` SHA `b7ae7a8`: 21 RED (sentinel writes + parseTally + badge + listRehearsals tally). Made Rehearsal.tally optional (?) to avoid breaking existing fixtures.
+- `feat/optimistic-tally` SHA `bef6a0d`: 7 RED (applyTallyDelta + page tally-delta). Partial-real mock pattern: applyTallyDelta + parseTally real in the mock so page can compute delta.
+
+[PATTERN] makeToken() for server-exchange tests: `'h.' + Buffer.from(JSON.stringify({ accounts })).toString('base64url') + '.s'` — base64url-correct, matches server's `Buffer.from(seg,'base64url')` decode.
+
+[PATTERN] Partial-real vi.mock: `vi.mock('module', async (importOriginal) => { const real = await importOriginal(); return { ...real, someHelper: vi.fn(real.someHelper) }; })` — keeps pure helpers real while making async/IO functions interceptable per-test.
+
+[GOTCHA] Adding a required field to a shared domain type (Rehearsal.tally, AgendaItem.tally) breaks ALL existing test fixtures. Always add as optional first (`?`); remove the `?` in GREEN once the producer always sets it.
+
+[DECISION] trusted-identity stack fully reverted. identity-cookie.ts + identity-cookie.spec.ts deleted. Server-exchange approach confirmed impossible (aud=IP binding). Formula-based tally approach works instead.
+
 (*MVOX:Tallis*)

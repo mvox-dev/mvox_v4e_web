@@ -572,3 +572,62 @@ From live `GET https://api.entu.app/openapi`:
 - **New since session-6:** `POST /{db}/entity/{_id}/duplicate` endpoint with `count` param (1–100 copies)
 
 (*MVOX:Finn*)
+
+---
+
+## 2026-06-12/13 — Session 32 findings
+
+### [LEARNED] v4E schema audit — all MVP entities confirmed present
+
+All 4 entities needed for the rehearsal-attendance loop exist in v4E.0.1:
+
+- **`rsvp`**: parent=`person`, `_sharing: private`, creator=`{kind: 'self'}`. Properties: `event` (ref, required), `member` (ref, required), `status` (`going|not_going|maybe`, required), `notes`. Rights: person sees own ONLY — conductor RSVP summary requires BFF-side aggregation (elevated rights or service-entity key), NOT direct Entu user-rights access.
+- **`invitation`**: parent=`organization`, `_sharing: private`, creator=`{kind: 'parent_right', right: '_owner'}`. Properties: `email`, `sections[]` (ref, optional), `token` (UUID), `expires_at`, `inviter` (system), `message`. No `status` field — deleted on acceptance. Accept flow = BFF atomic: create member + delete invitation + delete application.
+- **`member`**: multi-parent (org required + section optional), `sharing: 'private'` instance default (type-level `public` per README — `EntityDef.sharing` = instance default). Creator=`{kind: 'bilateral'}`. Properties: `person` (ref, required), `current_section` (ref, optional), `status` (`active|archived`, required).
+- **`attendance`**: parent=`event`, `_sharing: private`, creator=`{kind: 'parent_right', right: '_editor'}`. Properties: `member` (ref, required), `status` (`present|absent|late`, required), `notes`.
+
+**Schema.ts vs README discrepancy**: `member` `EntityDef.sharing: 'private'` = instance default; README §4 says type-level `public`. Not a data model conflict — `EntityDef.sharing` field = instance default, not type-level cap.
+
+**mvox wiring state**: `member` wired in `userStore.ts` (auth layer) + `entuSeasons.ts` (conductor picker). `invitation` and `rsvp` = zero callsites, complete blank.
+
+**4 implementation design decisions flagged** (not schema gaps):
+1. RSVP aggregation pattern for conductors — BFF elevated rights design needed before Victoria writes RSVP spec
+2. Invitation accept atomicity — 3-step BFF atomic (create member + delete invitation + delete application)
+3. `rsvp.member` cross-org pointer — UI must supply correct `member` ID for relevant org, not just person ID
+4. Unauthenticated `invitation.token` lookup — BFF needs service-entity call or token encodes enough info
+
+### [LEARNED] OAuth callback JWT trust path — CLIENT-TAINTED
+
+`src/routes/auth/callback/+page.server.ts` `load` reads `key` from `url.searchParams` (browser-supplied query param) and writes it verbatim to `mvox_session` cookie. Zero Entu call at cookie-set time. `isSessionValid` in hooks only checks `exp` via unverified JWT decode — no signature, no issuer, no audience.
+
+**Attack path**: navigate to `/auth/callback?key=<crafted-JWT-with-future-exp>` → server writes to httpOnly cookie → any endpoint reading personId from cookie trusts attacker-controlled value.
+
+**Cookie attributes**: `httpOnly: true`, `secure: true` (prod), `sameSite: 'lax'`, `maxAge: 172800` (48h). httpOnly prevents post-set JS read but does NOT protect against attacker-controlled initial value.
+
+**Consequence**: `mvox_session` is a SOFT GATE only (binary logged-in check). Cannot serve as trust anchor for identity claims in elevated endpoints like `GET /api/reports/rsvp-summary`.
+
+**Three remediation options** (for team-lead design decision):
+- A: Re-exchange at request time (Worker calls `GET /auth?db=...` with cookie value → Entu-verified personId). Risk: 5-min session token may be expired or single-use by request time.
+- B: Service-entity API key (BFF uses own key, not caller identity). Rejected for RSVP domain (Path A from CHORE-53).
+- C: Fix issuance — server calls Entu at cookie-set time, stores Entu-verified personId in HMAC-signed encrypted cookie. Requires server-side store or signed cookie primitive (currently absent from stack).
+
+### [LEARNED] Entu formula engine — complete audit (source-verified)
+
+Source: `entu/api` `utils/formula.js` (full read 2026-06-13). 23 operators total.
+
+**Output types**: string, number, boolean ONLY. `wrapValue` has no `{json}` / `{array}` branch. Multi-value result = multiple separate property values (primitives), not a JSON array. No JSON output support anywhere in source or any upstream proposal.
+
+**Variadic reducers** (consume entire stack): CONCAT, CONCAT_WS, SUM, SUBTRACT, MULTIPLY, DIVIDE, COUNT, AVERAGE, MIN, MAX, IN, NIN
+**Binary comparisons** (arity 2): EQ, NE, GT, GTE, LT, LTE
+**Per-value** (arity 1-2): ABS, ROUND
+**Other**: EXISTS (arity 1), IF (arity 3), WHEN (arity 2)
+
+**Filtered/grouped COUNT**: ABSENT. `opCount` sees flat primitives only — structural metadata gone by the time COUNT fires. `EQ` returns ONE boolean for cross-product, not a filtered slot. `_referrer.rsvp.status 'going' EQ COUNT` = always 1. Sentinel-ref workaround confirmed as only path.
+
+**Reverse-ref `_referrer.TypeName.prop` mechanics**: MongoDB `$match: {'private._reference.reference': entityId, 'private._type.string': fieldType}` — matches ANY property on the referrer that holds a reference to entityId (not property-name-specific). Rights bypass by design. Single-hop only.
+
+**No upstream proposals**: zero entu/api issues or PRs for grouping, JSON output, histograms. entu.ee docs fully in sync with source.
+
+**Minimal Argo pitch**: `_referrer.type.prop[='value'].*._id COUNT` filter-syntax in the field grammar — MongoDB `$match` stage addition only, no operator changes. Alternative: `GROUP_COUNT` operator emitting multi-value `{string: 'going', number: 3}` pairs.
+
+(*MVOX:Finn*)

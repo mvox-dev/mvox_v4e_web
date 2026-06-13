@@ -7,6 +7,36 @@ metadata:
 
 # Bentham scratchpad
 
+## 2026-06-13 — Session 32: reviews summary
+
+[SESSION-32 2026-06-13] 10 reviews this session, all GREEN. Highlights:
+
+[#88 runtime-type-ids `bb23a86` GREEN] `resolveTypeId` replaces hardcoded `TYPE_IDS`. YELLOW-88.1 per-commit-GREEN (RED imports non-existent exports), YELLOW-88.2 missing `encodeURIComponent` on typeName. Closes TYPE_IDS follow-up from `fix/seasons-create-wire`.
+
+[#10 agenda slice-1 `d3696dd` GREEN] `/agenda` unified singer rehearsal list. YELLOW-10.1 `$effect` race (no abort controller) — subsequently CLOSED by slice-2a request-id counter.
+
+[#8 rsvp-singer slice-2a `44e0214` GREEN] Singer RSVP — optimistic 4-state + member-pairing. Conditional on Schema-Change + PO-Approved trailers. YELLOW-10.1 closed.
+
+[auth trusted-identity `20f1e3a` GREEN] HMAC-signed `mvox_identity` cookie. Security-critical pass — taint closed (exchange-before-cookies), constant-time HMAC verify, secret server-only by build enforcement.
+
+[auth-callback error codes `8074cb1` GREEN] Split generic `server_exchange_failed` into 3 specific codes. YELLOW-EC.1 half-set cookie state (harmless, subsequently closed by accounts-shape fix).
+
+[accounts-array fix `b7196ae` GREEN] Accounts wire shape correction (array, not dict). YELLOW-EC.1 closed (atomic cookie ordering). GOTCHA-FABRICATED-MOCK-WIRE-SHAPE identified.
+
+[token-claims fix `8d9c6e4` GREEN] Definitive fix — derives personId from JWT claims (proven client method). Zero YELLOWs.
+
+[revert trusted-identity `ffbd2ec` GREEN] Clean revert — callback byte-matches known-good, grep-clean. IP-binding makes server-exchange impossible.
+
+[#89 stale-JWT cleanup `2fb4254` GREEN] exp pre-filter + runtime 401 sweep. YELLOW-89.1 (403-on-stale assumption), YELLOW-89.2 (auto-reauth navigation trimmed) — both agreed non-blocking.
+
+[slice-2b conductor-tally `4ad11f4` GREEN] Sentinel writes + `rsvp_tally` formula + `RsvpTallyBadge`. Conditional on Schema-Change trailers. Counts-only (formula rule compliant).
+
+[optimistic-tally `6a7944c` GREEN] `applyTallyDelta` + optimistic tally on `/agenda`. Delta math clamped >=0, dual revert atomic.
+
+[GOTCHA-FABRICATED-MOCK-WIRE-SHAPE 2026-06-13] **New standing audit (3rd instance of "test and code agreed on a lie").** Any new Entu response type assertion (`as { ... }`) should be cross-checked against a probe or Entu API docs. Mocks that return a shape the author ASSUMED (rather than probed) are the failure mode. Instances: (1) `_type` create-POST string-vs-reference, (2) store-contract-seam, (3) accounts dict-vs-array-vs-token-claims. Companion to GOTCHA-ENTU-TYPE-CREATE-WIRE + GOTCHA-STORE-CONTRACT-SEAM.
+
+(*MVOX:Bentham*)
+
 ## 2026-06-01 — Session 30: fix/season-date-format @ `ea2cdcb` — GREEN
 
 [SEASON-DATE-FORMAT 2026-06-01] **GREEN — merge-eligible — `fix/season-date-format` @ `ea2cdcb`** (1-line data-mapping bugfix, RED `f07a8d3` Tallis → GREEN `ea2cdcb` Josquin). listSeasons mapped Entu `date`-typed values straight through; Entu returns them as FULL ISO (`'2026-06-02T00:00:00.000Z'`), so `<input type="date">` rendered blank + edits didn't round-trip. Fix: `?.date?.slice(0,10) ?? ''` on startDate+endDate. Test-pinned 3 cases (real ISO→clean, already-clean idempotent, missing→''), full-shape toEqual, drives real listSeasons via stubbed fetch on probed wire shape.
