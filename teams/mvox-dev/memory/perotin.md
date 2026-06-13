@@ -742,4 +742,23 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
   known to be supported. The sentinel-reference pattern is the empirically confirmed workaround.
   Single-hop constraint satisfied: _referrer.rsvp.going_ref (one hop).
 
+## Session 32 (2026-06-13) — formula-count-concat probe
+
+[PROBE-RESULT] formula-count-concat — COMPLETE 2026-06-13
+  Q1 (formula-reads-formula): WORKS. Named formula-prop references are pre-evaluated scalars.
+    tally = '{"going":' going_count ',"maybe":' maybe_count ... CONCAT → correct JSON string.
+    Dependency ordering: Entu resolves count formulas before tally reads them. ✓
+  Q1 GOTCHA: Arithmetic on formula props is broken. going_count 2 * → "32" (string concat, not multiply).
+    Never use arithmetic operators on formula-derived values. Use separate _referrer COUNT for totals.
+  Q2 (single-formula count+concat): FAILS. COUNT is a whole-stack reducer — consumes ALL items on
+    evaluation stack, not just the preceding reverse-ref traversal result.
+    Interleaving string literals + referrer traversals + COUNTs always gives wrong results.
+  Cleanup: all _probe_* instances + types deleted.
+  Findings doc: docs/migration/findings/formula-count-concat-2026-06-13.md
+
+[DECISION] Slice-2b tally architecture: 4 count formulas + 1 tally formula on event.
+  rsvp_going_count / rsvp_maybe_count / rsvp_not_going_count / rsvp_late_count (number formulas)
+  rsvp_tally (string formula reading the 4 count props via named-prop reference — formula-reads-formula)
+  Both patterns confirmed working. No BFF elevated op needed for tally display.
+
 (*MVOX:Perotin*)

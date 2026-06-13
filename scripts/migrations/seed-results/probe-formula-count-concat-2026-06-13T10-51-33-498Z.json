@@ -1,0 +1,145 @@
+{
+  "probe": "formula-count-concat-2026-06-13",
+  "rsvpCounts": {
+    "going": 3,
+    "maybe": 2,
+    "not_going": 1,
+    "late": 1
+  },
+  "q1": {
+    "countsOk": true,
+    "tallyRaw": "{\\\"going\\\":3,\\\"maybe\\\":2,\\\"not_going\\\":1,\\\"late\\\":1}",
+    "tallyOk": true,
+    "goingTimes2": "32",
+    "goingTimes2Ok": false
+  },
+  "q2": {
+    "q2a_interleaved": "4}",
+    "q2b_counts_first": "2",
+    "q2c_one_count_concat": "4",
+    "verdict": "Q2a fails but Q2b (counts-first then concat) may work"
+  },
+  "rawEntity": {
+    "_id": "6a2d36304cd971291c5d560c",
+    "name": [
+      {
+        "_id": "6a2d36304cd971291c5d560e",
+        "string": "_probe_event_1"
+      }
+    ],
+    "going_count": [
+      {
+        "number": 3
+      }
+    ],
+    "maybe_count": [
+      {
+        "number": 2
+      }
+    ],
+    "not_going_count": [
+      {
+        "number": 1
+      }
+    ],
+    "late_count": [
+      {
+        "number": 1
+      }
+    ],
+    "tally": [
+      {
+        "string": "{\\\"going\\\":3,\\\"maybe\\\":2,\\\"not_going\\\":1,\\\"late\\\":1}"
+      }
+    ],
+    "q2a_interleaved": [
+      {
+        "string": "4}"
+      }
+    ],
+    "q2b_counts_first": [
+      {
+        "string": "2"
+      }
+    ],
+    "q2c_one_count_concat": [
+      {
+        "string": "4"
+      }
+    ],
+    "q1_going_times2": [
+      {
+        "string": "32"
+      }
+    ]
+  },
+  "log": [
+    "[probe] entity-meta=69bcfd8e9c031ab8e6ce8034  prop-meta=69bcfd8e9c031ab8e6ce8048",
+    "\n=== [Q1+Q2] Creating _probe_event type ===",
+    "  _probe_event type: 6a2d362e4cd971291c5d5589",
+    "  count prop-defs: going=6a2d362e4cd971291c5d5595 maybe=6a2d362e4cd971291c5d559d not_going=6a2d362e4cd971291c5d55a5 late=6a2d362e4cd971291c5d55ad",
+    "  tally formula prop-def: 6a2d362e4cd971291c5d55b5",
+    "  q2a_interleaved formula prop-def: 6a2d362f4cd971291c5d55bd",
+    "  q2b_counts_first formula prop-def: 6a2d362f4cd971291c5d55c5",
+    "  q2c_one_count_concat formula prop-def: 6a2d362f4cd971291c5d55cd",
+    "  q1_going_times2 formula prop-def (simple formula-reads-formula): 6a2d362f4cd971291c5d55d5",
+    "\n=== Creating _probe_rsvp type ===",
+    "  _probe_rsvp type: 6a2d362f4cd971291c5d55dd",
+    "\n=== Creating event instance ===",
+    "  event: 6a2d36304cd971291c5d560c",
+    "\n=== Creating rsvp instances ===",
+    "  r-going-1 (going, public) → 6a2d36304cd971291c5d5612",
+    "  r-going-2 (going, public) → 6a2d36304cd971291c5d561a",
+    "  r-going-3 (going, private) → 6a2d36304cd971291c5d5622",
+    "  r-maybe-1 (maybe, public) → 6a2d36304cd971291c5d562a",
+    "  r-maybe-2 (maybe, private) → 6a2d36304cd971291c5d5632",
+    "  r-ng-1 (not_going, public) → 6a2d36304cd971291c5d563a",
+    "  r-late-1 (late, private) → 6a2d36314cd971291c5d5642",
+    "\n=== Aggregating event ===",
+    "\n=== Reading all formula results ===",
+    "\n--- Q1 results ---",
+    "  going_count  = 3   (expected 3)",
+    "  maybe_count  = 2   (expected 2)",
+    "  not_going_count = 1  (expected 1)",
+    "  late_count   = 1   (expected 1)",
+    "  tally (formula-reads-formula) = \"{\\\\\\\"going\\\\\\\":3,\\\\\\\"maybe\\\\\\\":2,\\\\\\\"not_going\\\\\\\":1,\\\\\\\"late\\\\\\\":1}\"",
+    "  q1_going_times2 (going_count * 2) = 32  (expected 6)",
+    "  Q1 counts correct: true",
+    "  Q1 tally contains correct numbers: true — raw: \"{\\\\\\\"going\\\\\\\":3,\\\\\\\"maybe\\\\\\\":2,\\\\\\\"not_going\\\\\\\":1,\\\\\\\"late\\\\\\\":1}\"",
+    "  Q1 formula-reads-formula (times2): false",
+    "\n--- Q2 results ---",
+    "  q2a_interleaved    = \"4}\"",
+    "  q2b_counts_first   = \"2\"",
+    "  q2c_one_count_concat = \"4\"",
+    "  Q2 VERDICT: Q2a fails but Q2b (counts-first then concat) may work",
+    "\n=== Full raw entity data ===",
+    "{\n  \"_id\": \"6a2d36304cd971291c5d560c\",\n  \"name\": [\n    {\n      \"_id\": \"6a2d36304cd971291c5d560e\",\n      \"string\": \"_probe_event_1\"\n    }\n  ],\n  \"going_count\": [\n    {\n      \"number\": 3\n    }\n  ],\n  \"maybe_count\": [\n    {\n      \"number\": 2\n    }\n  ],\n  \"not_going_count\": [\n    {\n      \"number\": 1\n    }\n  ],\n  \"late_count\": [\n    {\n      \"number\": 1\n    }\n  ],\n  \"tally\": [\n    {\n      \"string\": \"{\\\\\\\"going\\\\\\\":3,\\\\\\\"maybe\\\\\\\":2,\\\\\\\"not_going\\\\\\\":1,\\\\\\\"late\\\\\\\":1}\"\n    }\n  ],\n  \"q2a_interleaved\": [\n    {\n      \"string\": \"4}\"\n    }\n  ],\n  \"q2b_counts_first\": [\n    {\n      \"string\": \"2\"\n    }\n  ],\n  \"q2c_one_count_concat\": [\n    {\n      \"string\": \"4\"\n    }\n  ],\n  \"q1_going_times2\": [\n    {\n      \"string\": \"32\"\n    }\n  ]\n}",
+    "\n=== Cleanup ===",
+    "  deleted entity: 6a2d36314cd971291c5d5642",
+    "  deleted entity: 6a2d36304cd971291c5d563a",
+    "  deleted entity: 6a2d36304cd971291c5d5632",
+    "  deleted entity: 6a2d36304cd971291c5d562a",
+    "  deleted entity: 6a2d36304cd971291c5d5622",
+    "  deleted entity: 6a2d36304cd971291c5d561a",
+    "  deleted entity: 6a2d36304cd971291c5d5612",
+    "  deleted entity: 6a2d36304cd971291c5d560c",
+    "  deleted type: 6a2d36304cd971291c5d5605",
+    "  deleted type: 6a2d36304cd971291c5d55fe",
+    "  deleted type: 6a2d362f4cd971291c5d55f7",
+    "  deleted type: 6a2d362f4cd971291c5d55f0",
+    "  deleted type: 6a2d362f4cd971291c5d55e9",
+    "  deleted type: 6a2d362f4cd971291c5d55e2",
+    "  deleted type: 6a2d362f4cd971291c5d55dd",
+    "  deleted type: 6a2d362f4cd971291c5d55d5",
+    "  deleted type: 6a2d362f4cd971291c5d55cd",
+    "  deleted type: 6a2d362f4cd971291c5d55c5",
+    "  deleted type: 6a2d362f4cd971291c5d55bd",
+    "  deleted type: 6a2d362e4cd971291c5d55b5",
+    "  deleted type: 6a2d362e4cd971291c5d55ad",
+    "  deleted type: 6a2d362e4cd971291c5d55a5",
+    "  deleted type: 6a2d362e4cd971291c5d559d",
+    "  deleted type: 6a2d362e4cd971291c5d5595",
+    "  deleted type: 6a2d362e4cd971291c5d558e",
+    "  deleted type: 6a2d362e4cd971291c5d5589"
+  ]
+}
