@@ -20,15 +20,12 @@ import { load } from '../../../../routes/auth/callback/+page.server';
 
 describe('/auth/callback server load', () => {
 	beforeEach(() => {
-		// Probed array shape: accounts: [{ _id: db, name, user: { _id: personId } }]
+		// Token-claims shape: { token: <jwt with accounts dict in claims> }
 		vi.stubGlobal(
 			'fetch',
 			vi.fn().mockResolvedValue({
 				ok: true,
-				json: async () => ({
-					accounts: [{ _id: 'testdb', name: 'testdb', user: { _id: 'some-person' } }],
-					token: 'tok',
-				}),
+				json: async () => ({ token: makeToken({ testdb: 'some-person' }) }),
 			}),
 		);
 	});
@@ -89,18 +86,23 @@ function makeCookies() {
 	return { get: vi.fn(), set: vi.fn(), delete: vi.fn() };
 }
 
+/**
+ * Build a minimal JWT-shaped token whose claims contain the given accounts dict.
+ * Mirrors the PROVEN client shape (userStore.ts:52-53): decodeJwt(token).accounts[db].
+ * Uses base64url (Node Buffer) to match the server's Buffer.from(seg,'base64url') decode.
+ */
+const makeToken = (accounts: Record<string, string>): string =>
+	'h.' + Buffer.from(JSON.stringify({ accounts })).toString('base64url') + '.s';
+
 /** Stub a global fetch that returns a valid Entu /auth response for the given personId.
- * Uses the PROBED array shape: accounts: [{ _id: db, name, user: { _id: personId } }]
+ * Uses the PROVEN token-claims shape: { token: makeToken({ testdb: personId }) }.
  */
 function stubEntuExchangeOk(personId = 'person-77') {
 	vi.stubGlobal(
 		'fetch',
 		vi.fn().mockResolvedValue({
 			ok: true,
-			json: async () => ({
-				accounts: [{ _id: 'testdb', name: 'testdb', user: { _id: personId } }],
-				token: 'tok',
-			}),
+			json: async () => ({ token: makeToken({ testdb: personId }) }),
 		}),
 	);
 }
@@ -167,16 +169,12 @@ describe('/auth/callback server load — server-side Entu exchange + identity co
 		expect(cookiesMock.set).not.toHaveBeenCalled();
 	});
 
-	it('exchange 200 but accounts array has no matching db → no cookies + redirect to error=exchange_no_account', async () => {
-		// Probed array shape with a DIFFERENT db — testdb absent
+	it('exchange 200 but no token field → no cookies + redirect to error=exchange_no_token', async () => {
 		vi.stubGlobal(
 			'fetch',
 			vi.fn().mockResolvedValue({
 				ok: true,
-				json: async () => ({
-					accounts: [{ _id: 'other_db', name: 'other_db', user: { _id: 'person-x' } }],
-					token: 'tok',
-				}),
+				json: async () => ({}), // no token field
 			}),
 		);
 		const cookiesMock = makeCookies();
@@ -187,17 +185,17 @@ describe('/auth/callback server load — server-side Entu exchange + identity co
 				url,
 				cookies: cookiesMock,
 			}),
-		).rejects.toMatchObject({ status: 303, location: expect.stringContaining('exchange_no_account') });
+		).rejects.toMatchObject({ status: 303, location: expect.stringContaining('exchange_no_token') });
 
 		expect(cookiesMock.set).not.toHaveBeenCalled();
 	});
 
-	it('exchange 200 but accounts array is empty → no cookies + redirect to error=exchange_no_account', async () => {
+	it('exchange 200 but token has undecodable claims segment → redirect to error=exchange_bad_token', async () => {
 		vi.stubGlobal(
 			'fetch',
 			vi.fn().mockResolvedValue({
 				ok: true,
-				json: async () => ({ accounts: [], token: 'tok' }),
+				json: async () => ({ token: 'not.avalidsegment!!.x' }),
 			}),
 		);
 		const cookiesMock = makeCookies();
@@ -208,7 +206,28 @@ describe('/auth/callback server load — server-side Entu exchange + identity co
 				url,
 				cookies: cookiesMock,
 			}),
-		).rejects.toMatchObject({ status: 303, location: expect.stringContaining('exchange_no_account') });
+		).rejects.toMatchObject({ status: 303, location: expect.stringContaining('exchange_bad_token') });
+
+		expect(cookiesMock.set).not.toHaveBeenCalled();
+	});
+
+	it('exchange 200 but token claims.accounts lacks db → redirect to error=exchange_no_claim', async () => {
+		vi.stubGlobal(
+			'fetch',
+			vi.fn().mockResolvedValue({
+				ok: true,
+				json: async () => ({ token: makeToken({ other_db: 'person-x' }) }), // testdb absent
+			}),
+		);
+		const cookiesMock = makeCookies();
+		const url = new URL('https://multivox.pages.dev/auth/callback?key=some-key');
+
+		await expect(
+			(load as unknown as (e: { url: URL; cookies: typeof cookiesMock }) => Promise<unknown>)({
+				url,
+				cookies: cookiesMock,
+			}),
+		).rejects.toMatchObject({ status: 303, location: expect.stringContaining('exchange_no_claim') });
 
 		expect(cookiesMock.set).not.toHaveBeenCalled();
 	});

@@ -31,14 +31,25 @@ export const load: ServerLoad = async ({ url, cookies }) => {
 			throw redirect(303, `/auth/login?error=exchange_http_${res.status}`);
 		}
 
-		const data = (await res.json()) as {
-			accounts?: Array<{ _id: string; user?: { _id: string } }>;
-		};
-		const pid = data.accounts?.find((a) => a._id === PUBLIC_ENTU_DB)?.user?._id;
+		const data = (await res.json()) as { token?: string };
+		if (!data.token) {
+			console.error('Entu exchange: no token in response');
+			throw redirect(303, '/auth/login?error=exchange_no_token');
+		}
 
+		const segments = data.token.split('.');
+		let claims: { accounts?: Record<string, string> };
+		try {
+			claims = JSON.parse(Buffer.from(segments[1], 'base64url').toString('utf8'));
+		} catch {
+			console.error('Entu exchange: token claims undecodable');
+			throw redirect(303, '/auth/login?error=exchange_bad_token');
+		}
+
+		const pid = claims.accounts?.[PUBLIC_ENTU_DB];
 		if (!pid) {
-			console.error('Entu exchange: accounts missing db entry');
-			throw redirect(303, '/auth/login?error=exchange_no_account');
+			console.error('Entu exchange: claims.accounts lacks db entry');
+			throw redirect(303, '/auth/login?error=exchange_no_claim');
 		}
 
 		personId = pid;
