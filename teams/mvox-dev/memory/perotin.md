@@ -718,4 +718,28 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
   Correct path: BFF elevated read-only report (already in spec §6) aggregates rsvps across
   rights boundary. No per-rsvp conductor grants needed. Simpler, fewer elevated ops.
 
+## Session 32 (2026-06-13) — formula-reverse-ref-aggregate probe
+
+[PROBE-RESULT] formula-reverse-ref-aggregate — COMPLETE 2026-06-13
+  Q1: _referrer.<type>.<prop> COUNT syntax WORKS. 6/6 voters counted (incl. 2 private). BYPASS YES.
+  Q2: Per-status counts via sentinel-reference pattern WORK.
+    going_count=3 (2 pub+1 priv), maybe_count=2 (1 pub+1 priv), not_going_count=1, total=6. BYPASS YES.
+  Q3: _child._probe_voter.name COUNT = 0 (expected — voters reference via prop, not _parent).
+  Findings doc: docs/migration/findings/formula-reverse-ref-aggregate-2026-06-13.md
+  Probe script: scripts/migrations/probes/probe-formula-reverse-ref-aggregate-2026-06-13.ts
+  Cleanup: all _probe_* entities + types deleted.
+
+[DECISION] Formula-based RSVP tally for slice-2b: VIABLE. No BFF elevated op needed for counts.
+  Pattern:
+    rsvp: add going_ref / maybe_ref / not_going_ref / late_ref (sentinel reference props, set to event._id)
+    event: add rsvp_going_count / rsvp_maybe_count / rsvp_not_going_count / rsvp_late_count
+           formulas: _referrer.rsvp.going_ref COUNT (etc.)
+  Conductor reads tally from public event entity directly. Formula bypasses rights on private rsvps.
+  BFF elevated report (spec §6) may still be needed for NAME LISTS (who is going) but not for counts.
+  Schema change required: sentinel props on rsvp + count formulas on event (upstream entu/research PR).
+
+[GOTCHA] Per-status formula filter via formula expression alone (e.g. status EQ "going") is not
+  known to be supported. The sentinel-reference pattern is the empirically confirmed workaround.
+  Single-hop constraint satisfied: _referrer.rsvp.going_ref (one hop).
+
 (*MVOX:Perotin*)

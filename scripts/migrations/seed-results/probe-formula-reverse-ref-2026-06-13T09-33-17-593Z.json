@@ -1,0 +1,88 @@
+{
+  "probe": "formula-reverse-ref-aggregate-2026-06-13",
+  "targetId": "6a2d23d94cd971291c5d5486",
+  "formulas": {
+    "voter_count_total": "_referrer._probe_voter.name COUNT",
+    "going_count": "_referrer._probe_voter.going COUNT",
+    "status_concat": "_referrer._probe_voter.status CONCAT",
+    "child_count": "_child._probe_voter.name COUNT"
+  },
+  "results": {
+    "voter_count_total": [
+      {
+        "number": 6
+      }
+    ],
+    "going_count": [
+      {
+        "number": 6
+      }
+    ],
+    "status_concat": [
+      {
+        "string": "goinggoingmaybenot_goinggoingmaybe"
+      }
+    ],
+    "child_count": [
+      {
+        "number": 0
+      }
+    ]
+  },
+  "rightsBypassVerdict": "YES",
+  "log": [
+    "[probe] JWT minted OK",
+    "[probe] entity meta-type: 69bcfd8e9c031ab8e6ce8034",
+    "[probe] property meta-type: 69bcfd8e9c031ab8e6ce8048",
+    "\n[step 1] Creating _probe_target type...",
+    "  _probe_target type: 6a2d23d84cd971291c5d5439",
+    "  voter_count_total formula prop-def: 6a2d23d84cd971291c5d5445",
+    "  going_count formula prop-def: 6a2d23d94cd971291c5d544d",
+    "  status_concat formula prop-def: 6a2d23d94cd971291c5d5455",
+    "  child_count formula prop-def: 6a2d23d94cd971291c5d545d",
+    "\n[step 2] Creating _probe_voter type...",
+    "  _probe_voter type: 6a2d23d94cd971291c5d5465",
+    "\n[step 3] Creating _probe_target instance...",
+    "  target entity: 6a2d23d94cd971291c5d5486",
+    "\n[step 4] Creating _probe_voter instances...",
+    "  voter: voter-1-going (going, public) → 6a2d23d94cd971291c5d548c",
+    "  voter: voter-2-going (going, public) → 6a2d23da4cd971291c5d5495",
+    "  voter: voter-3-maybe (maybe, public) → 6a2d23da4cd971291c5d549e",
+    "  voter: voter-4-not-going (not_going, public) → 6a2d23da4cd971291c5d54a7",
+    "  voter: voter-5-going-private (going, private) → 6a2d23da4cd971291c5d54b0",
+    "  voter: voter-6-maybe-private (maybe, private) → 6a2d23da4cd971291c5d54b9",
+    "\n[step 5] Triggering aggregate on target...",
+    "  aggregate triggered",
+    "\n[step 6] Reading formula results on target (owner JWT)...",
+    "  voter_count_total: [{\"number\":6}]",
+    "  going_count:       [{\"number\":6}]",
+    "  status_concat:     [{\"string\":\"goinggoingmaybenot_goinggoingmaybe\"}]",
+    "  child_count:       [{\"number\":0}]",
+    "\n[step 6b] Full target entity (raw):",
+    "{\n  \"_id\": \"6a2d23d94cd971291c5d5486\",\n  \"name\": [\n    {\n      \"_id\": \"6a2d23d94cd971291c5d5488\",\n      \"string\": \"_probe_target_instance_1\"\n    }\n  ],\n  \"voter_count_total\": [\n    {\n      \"number\": 6\n    }\n  ],\n  \"going_count\": [\n    {\n      \"number\": 6\n    }\n  ],\n  \"status_concat\": [\n    {\n      \"string\": \"goinggoingmaybenot_goinggoingmaybe\"\n    }\n  ],\n  \"child_count\": [\n    {\n      \"number\": 0\n    }\n  ]\n}",
+    "\n[step 7] Rights-bypass assessment:",
+    "  voter_count_total value: 6",
+    "  Expected (all 6 including private): 6",
+    "  Expected (only public 4): 4",
+    "  RIGHTS BYPASS: YES — formula counts private voters",
+    "\n[step 8] Cleanup...",
+    "  deleted entity: 6a2d23da4cd971291c5d54b9",
+    "  deleted entity: 6a2d23da4cd971291c5d54b0",
+    "  deleted entity: 6a2d23da4cd971291c5d54a7",
+    "  deleted entity: 6a2d23da4cd971291c5d549e",
+    "  deleted entity: 6a2d23da4cd971291c5d5495",
+    "  deleted entity: 6a2d23d94cd971291c5d548c",
+    "  deleted entity: 6a2d23d94cd971291c5d5486",
+    "  deleted type: 6a2d23d94cd971291c5d547f",
+    "  deleted type: 6a2d23d94cd971291c5d5478",
+    "  deleted type: 6a2d23d94cd971291c5d5471",
+    "  deleted type: 6a2d23d94cd971291c5d546a",
+    "  deleted type: 6a2d23d94cd971291c5d5465",
+    "  deleted type: 6a2d23d94cd971291c5d545d",
+    "  deleted type: 6a2d23d94cd971291c5d5455",
+    "  deleted type: 6a2d23d94cd971291c5d544d",
+    "  deleted type: 6a2d23d84cd971291c5d5445",
+    "  deleted type: 6a2d23d84cd971291c5d543e",
+    "  deleted type: 6a2d23d84cd971291c5d5439"
+  ]
+}
