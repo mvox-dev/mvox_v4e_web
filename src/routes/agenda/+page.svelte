@@ -166,23 +166,29 @@
 
 		<!-- Page header -->
 		<div class="page-hdr">
-			<div class="page-title">{m.agenda_title()}</div>
+			<div class="page-title" data-desk-text>{m.agenda_title()}</div>
 		</div>
 
 		<!-- Loading state -->
 		{#if $userStore.status === 'loading'}
-			<div data-testid="agenda-loading" class="state-msg">{m.agenda_title()}</div>
+			<div class="state-msg-container bg-paper">
+				<div data-testid="agenda-loading" class="state-msg">{m.agenda_title()}</div>
+			</div>
 
 		<!-- Ready: no orgs -->
 		{:else if $userStore.status === 'ready' && $userStore.orgs.length === 0}
-			<div data-testid="agenda-empty-no-orgs" class="state-msg">
-				{m.agenda_empty_no_orgs()}
+			<div class="state-msg-container bg-paper">
+				<div data-testid="agenda-empty-no-orgs" class="state-msg">
+					{m.agenda_empty_no_orgs()}
+				</div>
 			</div>
 
 		<!-- Ready: orgs present — show list (loading skeleton while result is null) -->
 		{:else if $userStore.status === 'ready'}
 			{#if result === null}
-				<div data-testid="agenda-loading" class="state-msg">{m.agenda_title()}</div>
+				<div class="state-msg-container bg-paper">
+					<div data-testid="agenda-loading" class="state-msg">{m.agenda_title()}</div>
+				</div>
 			{:else}
 				<div class="list-section">
 					<AgendaList
@@ -221,6 +227,12 @@
 		line-height: 1;
 		letter-spacing: -0.01em;
 		margin-top: 2px;
+	}
+
+	.state-msg-container {
+		margin: 12px 16px;
+		border-radius: 6px;
+		border: 1px solid rgba(0, 0, 0, 0.08);
 	}
 
 	.state-msg {

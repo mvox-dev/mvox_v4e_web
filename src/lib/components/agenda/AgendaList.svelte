@@ -91,9 +91,10 @@
 		</div>
 	{:else}
 		{#each groups as group (group.key)}
-			<div data-testid="agenda-date-header" class="date-header">
-				{group.header}
-			</div>
+			<div data-testid="agenda-day-card" class="day-card bg-paper">
+				<div data-testid="agenda-date-header" class="date-header">
+					{group.header}
+				</div>
 			{#each group.rows as item (item.id)}
 				{@const rsvp = rsvpMap.get(item.id) ?? null}
 				{@const memberId = memberMap.get(item.orgId)}
@@ -101,16 +102,16 @@
 				{@const rowError = rowErrors.get(item.id) ?? null}
 				<div data-testid="agenda-row-{item.id}" class="row">
 					<div class="row-main">
-						<span data-testid="agenda-row-time" class="row-time">
+						<span data-testid="row-time" class="row-time">
 							{timeFmt.format(new Date(item.startDatetime))}
 						</span>
-						<span data-testid="agenda-row-duration" class="row-duration">
+						<span data-testid="row-duration" class="row-duration">
 							{m.agenda_duration_min({ minutes: item.durationMinutes })}
 						</span>
 						<span class="row-name">{item.name ?? ''}</span>
 						<span data-testid="agenda-org-chip" class="org-chip">{item.orgLabel}</span>
 						{#if item.location}
-							<span data-testid="agenda-row-location" class="row-location">{item.location}</span>
+							<span data-testid="row-location" class="row-location">{item.location}</span>
 						{/if}
 						<RsvpTallyBadge tally={tallyMap.get(item.id) ?? item.tally} />
 					</div>
@@ -128,6 +129,7 @@
 					{/if}
 				</div>
 			{/each}
+			</div><!-- end agenda-day-card -->
 		{/each}
 	{/if}
 </div>
@@ -136,6 +138,13 @@
 	.list-wrap {
 		display: flex;
 		flex-direction: column;
+		gap: 12px;
+	}
+
+	.day-card {
+		border-radius: 6px;
+		padding: 10px 14px;
+		border: 1px solid rgba(0, 0, 0, 0.08);
 	}
 
 	.partial-error {

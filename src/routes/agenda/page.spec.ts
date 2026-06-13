@@ -295,6 +295,58 @@ describe('/agenda page — optimistic tally delta (#slice-2b-opt)', () => {
 	});
 });
 
+// ── S33 sub-chain 2 — readability conformance (§2) ───────────────────────────
+
+describe('/agenda page — readability (S33 §2)', () => {
+	// AC: big page-title is exempt (big display heading on desk) but must carry
+	// data-desk-text to signal the exemption to Bentham's review gate.
+	it('page-title carries data-desk-text attribute (exemption marker)', () => {
+		(userStore as Writable<unknown>).set(readyUser);
+		mockListAgenda.mockResolvedValue({ items: [sampleItem], errors: [] });
+		mockListMyRsvps.mockResolvedValue([]);
+		mockFindMyMemberId.mockResolvedValue('member-1');
+		const { container } = render(Page);
+		const title = container.querySelector('.page-title');
+		expect(title).not.toBeNull();
+		// data-desk-text is a boolean attribute; presence = '' (empty string)
+		expect(title?.hasAttribute('data-desk-text')).toBe(true);
+	});
+
+	// AC: loading skeleton must not sit bare on the wood-grain desk.
+	// It must be wrapped in a container with a colored background.
+	it('loading state message sits inside a colored-background container', () => {
+		(userStore as Writable<unknown>).set({ status: 'loading' });
+		const { container } = render(Page);
+		const stateMsg = container.querySelector('[data-testid="agenda-loading"]');
+		expect(stateMsg).not.toBeNull();
+		// Must be inside a .state-msg-container with bg class or inline background
+		const containerEl = stateMsg?.closest('.state-msg-container');
+		expect(containerEl).not.toBeNull();
+		const classList = containerEl?.className ?? '';
+		const inlineStyle = containerEl?.getAttribute('style') ?? '';
+		expect(classList.includes('bg-') || inlineStyle.includes('background')).toBe(true);
+	});
+
+	// AC: no-orgs empty state must also sit on a colored background.
+	it('empty-no-orgs state message sits inside a colored-background container', () => {
+		(userStore as Writable<unknown>).set({
+			status: 'ready',
+			name: 'Test User',
+			initial: 'T',
+			personId: 'p1',
+			orgs: [],
+		});
+		const { container } = render(Page);
+		const stateMsg = container.querySelector('[data-testid="agenda-empty-no-orgs"]');
+		expect(stateMsg).not.toBeNull();
+		const containerEl = stateMsg?.closest('.state-msg-container');
+		expect(containerEl).not.toBeNull();
+		const classList = containerEl?.className ?? '';
+		const inlineStyle = containerEl?.getAttribute('style') ?? '';
+		expect(classList.includes('bg-') || inlineStyle.includes('background')).toBe(true);
+	});
+});
+
 // ── YELLOW-10.1 staleness regression ─────────────────────────────────────────
 
 describe('/agenda page — YELLOW-10.1 staleness guard', () => {
