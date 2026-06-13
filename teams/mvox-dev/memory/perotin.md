@@ -778,4 +778,22 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
          rsvp_late_count, rsvp_tally (NEW — formula-based, rights-bypassing tally)
   Slices 2–3 BFF elevated op for tally: NOT NEEDED. Conductor reads rsvp_tally from public event.
 
+## Session 32 shutdown — 2026-06-13
+
+[CHECKPOINT] Session 32 work complete. All probes clean, no open live artifacts.
+  Probes run this session:
+    1. probe-cf-jwt-binding — CF Pages Worker JWT mint+use CONFIRMED 7/7 (branch chore/probe-cf-jwt-binding, merged)
+    2. probe-member-rights-vis — rights visibility: grants-at-write NOT VIABLE (branch chore/probe-member-rights-vis, merged)
+    3. probe-formula-reverse-ref-aggregate — _referrer COUNT WORKS, rights bypass YES (main, ed7f8c1)
+    4. probe-formula-count-concat — Q1 formula-reads-formula WORKS, Q2 single-formula COUNT FAILS (main, 89edd50)
+  Live mutations this session:
+    - PO member in EFK seeded (6a2ba6c84cd971291c5d5320, main ea1267b)
+    - rsvp + event tally prop-defs applied (9 props, main 35f30ec) — 3/3 verify PASS
+
+[NEXT SESSION] Standing concerns to pick up:
+  - Seed catalog: seed-po-member-ekf.ts (1 PO member in EFK, last live 2026-06-13) — add to catalog in scratchpad
+  - Slice-2b unblocked: BFF rsvp CREATE must POST sentinel ref prop (going_ref etc. = event_id); UPDATE must DELETE old + POST new sentinel. This is a Josquin implementation note.
+  - rsvp prop-def _ids (going_ref etc.) are now in seed-rsvp-tally-prop-defs-live-2026-06-13.json — useful for BFF tests that need to reference them.
+  - No stale result artifacts identified this session.
+
 (*MVOX:Perotin*)
