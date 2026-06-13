@@ -77,15 +77,60 @@ describe('AvatarMenu', () => {
 		expect(container.querySelector('[data-testid="avatar-menu-panel"]')).toBeNull();
 	});
 
-	it('focuses the first menuitem when opened (CHORE-75 YELLOW-75.1 fold-in)', async () => {
+	it('focuses the first menuitem when opened (CHORE-75 YELLOW-75.1 fold-in — now About link per S33)', async () => {
 		const { container } = render(AvatarMenu, { name: 'Mihkel Putrinš', initial: 'M' });
 		const btn = container.querySelector(
 			'button[data-testid="avatar-menu-trigger"]',
 		) as HTMLButtonElement;
 		await fireEvent.click(btn);
-		const signoutLink = container.querySelector(
-			'a[data-testid="avatar-menu-signout"]',
+		const aboutLink = container.querySelector(
+			'a[data-testid="avatar-menu-about"]',
 		) as HTMLAnchorElement;
-		expect(document.activeElement).toBe(signoutLink);
+		expect(document.activeElement).toBe(aboutLink);
 	});
 });
+
+// S33 — About link in AvatarMenu dropdown
+// RED until Byrd adds an "About" <a href="/about"> item to the menu panel.
+describe('AvatarMenu — S33 About link', () => {
+	it('menu panel includes an "About" link to /about', async () => {
+		const { container } = render(AvatarMenu, { name: 'Mihkel Putrinš', initial: 'M' });
+		const btn = container.querySelector(
+			'button[data-testid="avatar-menu-trigger"]',
+		) as HTMLButtonElement;
+		await fireEvent.click(btn);
+		const aboutLink = container.querySelector('a[href="/about"]');
+		expect(aboutLink).not.toBeNull();
+		expect(aboutLink?.textContent?.toLowerCase()).toContain('about');
+	});
+
+	it('About link appears before Sign out link in menu order', async () => {
+		const { container } = render(AvatarMenu, { name: 'Test', initial: 'T' });
+		const btn = container.querySelector(
+			'button[data-testid="avatar-menu-trigger"]',
+		) as HTMLButtonElement;
+		await fireEvent.click(btn);
+		const panel = container.querySelector('[data-testid="avatar-menu-panel"]');
+		const links = Array.from(panel?.querySelectorAll('a') ?? []);
+		const aboutIndex = links.findIndex((a) => a.getAttribute('href') === '/about');
+		const signoutIndex = links.findIndex((a) => a.getAttribute('href') === '/auth/logout');
+		expect(aboutIndex).toBeGreaterThanOrEqual(0);
+		expect(signoutIndex).toBeGreaterThanOrEqual(0);
+		expect(aboutIndex).toBeLessThan(signoutIndex);
+	});
+
+	// After S33 GREEN, the first focused menuitem shifts to About (not sign-out).
+	// This test replaces the focus assertion in the base describe above.
+	it('focuses the About link (now first menuitem) when menu opens', async () => {
+		const { container } = render(AvatarMenu, { name: 'Test', initial: 'T' });
+		const btn = container.querySelector(
+			'button[data-testid="avatar-menu-trigger"]',
+		) as HTMLButtonElement;
+		await fireEvent.click(btn);
+		const aboutLink = container.querySelector('a[href="/about"]') as HTMLAnchorElement;
+		expect(aboutLink).not.toBeNull();
+		expect(document.activeElement).toBe(aboutLink);
+	});
+});
+
+// (*MVOX:Tallis*)

@@ -3,6 +3,7 @@
 	import AvatarMenu from './AvatarMenu.svelte';
 	import BrandMark from './BrandMark.svelte';
 	import OrgPicker from './OrgPicker.svelte';
+	import SoonMarker from './SoonMarker.svelte';
 	import type { OrgPickerMode } from '$lib/auth/userStore';
 
 	type Tab = 'agenda' | 'library' | 'roster' | 'notices' | 'settings' | 'seasons';
@@ -111,7 +112,7 @@
 			<!-- Desktop inline tab row — hidden on mobile, visible at sm+ -->
 			<div data-testid="nav-inline-tabs" class="hidden sm:flex gap-3">
 				{#each TABS as tab (tab)}
-					{#if tab === 'seasons' || tab === 'agenda'}
+					{#if tab === 'agenda' || tab === 'seasons' || tab === 'library'}
 						<a
 							data-testid="nav-inline-tab-{tab}"
 							href="/{tab}"
@@ -120,22 +121,25 @@
 								: 'text-ink-3 font-medium'} inline-flex items-center gap-1 no-underline"
 						>
 							{TAB_LABELS[tab]()}
-						</a>
-					{:else}
-						<span
-							data-testid="nav-inline-tab-{tab}"
-							class="font-sans text-[11.5px] {tab === currentTab
-								? 'text-ink font-semibold border-b-2 border-ink pb-1'
-								: 'text-ink-3 font-medium'} inline-flex items-center gap-1"
-						>
-							{TAB_LABELS[tab]()}
 							{#if tab === 'library' && tab === currentTab}
 								<span
+									data-testid="nav-chip-librarian"
 									class="font-sans text-[7px] tracking-wider py-px px-1 bg-ink text-paper rounded-sm font-semibold"
 									>{m.nav_chip_librarian()}</span
 								>
 							{/if}
-						</span>
+						</a>
+					{:else}
+						<a
+							data-testid="nav-inline-tab-{tab}"
+							href="/{tab}"
+							class="font-sans text-[11.5px] {tab === currentTab
+								? 'text-ink font-semibold border-b-2 border-ink pb-1'
+								: 'text-ink-3 font-medium'} inline-flex items-center gap-1 no-underline"
+						>
+							{TAB_LABELS[tab]()}
+							<SoonMarker />
+						</a>
 					{/if}
 				{/each}
 			</div>
@@ -164,13 +168,13 @@
 						class="absolute top-full right-0 mt-1.5 min-w-[160px] bg-paper border border-ink/10 rounded shadow-lg p-2 z-50"
 					>
 						{#each TABS as tab (tab)}
-							<div
+							<a
+								href="/{tab}"
 								data-testid="nav-tab-menu-item-{tab}"
 								role="menuitem"
-								tabindex="0"
 								class="flex items-center gap-1 font-sans text-[12px] {tab === currentTab
 									? 'text-ink font-semibold'
-									: 'text-ink-3 font-medium'} hover:bg-paper-2 -mx-2 px-2 py-1.5 rounded cursor-default"
+									: 'text-ink-3 font-medium'} hover:bg-paper-2 -mx-2 px-2 py-1.5 rounded no-underline"
 							>
 								{TAB_LABELS[tab]()}
 								{#if tab === 'library' && tab === currentTab}
@@ -179,8 +183,10 @@
 										class="font-sans text-[7px] tracking-wider py-px px-1 bg-ink text-paper rounded-sm font-semibold"
 										>{m.nav_chip_librarian()}</span
 									>
+								{:else if tab !== 'agenda' && tab !== 'library' && tab !== 'seasons'}
+									<SoonMarker />
 								{/if}
-							</div>
+							</a>
 						{/each}
 					</div>
 				{/if}

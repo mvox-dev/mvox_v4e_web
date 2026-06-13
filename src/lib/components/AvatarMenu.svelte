@@ -21,10 +21,13 @@
 		open = false;
 	}
 
+	let aboutLinkEl: HTMLAnchorElement | undefined = $state();
+
 	$effect(() => {
 		if (!open) return;
 
-		queueMicrotask(() => signoutLinkEl?.focus());
+		// Focus About link (first menuitem) on open — S33 adds About before Sign out
+		queueMicrotask(() => aboutLinkEl?.focus());
 
 		function onKeyDown(e: KeyboardEvent) {
 			if (e.key === 'Escape') {
@@ -76,6 +79,16 @@
 			</div>
 			<div class="text-sm font-semibold text-ink mb-2">{name}</div>
 			<div class="h-px bg-ink-5 -mx-3 mb-1"></div>
+			<a
+				bind:this={aboutLinkEl}
+				data-testid="avatar-menu-about"
+				role="menuitem"
+				href="/about"
+				class="flex items-center justify-between text-sm text-ink hover:bg-paper-2 -mx-3 px-3 py-1.5 no-underline"
+			>
+				<span>{m.nav_menu_about()}</span>
+				<span class="font-display text-base text-ink-3" aria-hidden="true">→</span>
+			</a>
 			<a
 				bind:this={signoutLinkEl}
 				data-testid="avatar-menu-signout"

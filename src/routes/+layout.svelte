@@ -2,6 +2,7 @@
 	import '../app.css';
 	import { page } from '$app/state';
 	import { onMount } from 'svelte';
+	import { tabForPath } from '$lib/nav/currentTab';
 	import {
 		userStore,
 		selectedOrgStore,
@@ -47,17 +48,7 @@
 	const orgInitials = $derived($selectedOrgStore?.initials ?? '');
 	const orgPickerMode = $derived($pickerModeStore);
 
-	const currentTab = $derived(
-		page.url.pathname.startsWith('/library')
-			? 'library'
-			: page.url.pathname.startsWith('/roster')
-				? 'roster'
-				: page.url.pathname.startsWith('/notices')
-					? 'notices'
-					: page.url.pathname.startsWith('/settings')
-						? 'settings'
-						: 'agenda',
-	);
+	const currentTab = $derived(tabForPath(page.url.pathname));
 </script>
 
 {#if mounted}

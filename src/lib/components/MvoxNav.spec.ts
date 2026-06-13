@@ -387,3 +387,107 @@ describe('MvoxNav — /seasons tab (#82)', () => {
 		expect(container.querySelector('[data-testid="nav-tab-menu-item-seasons"]')).not.toBeNull();
 	});
 });
+
+// S33 — Navigation cleanup
+// RED until Byrd converts Library span→<a> and mobile menu divs→<a> links,
+// adds SoonMarker to unbuilt tabs, and links roster/notices/settings to their placeholder pages.
+describe('MvoxNav — S33 library link + mobile menu links', () => {
+	const signedInProps = {
+		signedIn: true,
+		currentTab: 'agenda' as const,
+		orgLabel: 'EFK',
+		orgInitials: 'EF',
+		userInitial: 'A',
+		userName: 'Alice',
+		orgPickerMode: 'static' as const,
+	};
+
+	// Library inline tab must be a real <a> link, not a <span>
+	it('library inline tab renders as <a href="/library"> (not a span)', () => {
+		const { container } = render(MvoxNav, { props: signedInProps });
+		const libraryTab = container.querySelector('[data-testid="nav-inline-tab-library"]');
+		expect(libraryTab?.tagName.toLowerCase()).toBe('a');
+		expect(libraryTab?.getAttribute('href')).toBe('/library');
+	});
+
+	it('library inline tab shows LIBRARIAN chip when currentTab is library', () => {
+		const { container } = render(MvoxNav, {
+			props: { ...signedInProps, currentTab: 'library' as const },
+		});
+		const libraryTab = container.querySelector('[data-testid="nav-inline-tab-library"]');
+		expect(libraryTab?.tagName.toLowerCase()).toBe('a');
+		const chip = libraryTab?.querySelector('[data-testid="nav-chip-librarian"]');
+		expect(chip).not.toBeNull();
+		expect(chip?.textContent).toContain('LIBRARIAN');
+	});
+
+	// Mobile menu items must be real <a> links for real (built) tabs
+	it('mobile menu agenda item is an <a href="/agenda"> link', async () => {
+		const { container } = render(MvoxNav, { props: signedInProps });
+		const hamburger = container.querySelector(
+			'[data-testid="nav-tab-menu-trigger"]',
+		) as HTMLButtonElement;
+		await fireEvent.click(hamburger);
+		const agendaItem = container.querySelector('[data-testid="nav-tab-menu-item-agenda"]');
+		expect(agendaItem?.tagName.toLowerCase()).toBe('a');
+		expect(agendaItem?.getAttribute('href')).toBe('/agenda');
+	});
+
+	it('mobile menu library item is an <a href="/library"> link', async () => {
+		const { container } = render(MvoxNav, { props: signedInProps });
+		const hamburger = container.querySelector(
+			'[data-testid="nav-tab-menu-trigger"]',
+		) as HTMLButtonElement;
+		await fireEvent.click(hamburger);
+		const libraryItem = container.querySelector('[data-testid="nav-tab-menu-item-library"]');
+		expect(libraryItem?.tagName.toLowerCase()).toBe('a');
+		expect(libraryItem?.getAttribute('href')).toBe('/library');
+	});
+
+	it('mobile menu seasons (rehearsals) item is an <a href="/seasons"> link', async () => {
+		const { container } = render(MvoxNav, { props: signedInProps });
+		const hamburger = container.querySelector(
+			'[data-testid="nav-tab-menu-trigger"]',
+		) as HTMLButtonElement;
+		await fireEvent.click(hamburger);
+		const rehearsalsItem = container.querySelector('[data-testid="nav-tab-menu-item-seasons"]');
+		expect(rehearsalsItem?.tagName.toLowerCase()).toBe('a');
+		expect(rehearsalsItem?.getAttribute('href')).toBe('/seasons');
+	});
+
+	// Unbuilt tabs (roster/notices/settings) are <a> links to their placeholder pages
+	it('mobile menu roster item is an <a href="/roster"> link', async () => {
+		const { container } = render(MvoxNav, { props: signedInProps });
+		const hamburger = container.querySelector(
+			'[data-testid="nav-tab-menu-trigger"]',
+		) as HTMLButtonElement;
+		await fireEvent.click(hamburger);
+		const rosterItem = container.querySelector('[data-testid="nav-tab-menu-item-roster"]');
+		expect(rosterItem?.tagName.toLowerCase()).toBe('a');
+		expect(rosterItem?.getAttribute('href')).toBe('/roster');
+	});
+
+	it('mobile menu notices item is an <a href="/notices"> link', async () => {
+		const { container } = render(MvoxNav, { props: signedInProps });
+		const hamburger = container.querySelector(
+			'[data-testid="nav-tab-menu-trigger"]',
+		) as HTMLButtonElement;
+		await fireEvent.click(hamburger);
+		const noticesItem = container.querySelector('[data-testid="nav-tab-menu-item-notices"]');
+		expect(noticesItem?.tagName.toLowerCase()).toBe('a');
+		expect(noticesItem?.getAttribute('href')).toBe('/notices');
+	});
+
+	it('mobile menu settings item is an <a href="/settings"> link', async () => {
+		const { container } = render(MvoxNav, { props: signedInProps });
+		const hamburger = container.querySelector(
+			'[data-testid="nav-tab-menu-trigger"]',
+		) as HTMLButtonElement;
+		await fireEvent.click(hamburger);
+		const settingsItem = container.querySelector('[data-testid="nav-tab-menu-item-settings"]');
+		expect(settingsItem?.tagName.toLowerCase()).toBe('a');
+		expect(settingsItem?.getAttribute('href')).toBe('/settings');
+	});
+});
+
+// (*MVOX:Tallis*)
