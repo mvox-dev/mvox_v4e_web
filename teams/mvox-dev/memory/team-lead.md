@@ -23,7 +23,7 @@ PO explicitly left this for next session. It's the cleanest of the three (pure c
 | `eaa3c1b` | slice-2b conductor+singer RSVP tally (formula-based) |
 | `8878419` | slice-2b-opt optimistic tally delta (instant, no reload) |
 
-main @ `8878419` (origin matches). Tests **915/915**, check 0. Preview build `66f32e39`. **PO has NOT yet confirmed the final instant-tally live-test** — ask at session-33 open.
+main @ `8878419` (origin matches). Tests **915/915**, check 0. Preview build `66f32e39`. **PO CONFIRMED the instant-tally live-test (2026-06-13) — the full MVP attendance loop is verified working end-to-end on preview.** No re-test needed at session-33 open.
 
 ## The auth detour — DEAD END, don't repeat (this is the session's big lesson)
 
