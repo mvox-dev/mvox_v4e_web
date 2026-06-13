@@ -564,4 +564,23 @@ Stubs committed (YELLOW-78.1 pattern — RED = assertion failure, not module res
 
 [PATTERN] AvatarMenu — existing "focuses first menuitem" test pins sign-out link as first focus target. S33 GREEN shifts this to About link. Handled via a separate S33 describe block with a complementary focus test — existing test left in place as a forward guard until Byrd wires About (it will conflict post-GREEN; Byrd updates existing test as part of GREEN per Task-15 rule).
 
+## [CHECKPOINT] 2026-06-13 — Session 33: S33 sub-chain 2 RED phase
+
+[DECISION] 17 RED tests across 3 spec files on `feat/s33-readability-visual`. SHA `d1e050b`. 957 existing tests unaffected.
+
+Files:
+- `src/lib/components/DeskSurface.spec.ts` (+10) — orbit keyframe stop counts + dx/dy var counts + base gradient color swap
+- `src/lib/components/agenda/AgendaList.spec.ts` (+5) — agenda-day-card wrapper + bg class/style
+- `src/routes/agenda/page.spec.ts` (+3) — data-desk-text on page-title + .state-msg-container on loading/empty-no-orgs
+
+[GOTCHA] DeskSurface keyframe regex: non-greedy `([\s\S]*?)` stops at the first `}` inside the keyframe block (each stop has inline braces `0% { ... }`). Must use nested-brace regex: `\{([^{}]*(?:\{[^{}]*\}[^{}]*)*)\}`. Extracted into `extractKeyframeContent(src, name)` helper inside the spec — keeps tests readable without a separate utils file.
+
+[PATTERN] Source-level CSS assertion via `?raw` import is the right tool for keyframe stop counts and CSS values that jsdom can't evaluate. Used for both orbit stop counts and base gradient color assertions.
+
+[DECISION] Orbit keyframe tests correctly fail as `expected 5 to be 13` (current keyframes have 5 stops: 0/25/50/75/100%). Color tests fail because old hex (#b8895a/#a87850) is present and new hex (#f7ecd4/#f7dcca) is absent.
+
+[DECISION] AgendaList forward guard: "each day card contains its date header" vacuously passes on empty cards (forEach noop). This is expected — noted in handoff. The other 4 card tests fail with the right assertion errors.
+
+[PATTERN] Readability conformance tests: use `.closest('.state-msg-container')` to find the wrapping container, then assert bg class OR inline style. This is permissive enough to let Byrd choose Tailwind class vs CSS custom property approach.
+
 (*MVOX:Tallis*)
