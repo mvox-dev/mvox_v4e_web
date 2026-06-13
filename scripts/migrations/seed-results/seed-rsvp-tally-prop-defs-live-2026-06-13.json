@@ -1,0 +1,67 @@
+{
+  "operation": "apply-rsvp-tally-prop-defs",
+  "date": "2026-06-13",
+  "authorized_by": "team-lead 2026-06-13 session-32",
+  "schema_ref": "entu/research PR #52",
+
+  "state_check": {
+    "rsvp_type_existed": true,
+    "rsvp_type_id": "6a0d2e8590c8df7a1cc7df1b",
+    "event_type_id": "69c7ea548489bfcb0e81a0a2",
+    "rsvp_props_before": ["event", "member", "status", "notes"],
+    "event_props_before": ["name", "event_type", "date", "start_time", "end_time", "location", "season", "notes", "start_datetime", "duration_minutes", "description", "capacity"]
+  },
+
+  "prop_defs_added": {
+    "rsvp.going_ref":           "6a2d3db34cd971291c5d5664",
+    "rsvp.not_going_ref":       "6a2d3db34cd971291c5d566d",
+    "rsvp.maybe_ref":           "6a2d3db34cd971291c5d5676",
+    "rsvp.late_ref":            "6a2d3db34cd971291c5d567f",
+    "event.rsvp_going_count":   "6a2d3db44cd971291c5d5688",
+    "event.rsvp_not_going_count": "6a2d3db44cd971291c5d5692",
+    "event.rsvp_maybe_count":   "6a2d3db44cd971291c5d569c",
+    "event.rsvp_late_count":    "6a2d3db44cd971291c5d56a6",
+    "event.rsvp_tally":         "6a2d3db44cd971291c5d56b0"
+  },
+
+  "formulas": {
+    "event.rsvp_going_count":     "_referrer.rsvp.going_ref COUNT",
+    "event.rsvp_not_going_count": "_referrer.rsvp.not_going_ref COUNT",
+    "event.rsvp_maybe_count":     "_referrer.rsvp.maybe_ref COUNT",
+    "event.rsvp_late_count":      "_referrer.rsvp.late_ref COUNT",
+    "event.rsvp_tally":           "'{'\"going\"':' rsvp_going_count ',\"not_going\":' rsvp_not_going_count ',\"maybe\":' rsvp_maybe_count ',\"late\":' rsvp_late_count '}' CONCAT"
+  },
+
+  "verification": {
+    "test_event_id": "6a1d6b6210cc20db24e7ce70",
+    "test_event_name": "Tuesday rehearsals",
+    "test_rsvp_id": "6a2d3dd34cd971291c5d56ba",
+    "test_rsvp_deleted": true,
+    "before": {
+      "rsvp_going_count": 0,
+      "rsvp_tally": "{\"going\":0,\"not_going\":0,\"maybe\":0,\"late\":0}"
+    },
+    "after_create": {
+      "rsvp_going_count": 1,
+      "rsvp_not_going_count": 0,
+      "rsvp_maybe_count": 0,
+      "rsvp_late_count": 0,
+      "rsvp_tally": "{\"going\":1,\"not_going\":0,\"maybe\":0,\"late\":0}"
+    },
+    "after_delete": {
+      "rsvp_going_count": 0,
+      "rsvp_tally": "{\"going\":0,\"not_going\":0,\"maybe\":0,\"late\":0}"
+    },
+    "verdicts": {
+      "going_count_ok": true,
+      "tally_ok": true,
+      "cleanup_ok": true,
+      "overall": "PASS"
+    }
+  },
+
+  "gotchas": [
+    "Zero counts work correctly — tally returns {\"going\":0,\"not_going\":0,\"maybe\":0,\"late\":0} when no rsvps exist (not null/absent). Clean zero-state behaviour confirmed.",
+    "Private rsvp (singer's own) IS counted by formula (rights bypass, confirmed in probe-formula-reverse-ref-aggregate-2026-06-13). Conductors reading the public event see accurate counts regardless of rsvp visibility."
+  ]
+}

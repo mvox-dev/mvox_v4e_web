@@ -761,4 +761,21 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
   rsvp_tally (string formula reading the 4 count props via named-prop reference — formula-reads-formula)
   Both patterns confirmed working. No BFF elevated op needed for tally display.
 
+## Session 32 (2026-06-13) — apply rsvp-tally prop-defs to live polyphony
+
+[CHECKPOINT] seed-rsvp-tally-prop-defs — COMPLETE 2026-06-13
+  rsvp type (6a0d2e8590c8df7a1cc7df1b): added going_ref / not_going_ref / maybe_ref / late_ref (reference)
+  event type (69c7ea548489bfcb0e81a0a2): added rsvp_going_count / rsvp_not_going_count / rsvp_maybe_count /
+    rsvp_late_count (number formulas) + rsvp_tally (string formula-reads-formula)
+  prop-def _ids in seed-rsvp-tally-prop-defs-live-2026-06-13.json
+  Verification: 3/3 PASS — going_count=1 after create, tally={"going":1,...}, going_count=0 after delete
+  Bonus: zero case works ({"going":0,"not_going":0,"maybe":0,"late":0} when no rsvps, not null)
+  Test rsvp (6a2d3dd34cd971291c5d56ba): deleted. No live test artifacts.
+
+[DATA STATE] polyphony rsvp + event types after this session:
+  rsvp: event, member, status, notes (existing) + going_ref, not_going_ref, maybe_ref, late_ref (NEW)
+  event: [12 existing props] + rsvp_going_count, rsvp_not_going_count, rsvp_maybe_count,
+         rsvp_late_count, rsvp_tally (NEW — formula-based, rights-bypassing tally)
+  Slices 2–3 BFF elevated op for tally: NOT NEEDED. Conductor reads rsvp_tally from public event.
+
 (*MVOX:Perotin*)
