@@ -211,3 +211,32 @@ describe('LibraryMasterDetail — responsive layout (CHORE-78)', () => {
 		expect(back?.textContent).toContain('Works');
 	});
 });
+
+// S33 sub-chain 3 — §2 readability conformance
+// The mobile-back link (library-mobile-back) must sit on a colored-background ancestor.
+// Currently: <a class="inline-flex ... text-ink-3 ..."> with NO bg ancestor other than DeskSurface.
+// RED until Byrd wraps the mobile detail view header in a bg-paper container.
+describe('LibraryMasterDetail — mobile-back readability conformance (S33 §2)', () => {
+	it('library-mobile-back link sits inside a colored-background container', () => {
+		const { container } = render(LibraryMasterDetail, {
+			props: { library, works, editionsByWork, initialWorkId: 'work-a' },
+		});
+		const backLink = container.querySelector('[data-testid="library-mobile-back"]');
+		expect(backLink).not.toBeNull();
+		// The link or any ancestor must carry a bg class
+		const selfCls = backLink?.className ?? '';
+		let ancestor = backLink?.parentElement;
+		let hasColoredBg = selfCls.includes('bg-');
+		while (!hasColoredBg && ancestor && ancestor !== container) {
+			const cls = ancestor.className ?? '';
+			const style = ancestor.getAttribute('style') ?? '';
+			if (cls.includes('bg-') || style.includes('background')) {
+				hasColoredBg = true;
+			}
+			ancestor = ancestor.parentElement;
+		}
+		expect(hasColoredBg).toBe(true);
+	});
+});
+
+// (*MVOX:Tallis*)

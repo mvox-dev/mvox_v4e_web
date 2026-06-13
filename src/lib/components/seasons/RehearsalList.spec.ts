@@ -345,3 +345,58 @@ describe('RehearsalList — delete-series control (T5, #86)', () => {
 		expect(btn?.textContent?.trim()).toBeTruthy();
 	});
 });
+
+// S33 sub-chain 3 — §2 readability conformance
+// RehearsalList group headers and empty-text must sit on a colored-background ancestor.
+// Currently: .group-header-row has background: none; .empty-text has background: none.
+// RED until Byrd wraps the list groups in a panel container.
+describe('RehearsalList — readability conformance (S33 §2)', () => {
+	it('group header sits inside a colored-background container', () => {
+		const { container } = render(RehearsalList, {
+			rehearsals: rehearsalsMultiSeries,
+			seriesNames,
+			oncancel: vi.fn(),
+			onedit: vi.fn(),
+		});
+		const header = container.querySelector('[data-testid="rehearsal-group-header"]');
+		expect(header).not.toBeNull();
+		// Walk ancestors for any bg class or style
+		let el = header?.parentElement;
+		let hasColoredBg = false;
+		while (el && el !== container) {
+			const cls = el.className ?? '';
+			const style = el.getAttribute('style') ?? '';
+			if (cls.includes('bg-') || style.includes('background') || cls.includes('panel')) {
+				hasColoredBg = true;
+				break;
+			}
+			el = el.parentElement;
+		}
+		expect(hasColoredBg).toBe(true);
+	});
+
+	it('empty-text sits inside a colored-background container', () => {
+		const { container } = render(RehearsalList, {
+			rehearsals: [],
+			seriesNames: new Map(),
+			oncancel: vi.fn(),
+			onedit: vi.fn(),
+		});
+		const emptyText = container.querySelector('.empty-text');
+		expect(emptyText).not.toBeNull();
+		let el = emptyText?.parentElement;
+		let hasColoredBg = false;
+		while (el && el !== container) {
+			const cls = el.className ?? '';
+			const style = el.getAttribute('style') ?? '';
+			if (cls.includes('bg-') || style.includes('background') || cls.includes('panel')) {
+				hasColoredBg = true;
+				break;
+			}
+			el = el.parentElement;
+		}
+		expect(hasColoredBg).toBe(true);
+	});
+});
+
+// (*MVOX:Tallis*)

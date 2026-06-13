@@ -119,6 +119,8 @@
 	"library_field_publisher": "Kirjastaja",
 	"library_field_voicing": "Häälestus",
 	"library_field_year": "Aasta",
+	"library_load_error": "Raamatukogu laadimisel tekkis viga.",
+	"library_loading": "…raamatukogu laaditakse…",
 	"library_master_count": "{n} teost",
 	"library_master_sort_label": "helilooja ↑",
 	"library_mobile_search_placeholder": "Otsi pealkirja või heliloojat…",

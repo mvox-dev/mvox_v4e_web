@@ -80,3 +80,30 @@ describe('buildOAuthInitUrl', () => {
 		expect(new URL(url).searchParams.has('login_hint')).toBe(false);
 	});
 });
+
+// S33 sub-chain 3 — §2 readability conformance (source-level)
+// auth/[provider]/+page.svelte currently renders bare <div class="... text-gray-600">
+// with no DeskSurface wrapper and no paper-bg ancestor.
+// RED until Byrd wraps the content in DeskSurface + a paper card and uses ink tokens.
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+const PROVIDER_PAGE_SOURCE = readFileSync(
+	resolve(import.meta.dirname, '+page.svelte'),
+	'utf-8',
+);
+
+describe('auth/[provider]/+page.svelte — readability conformance (S33 §2)', () => {
+	it('does not use raw text-gray-* Tailwind class (must use theme ink tokens)', () => {
+		expect(PROVIDER_PAGE_SOURCE).not.toMatch(/text-gray-\d+/);
+	});
+
+	it('wraps content in DeskSurface (or equivalent colored-bg ancestor)', () => {
+		// Must import/use DeskSurface OR contain a bg-paper/bg-* wrapper
+		const hasDeskSurface = PROVIDER_PAGE_SOURCE.includes('DeskSurface');
+		const hasBgClass = /class="[^"]*bg-[a-z]/.test(PROVIDER_PAGE_SOURCE);
+		expect(hasDeskSurface || hasBgClass).toBe(true);
+	});
+});
+
+// (*MVOX:Tallis*)

@@ -42,7 +42,7 @@
 
 <div data-testid="rehearsal-list" class="list-wrap">
 	{#each groups as group (group.seriesId)}
-		<div class="group-header-row">
+		<div class="group-header-row bg-paper-2">
 			<div data-testid="rehearsal-group-header" class="group-header">
 				{seriesNames.get(group.seriesId) ?? group.seriesId}
 			</div>
@@ -103,7 +103,7 @@
 	{/each}
 
 	{#if rehearsals.length === 0}
-		<div data-testid="rehearsal-empty" class="empty-state">
+		<div data-testid="rehearsal-empty" class="empty-state bg-paper">
 			<p class="empty-text">{m.seasons_empty_no_rehearsals()}</p>
 			<button data-testid="rehearsal-empty-cta" type="button" class="empty-cta">
 				{m.seasons_empty_no_rehearsals_cta()}

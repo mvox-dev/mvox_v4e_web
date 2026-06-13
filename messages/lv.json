@@ -119,6 +119,8 @@
 	"library_field_publisher": "Izdevējs",
 	"library_field_voicing": "Balsu sadalījums",
 	"library_field_year": "Gads",
+	"library_load_error": "Kļūda ielādējot bibliotēku.",
+	"library_loading": "…ielādē bibliotēku…",
 	"library_master_count": "{n} darbi",
 	"library_master_sort_label": "komponists ↑",
 	"library_mobile_search_placeholder": "Meklēt pēc nosaukuma vai komponista…",

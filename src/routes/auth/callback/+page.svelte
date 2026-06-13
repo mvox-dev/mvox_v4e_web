@@ -6,6 +6,7 @@
 	import { OAUTH_STATE_KEY } from '../[provider]/build-oauth-init-url';
 	import { hydrateUserStore } from '$lib/auth/userStore';
 	import * as m from '$lib/paraglide/messages.js';
+	import DeskSurface from '$lib/components/DeskSurface.svelte';
 
 	const { data } = $props<{ data: { sessionToken: string; db: string } }>();
 
@@ -57,15 +58,19 @@
 	}
 </script>
 
-<div class="max-w-md mx-auto py-16 text-center">
-	{#if exchangeState === 'pending'}
-		<p class="text-gray-600">{m.auth_callback_pending()}</p>
-	{:else if exchangeState === 'success'}
-		<p class="text-gray-600">{m.auth_callback_success()}</p>
-	{:else}
-		<p class="text-red-600">{m.auth_callback_failed()}</p>
-		<a href="/auth/login" class="mt-4 inline-block text-blue-600 hover:underline">
-			{m.auth_login_heading()}
-		</a>
-	{/if}
-</div>
+<DeskSurface>
+	<div class="min-h-[80vh] flex flex-col items-center justify-center py-16 px-6">
+		<div class="bg-paper border border-ink rounded-md p-8 shadow-[4px_6px_0_0_rgba(0,0,0,0.08)] max-w-sm w-full text-center">
+			{#if exchangeState === 'pending'}
+				<p class="font-sans text-[13px] text-ink-2">{m.auth_callback_pending()}</p>
+			{:else if exchangeState === 'success'}
+				<p class="font-sans text-[13px] text-ink-2">{m.auth_callback_success()}</p>
+			{:else}
+				<p class="font-sans text-[13px] text-ink">{m.auth_callback_failed()}</p>
+				<a href="/auth/login" class="mt-4 inline-block font-sans text-[13px] text-ink-2 hover:underline">
+					{m.auth_login_heading()}
+				</a>
+			{/if}
+		</div>
+	</div>
+</DeskSurface>

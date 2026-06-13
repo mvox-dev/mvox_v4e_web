@@ -184,3 +184,38 @@ describe('SeriesForm', () => {
 		);
 	});
 });
+
+// S33 sub-chain 3 — §2 readability conformance
+// SeriesForm heading + field labels must sit on a colored-background ancestor.
+// RED until Byrd wraps <form data-testid="series-form"> in a panel container.
+describe('SeriesForm — readability conformance (S33 §2)', () => {
+	it('form heading has a colored-background ancestor (not bare on desk)', () => {
+		const oncreate = vi.fn();
+		const { container } = render(SeriesForm, {
+			season,
+			oncreate,
+		});
+		const heading = container.querySelector('h2.form-heading');
+		expect(heading).not.toBeNull();
+		let el = heading?.parentElement;
+		let hasColoredBg = false;
+		while (el && el !== container) {
+			const cls = el.className ?? '';
+			const style = el.getAttribute('style') ?? '';
+			if (cls.includes('bg-') || style.includes('background') || cls.includes('panel')) {
+				hasColoredBg = true;
+				break;
+			}
+			el = el.parentElement;
+		}
+		expect(hasColoredBg).toBe(true);
+	});
+
+	it('form root has a panel container (data-testid or class)', () => {
+		const { container } = render(SeriesForm, { season, oncreate: vi.fn() });
+		const panel = container.querySelector('.panel, [data-testid="series-form-panel"]');
+		expect(panel).not.toBeNull();
+	});
+});
+
+// (*MVOX:Tallis*)

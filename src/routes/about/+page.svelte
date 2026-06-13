@@ -59,6 +59,6 @@
 			</section>
 		</PaperCard>
 
-		<Margin rotate={-1.2}>{m.about_marginalia()}</Margin>
+		<Margin rotate={-1.2} exempt>{m.about_marginalia()}</Margin>
 	</div>
 </DeskSurface>

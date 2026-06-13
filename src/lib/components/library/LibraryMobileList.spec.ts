@@ -186,3 +186,53 @@ describe('LibraryMobileList', () => {
 		expect(rowB).not.toBeNull();
 	});
 });
+
+// S33 sub-chain 3 — §2 readability conformance
+// LibraryMobileList empty state text must sit on a colored-background ancestor.
+// Currently: library-mobile-empty is bare text (no bg class). Rows themselves have
+// hover:bg-paper-2 but no own bg; their list container also has no bg.
+// RED until Byrd wraps the list content area in a bg-paper container.
+describe('LibraryMobileList — readability conformance (S33 §2)', () => {
+	it('empty-state text sits inside a colored-background container', () => {
+		const { container } = render(LibraryMobileList, {
+			props: { works: [], editionsByWork: new Map() },
+		});
+		const emptyEl = container.querySelector('[data-testid="library-mobile-empty"]');
+		expect(emptyEl).not.toBeNull();
+		let ancestor = emptyEl?.parentElement;
+		let hasColoredBg = false;
+		while (ancestor && ancestor !== container) {
+			const cls = ancestor.className ?? '';
+			const style = ancestor.getAttribute('style') ?? '';
+			if (cls.includes('bg-') || style.includes('background')) {
+				hasColoredBg = true;
+				break;
+			}
+			ancestor = ancestor.parentElement;
+		}
+		expect(hasColoredBg).toBe(true);
+	});
+
+	it('work rows sit inside a colored-background container', () => {
+		const { container } = render(LibraryMobileList, {
+			props: { works, editionsByWork },
+		});
+		const row = container.querySelector('[data-testid="library-mobile-row"]');
+		expect(row).not.toBeNull();
+		// Check the row OR any ancestor for a bg class — rows must not sit bare on desk
+		const cls = row?.className ?? '';
+		let ancestor = row?.parentElement;
+		let hasColoredBg = cls.includes('bg-');
+		while (!hasColoredBg && ancestor && ancestor !== container) {
+			const ancestorCls = ancestor.className ?? '';
+			const style = ancestor.getAttribute('style') ?? '';
+			if (ancestorCls.includes('bg-') || style.includes('background')) {
+				hasColoredBg = true;
+			}
+			ancestor = ancestor.parentElement;
+		}
+		expect(hasColoredBg).toBe(true);
+	});
+});
+
+// (*MVOX:Tallis*)

@@ -119,6 +119,8 @@
 	"library_field_publisher": "Publisher",
 	"library_field_voicing": "Voicing",
 	"library_field_year": "Year",
+	"library_load_error": "Something went wrong loading the library.",
+	"library_loading": "…loading library…",
 	"library_master_count": "{n} works",
 	"library_master_sort_label": "composer ↑",
 	"library_mobile_search_placeholder": "Search title or composer…",

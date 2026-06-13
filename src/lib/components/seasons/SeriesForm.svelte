@@ -70,6 +70,7 @@
 	}
 </script>
 
+<div data-testid="series-form-panel" class="panel">
 <form data-testid="series-form" onsubmit={handleSubmit}>
 	<h2 class="form-heading">{m.seasons_form_series_heading()}</h2>
 
@@ -168,8 +169,15 @@
 		{m.seasons_form_series_submit()}
 	</button>
 </form>
+</div>
 
 <style>
+	.panel {
+		border: 1px solid #b8a986;
+		border-radius: 3px;
+		padding: 12px 14px;
+		background: #fbf9f3;
+	}
 	.form-heading {
 		font-family: inherit;
 		font-size: 14px;

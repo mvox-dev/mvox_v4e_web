@@ -121,6 +121,6 @@
 				{m.auth_login_footnote()}
 			</div>
 		</PaperCard>
-		<Margin rotate={-1.5}>~ multivox.pages.dev · v0.4</Margin>
+		<Margin rotate={-1.5} exempt>~ multivox.pages.dev · v0.4</Margin>
 	</div>
 </DeskSurface>

@@ -213,7 +213,9 @@
 
 		<div class="px-6 pb-8">
 			{#if $librarySectionStore.status === 'loading'}
-				<div class="library-loading">…loading library…</div>
+				<div class="bg-paper rounded p-4">
+					<div class="library-loading">{m.library_loading()}</div>
+				</div>
 			{:else if $librarySectionStore.status === 'empty'}
 				<LibraryEmptyState />
 			{:else if $librarySectionStore.status === 'ready'}
@@ -224,7 +226,9 @@
 					{initialWorkId}
 				/>
 			{:else if $librarySectionStore.status === 'error'}
-				<div class="library-error">Something went wrong loading the library.</div>
+				<div class="bg-paper rounded p-4">
+					<div class="library-error">{m.library_load_error()}</div>
+				</div>
 			{/if}
 		</div>
 	</div>

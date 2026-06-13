@@ -233,3 +233,37 @@ describe('SeasonForm — edit mode', () => {
 		expect(patch?.description).not.toBe('');
 	});
 });
+
+// S33 sub-chain 3 — §2 readability conformance
+// The form heading and field labels must sit on a colored-background ancestor.
+// RED until Byrd wraps <form data-testid="season-form"> in a panel container
+// (mirroring ConductorPanel's .panel with background: #fbf9f3).
+describe('SeasonForm — readability conformance (S33 §2)', () => {
+	it('form heading has a colored-background ancestor (not bare on desk)', () => {
+		const { container } = render(SeasonForm, { oncreate: vi.fn() });
+		const heading = container.querySelector('h2.form-heading');
+		expect(heading).not.toBeNull();
+		// Walk ancestors looking for any element with a non-transparent bg class or style
+		let el = heading?.parentElement;
+		let hasColoredBg = false;
+		while (el && el !== container) {
+			const cls = el.className ?? '';
+			const style = el.getAttribute('style') ?? '';
+			if (cls.includes('bg-') || style.includes('background') || cls.includes('panel')) {
+				hasColoredBg = true;
+				break;
+			}
+			el = el.parentElement;
+		}
+		expect(hasColoredBg).toBe(true);
+	});
+
+	it('form root has a panel container (data-testid or class)', () => {
+		const { container } = render(SeasonForm, { oncreate: vi.fn() });
+		// The form must be wrapped in a panel or the form itself carries a bg class
+		const panel = container.querySelector('.panel, [data-testid="season-form-panel"]');
+		expect(panel).not.toBeNull();
+	});
+});
+
+// (*MVOX:Tallis*)

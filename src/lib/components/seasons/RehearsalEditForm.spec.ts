@@ -213,3 +213,42 @@ describe('RehearsalEditForm — dirty tracking / onsave patch (#87)', () => {
 		expect(patch).not.toHaveProperty('duration_minutes');
 	});
 });
+
+// S33 sub-chain 3 — §2 readability conformance
+// RehearsalEditForm heading must sit on a colored-background ancestor.
+// RED until Byrd wraps the form in a panel container (same pattern as ConductorPanel).
+describe('RehearsalEditForm — readability conformance (S33 §2)', () => {
+	it('edit heading has a colored-background ancestor (not bare on desk)', () => {
+		const { container } = render(RehearsalEditForm, {
+			rehearsal: sampleRehearsal,
+			onsave: vi.fn(),
+			oncancel: vi.fn(),
+		});
+		const heading = container.querySelector('[data-testid="rehearsal-edit-heading"]');
+		expect(heading).not.toBeNull();
+		let el = heading?.parentElement;
+		let hasColoredBg = false;
+		while (el && el !== container) {
+			const cls = el.className ?? '';
+			const style = el.getAttribute('style') ?? '';
+			if (cls.includes('bg-') || style.includes('background') || cls.includes('panel')) {
+				hasColoredBg = true;
+				break;
+			}
+			el = el.parentElement;
+		}
+		expect(hasColoredBg).toBe(true);
+	});
+
+	it('form root has a panel container (data-testid or class)', () => {
+		const { container } = render(RehearsalEditForm, {
+			rehearsal: sampleRehearsal,
+			onsave: vi.fn(),
+			oncancel: vi.fn(),
+		});
+		const panel = container.querySelector('.panel, [data-testid="rehearsal-edit-panel"]');
+		expect(panel).not.toBeNull();
+	});
+});
+
+// (*MVOX:Tallis*)

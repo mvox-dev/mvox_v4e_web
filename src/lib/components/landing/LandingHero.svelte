@@ -59,6 +59,7 @@
 	<div
 		class="absolute bottom-8 left-0 right-0 text-center font-display text-[19px] text-ink-2"
 		style="transform: rotate(-2deg);"
+		data-desk-text
 	>
 		{m.landing_hero_already_invited()}{' '}
 		<a data-testid="hero-signin" href="/auth/login" class="border-b border-current">{m.landing_hero_sign_in()}</a>

@@ -35,32 +35,34 @@
 		/>
 	</div>
 
-	{#if filteredWorks.length === 0}
-		<div data-testid="library-mobile-empty" class="px-4 py-6 font-sans text-[13px] text-ink-3 text-center">
-			{m.library_search_no_results()}
-		</div>
-	{:else}
-		<div class="flex flex-col divide-y divide-ink-5">
-			{#each filteredWorks as work (work.id)}
-				{@const editionCount = editionsByWork.get(work.id)?.length ?? 0}
-				<a
-					data-testid="library-mobile-row"
-					data-work-id={work.id}
-					href="?work={work.id}"
-					class="flex items-center gap-3 px-4 py-3 no-underline text-ink hover:bg-paper-2"
-				>
-					<div class="flex-1 min-w-0">
-						<div class="font-sans text-[12px] font-semibold text-ink truncate">{work.composer}</div>
-						<div class="font-sans text-[12px] italic text-ink-3 truncate">{work.title}</div>
-					</div>
-					<div class="flex items-center gap-2 flex-shrink-0">
-						{#if editionCount > 0}
-							<span class="font-mono text-[10px] text-ink-4">{editionCount}</span>
-						{/if}
-						<span class="text-ink-4 text-[14px]" aria-hidden="true">›</span>
-					</div>
-				</a>
-			{/each}
-		</div>
-	{/if}
+	<div class="bg-paper rounded">
+		{#if filteredWorks.length === 0}
+			<div data-testid="library-mobile-empty" class="px-4 py-6 font-sans text-[13px] text-ink-3 text-center">
+				{m.library_search_no_results()}
+			</div>
+		{:else}
+			<div class="flex flex-col divide-y divide-ink-5">
+				{#each filteredWorks as work (work.id)}
+					{@const editionCount = editionsByWork.get(work.id)?.length ?? 0}
+					<a
+						data-testid="library-mobile-row"
+						data-work-id={work.id}
+						href="?work={work.id}"
+						class="flex items-center gap-3 px-4 py-3 no-underline text-ink hover:bg-paper-2"
+					>
+						<div class="flex-1 min-w-0">
+							<div class="font-sans text-[12px] font-semibold text-ink truncate">{work.composer}</div>
+							<div class="font-sans text-[12px] italic text-ink-3 truncate">{work.title}</div>
+						</div>
+						<div class="flex items-center gap-2 flex-shrink-0">
+							{#if editionCount > 0}
+								<span class="font-mono text-[10px] text-ink-4">{editionCount}</span>
+							{/if}
+							<span class="text-ink-4 text-[14px]" aria-hidden="true">›</span>
+						</div>
+					</a>
+				{/each}
+			</div>
+		{/if}
+	</div>
 </div>

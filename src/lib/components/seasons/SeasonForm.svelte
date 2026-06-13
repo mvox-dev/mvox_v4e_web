@@ -80,6 +80,7 @@
 	}
 </script>
 
+<div data-testid="season-form-panel" class="panel">
 <form data-testid="season-form" onsubmit={handleSubmit}>
 	<h2 class="form-heading">
 		{editMode ? m.seasons_form_season_edit_heading() : m.seasons_form_season_heading()}
@@ -138,8 +139,15 @@
 		{editMode ? m.seasons_form_season_save() : m.seasons_form_season_submit()}
 	</button>
 </form>
+</div>
 
 <style>
+	.panel {
+		border: 1px solid #b8a986;
+		border-radius: 3px;
+		padding: 12px 14px;
+		background: #fbf9f3;
+	}
 	.form-heading {
 		font-family: inherit;
 		font-size: 14px;

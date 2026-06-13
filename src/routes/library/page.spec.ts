@@ -9,6 +9,17 @@ vi.mock('$app/state', () => ({
 vi.mock('$app/navigation', () => ({
 	goto: vi.fn(),
 }));
+// Stub the two i18n keys introduced by S33 fix 3; Comenius adds them to messages/*.json.
+// Mechanical refactor: component changed to call m.library_loading() + m.library_load_error();
+// spec must supply them until the real Paraglide module exports them.
+vi.mock('$lib/paraglide/messages.js', async (importOriginal) => {
+	const real = await importOriginal<Record<string, unknown>>();
+	return {
+		...real,
+		library_loading: () => '…loading library…',
+		library_load_error: () => 'Something went wrong loading the library.',
+	};
+});
 vi.mock('$lib/auth/userStore', () => ({
 	selectedOrgStore: {
 		subscribe: (cb: any) => {
@@ -82,6 +93,51 @@ describe('library page — section-state rendering', () => {
 		});
 		const { container } = render(Page);
 		expect(container.querySelector('[data-work-id="w-1"]')).not.toBeNull();
+	});
+});
+
+// S33 sub-chain 3 — §2 readability conformance
+// library-loading and library-error must have a colored-background ancestor.
+// Currently: <div class="library-loading"> / <div class="library-error"> have NO CSS definitions.
+// RED until Byrd gives them a paper-bg wrapper or styled container.
+describe('library page — readability conformance (S33 §2)', () => {
+	it('library-loading element has a colored-background ancestor', () => {
+		librarySectionStore.set({ status: 'loading' });
+		const { container } = render(Page);
+		const el = container.querySelector('.library-loading');
+		expect(el).not.toBeNull();
+		// Must have an ancestor with bg class or inline background
+		let ancestor = el?.parentElement;
+		let hasColoredBg = false;
+		while (ancestor && ancestor !== container) {
+			const cls = ancestor.className ?? '';
+			const style = ancestor.getAttribute('style') ?? '';
+			if (cls.includes('bg-') || style.includes('background') || cls.includes('paper')) {
+				hasColoredBg = true;
+				break;
+			}
+			ancestor = ancestor.parentElement;
+		}
+		expect(hasColoredBg).toBe(true);
+	});
+
+	it('library-error element has a colored-background ancestor', () => {
+		librarySectionStore.set({ status: 'error' } as any);
+		const { container } = render(Page);
+		const el = container.querySelector('.library-error');
+		expect(el).not.toBeNull();
+		let ancestor = el?.parentElement;
+		let hasColoredBg = false;
+		while (ancestor && ancestor !== container) {
+			const cls = ancestor.className ?? '';
+			const style = ancestor.getAttribute('style') ?? '';
+			if (cls.includes('bg-') || style.includes('background') || cls.includes('paper')) {
+				hasColoredBg = true;
+				break;
+			}
+			ancestor = ancestor.parentElement;
+		}
+		expect(hasColoredBg).toBe(true);
 	});
 });
 

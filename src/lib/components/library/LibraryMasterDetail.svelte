@@ -75,13 +75,15 @@
 	<LibraryMobileList {works} {editionsByWork} />
 {:else}
 	<div data-testid="library-mobile-detail" class="block sm:hidden">
-		<a
-			data-testid="library-mobile-back"
-			href="?"
-			class="inline-flex items-center gap-1 font-sans text-[13px] text-ink-3 no-underline py-2 px-4"
-		>
-			{m.library_back_to_works()}
-		</a>
+		<div class="bg-paper px-4 py-2">
+			<a
+				data-testid="library-mobile-back"
+				href="?"
+				class="inline-flex items-center gap-1 font-sans text-[13px] text-ink-3 no-underline"
+			>
+				{m.library_back_to_works()}
+			</a>
+		</div>
 		{#if selectedWork}
 			<div class="px-4">
 				<LibraryWorkPaperStack

@@ -5,6 +5,7 @@
 	import { createNonce } from '$lib/auth/state';
 	import { buildOAuthInitUrl } from './build-oauth-init-url';
 	import * as m from '$lib/paraglide/messages.js';
+	import DeskSurface from '$lib/components/DeskSurface.svelte';
 
 	onMount(() => {
 		const provider = page.params.provider ?? '';
@@ -27,6 +28,10 @@
 	});
 </script>
 
-<div class="mx-auto max-w-md py-16 text-center">
-	<p class="text-gray-600">{m.auth_provider_redirecting()}</p>
-</div>
+<DeskSurface>
+	<div class="min-h-[80vh] flex flex-col items-center justify-center py-16 px-6">
+		<div class="bg-paper border border-ink rounded-md p-8 shadow-[4px_6px_0_0_rgba(0,0,0,0.08)] max-w-sm w-full text-center">
+			<p class="font-sans text-[13px] text-ink-2">{m.auth_provider_redirecting()}</p>
+		</div>
+	</div>
+</DeskSurface>

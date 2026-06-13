@@ -3,7 +3,7 @@
 	import * as m from '$lib/paraglide/messages.js';
 </script>
 
-<div class="empty-marginalia">
+<div class="empty-marginalia" data-desk-text>
 	{m.library_empty_marginalia()}
 </div>
 

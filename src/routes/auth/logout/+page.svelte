@@ -65,7 +65,7 @@
 				{/if}
 			</div>
 		</PaperCard>
-		<Margin rotate={1.5}>
+		<Margin rotate={1.5} exempt>
 			thanks for stopping by →<br />
 			<span class="text-[12px] text-ink-3">~ Maire (the librarian)</span>
 		</Margin>

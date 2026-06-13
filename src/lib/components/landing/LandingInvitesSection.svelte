@@ -21,7 +21,7 @@
 			<p class="text-sm text-ink-2 leading-relaxed">{m.landing_invites_body_2()}</p>
 		</div>
 	</div>
-	<div class="absolute bottom-9 left-0 right-0 text-center font-display text-[19px] text-ink-2" style="transform: rotate(-2deg);">
+	<div class="absolute bottom-9 left-0 right-0 text-center font-display text-[19px] text-ink-2" style="transform: rotate(-2deg);" data-desk-text>
 		{m.landing_invites_marginalia()}
 	</div>
 </section>

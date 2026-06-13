@@ -50,6 +50,7 @@
 	}
 </script>
 
+<div data-testid="rehearsal-edit-panel" class="panel">
 <div data-testid="rehearsal-edit-form" class="edit-form">
 	<h2 data-testid="rehearsal-edit-heading" class="form-heading">{m.seasons_form_rehearsal_edit_heading()}</h2>
 	<div class="form-row">
@@ -125,8 +126,16 @@
 		{/if}
 	</div>
 </div>
+</div>
 
 <style>
+	.panel {
+		border: 1px solid #b8a986;
+		border-radius: 3px;
+		padding: 12px 14px;
+		background: #fbf9f3;
+	}
+
 	.edit-form {
 		display: flex;
 		flex-direction: column;

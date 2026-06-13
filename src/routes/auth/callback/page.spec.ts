@@ -119,3 +119,31 @@ describe('callback +page.svelte — hydrateUserStore call order (CHORE-74)', () 
 		expect(callOrder.log).toEqual(['hydrate', 'goto']);
 	});
 });
+
+// S33 sub-chain 3 — §2 readability conformance (source-level)
+// auth/callback/+page.svelte currently renders bare <div class="max-w-md...">
+// with text-gray-600 / text-red-600 / text-blue-600 and no DeskSurface wrapper.
+// RED until Byrd wraps the content in DeskSurface + paper card and uses ink tokens.
+const CALLBACK_PAGE_SOURCE = readFileSync(resolve(SPEC_DIR, '+page.svelte'), 'utf-8');
+
+describe('auth/callback/+page.svelte — readability conformance (S33 §2)', () => {
+	it('does not use raw text-gray-* class (must use theme ink tokens)', () => {
+		expect(CALLBACK_PAGE_SOURCE).not.toMatch(/text-gray-\d+/);
+	});
+
+	it('does not use raw text-red-* class (must use theme color token)', () => {
+		expect(CALLBACK_PAGE_SOURCE).not.toMatch(/text-red-\d+/);
+	});
+
+	it('does not use raw text-blue-* class (must use theme ink or accent token)', () => {
+		expect(CALLBACK_PAGE_SOURCE).not.toMatch(/text-blue-\d+/);
+	});
+
+	it('wraps content in DeskSurface (or equivalent colored-bg ancestor)', () => {
+		const hasDeskSurface = CALLBACK_PAGE_SOURCE.includes('DeskSurface');
+		const hasBgClass = /class="[^"]*bg-[a-z]/.test(CALLBACK_PAGE_SOURCE);
+		expect(hasDeskSurface || hasBgClass).toBe(true);
+	});
+});
+
+// (*MVOX:Tallis*)

@@ -119,6 +119,8 @@
 	"library_field_publisher": "Видавець",
 	"library_field_voicing": "Голосовий склад",
 	"library_field_year": "Рік",
+	"library_load_error": "Під час завантаження бібліотеки сталася помилка.",
+	"library_loading": "…завантаження бібліотеки…",
 	"library_master_count": "{n} творів",
 	"library_master_sort_label": "композитор ↑",
 	"library_mobile_search_placeholder": "Пошук за назвою або композитором…",
