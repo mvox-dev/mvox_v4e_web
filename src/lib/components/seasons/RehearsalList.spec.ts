@@ -399,4 +399,108 @@ describe('RehearsalList — readability conformance (S33 §2)', () => {
 	});
 });
 
+// fix/s33-seasons-rehearsal-bg — PO live-check caught rehearsal rows bare on desk.
+// .group-header-row has bg-paper-2 (header ok) but the {#each group.rows} items
+// are siblings of .group-header-row with NO background — they render bare on the desk.
+// RED until Byrd wraps each series group (header + rows) in a data-testid="rehearsal-series-card"
+// container with a paper bg, mirroring the agenda per-day card pattern.
+describe('RehearsalList — series card bg conformance (fix/s33-seasons-rehearsal-bg)', () => {
+	// Inline fixtures: two series, two rehearsals each.
+	// (Re-declared here so this describe block is self-contained.)
+	const twoSeriesRehersals: Rehearsal[] = [
+		{ id: 'c1', seriesId: 'sA', startDatetime: '2026-10-01T16:00:00.000Z', durationMinutes: 90, tally: { going: 0, not_going: 0, maybe: 0, late: 0 } },
+		{ id: 'c2', seriesId: 'sA', startDatetime: '2026-10-08T16:00:00.000Z', durationMinutes: 90, tally: { going: 0, not_going: 0, maybe: 0, late: 0 } },
+		{ id: 'c3', seriesId: 'sB', startDatetime: '2026-10-02T17:00:00.000Z', durationMinutes: 60, tally: { going: 0, not_going: 0, maybe: 0, late: 0 } },
+		{ id: 'c4', seriesId: 'sB', startDatetime: '2026-10-09T17:00:00.000Z', durationMinutes: 60, tally: { going: 0, not_going: 0, maybe: 0, late: 0 } },
+	];
+	const twoSeriesNames = new Map([
+		['sA', 'Thursday Morning'],
+		['sB', 'Friday Evening'],
+	]);
+
+	it('each series group renders a rehearsal-series-card container', () => {
+		const { container } = render(RehearsalList, {
+			rehearsals: twoSeriesRehersals,
+			seriesNames: twoSeriesNames,
+			oncancel: vi.fn(),
+			onedit: vi.fn(),
+		});
+		const cards = container.querySelectorAll('[data-testid="rehearsal-series-card"]');
+		// Two series → two cards
+		expect(cards.length).toBe(2);
+	});
+
+	it('rehearsal-series-card carries a paper background (bg- class or background-color style)', () => {
+		const { container } = render(RehearsalList, {
+			rehearsals: twoSeriesRehersals,
+			seriesNames: twoSeriesNames,
+			oncancel: vi.fn(),
+			onedit: vi.fn(),
+		});
+		const card = container.querySelector('[data-testid="rehearsal-series-card"]');
+		expect(card).not.toBeNull();
+		const cls = card?.className ?? '';
+		const style = card?.getAttribute('style') ?? '';
+		const hasBackground = cls.includes('bg-') || style.includes('background');
+		expect(hasBackground).toBe(true);
+	});
+
+	it('rehearsal rows sit INSIDE their series card (have a bg ancestor between row and list)', () => {
+		const { container } = render(RehearsalList, {
+			rehearsals: twoSeriesRehersals,
+			seriesNames: twoSeriesNames,
+			oncancel: vi.fn(),
+			onedit: vi.fn(),
+		});
+		// Check every rehearsal row has a bg ancestor before reaching the list-wrap root
+		const rows = container.querySelectorAll('[data-testid="rehearsal-row"]');
+		expect(rows.length).toBe(4);
+		for (const row of rows) {
+			let el = row.parentElement;
+			let hasColoredBg = false;
+			while (el && el !== container) {
+				const cls = el.className ?? '';
+				const style = el.getAttribute('style') ?? '';
+				if (cls.includes('bg-') || style.includes('background')) {
+					hasColoredBg = true;
+					break;
+				}
+				el = el.parentElement;
+			}
+			expect(hasColoredBg).toBe(true);
+		}
+	});
+
+	it('group header sits inside its series card', () => {
+		const { container } = render(RehearsalList, {
+			rehearsals: twoSeriesRehersals,
+			seriesNames: twoSeriesNames,
+			oncancel: vi.fn(),
+			onedit: vi.fn(),
+		});
+		// Each series card must contain a group header
+		const cards = container.querySelectorAll('[data-testid="rehearsal-series-card"]');
+		cards.forEach((card) => {
+			const header = card.querySelector('[data-testid="rehearsal-group-header"]');
+			expect(header).not.toBeNull();
+		});
+	});
+
+	it('first series card contains exactly its two rows (no cross-contamination)', () => {
+		const { container } = render(RehearsalList, {
+			rehearsals: twoSeriesRehersals,
+			seriesNames: twoSeriesNames,
+			oncancel: vi.fn(),
+			onedit: vi.fn(),
+		});
+		const cards = container.querySelectorAll('[data-testid="rehearsal-series-card"]');
+		// First card = sA → rows c1, c2
+		const cardARows = cards[0].querySelectorAll('[data-testid="rehearsal-row"]');
+		expect(cardARows.length).toBe(2);
+		// Second card = sB → rows c3, c4
+		const cardBRows = cards[1].querySelectorAll('[data-testid="rehearsal-row"]');
+		expect(cardBRows.length).toBe(2);
+	});
+});
+
 // (*MVOX:Tallis*)

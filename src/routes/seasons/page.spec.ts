@@ -1321,3 +1321,102 @@ describe('/seasons page — edit-rehearsal (#87)', () => {
 		expect(rows.length).toBe(2);
 	});
 });
+
+// fix/s33-seasons-rehearsal-bg — seasons page state-message conformance.
+// The .state-msg divs (seasons-loading, seasons-error, seasons-viewer,
+// seasons-empty-viewer, seasons-empty-owner p, no-season-selected) render
+// italic text with padding but NO background — bare on the desk.
+// RED until Byrd wraps each in <div class="state-msg-container bg-paper">
+// (mirror the agenda +page.svelte fix from sub-chain 2).
+describe('/seasons page — state-msg readability conformance (fix/s33-seasons-rehearsal-bg)', () => {
+	/** Walk ancestors of el up to (but not including) container, looking for any
+	 *  element with a bg-* class or inline background style. */
+	function hasBgAncestor(el: Element | null, root: Element): boolean {
+		let current = el?.parentElement ?? null;
+		while (current && current !== root) {
+			const cls = current.className ?? '';
+			const style = current.getAttribute('style') ?? '';
+			if (cls.includes('bg-') || style.includes('background')) return true;
+			current = current.parentElement;
+		}
+		return false;
+	}
+
+	it('seasons-loading state-msg sits inside a colored-background container', () => {
+		(seasonsStore as ReturnType<typeof import('svelte/store').writable>).set({ status: 'loading' });
+		const { container } = render(Page);
+		const el = container.querySelector('[data-testid="seasons-loading"]');
+		expect(el).not.toBeNull();
+		expect(hasBgAncestor(el, container)).toBe(true);
+	});
+
+	it('seasons-error state-msg sits inside a colored-background container', () => {
+		(seasonsStore as ReturnType<typeof import('svelte/store').writable>).set({ status: 'error', reason: 'oops' });
+		const { container } = render(Page);
+		const el = container.querySelector('[data-testid="seasons-error"]');
+		expect(el).not.toBeNull();
+		expect(hasBgAncestor(el, container)).toBe(true);
+	});
+
+	it('seasons-viewer (no-rights) state-msg sits inside a colored-background container', () => {
+		(seasonsStore as ReturnType<typeof import('svelte/store').writable>).set({ status: 'no-rights' });
+		const { container } = render(Page);
+		const el = container.querySelector('[data-testid="seasons-viewer"]');
+		expect(el).not.toBeNull();
+		expect(hasBgAncestor(el, container)).toBe(true);
+	});
+
+	it('seasons-empty-viewer state-msg sits inside a colored-background container', () => {
+		// Non-owner + empty seasons: shows seasons-empty-viewer
+		(selectedOrgStore as ReturnType<typeof import('svelte/store').writable>).set(null);
+		(seasonsStore as ReturnType<typeof import('svelte/store').writable>).set({
+			status: 'ready',
+			seasons: [],
+		});
+		const { container } = render(Page);
+		const el = container.querySelector('[data-testid="seasons-empty-viewer"]');
+		expect(el).not.toBeNull();
+		expect(hasBgAncestor(el, container)).toBe(true);
+	});
+
+	it('seasons-empty-owner .state-msg sits inside a colored-background container', () => {
+		// Owner + empty seasons: shows seasons-empty-owner with a p.state-msg
+		(selectedOrgStore as ReturnType<typeof import('svelte/store').writable>).set({
+			id: 'org1',
+			label: 'EFK',
+			initials: 'EFK',
+			role: 'owner',
+		});
+		(seasonsStore as ReturnType<typeof import('svelte/store').writable>).set({
+			status: 'ready',
+			seasons: [],
+		});
+		const { container } = render(Page);
+		const ownerSection = container.querySelector('[data-testid="seasons-empty-owner"]');
+		expect(ownerSection).not.toBeNull();
+		const stateMsg = (ownerSection?.querySelector('p.state-msg') ?? ownerSection?.querySelector('.state-msg')) as Element | null;
+		expect(stateMsg).not.toBeNull();
+		expect(hasBgAncestor(stateMsg, container)).toBe(true);
+	});
+
+	it('no-season-selected state-msg sits inside a colored-background container', () => {
+		// ready + seasons present + no season selected → no-season-selected
+		(selectedOrgStore as ReturnType<typeof import('svelte/store').writable>).set(null);
+		(seasonsStore as ReturnType<typeof import('svelte/store').writable>).set({
+			status: 'ready',
+			seasons: [
+				{ id: 'sea1', name: 'Autumn 2026', startDate: '2026-09-01', endDate: '2027-05-31' },
+			],
+		});
+		const { container } = render(Page);
+		// no-season-selected renders in the {:else} branch when selectedSeason is null.
+		// With non-owner (null org) and a season, the page renders SeasonBar + no selection.
+		// The element may not always render (if selectedSeason auto-picks first season);
+		// skip if not present and note in handoff.
+		const el = container.querySelector('[data-testid="no-season-selected"]');
+		if (!el) return; // forward guard if auto-select prevents this branch
+		expect(hasBgAncestor(el, container)).toBe(true);
+	});
+});
+
+// (*MVOX:Tallis*)

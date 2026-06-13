@@ -42,24 +42,25 @@
 
 <div data-testid="rehearsal-list" class="list-wrap">
 	{#each groups as group (group.seriesId)}
-		<div class="group-header-row bg-paper-2">
-			<div data-testid="rehearsal-group-header" class="group-header">
-				{seriesNames.get(group.seriesId) ?? group.seriesId}
+		<div data-testid="rehearsal-series-card" class="series-card bg-paper">
+			<div class="group-header-row">
+				<div data-testid="rehearsal-group-header" class="group-header">
+					{seriesNames.get(group.seriesId) ?? group.seriesId}
+				</div>
+				{#if canManage && ondeleteseries}
+					<button
+						data-testid="series-delete"
+						type="button"
+						class="series-del-btn"
+						onclick={() => {
+							if (!window.confirm(m.seasons_confirm_delete_series_body({ n: group.rows.length }))) return;
+							ondeleteseries!(group.seriesId);
+						}}
+					>
+						{m.seasons_actions_delete()}
+					</button>
+				{/if}
 			</div>
-			{#if canManage && ondeleteseries}
-				<button
-					data-testid="series-delete"
-					type="button"
-					class="series-del-btn"
-					onclick={() => {
-						if (!window.confirm(m.seasons_confirm_delete_series_body({ n: group.rows.length }))) return;
-						ondeleteseries!(group.seriesId);
-					}}
-				>
-					{m.seasons_actions_delete()}
-				</button>
-			{/if}
-		</div>
 		{#each group.rows as rehearsal (rehearsal.id)}
 			<div
 				data-testid="rehearsal-row"
@@ -100,6 +101,7 @@
 				</button>
 			</div>
 		{/each}
+		</div><!-- end rehearsal-series-card -->
 	{/each}
 
 	{#if rehearsals.length === 0}
@@ -116,7 +118,15 @@
 	.list-wrap {
 		display: flex;
 		flex-direction: column;
+		gap: 10px;
 	}
+
+	.series-card {
+		border: 1px solid rgba(0, 0, 0, 0.08);
+		border-radius: 4px;
+		padding: 10px 12px;
+	}
+
 	.group-header-row {
 		display: flex;
 		align-items: center;

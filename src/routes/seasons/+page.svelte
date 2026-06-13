@@ -330,16 +330,24 @@
 
 		<!-- Loading / error states -->
 		{#if $seasonsStore.status === 'loading'}
-			<div data-testid="seasons-loading" class="state-msg">{m.common_loading()}</div>
+			<div class="state-msg-container bg-paper">
+				<div data-testid="seasons-loading" class="state-msg">{m.common_loading()}</div>
+			</div>
 		{:else if $seasonsStore.status === 'error'}
-			<div data-testid="seasons-error" class="state-msg">{m.common_error()}</div>
+			<div class="state-msg-container bg-paper">
+				<div data-testid="seasons-error" class="state-msg">{m.common_error()}</div>
+			</div>
 		{:else if $seasonsStore.status === 'no-rights'}
-			<div data-testid="seasons-viewer" class="state-msg">{m.seasons_empty_no_seasons_viewer()}</div>
+			<div class="state-msg-container bg-paper">
+				<div data-testid="seasons-viewer" class="state-msg">{m.seasons_empty_no_seasons_viewer()}</div>
+			</div>
 		{:else if $seasonsStore.status === 'ready' && $seasonsStore.seasons.length === 0}
 			<!-- No seasons yet -->
 			{#if canManage}
 				<div data-testid="seasons-empty-owner" class="stacked-section">
-					<p class="state-msg">{m.seasons_empty_no_seasons()}</p>
+					<div class="state-msg-container bg-paper">
+						<p class="state-msg">{m.seasons_empty_no_seasons()}</p>
+					</div>
 					{#if panelMode === 'create'}
 						<div data-testid="season-form-wrap" class="form-wrap">
 							<SeasonForm oncreate={handleSeasonCreate} />
@@ -354,7 +362,9 @@
 					>+</button>
 				</div>
 			{:else}
+				<div class="state-msg-container bg-paper">
 				<div data-testid="seasons-empty-viewer" class="state-msg">{m.seasons_empty_no_seasons_viewer()}</div>
+			</div>
 			{/if}
 		{:else if $seasonsStore.status === 'ready'}
 			<!-- SeasonBar: horizontal scrollable tag row with inline edit + create -->
@@ -421,8 +431,10 @@
 					{/if}
 				{/if}
 			{:else}
-				<div data-testid="no-season-selected" class="state-msg">
-					{m.seasons_empty_no_seasons()}
+				<div class="state-msg-container bg-paper">
+					<div data-testid="no-season-selected" class="state-msg">
+						{m.seasons_empty_no_seasons()}
+					</div>
 				</div>
 			{/if}
 		{/if}
@@ -465,6 +477,12 @@
 		font-size: 11px;
 		color: #4a3a1f;
 	}
+	.state-msg-container {
+		margin: 12px 16px;
+		border-radius: 6px;
+		border: 1px solid rgba(0, 0, 0, 0.08);
+	}
+
 	.state-msg {
 		padding: 20px 28px;
 		font-size: 12px;
