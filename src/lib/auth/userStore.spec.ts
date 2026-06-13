@@ -532,6 +532,240 @@ describe('pickerModeStore — derived from orgs.length', () => {
 	});
 });
 
+// === #89 — isTokenExpired boundary tests ===
+// These tests are RED: the stub throws 'not implemented'. Josquin implements the real logic.
+
+describe('isTokenExpired — boundary tests (#89)', () => {
+	it('returns true when exp is in the past (exp*1000 < nowMs)', async () => {
+		const { isTokenExpired } = await import('./userStore');
+		const claims = { accounts: {}, iat: 0, exp: 1000, aud: '' };
+		// exp=1000 → exp*1000=1_000_000ms; nowMs=1_000_001 → expired
+		expect(isTokenExpired(claims, 1_000_001)).toBe(true);
+	});
+
+	it('returns true when exp*1000 === nowMs (boundary: not strictly future)', async () => {
+		const { isTokenExpired } = await import('./userStore');
+		const claims = { accounts: {}, iat: 0, exp: 2000, aud: '' };
+		// exp=2000 → exp*1000=2_000_000ms; nowMs=2_000_000 → boundary → expired
+		expect(isTokenExpired(claims, 2_000_000)).toBe(true);
+	});
+
+	it('returns false when exp is strictly in the future', async () => {
+		const { isTokenExpired } = await import('./userStore');
+		const claims = { accounts: {}, iat: 0, exp: 9999999999, aud: '' };
+		// exp=9999999999 → exp*1000 far future; nowMs=Date.now() → not expired
+		expect(isTokenExpired(claims, Date.now())).toBe(false);
+	});
+
+	it('returns true when claims is null (fail-closed)', async () => {
+		const { isTokenExpired } = await import('./userStore');
+		expect(isTokenExpired(null, Date.now())).toBe(true);
+	});
+
+	it('returns true when exp property is missing (fail-closed)', async () => {
+		const { isTokenExpired } = await import('./userStore');
+		const claims = { accounts: {}, iat: 0, aud: '' } as unknown as import('./types').EntuJwtClaims;
+		expect(isTokenExpired(claims, Date.now())).toBe(true);
+	});
+
+	it('returns true when exp is a non-numeric string (fail-closed)', async () => {
+		const { isTokenExpired } = await import('./userStore');
+		const claims = { accounts: {}, iat: 0, exp: 'not-a-number' as unknown as number, aud: '' };
+		expect(isTokenExpired(claims, Date.now())).toBe(true);
+	});
+});
+
+// Helpers for #89 matrix tests — populate all auth keys to verify cleared-vs-kept assertions
+const AUTH_KEYS = ['token', 'accounts', 'user', 'mvox.token_version'] as const;
+const PROVIDER_KEY = 'mvox.last_provider';
+
+function seedAuthStorage(token: string) {
+	localStorage.setItem('token', token);
+	localStorage.setItem('accounts', JSON.stringify([{ _id: 'acc-1' }]));
+	localStorage.setItem('user', JSON.stringify({ _id: 'u-1' }));
+	localStorage.setItem('mvox.token_version', '1');
+	localStorage.setItem(PROVIDER_KEY, 'google');
+}
+
+function assertTokenCleared() {
+	for (const key of AUTH_KEYS) {
+		expect(localStorage.getItem(key), `${key} should be cleared`).toBeNull();
+	}
+}
+
+function assertTokenKept(token: string) {
+	expect(localStorage.getItem('token'), 'token should be kept').toBe(token);
+}
+
+function assertProviderPreserved() {
+	expect(localStorage.getItem(PROVIDER_KEY), 'mvox.last_provider should be preserved').toBe('google');
+}
+
+// 200 OK response factories with explicit numeric status
+const ok200 = (body: unknown) =>
+	Promise.resolve(
+		new Response(JSON.stringify(body), { status: 200, headers: { 'content-type': 'application/json' } }),
+	);
+
+const makePersonOk = (personId: string) =>
+	ok200({ entity: { _id: personId, name: [{ string: 'Test User' }] } });
+const makeMemberOk = () =>
+	ok200({ count: 0, limit: 100, skip: 0, entities: [] });
+const makeOwnerOk = () =>
+	ok200({ count: 0, limit: 100, skip: 0, entities: [] });
+const makeStatus = (status: number) =>
+	Promise.resolve(new Response(null, { status }));
+
+const DB_KEY = 'test-env-db';
+
+// Far-future token: passes Gate 1
+const FAR_FUTURE_EXP = 9999999999;
+const JWT_FAR_FUTURE = makeJwt({ accounts: { [DB_KEY]: PERSON_ID }, iat: 0, exp: FAR_FUTURE_EXP, aud: '127.0.0.1' });
+
+// Past-expired token: exp*1000 < Date.now() (exp=1 → 1000ms = year 1970)
+const JWT_EXPIRED = makeJwt({ accounts: { [DB_KEY]: PERSON_ID }, iat: 0, exp: 1, aud: '127.0.0.1' });
+
+// No-exp token: exp missing entirely
+const JWT_NO_EXP = makeJwt({ accounts: { [DB_KEY]: PERSON_ID }, iat: 0, aud: '127.0.0.1' });
+
+// No-personId token: valid exp but no account for DB
+const JWT_NO_PERSON_ID = makeJwt({ accounts: {}, iat: 0, exp: FAR_FUTURE_EXP, aud: '127.0.0.1' });
+
+describe('hydrateUserStore — #89 stale-JWT cleanup matrix', () => {
+	// Each test uses beforeEach from the outer scope (vi.resetModules, localStorage.clear, etc.)
+
+	it('row 1: no token → signed-out, 0 fetches', async () => {
+		// localStorage already empty from outer beforeEach
+		const fetchMock = globalThis.fetch as ReturnType<typeof vi.fn>;
+		await userStore.hydrateUserStore();
+		expect(get(userStore.userStore).status).toBe('signed-out');
+		expect(fetchMock).not.toHaveBeenCalled();
+	});
+
+	it('row 2: exp in past → signed-out, token cleared, provider preserved, 0 fetches', async () => {
+		seedAuthStorage(JWT_EXPIRED);
+		const fetchMock = globalThis.fetch as ReturnType<typeof vi.fn>;
+		await userStore.hydrateUserStore();
+		expect(get(userStore.userStore).status).toBe('signed-out');
+		assertTokenCleared();
+		assertProviderPreserved();
+		expect(fetchMock).not.toHaveBeenCalled();
+	});
+
+	it('row 3: exp missing → signed-out, token cleared, provider preserved, 0 fetches', async () => {
+		seedAuthStorage(JWT_NO_EXP);
+		const fetchMock = globalThis.fetch as ReturnType<typeof vi.fn>;
+		await userStore.hydrateUserStore();
+		expect(get(userStore.userStore).status).toBe('signed-out');
+		assertTokenCleared();
+		assertProviderPreserved();
+		expect(fetchMock).not.toHaveBeenCalled();
+	});
+
+	it('row 4: token decodes but no personId for db → signed-out, token cleared, 0 fetches', async () => {
+		seedAuthStorage(JWT_NO_PERSON_ID);
+		const fetchMock = globalThis.fetch as ReturnType<typeof vi.fn>;
+		await userStore.hydrateUserStore();
+		expect(get(userStore.userStore).status).toBe('signed-out');
+		assertTokenCleared();
+		assertProviderPreserved();
+		expect(fetchMock).not.toHaveBeenCalled();
+	});
+
+	it('row 5: valid future exp, all 200 → ready, 3 fetches, token KEPT (regression guard)', async () => {
+		seedAuthStorage(JWT_FAR_FUTURE);
+		const fetchMock = globalThis.fetch as ReturnType<typeof vi.fn>;
+		fetchMock.mockImplementation((url: string) => {
+			if (url.includes(`entity/${PERSON_ID}`) && !url.includes('_type')) return makePersonOk(PERSON_ID);
+			if (url.includes('_type.string=member')) return makeMemberOk();
+			if (url.includes('_type.string=organization') && url.includes('_owner.reference')) return makeOwnerOk();
+			return Promise.reject(new Error(`Unexpected URL: ${url}`));
+		});
+		await userStore.hydrateUserStore();
+		expect(get(userStore.userStore).status).toBe('ready');
+		expect(fetchMock).toHaveBeenCalledTimes(3);
+		assertTokenKept(JWT_FAR_FUTURE);
+	});
+
+	it('row 6: future exp, person returns 401 → signed-out, token cleared, provider preserved, 3 fetches', async () => {
+		seedAuthStorage(JWT_FAR_FUTURE);
+		const fetchMock = globalThis.fetch as ReturnType<typeof vi.fn>;
+		fetchMock.mockImplementation((url: string) => {
+			if (url.includes(`entity/${PERSON_ID}`) && !url.includes('_type')) return makeStatus(401);
+			if (url.includes('_type.string=member')) return makeMemberOk();
+			if (url.includes('_type.string=organization') && url.includes('_owner.reference')) return makeOwnerOk();
+			return Promise.reject(new Error(`Unexpected URL: ${url}`));
+		});
+		await userStore.hydrateUserStore();
+		expect(get(userStore.userStore).status).toBe('signed-out');
+		assertTokenCleared();
+		assertProviderPreserved();
+		expect(fetchMock).toHaveBeenCalledTimes(3);
+	});
+
+	it('row 7: future exp, mixed person 500 + member 401 → signed-out (sweep wins), token cleared, 3 fetches', async () => {
+		seedAuthStorage(JWT_FAR_FUTURE);
+		const fetchMock = globalThis.fetch as ReturnType<typeof vi.fn>;
+		fetchMock.mockImplementation((url: string) => {
+			if (url.includes(`entity/${PERSON_ID}`) && !url.includes('_type')) return makeStatus(500);
+			if (url.includes('_type.string=member')) return makeStatus(401);
+			if (url.includes('_type.string=organization') && url.includes('_owner.reference')) return makeOwnerOk();
+			return Promise.reject(new Error(`Unexpected URL: ${url}`));
+		});
+		await userStore.hydrateUserStore();
+		expect(get(userStore.userStore).status).toBe('signed-out');
+		assertTokenCleared();
+		assertProviderPreserved();
+		expect(fetchMock).toHaveBeenCalledTimes(3);
+	});
+
+	it('row 8: future exp, person 500 only → error with reason containing "500", token NOT cleared', async () => {
+		seedAuthStorage(JWT_FAR_FUTURE);
+		const fetchMock = globalThis.fetch as ReturnType<typeof vi.fn>;
+		fetchMock.mockImplementation((url: string) => {
+			if (url.includes(`entity/${PERSON_ID}`) && !url.includes('_type')) return makeStatus(500);
+			if (url.includes('_type.string=member')) return makeOwnerOk(); // 200
+			if (url.includes('_type.string=organization') && url.includes('_owner.reference')) return makeOwnerOk();
+			return Promise.reject(new Error(`Unexpected URL: ${url}`));
+		});
+		await userStore.hydrateUserStore();
+		const state = get(userStore.userStore);
+		expect(state.status).toBe('error');
+		if (state.status === 'error') {
+			expect(state.reason).toContain('500');
+		}
+		assertTokenKept(JWT_FAR_FUTURE);
+		expect(fetchMock).toHaveBeenCalledTimes(3);
+	});
+
+	it('row 9: future exp, person 403 → error, token NOT cleared', async () => {
+		seedAuthStorage(JWT_FAR_FUTURE);
+		const fetchMock = globalThis.fetch as ReturnType<typeof vi.fn>;
+		fetchMock.mockImplementation((url: string) => {
+			if (url.includes(`entity/${PERSON_ID}`) && !url.includes('_type')) return makeStatus(403);
+			if (url.includes('_type.string=member')) return makeMemberOk();
+			if (url.includes('_type.string=organization') && url.includes('_owner.reference')) return makeOwnerOk();
+			return Promise.reject(new Error(`Unexpected URL: ${url}`));
+		});
+		await userStore.hydrateUserStore();
+		const state = get(userStore.userStore);
+		expect(state.status).toBe('error');
+		assertTokenKept(JWT_FAR_FUTURE);
+		expect(fetchMock).toHaveBeenCalledTimes(3);
+	});
+
+	it('row 10: fetch throws (network error) → error, token NOT cleared', async () => {
+		seedAuthStorage(JWT_FAR_FUTURE);
+		const fetchMock = globalThis.fetch as ReturnType<typeof vi.fn>;
+		fetchMock.mockRejectedValue(new Error('network error'));
+		await userStore.hydrateUserStore();
+		const state = get(userStore.userStore);
+		expect(state.status).toBe('error');
+		assertTokenKept(JWT_FAR_FUTURE);
+		expect(fetchMock).toHaveBeenCalled();
+	});
+});
+
 // === CHORE-74 — new tests ===
 
 describe('selectedOrgIdStore + urlOrgIdStore (CHORE-74)', () => {

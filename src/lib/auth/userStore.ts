@@ -2,7 +2,7 @@ import { writable, derived, get, type Readable, type Writable } from 'svelte/sto
 import { goto } from '$app/navigation';
 import { PUBLIC_ENTU_DB } from '$env/static/public';
 import { ENTU_API_BASE } from '$lib/entu-config';
-import { getToken } from './storage';
+import { clearAll, getToken } from './storage';
 import type {
 	EntuJwtClaims,
 	EntuMemberSearchResponse,
@@ -36,6 +36,12 @@ export function decodeJwt(token: string): EntuJwtClaims | null {
 	}
 }
 
+export function isTokenExpired(claims: EntuJwtClaims | null, nowMs: number): boolean {
+	const exp = claims?.exp;
+	if (typeof exp !== 'number') return true;
+	return exp * 1000 <= nowMs;
+}
+
 export async function hydrateUserStore(): Promise<void> {
 	const token = getToken();
 	if (!token) {
@@ -46,6 +52,13 @@ export async function hydrateUserStore(): Promise<void> {
 	const claims = decodeJwt(token);
 	const personId = claims?.accounts?.[PUBLIC_ENTU_DB];
 	if (!personId) {
+		clearAll({ preserveProvider: true });
+		userStore.set({ status: 'signed-out' });
+		return;
+	}
+
+	if (isTokenExpired(claims, Date.now())) {
+		clearAll({ preserveProvider: true });
 		userStore.set({ status: 'signed-out' });
 		return;
 	}
@@ -64,6 +77,12 @@ export async function hydrateUserStore(): Promise<void> {
 				{ headers: { Authorization: `Bearer ${token}` } },
 			),
 		]);
+
+		if ([personRes, memberRes, ownerRes].some((r) => r.status === 401)) {
+			clearAll({ preserveProvider: true });
+			userStore.set({ status: 'signed-out' });
+			return;
+		}
 
 		if (!personRes.ok) {
 			userStore.set({ status: 'error', reason: `person fetch ${personRes.status}` });
