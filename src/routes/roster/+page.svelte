@@ -4,7 +4,7 @@
 </script>
 
 <ComingSoon
-	label="Choir management"
+	label={m.page_roster_label()}
 	name={m.nav_tab_roster()}
 	description={m.page_roster_description()}
 	backHref="/agenda"

@@ -166,7 +166,7 @@
 
 		<!-- Page header -->
 		<div class="page-hdr">
-			<div class="page-title" data-desk-text>{m.agenda_title()}</div>
+			<div class="page-title">{m.agenda_title()}</div>
 		</div>
 
 		<!-- Loading state -->

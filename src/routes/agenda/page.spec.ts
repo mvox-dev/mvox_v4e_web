@@ -298,9 +298,11 @@ describe('/agenda page — optimistic tally delta (#slice-2b-opt)', () => {
 // ── S33 sub-chain 2 — readability conformance (§2) ───────────────────────────
 
 describe('/agenda page — readability (S33 §2)', () => {
-	// AC: big page-title is exempt (big display heading on desk) but must carry
-	// data-desk-text to signal the exemption to Bentham's review gate.
-	it('page-title carries data-desk-text attribute (exemption marker)', () => {
+	// YELLOW-33.2 correction: the .page-title sits inside .page-hdr which has
+	// background: rgba(251,249,243,0.8) — it already conforms via that ancestor.
+	// data-desk-text is the WRONG tag here (§2: never tag elements with a bg ancestor).
+	// Byrd must REMOVE data-desk-text from .page-title; we assert its ABSENCE.
+	it('page-title does NOT carry data-desk-text (it is covered by page-hdr rgba bg)', () => {
 		(userStore as Writable<unknown>).set(readyUser);
 		mockListAgenda.mockResolvedValue({ items: [sampleItem], errors: [] });
 		mockListMyRsvps.mockResolvedValue([]);
@@ -308,8 +310,9 @@ describe('/agenda page — readability (S33 §2)', () => {
 		const { container } = render(Page);
 		const title = container.querySelector('.page-title');
 		expect(title).not.toBeNull();
-		// data-desk-text is a boolean attribute; presence = '' (empty string)
-		expect(title?.hasAttribute('data-desk-text')).toBe(true);
+		// The title is NOT exempt-on-desk — it has a colored-bg ancestor (.page-hdr).
+		// Mis-tagging it data-desk-text signals false "intentionally bare" when it isn't.
+		expect(title?.hasAttribute('data-desk-text')).toBe(false);
 	});
 
 	// AC: loading skeleton must not sit bare on the wood-grain desk.

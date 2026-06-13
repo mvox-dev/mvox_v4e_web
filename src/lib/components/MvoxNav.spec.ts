@@ -490,4 +490,59 @@ describe('MvoxNav — S33 library link + mobile menu links', () => {
 	});
 });
 
+// YELLOW-33.6 — SoonMarker nav links need an accessible name.
+// SoonMarker carries aria-hidden="true" (decorative), so the "soon" text
+// is invisible to screen readers. The nav link itself reads only the tab label
+// (e.g. "Roster") — screen readers don't know the tab is not yet available.
+// Fix: add aria-label="Roster — coming soon" (and equivalents) to the
+// soon-marked desktop inline tabs and mobile menu items.
+// RED until Byrd adds aria-label to the soon-marked <a> elements in MvoxNav.
+describe('MvoxNav — soon-marked nav links have accessible names (YELLOW-33.6)', () => {
+	const signedInProps = {
+		signedIn: true,
+		currentTab: 'agenda' as const,
+		orgLabel: 'EFK',
+		orgInitials: 'EF',
+		userInitial: 'A',
+		userName: 'Alice',
+		orgPickerMode: 'static' as const,
+	};
+
+	it('desktop roster tab carries aria-label including "coming soon"', () => {
+		const { container } = render(MvoxNav, { props: signedInProps });
+		const rosterTab = container.querySelector('[data-testid="nav-inline-tab-roster"]');
+		expect(rosterTab).not.toBeNull();
+		const ariaLabel = rosterTab?.getAttribute('aria-label') ?? '';
+		expect(ariaLabel.toLowerCase()).toContain('soon');
+	});
+
+	it('desktop notices tab carries aria-label including "coming soon"', () => {
+		const { container } = render(MvoxNav, { props: signedInProps });
+		const noticesTab = container.querySelector('[data-testid="nav-inline-tab-notices"]');
+		expect(noticesTab).not.toBeNull();
+		const ariaLabel = noticesTab?.getAttribute('aria-label') ?? '';
+		expect(ariaLabel.toLowerCase()).toContain('soon');
+	});
+
+	it('desktop settings tab carries aria-label including "coming soon"', () => {
+		const { container } = render(MvoxNav, { props: signedInProps });
+		const settingsTab = container.querySelector('[data-testid="nav-inline-tab-settings"]');
+		expect(settingsTab).not.toBeNull();
+		const ariaLabel = settingsTab?.getAttribute('aria-label') ?? '';
+		expect(ariaLabel.toLowerCase()).toContain('soon');
+	});
+
+	it('mobile menu roster item carries aria-label including "coming soon"', async () => {
+		const { container } = render(MvoxNav, { props: signedInProps });
+		const hamburger = container.querySelector(
+			'[data-testid="nav-tab-menu-trigger"]',
+		) as HTMLButtonElement;
+		await fireEvent.click(hamburger);
+		const rosterItem = container.querySelector('[data-testid="nav-tab-menu-item-roster"]');
+		expect(rosterItem).not.toBeNull();
+		const ariaLabel = rosterItem?.getAttribute('aria-label') ?? '';
+		expect(ariaLabel.toLowerCase()).toContain('soon');
+	});
+});
+
 // (*MVOX:Tallis*)

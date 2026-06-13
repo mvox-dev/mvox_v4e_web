@@ -4,7 +4,7 @@
 </script>
 
 <ComingSoon
-	label="Account"
+	label={m.page_settings_label()}
 	name={m.nav_tab_settings()}
 	description={m.page_settings_description()}
 	backHref="/agenda"

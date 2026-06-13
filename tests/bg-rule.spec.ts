@@ -89,11 +89,16 @@ async function findViolations(page: import('@playwright/test').Page): Promise<Vi
 
 		/**
 		 * Check whether this element or any ancestor carries data-desk-text, or has
-		 * a non-transparent background before reaching .wood-bg.
+		 * an opaque background-color before reaching the .wood-bg desk surface.
 		 *
-		 * FIX D — background-image check is safe here because the .wood-bg stop
-		 * condition fires BEFORE we test that element's own background-image, so the
-		 * desk gradient never false-passes as a conforming background.
+		 * Conformance rule: only an opaque background-color counts. background-image is
+		 * NOT used as an independent conformance signal (Fix D tightened, YELLOW-33.3):
+		 * a transparent gradient has background-image !== 'none' but zero coverage.
+		 * All real conforming elements in mvox carry an explicit background-color; any
+		 * that paint via an image/gradient also declare a fallback color.
+		 *
+		 * The .wood-bg stop fires BEFORE we inspect that element's own styles, so the
+		 * desk gradient is never evaluated as a conforming background.
 		 */
 		function hasBgOrExemption(el: Element): boolean {
 			let current: Element | null = el;
@@ -105,11 +110,17 @@ async function findViolations(page: import('@playwright/test').Page): Promise<Vi
 				// Explicit exemption via data-desk-text on this element or any ancestor
 				if (current.hasAttribute('data-desk-text')) return true;
 				const style = window.getComputedStyle(current);
-				// FIX A — use isOpaqueColor instead of literal string comparison
+				// FIX A — opaque background-color is the primary conformance signal
 				if (isOpaqueColor(style.backgroundColor)) return true;
-				// FIX D — background-image (gradients, images) also counts as coverage
-				const bgImage = style.backgroundImage;
-				if (bgImage && bgImage !== 'none') return true;
+				// FIX D (tightened) — background-image is NOT counted as an independent
+				// conformance signal. Only an opaque background-color (checked above) counts.
+				// Reason: a transparent/decorative gradient (e.g. linear-gradient(transparent,
+				// transparent)) has background-image !== 'none' but provides zero coverage.
+				// All conforming elements in the mvox design carry an explicit background-color;
+				// relying on background-image alone would admit false passes.
+				// Image/gradient coverage is handled implicitly: if an element's background-image
+				// makes it visually opaque AND it was designed to provide coverage, it should also
+				// declare a fallback background-color — which isOpaqueColor catches above.
 				current = current.parentElement;
 			}
 			return false;
@@ -250,6 +261,44 @@ test('negative control — transparent rgba background is NOT counted as colored
 		v.text.includes('TRANSPARENT RGBA VIOLATION'),
 	);
 	expect(transparentViolation).toBeDefined();
+});
+
+// YELLOW-33.3 (tightened) — Fix-D transparent/decorative gradient guard.
+// Fix D originally counted ANY background-image !== 'none' as conformance. A fully-
+// transparent gradient (linear-gradient(transparent, transparent)) has no visual
+// coverage but would have false-passed. Fix D is now retired: background-image is not
+// used as an independent conformance signal at all. Only opaque background-color counts.
+// This negative control verifies the tightened behavior: a transparent-gradient-only
+// element on the desk is correctly flagged as a violation.
+test('negative control — transparent gradient background-image is NOT counted as colored bg', async ({
+	page,
+}) => {
+	await page.goto('/');
+	await page.waitForLoadState('networkidle');
+
+	// Inject a span with a fully-transparent gradient directly on the desk.
+	// background-image is set (non 'none'), but it provides zero coverage.
+	const injected = await page.evaluate(() => {
+		const desk = document.querySelector('.wood-bg');
+		if (!desk) return false;
+		const span = document.createElement('span');
+		span.setAttribute('data-testid', 'injected-transparent-gradient');
+		span.textContent = 'TRANSPARENT GRADIENT VIOLATION';
+		// Transparent gradient — has a background-image, but no actual color
+		span.style.backgroundImage = 'linear-gradient(transparent, transparent)';
+		span.style.backgroundColor = 'transparent';
+		desk.appendChild(span);
+		return true;
+	});
+	expect(injected).toBe(true);
+
+	// The injected element must be reported as a violation.
+	// If Fix D is too broad (counts all background-image as conformance), this fails.
+	const violations = await findViolations(page);
+	const gradientViolation = violations.find((v) =>
+		v.text.includes('TRANSPARENT GRADIENT VIOLATION'),
+	);
+	expect(gradientViolation).toBeDefined();
 });
 
 // (*MVOX:Tallis*)

@@ -35,4 +35,35 @@ describe('tabForPath()', () => {
 	});
 });
 
+// YELLOW-33.3 — tabForPath() prefix edge cases.
+// Paths like /libraryxyz or /settingspage must NOT match their tab's prefix.
+// The current startsWith() check incorrectly returns 'library' for /libraryxyz.
+// Fix: require exact segment match (path === '/tab' || path.startsWith('/tab/')).
+// RED until Byrd updates the implementation.
+describe('tabForPath() — exact-segment edge cases (YELLOW-33.3)', () => {
+	it('/libraryxyz does NOT match library tab (prefix-only false-match)', () => {
+		expect(tabForPath('/libraryxyz')).toBe('agenda');
+	});
+
+	it('/roster-admin does NOT match roster tab', () => {
+		expect(tabForPath('/roster-admin')).toBe('agenda');
+	});
+
+	it('/settings-page does NOT match settings tab', () => {
+		expect(tabForPath('/settings-page')).toBe('agenda');
+	});
+
+	it('/seasons2026 does NOT match seasons tab', () => {
+		expect(tabForPath('/seasons2026')).toBe('agenda');
+	});
+
+	it('/library/works DOES match library tab (sub-path)', () => {
+		expect(tabForPath('/library/works')).toBe('library');
+	});
+
+	it('/roster/members DOES match roster tab (sub-path)', () => {
+		expect(tabForPath('/roster/members')).toBe('roster');
+	});
+});
+
 // (*MVOX:Tallis*)

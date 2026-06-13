@@ -4,7 +4,7 @@
 </script>
 
 <ComingSoon
-	label="Communications"
+	label={m.page_notices_label()}
 	name={m.nav_tab_notices()}
 	description={m.page_notices_description()}
 	backHref="/agenda"

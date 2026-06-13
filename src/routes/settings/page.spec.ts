@@ -12,6 +12,8 @@ vi.mock('$lib/paraglide/messages.js', () => ({
 	page_coming_soon_label: () => 'Coming soon',
 	page_coming_soon_back_to_agenda: () => 'Back to Agenda',
 	page_settings_description: () => 'Your account and preferences.',
+	// Stub for YELLOW-33.1: Comenius adds real value; mock enables unit tests to pass.
+	page_settings_label: () => 'Account',
 }));
 
 import SettingsPage from './+page.svelte';

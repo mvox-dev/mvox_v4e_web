@@ -133,6 +133,7 @@
 						<a
 							data-testid="nav-inline-tab-{tab}"
 							href="/{tab}"
+							aria-label="{TAB_LABELS[tab]()} — coming soon"
 							class="font-sans text-[11.5px] {tab === currentTab
 								? 'text-ink font-semibold border-b-2 border-ink pb-1'
 								: 'text-ink-3 font-medium'} inline-flex items-center gap-1 no-underline"
@@ -172,6 +173,9 @@
 								href="/{tab}"
 								data-testid="nav-tab-menu-item-{tab}"
 								role="menuitem"
+								aria-label={tab !== 'agenda' && tab !== 'library' && tab !== 'seasons'
+									? `${TAB_LABELS[tab]()} — coming soon`
+									: undefined}
 								class="flex items-center gap-1 font-sans text-[12px] {tab === currentTab
 									? 'text-ink font-semibold'
 									: 'text-ink-3 font-medium'} hover:bg-paper-2 -mx-2 px-2 py-1.5 rounded no-underline"

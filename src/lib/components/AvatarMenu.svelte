@@ -33,6 +33,19 @@
 			if (e.key === 'Escape') {
 				close();
 				triggerEl?.focus();
+			} else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+				e.preventDefault();
+				const items = Array.from(
+					panelEl?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? [],
+				);
+				if (items.length === 0) return;
+				const current = document.activeElement as HTMLElement | null;
+				const idx = items.indexOf(current!);
+				if (e.key === 'ArrowDown') {
+					items[(idx + 1) % items.length]?.focus();
+				} else {
+					items[(idx - 1 + items.length) % items.length]?.focus();
+				}
 			}
 		}
 
@@ -41,6 +54,7 @@
 			if (triggerEl?.contains(target)) return;
 			if (panelEl?.contains(target)) return;
 			close();
+			triggerEl?.focus();
 		}
 
 		window.addEventListener('keydown', onKeyDown);

@@ -133,4 +133,70 @@ describe('AvatarMenu — S33 About link', () => {
 	});
 });
 
+// YELLOW-33.4 — AvatarMenu: restore focus to trigger on outside-click close.
+// The Escape handler calls triggerEl?.focus() but onMouseDown close() does not.
+// ARIA APG pattern: closing a menu by any means (Escape OR outside click) must
+// return focus to the element that opened it.
+// RED until Byrd adds triggerEl?.focus() in the onMouseDown close path.
+describe('AvatarMenu — focus restoration on outside-click close (YELLOW-33.4)', () => {
+	it('outside click closes menu AND restores focus to trigger button', async () => {
+		const { container } = render(AvatarMenu, { name: 'Mihkel Putrinš', initial: 'M' });
+		const btn = container.querySelector(
+			'button[data-testid="avatar-menu-trigger"]',
+		) as HTMLButtonElement;
+		await fireEvent.click(btn);
+		expect(container.querySelector('[data-testid="avatar-menu-panel"]')).not.toBeNull();
+		// Click outside
+		await fireEvent.mouseDown(document.body);
+		// Panel must be gone
+		expect(container.querySelector('[data-testid="avatar-menu-panel"]')).toBeNull();
+		// Focus must return to the trigger button
+		expect(document.activeElement).toBe(btn);
+	});
+});
+
+// YELLOW-33.5 — AvatarMenu: arrow-key navigation between menuitems.
+// <a role="menuitem"> elements should respond to ArrowDown/ArrowUp to move
+// focus between items per the ARIA menu pattern.
+// RED until Byrd adds keydown handler for ArrowDown/ArrowUp on the panel.
+describe('AvatarMenu — arrow-key menuitem navigation (YELLOW-33.5)', () => {
+	it('ArrowDown on About link moves focus to Sign out link', async () => {
+		const { container } = render(AvatarMenu, { name: 'Test', initial: 'T' });
+		const btn = container.querySelector(
+			'button[data-testid="avatar-menu-trigger"]',
+		) as HTMLButtonElement;
+		await fireEvent.click(btn);
+		// About link receives initial focus
+		const aboutLink = container.querySelector(
+			'a[data-testid="avatar-menu-about"]',
+		) as HTMLAnchorElement;
+		const signoutLink = container.querySelector(
+			'a[data-testid="avatar-menu-signout"]',
+		) as HTMLAnchorElement;
+		expect(aboutLink).not.toBeNull();
+		expect(signoutLink).not.toBeNull();
+		// ArrowDown should move to next menuitem
+		await fireEvent.keyDown(aboutLink, { key: 'ArrowDown' });
+		expect(document.activeElement).toBe(signoutLink);
+	});
+
+	it('ArrowUp on Sign out link moves focus back to About link', async () => {
+		const { container } = render(AvatarMenu, { name: 'Test', initial: 'T' });
+		const btn = container.querySelector(
+			'button[data-testid="avatar-menu-trigger"]',
+		) as HTMLButtonElement;
+		await fireEvent.click(btn);
+		const aboutLink = container.querySelector(
+			'a[data-testid="avatar-menu-about"]',
+		) as HTMLAnchorElement;
+		const signoutLink = container.querySelector(
+			'a[data-testid="avatar-menu-signout"]',
+		) as HTMLAnchorElement;
+		signoutLink?.focus();
+		// ArrowUp should move back to previous menuitem
+		await fireEvent.keyDown(signoutLink, { key: 'ArrowUp' });
+		expect(document.activeElement).toBe(aboutLink);
+	});
+});
+
 // (*MVOX:Tallis*)
