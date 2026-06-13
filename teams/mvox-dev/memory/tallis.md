@@ -502,4 +502,22 @@ Files created/modified:
 
 [PATTERN] Disabled-button click in happy-dom: `fireEvent.click(null)` throws "Unable to fire a click event". Use `if (btn && !btn.disabled)` guard in tests where the click is conditional on button existence.
 
+## [CHECKPOINT] 2026-06-12 — Auth trusted-identity RED phase (Task 1)
+
+[DECISION] 18 tests across 3 files on `feat/auth-trusted-identity`. SHA `cddc698`. 11 RED, 7 forward guards. pnpm check: 0 errors.
+
+Files created/modified:
+- `src/lib/server/auth/identity-cookie.ts` — stub (signIdentity + verifyIdentity both throw 'not implemented')
+- `src/lib/server/auth/identity-cookie.spec.ts` — 6 async Web Crypto tests: round-trip, payload tamper, sig tamper, expired, malformed, wrong secret
+- `src/tests/routes/auth/oauth/callback-page-server.spec.ts` — extended with 5 exchange tests (4 RED + 1 forward guard)
+- `src/routes/auth/logout/page.spec.ts` — extended: 2 server handler tests (1 RED: mvox_identity deleted; 1 forward guard: mvox_session regression pin)
+
+[GOTCHA] After Josquin adds fetch to `load`, the first existing test ("returns sessionToken") will start calling fetch too — it will need a fetch stub. Josquin: add `vi.stubGlobal('fetch', happyPathMock)` in a `beforeEach` wrapping the existing tests, or the first test breaks.
+
+[GOTCHA] `vi.mock('$app/environment', ...)` set in spec; Josquin must import `dev` from `$app/environment` (not hardcode false) so `secure` cookie attribute resolves correctly.
+
+[PATTERN] Logout server handler test: dynamic `await import('./+page.server')` inside `it()` body so the module loads after cookies mock is set up. `vi.resetModules()` before re-import in second test for a fresh load.
+
+[PATTERN] `vi.unstubAllGlobals()` in `afterEach` to clear `vi.stubGlobal('fetch', ...)` stubs — `vi.restoreAllMocks()` does NOT clear stub globals.
+
 (*MVOX:Tallis*)
