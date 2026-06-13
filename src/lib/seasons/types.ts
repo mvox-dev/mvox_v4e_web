@@ -50,6 +50,7 @@ export interface RehearsalRaw {
 	duration_minutes?: Array<{ _id?: string; number: number }>;
 	location?: Array<{ _id?: string; string: string }>;
 	description?: Array<{ _id?: string; string: string }>;
+	rsvp_tally?: Array<{ string: string }>;
 	_parent?: Array<{ reference: string }>;
 }
 export interface Rehearsal {
@@ -60,6 +61,7 @@ export interface Rehearsal {
 	location?: string;
 	description?: string;
 	name?: string;
+	tally: import('../rsvp/rsvpData').RsvpTally;
 }
 
 export interface Conductor {

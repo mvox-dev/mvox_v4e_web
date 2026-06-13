@@ -2,6 +2,7 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import type { Rehearsal } from '$lib/seasons/types';
+	import RsvpTallyBadge from '$lib/components/agenda/RsvpTallyBadge.svelte';
 
 	interface Props {
 		/** Rehearsals to display, pre-sorted by start_datetime asc. */
@@ -72,6 +73,7 @@
 				<span data-testid="rehearsal-duration" class="row-duration">
 					{rehearsal.durationMinutes}
 				</span>
+				<RsvpTallyBadge tally={rehearsal.tally} />
 				<span data-testid="rehearsal-location" class="row-location">
 					{rehearsal.location ?? '—'}
 				</span>

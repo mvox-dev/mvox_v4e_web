@@ -33,6 +33,7 @@ const sampleRehearsal: Rehearsal = {
 	durationMinutes: 90,
 	location: 'Church Hall',
 	description: 'Bring scores',
+tally: { going: 0, not_going: 0, maybe: 0, late: 0 },
 };
 
 describe('RehearsalEditForm — pre-population (#87)', () => {

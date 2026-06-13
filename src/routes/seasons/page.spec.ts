@@ -541,6 +541,7 @@ describe('/seasons page — read-path (T3, #86)', () => {
 				seriesId: 'ser1',
 				startDatetime: '2026-09-01T16:00:00.000Z',
 				durationMinutes: 90,
+			tally: { going: 0, not_going: 0, maybe: 0, late: 0 },
 			},
 		]);
 		(selectedOrgStore as ReturnType<typeof import('svelte/store').writable>).set(ownerOrg);
@@ -573,6 +574,7 @@ describe('/seasons page — read-path (T3, #86)', () => {
 				seriesId: 'ser1',
 				startDatetime: '2026-09-01T16:00:00.000Z',
 				durationMinutes: 90,
+			tally: { going: 0, not_going: 0, maybe: 0, late: 0 },
 			},
 		]);
 		(selectedOrgStore as ReturnType<typeof import('svelte/store').writable>).set(ownerOrg);
@@ -613,6 +615,7 @@ describe('/seasons page — read-path (T3, #86)', () => {
 					seriesId: 'ser1',
 					startDatetime: '2026-09-01T16:00:00.000Z',
 					durationMinutes: 90,
+				tally: { going: 0, not_going: 0, maybe: 0, late: 0 },
 				},
 			];
 		});
@@ -669,6 +672,7 @@ describe('/seasons page — cancel-rehearsal wiring (T4, #86)', () => {
 		seriesId: 'ser1',
 		startDatetime: '2026-09-01T16:00:00.000Z',
 		durationMinutes: 90,
+	tally: { going: 0, not_going: 0, maybe: 0, late: 0 },
 	};
 
 	beforeEach(() => {
@@ -743,6 +747,7 @@ describe('/seasons page — delete-series wiring (T5, #86)', () => {
 		seriesId: 'ser1',
 		startDatetime: '2026-09-01T16:00:00.000Z',
 		durationMinutes: 90,
+	tally: { going: 0, not_going: 0, maybe: 0, late: 0 },
 	};
 	const series = {
 		id: 'ser1',
@@ -1126,6 +1131,7 @@ describe('/seasons page — edit-rehearsal (#87)', () => {
 		durationMinutes: 90,
 		location: 'Church Hall',
 		description: 'Bring scores',
+	tally: { going: 0, not_going: 0, maybe: 0, late: 0 },
 	};
 	const series = {
 		id: 'ser1',
@@ -1274,6 +1280,7 @@ describe('/seasons page — edit-rehearsal (#87)', () => {
 			durationMinutes: 90,
 			location: 'Church Hall',
 			description: 'Sibling notes',
+		tally: { going: 0, not_going: 0, maybe: 0, late: 0 },
 		};
 		mockListRehearsals
 			.mockResolvedValueOnce([rehearsal, sibling])

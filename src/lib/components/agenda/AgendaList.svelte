@@ -4,6 +4,7 @@
 	import type { AgendaItem } from '$lib/agenda/agendaData';
 	import type { MyRsvp, RsvpStatus } from '$lib/rsvp/rsvpData';
 	import RsvpControl from './RsvpControl.svelte';
+	import RsvpTallyBadge from './RsvpTallyBadge.svelte';
 
 	interface Props {
 		items: AgendaItem[];
@@ -108,6 +109,7 @@
 						{#if item.location}
 							<span data-testid="agenda-row-location" class="row-location">{item.location}</span>
 						{/if}
+						<RsvpTallyBadge tally={item.tally} />
 					</div>
 					{#if memberResolved}
 						<div class="row-rsvp">

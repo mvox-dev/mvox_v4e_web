@@ -1489,6 +1489,67 @@ describe('listRehearsals — description field (#87)', () => {
 	});
 });
 
+// ── #slice-2b: listRehearsals rsvp_tally ─────────────────────────────────────
+
+describe('listRehearsals — rsvp_tally (#slice-2b)', () => {
+	it('query URL includes rsvp_tally in props', async () => {
+		let searchUrl = '';
+		vi.stubGlobal(
+			'fetch',
+			vi.fn().mockImplementation((url: string) => {
+				if (!url.includes('/entity/')) searchUrl = url;
+				return Promise.resolve({ ok: true, json: async () => ({ entities: [] }) });
+			}),
+		);
+		await listRehearsals({ db: 'd', token: 't' }, { orgId: 'o', seasonId: 's' });
+		expect(searchUrl).toContain('rsvp_tally');
+	});
+
+	it('row with rsvp_tally string maps to parsed tally on Rehearsal', async () => {
+		vi.stubGlobal(
+			'fetch',
+			vi.fn().mockResolvedValue({
+				ok: true,
+				json: async () => ({
+					entities: [
+						{
+							_id: 'e1',
+							event_type: [{ string: 'rehearsal' }],
+							start_datetime: [{ datetime: '2026-09-01T16:00:00.000Z' }],
+							_parent: [{ reference: 'series1' }],
+							rsvp_tally: [{ string: '{"going":2,"not_going":1,"maybe":0,"late":3}' }],
+						},
+					],
+				}),
+			}),
+		);
+		const r = await listRehearsals({ db: 'd', token: 't' }, { orgId: 'o', seasonId: 's' });
+		expect(r[0].tally).toEqual({ going: 2, not_going: 1, maybe: 0, late: 3 });
+	});
+
+	it('row without rsvp_tally maps to all-zeros tally', async () => {
+		vi.stubGlobal(
+			'fetch',
+			vi.fn().mockResolvedValue({
+				ok: true,
+				json: async () => ({
+					entities: [
+						{
+							_id: 'e1',
+							event_type: [{ string: 'rehearsal' }],
+							start_datetime: [{ datetime: '2026-09-01T16:00:00.000Z' }],
+							_parent: [{ reference: 'series1' }],
+							// rsvp_tally absent
+						},
+					],
+				}),
+			}),
+		);
+		const r = await listRehearsals({ db: 'd', token: 't' }, { orgId: 'o', seasonId: 's' });
+		expect(r[0].tally).toEqual({ going: 0, not_going: 0, maybe: 0, late: 0 });
+	});
+});
+
 // ── #87: updateRehearsal self-resolving refactor ──────────────────────────────
 //
 // Design decision (team-lead, option (a)): updateRehearsal self-resolves value-ids,

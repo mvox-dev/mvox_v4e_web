@@ -78,6 +78,7 @@ export async function createRsvp(cfg: EntuCfg, input: CreateRsvpInput): Promise<
 		{ type: 'event', reference: input.eventId },
 		{ type: 'member', reference: input.memberId },
 		{ type: 'status', string: input.status },
+		{ type: `${input.status}_ref`, reference: input.eventId },
 	];
 	const res = await fetch(`${ENTU_API_BASE}${cfg.db}/entity`, {
 		method: 'POST',
@@ -99,13 +100,32 @@ export async function updateRsvpStatus(
 	const headers = authHeaders(cfg.token);
 	const base = `${ENTU_API_BASE}${cfg.db}`;
 
-	const getRes = await fetch(`${base}/entity/${rsvpId}?props=status`, { headers });
+	const getRes = await fetch(
+		`${base}/entity/${rsvpId}?props=status,event,going_ref,not_going_ref,maybe_ref,late_ref`,
+		{ headers },
+	);
 	if (!getRes.ok) throw new Error(`updateRsvpStatus lookup failed: ${getRes.status}`);
 	const body = (await getRes.json()) as {
-		entity?: { status?: Array<{ _id: string }> };
+		entity?: {
+			status?: Array<{ _id: string }>;
+			event?: Array<{ reference: string }>;
+			going_ref?: Array<{ _id: string }>;
+			not_going_ref?: Array<{ _id: string }>;
+			maybe_ref?: Array<{ _id: string }>;
+			late_ref?: Array<{ _id: string }>;
+		};
 	};
+	const entity = body.entity ?? {};
+	const eventId = entity.event?.[0]?.reference ?? '';
 
-	for (const value of body.entity?.status ?? []) {
+	const toDelete = [
+		...(entity.status ?? []),
+		...(entity.going_ref ?? []),
+		...(entity.not_going_ref ?? []),
+		...(entity.maybe_ref ?? []),
+		...(entity.late_ref ?? []),
+	];
+	for (const value of toDelete) {
 		const delRes = await fetch(`${base}/property/${value._id}`, { method: 'DELETE', headers });
 		if (!delRes.ok) throw new Error(`updateRsvpStatus delete failed: ${delRes.status}`);
 	}
@@ -113,9 +133,30 @@ export async function updateRsvpStatus(
 	const postRes = await fetch(`${base}/entity/${rsvpId}`, {
 		method: 'POST',
 		headers,
-		body: JSON.stringify([{ type: 'status', string: status }]),
+		body: JSON.stringify([
+			{ type: 'status', string: status },
+			{ type: `${status}_ref`, reference: eventId },
+		]),
 	});
 	if (!postRes.ok) throw new Error(`updateRsvpStatus POST failed: ${postRes.status}`);
+}
+
+export interface RsvpTally {
+	going: number;
+	not_going: number;
+	maybe: number;
+	late: number;
+}
+
+export function parseTally(raw: string | undefined): RsvpTally {
+	const zero: RsvpTally = { going: 0, not_going: 0, maybe: 0, late: 0 };
+	if (raw === undefined) return zero;
+	try {
+		return { ...zero, ...JSON.parse(raw) };
+	} catch {
+		console.warn('parseTally: malformed input', raw);
+		return zero;
+	}
 }
 
 export async function deleteRsvp(cfg: EntuCfg, rsvpId: string): Promise<void> {

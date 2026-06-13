@@ -1,4 +1,5 @@
 import { ENTU_API_BASE } from '$lib/entu-config';
+import { parseTally } from '$lib/rsvp/rsvpData';
 import { occurrenceDates, toStartDatetime } from './recurrence';
 import type {
 	Conductor,
@@ -211,7 +212,7 @@ export async function listRehearsals(
 ): Promise<Rehearsal[]> {
 	const { orgId, seasonId } = input;
 	const res = await fetch(
-		`${ENTU_API_BASE}${cfg.db}/entity?_type.string=event&event_type.string=rehearsal&_parent.reference=${seasonId}&props=name,event_type,start_datetime,duration_minutes,location,description,_parent&limit=500`,
+		`${ENTU_API_BASE}${cfg.db}/entity?_type.string=event&event_type.string=rehearsal&_parent.reference=${seasonId}&props=name,event_type,start_datetime,duration_minutes,location,description,rsvp_tally,_parent&limit=500`,
 		{ headers: authHeaders(cfg.token) },
 	);
 	if (!res.ok) {
@@ -256,6 +257,7 @@ export async function listRehearsals(
 				location: raw.location?.[0]?.string ?? series?.default_location?.[0]?.string,
 				name: raw.name?.[0]?.string,
 				description: raw.description?.[0]?.string,
+				tally: parseTally(raw.rsvp_tally?.[0]?.string),
 			};
 		})
 		.sort((a, b) => a.startDatetime.localeCompare(b.startDatetime));

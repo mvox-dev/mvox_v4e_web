@@ -29,6 +29,7 @@ describe('listAgenda', () => {
 							location: 'Hall A',
 							name: 'Tue',
 							description: undefined,
+						tally: { going: 0, not_going: 0, maybe: 0, late: 0 },
 						},
 					]
 				: [
@@ -40,6 +41,7 @@ describe('listAgenda', () => {
 							location: undefined,
 							name: 'Mon',
 							description: undefined,
+						tally: { going: 0, not_going: 0, maybe: 0, late: 0 },
 						},
 					],
 		);
@@ -56,6 +58,7 @@ describe('listAgenda', () => {
 					description: undefined,
 					orgId: 'orgB',
 					orgLabel: 'Koor B',
+				tally: { going: 0, not_going: 0, maybe: 0, late: 0 },
 				},
 				{
 					id: 'r2',
@@ -67,6 +70,7 @@ describe('listAgenda', () => {
 					description: undefined,
 					orgId: 'orgA',
 					orgLabel: 'EFK',
+				tally: { going: 0, not_going: 0, maybe: 0, late: 0 },
 				},
 			],
 			errors: [],
@@ -97,6 +101,7 @@ describe('listAgenda', () => {
 				location: undefined,
 				name: undefined,
 				description: undefined,
+			tally: { going: 0, not_going: 0, maybe: 0, late: 0 },
 			},
 			{
 				id: 'next',
@@ -106,6 +111,7 @@ describe('listAgenda', () => {
 				location: undefined,
 				name: undefined,
 				description: undefined,
+			tally: { going: 0, not_going: 0, maybe: 0, late: 0 },
 			},
 		]);
 		const res = await listAgenda(cfg, [org('o1', 'A')], NOW);
@@ -126,6 +132,7 @@ describe('listAgenda', () => {
 				location: undefined,
 				name: undefined,
 				description: undefined,
+			tally: { going: 0, not_going: 0, maybe: 0, late: 0 },
 			},
 		]);
 		const res = await listAgenda(cfg, [org('bad', 'Broken'), org('ok', 'Fine')], NOW);

@@ -80,6 +80,7 @@ const sampleItem = {
 	description: undefined,
 	orgId: 'org1',
 	orgLabel: 'EFK',
+tally: { going: 0, not_going: 0, maybe: 0, late: 0 },
 };
 const readyUser = {
 	status: 'ready' as const,

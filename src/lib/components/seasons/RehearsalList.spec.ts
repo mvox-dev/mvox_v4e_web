@@ -26,10 +26,10 @@ afterEach(cleanup);
 
 // Two series, two rehearsals each
 const rehearsalsMultiSeries: Rehearsal[] = [
-	{ id: 'r1', seriesId: 'ser1', startDatetime: '2026-09-01T16:00:00.000Z', durationMinutes: 90 },
-	{ id: 'r2', seriesId: 'ser1', startDatetime: '2026-09-08T16:00:00.000Z', durationMinutes: 90 },
-	{ id: 'r3', seriesId: 'ser2', startDatetime: '2026-09-02T17:00:00.000Z', durationMinutes: 60 },
-	{ id: 'r4', seriesId: 'ser2', startDatetime: '2026-09-09T17:00:00.000Z', durationMinutes: 60 },
+	{ id: 'r1', seriesId: 'ser1', startDatetime: '2026-09-01T16:00:00.000Z', durationMinutes: 90, tally: { going: 0, not_going: 0, maybe: 0, late: 0 } },
+	{ id: 'r2', seriesId: 'ser1', startDatetime: '2026-09-08T16:00:00.000Z', durationMinutes: 90, tally: { going: 0, not_going: 0, maybe: 0, late: 0 } },
+	{ id: 'r3', seriesId: 'ser2', startDatetime: '2026-09-02T17:00:00.000Z', durationMinutes: 60, tally: { going: 0, not_going: 0, maybe: 0, late: 0 } },
+	{ id: 'r4', seriesId: 'ser2', startDatetime: '2026-09-09T17:00:00.000Z', durationMinutes: 60, tally: { going: 0, not_going: 0, maybe: 0, late: 0 } },
 ];
 const seriesNames = new Map([
 	['ser1', 'Tuesday Evening'],
@@ -59,6 +59,7 @@ describe('RehearsalList', () => {
 				seriesId: 'ser1',
 				startDatetime: '2026-09-01T16:00:00.000Z',
 				durationMinutes: 90,
+			tally: { going: 0, not_going: 0, maybe: 0, late: 0 },
 			},
 			// no location property
 		];
@@ -80,6 +81,7 @@ describe('RehearsalList', () => {
 				seriesId: 'ser1',
 				startDatetime: '2020-01-01T10:00:00.000Z',
 				durationMinutes: 60,
+			tally: { going: 0, not_going: 0, maybe: 0, late: 0 },
 			},
 		];
 		const { container } = render(RehearsalList, {
@@ -100,6 +102,7 @@ describe('RehearsalList', () => {
 				seriesId: 'ser1',
 				startDatetime: '2099-01-01T10:00:00.000Z',
 				durationMinutes: 60,
+			tally: { going: 0, not_going: 0, maybe: 0, late: 0 },
 			},
 		];
 		const { container } = render(RehearsalList, {
@@ -121,6 +124,7 @@ describe('RehearsalList', () => {
 				seriesId: 'ser1',
 				startDatetime: '2026-09-01T16:00:00.000Z',
 				durationMinutes: 90,
+			tally: { going: 0, not_going: 0, maybe: 0, late: 0 },
 			},
 		];
 		const { container } = render(RehearsalList, {
@@ -146,6 +150,7 @@ describe('RehearsalList', () => {
 				seriesId: 'ser1',
 				startDatetime: '2026-09-01T16:00:00.000Z',
 				durationMinutes: 90,
+			tally: { going: 0, not_going: 0, maybe: 0, late: 0 },
 			},
 		];
 		const { container } = render(RehearsalList, {
@@ -166,8 +171,8 @@ describe('RehearsalList', () => {
 	it('canManage=true: rehearsal-edit button present on each row', () => {
 		// Owner-gated: edit control is present when canManage=true.
 		const rehearsals: Rehearsal[] = [
-			{ id: 'r1', seriesId: 'ser1', startDatetime: '2026-09-01T16:00:00.000Z', durationMinutes: 90 },
-			{ id: 'r2', seriesId: 'ser1', startDatetime: '2026-09-08T16:00:00.000Z', durationMinutes: 90 },
+			{ id: 'r1', seriesId: 'ser1', startDatetime: '2026-09-01T16:00:00.000Z', durationMinutes: 90, tally: { going: 0, not_going: 0, maybe: 0, late: 0 } },
+			{ id: 'r2', seriesId: 'ser1', startDatetime: '2026-09-08T16:00:00.000Z', durationMinutes: 90, tally: { going: 0, not_going: 0, maybe: 0, late: 0 } },
 		];
 		const { container } = render(RehearsalList, {
 			rehearsals,
@@ -186,7 +191,7 @@ describe('RehearsalList', () => {
 	it('canManage=false (or absent): rehearsal-edit button NOT rendered', () => {
 		// Non-owner: edit control must be absent (owner-gated).
 		const rehearsals: Rehearsal[] = [
-			{ id: 'r1', seriesId: 'ser1', startDatetime: '2026-09-01T16:00:00.000Z', durationMinutes: 90 },
+			{ id: 'r1', seriesId: 'ser1', startDatetime: '2026-09-01T16:00:00.000Z', durationMinutes: 90, tally: { going: 0, not_going: 0, maybe: 0, late: 0 } },
 		];
 		const { container } = render(RehearsalList, {
 			rehearsals,
@@ -200,7 +205,7 @@ describe('RehearsalList', () => {
 	it('rehearsal-edit click: onedit(rehearsalId) called with the correct rehearsal id', async () => {
 		const onedit = vi.fn();
 		const rehearsals: Rehearsal[] = [
-			{ id: 'r-edit-1', seriesId: 'ser1', startDatetime: '2026-09-01T16:00:00.000Z', durationMinutes: 90 },
+			{ id: 'r-edit-1', seriesId: 'ser1', startDatetime: '2026-09-01T16:00:00.000Z', durationMinutes: 90, tally: { going: 0, not_going: 0, maybe: 0, late: 0 } },
 		];
 		const { container } = render(RehearsalList, {
 			rehearsals,
@@ -235,8 +240,8 @@ describe('RehearsalList', () => {
 // in each group header.
 describe('RehearsalList — delete-series control (T5, #86)', () => {
 	const rehearsals: Rehearsal[] = [
-		{ id: 'r1', seriesId: 'ser1', startDatetime: '2026-09-01T16:00:00.000Z', durationMinutes: 90 },
-		{ id: 'r2', seriesId: 'ser1', startDatetime: '2026-09-08T16:00:00.000Z', durationMinutes: 90 },
+		{ id: 'r1', seriesId: 'ser1', startDatetime: '2026-09-01T16:00:00.000Z', durationMinutes: 90, tally: { going: 0, not_going: 0, maybe: 0, late: 0 } },
+		{ id: 'r2', seriesId: 'ser1', startDatetime: '2026-09-08T16:00:00.000Z', durationMinutes: 90, tally: { going: 0, not_going: 0, maybe: 0, late: 0 } },
 	];
 	const seriesNamesOne = new Map([['ser1', 'Tuesday Evening']]);
 

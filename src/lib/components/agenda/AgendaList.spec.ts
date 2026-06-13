@@ -32,6 +32,7 @@ const itemSameDay: AgendaItem[] = [
 		description: undefined,
 		orgId: 'org1',
 		orgLabel: 'EFK',
+	tally: { going: 0, not_going: 0, maybe: 0, late: 0 },
 	},
 	{
 		id: 'r2',
@@ -43,6 +44,7 @@ const itemSameDay: AgendaItem[] = [
 		description: undefined,
 		orgId: 'org2',
 		orgLabel: 'Koor B',
+	tally: { going: 0, not_going: 0, maybe: 0, late: 0 },
 	},
 ];
 
@@ -58,6 +60,7 @@ const itemsDifferentDays: AgendaItem[] = [
 		description: undefined,
 		orgId: 'org1',
 		orgLabel: 'EFK',
+	tally: { going: 0, not_going: 0, maybe: 0, late: 0 },
 	},
 	{
 		id: 'r2',
@@ -69,6 +72,7 @@ const itemsDifferentDays: AgendaItem[] = [
 		description: undefined,
 		orgId: 'org1',
 		orgLabel: 'EFK',
+	tally: { going: 0, not_going: 0, maybe: 0, late: 0 },
 	},
 ];
 
