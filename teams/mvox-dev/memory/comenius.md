@@ -6,6 +6,22 @@ Tags: `[DECISION]`, `[PATTERN]`, `[WIP]`, `[CHECKPOINT]`, `[DEFERRED]`, `[GOTCHA
 
 ---
 
+## Session 33 — S33 sub-chain 1 i18n (2026-06-13)
+
+[CHECKPOINT] Added 6 keys (nav_menu_about + page_coming_soon_* + page_*_description) across 4 locales. Commit `bc57ca1` on `feat/s33-navigation`. pnpm check: 0 errors / 8 pre-existing warnings. pnpm test:unit: 112 files, 956 tests — all pass. The 6 AvatarMenu failures resolved.
+
+[DECISION] `nav_menu_about`: et `Meist` / lv `Par mums` / uk `Про нас` — "About us" short form. Different from `landing_footer_link_about` which uses full "About mvox" phrasing. Menu context warrants shorter label.
+
+[DECISION] `page_coming_soon_label` ("Coming soon"): et `Peagi tulemas` (matches badge vocab PEAGI+TULEMAS); lv `Drīzumā` (single word, no redundant compound); uk `Незабаром` (already covers COMING+SOON badges).
+
+[DECISION] `page_coming_soon_back_to_agenda`: et `Tagasi kava juurde` (allative); lv `Atpakaļ uz programmu` (acc.); uk `Назад до програми` (gen.). Standard back-link patterns per locale.
+
+[CONVENTION] `page_*_description` keys (roster/notices/settings): full real translations, no TODO markers. Simple noun phrases + description sentences, no date-specific content. Register: informal 2nd-sg (et) / formal-pl (lv/uk) per established patterns.
+
+(*MVOX:Comenius*)
+
+---
+
 ## Session 31 — #8 rsvp i18n Task 1 (2026-06-12)
 
 [CHECKPOINT] Added 6 `rsvp_*` keys across 4 locales. Commit `ff77b97` on `feat/rsvp-singer`. `pnpm check` 0 errors, 8 pre-existing warnings. Reused the `comenius-agenda-i18n` worktree (checked out `feat/rsvp-singer` there — branch switch works cleanly in existing worktree with `node_modules` present).

@@ -539,4 +539,29 @@ Files created/modified:
 
 [DECISION] trusted-identity stack fully reverted. identity-cookie.ts + identity-cookie.spec.ts deleted. Server-exchange approach confirmed impossible (aud=IP binding). Formula-based tally approach works instead.
 
+## [CHECKPOINT] 2026-06-13 — Session 33: S33 sub-chain 1 RED phase
+
+[DECISION] 41 RED tests across 9 spec files on `feat/s33-navigation`. SHA `b049c1a`. 915 existing tests unaffected.
+
+Spec files written:
+- `src/lib/nav/currentTab.spec.ts` (8) — tabForPath() for all 6 paths + fallback
+- `src/lib/components/SoonMarker.spec.ts` (6) — handwritten "soon" marker
+- `src/lib/components/ComingSoon.spec.ts` (4) — coming-soon page component (with paraglide mocks)
+- `src/routes/roster/page.spec.ts` (4) — /roster placeholder route
+- `src/routes/notices/page.spec.ts` (4) — /notices placeholder route
+- `src/routes/settings/page.spec.ts` (4) — /settings placeholder route
+- `src/lib/components/MvoxNav.spec.ts` (+8) — Library <a> link + mobile menu <a> links (S33 describe block)
+- `src/lib/components/AvatarMenu.spec.ts` (+3) — About link in dropdown (S33 describe block)
+- `tests/s33-coming-soon-readability.spec.ts` (3) — Playwright bg-rule check (remains RED until routes + preview server built)
+
+Stubs committed (YELLOW-78.1 pattern — RED = assertion failure, not module resolution):
+- `src/lib/nav/currentTab.ts` — throws 'not implemented'
+- `src/lib/components/SoonMarker.svelte` — empty stub span
+- `src/lib/components/ComingSoon.svelte` — stub with correct Props type, renders empty div
+- `src/routes/roster/+page.svelte`, `src/routes/notices/+page.svelte`, `src/routes/settings/+page.svelte` — empty div stubs
+
+[PATTERN] Route page specs: mock `$lib/paraglide/runtime.js` AND `$lib/paraglide/messages.js` fully when the page/component imports `m.*` keys. Import the page module AFTER the vi.mock calls.
+
+[PATTERN] AvatarMenu — existing "focuses first menuitem" test pins sign-out link as first focus target. S33 GREEN shifts this to About link. Handled via a separate S33 describe block with a complementary focus test — existing test left in place as a forward guard until Byrd wires About (it will conflict post-GREEN; Byrd updates existing test as part of GREEN per Task-15 rule).
+
 (*MVOX:Tallis*)

@@ -7,6 +7,19 @@ metadata:
 
 # Bentham scratchpad
 
+## 2026-06-13 — Session 33: feat/s33-navigation @ `07191d5` — GREEN + YELLOW-33.1 (hardcoded ComingSoon `label`)
+
+[#s33-nav 2026-06-13] **GREEN — merge-eligible — `feat/s33-navigation` @ `07191d5`** (off main `8280178`; trail RED `b049c1a` → GREEN `83e159e` → i18n `bc57ca1` → RED-fixes `2cc9b56` → lv-term `07191d5`). Merge-shape clean (`07191d5..origin/main` empty). Verified from blobs. Nav-cleanup + 3 placeholder routes (roster/notices/settings) + SoonMarker + ComingSoon + pure `tabForPath()`. Zero server surface (no `$lib/server`/`$env/*/private`/node imports in any new file — clean Path-C). Runes-only.
+- **MvoxNav GOTCHA-OVERFLOW-FORCES-AUTO does NOT fire**: dropdown ancestor is `<div class="relative sm:hidden">` (no overflow clip); header is `relative z-30` (the CHORE-77 fix preserved); dropdown `absolute top-full z-50`. Responsive BOTH-halves OK: `nav-inline-tabs` is `hidden sm:flex` (base-hide present).
+- **Mobile-menu a11y IMPROVEMENT**: dropdown items `<div tabindex=0 ... cursor-default>` (no-op anti-pattern) → real `<a href role=menuitem>`. Inline-tab `<span>` for library → `<a href>`. Genuine fix, not a regression.
+- **`+layout.svelte` refactor is a real bugfix**: inline `currentTab` derivation that OMITTED `/seasons` → pure `tabForPath()` which maps it. Unit-tested (`currentTab.spec.ts` pins `/seasons`→seasons + `/unknown`→agenda fallback). No `?org=`/persisted-state regression (nav links plain `href`).
+- **RED `b049c1a` = tests + minimal import-stubs** (ComingSoon 15L, SoonMarker 2L, currentTab 9L, placeholder pages) so 41 tests fail on ASSERTIONS not import errors. Established Tallis RED pattern, TDD-compliant.
+- i18n: 6 new keys × 4 locales in sync (`nav_menu_about` + 5 `page_*`), all live in `src/`, no AUTHORED-BUT-DEAD. Specs render real components.
+
+[YELLOW-33.1 — ComingSoon `label` prop is hardcoded English, rendered to user.] roster/notices/settings `+page.svelte` pass `label="Choir management"` / `"Communications"` / `"Account"` — rendered into the visible `coming-soon-label` eyebrow (`ComingSoon.svelte` `{label}` + `ComingSoon.spec.ts:29` asserts the literal). `name`/`description`/back-link ARE i18n'd; only the category eyebrow is not → displays untranslated English in et/lv/uk. YELLOW not RED: placeholder pages, feature works, every other string localized. Fix = 3 `m.page_*_label()` keys ×4 locales (Comenius + Byrd one-liners). Routed to Task #7 (nav follow-ups) — classic GOTCHA-AUTHORED-BUT-DEAD-I18N's inverse (string IN src but NOT in locales).
+
+(*MVOX:Bentham*)
+
 ## 2026-06-13 — Session 32: reviews summary
 
 [SESSION-32 2026-06-13] 10 reviews this session, all GREEN. Highlights:

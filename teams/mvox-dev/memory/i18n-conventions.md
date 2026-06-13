@@ -215,6 +215,17 @@ Tab label keys for MvoxNav: `nav_tab_agenda`, `nav_tab_library`, `nav_tab_roster
 
 ---
 
+### Terminology consistency rule (added session 33, 2026-06-13)
+
+When a nav-tab key establishes the canonical term for a feature area, all other keys in that feature area (page titles, descriptions, back-links) **must use the same term**. The tab is the primary entry point and sets user expectation.
+
+- **lv "settings"**: canonical term is `iestatījumi` (from `nav_tab_settings`). Do NOT use `preferences` loanword in descriptions or labels — that creates terminology drift within the same interface.
+- General check: before committing `page_*_description` or similar context keys, verify the noun form matches the corresponding `nav_tab_*` value in that locale.
+
+(*MVOX:Comenius*)
+
+---
+
 ### Naming rule: i18n keys are vocabulary-neutral (added session 24, 2026-05-31)
 
 i18n message **keys** never carry vertical-specific vocabulary (no `choir`, `sing`, `orchestra`, etc. in key names). The **values** carry the vocabulary; the keys describe what slot the string fills semantically.
@@ -402,5 +413,51 @@ Single new key added for the rehearsal inline edit form heading. All other neede
 | `rsvp_error` | et | `RSVP salvestamine ebaõnnestus. Palun proovi uuesti.` | Verbal-noun pattern for error (matches `agenda_partial_error` style). |
 | `rsvp_error` | lv | `Neizdevās saglabāt RSVP. Lūdzu, mēģiniet vēlreiz.` | Verb-first impersonal past; matches `auth_callback_failed` style. |
 | `rsvp_error` | uk | `Не вдалося зберегти RSVP. Будь ласка, спробуйте ще раз.` | Impersonal past + infinitive; matches existing error patterns. |
+
+(*MVOX:Comenius*)
+
+---
+
+### New key group: `nav_menu_*` + `page_*` (S33 sub-chain 1, session 33, 2026-06-13)
+
+6 keys for avatar menu "About" link and placeholder coming-soon pages. Commit `bc57ca1` on `feat/s33-navigation`.
+
+**`nav_menu_about`** — plain "About" nav menu item linking to `/about`. Distinguished from `landing_footer_link_about` ("About mvox" full phrase) by context: the dropdown menu is tighter, "About" alone is the natural label.
+- et: `Meist` — "About us"; standard Estonian product nav label; shorter than `Teave mvox-i kohta`.
+- lv: `Par mums` — "About us"; standard Latvian dropdown label; `Par mvox` reserved for the footer where the brand name clarifies context.
+- uk: `Про нас` — "About us"; standard Ukrainian nav label.
+
+**`page_coming_soon_label`** — eyebrow label on placeholder pages ("Coming soon").
+- et: `Peagi tulemas` — combines `PEAGI` (soon) + `TULEMAS` (coming); matches badge vocabulary; two-word phrase natural for an eyebrow.
+- lv: `Drīzumā` — "soon/coming soon"; single word covers the meaning; more natural than `Gaidāms drīzumā` (redundant).
+- uk: `Незабаром` — standard Ukrainian "coming soon"; already used for both `COMING` + `SOON` badges.
+
+**`page_coming_soon_back_to_agenda`** — back-link on placeholder pages ("Back to Agenda").
+- et: `Tagasi kava juurde` — "back to the agenda" (allative `juurde`); natural Estonian back-link phrasing.
+- lv: `Atpakaļ uz programmu` — "back to programme" (accusative `programmu` after `uz`); standard Latvian back-link.
+- uk: `Назад до програми` — "back to programme" (genitive `програми` after `до`); standard Ukrainian back-link.
+
+**`page_roster_description`, `page_notices_description`, `page_settings_description`** — one-line descriptions on placeholder pages. Full translations — no TODO markers. Register: informal 2nd-sg (et) / formal-pl (lv/uk), matching established patterns.
+
+| Key | Locale | Value | Rationale |
+|---|---|---|---|
+| `nav_menu_about` | et | `Meist` | "About us" elative; standard Estonian product nav label. |
+| `nav_menu_about` | lv | `Par mums` | "About us"; standard Latvian dropdown (footer gets `Par mvox`). |
+| `nav_menu_about` | uk | `Про нас` | "About us"; standard Ukrainian nav label. |
+| `page_coming_soon_label` | et | `Peagi tulemas` | "Coming soon" two-word phrase; matches badge vocab (`PEAGI`+`TULEMAS`). |
+| `page_coming_soon_label` | lv | `Drīzumā` | Single word covers "coming soon"; avoids redundant compound. |
+| `page_coming_soon_label` | uk | `Незабаром` | Standard Ukrainian "coming soon"; already used for `COMING`+`SOON` badges. |
+| `page_coming_soon_back_to_agenda` | et | `Tagasi kava juurde` | "Back to agenda" (allative); natural Estonian back-link. |
+| `page_coming_soon_back_to_agenda` | lv | `Atpakaļ uz programmu` | "Back to programme" (acc. after `uz`); standard Latvian. |
+| `page_coming_soon_back_to_agenda` | uk | `Назад до програми` | "Back to programme" (gen. after `до`); standard Ukrainian. |
+| `page_roster_description` | et | `Vaata, kes sinu kooris laulab — häälerühmad, hääled ja kontaktid.` | Informal 2nd-sg `Vaata`; `häälerühmad`=voice groups, `hääled`=voice parts. |
+| `page_roster_description` | lv | `Uzziniet, kas dzied jūsu korī — sekcijas, balsu daļas un kontaktinformācija.` | Formal pl. `Uzziniet`; `balsu daļas`=voice parts. |
+| `page_roster_description` | uk | `Дізнайтеся, хто співає у вашому хорі — секції, партії і контакти.` | Formal 2nd-pl; `партії`=voice parts (choral term). |
+| `page_notices_description` | et | `Teated ja sõnumid sinu koorile.` | `teated`=notices; `sõnumid`=messages; `koorile`=for choir (dative). |
+| `page_notices_description` | lv | `Paziņojumi un ziņas jūsu korim.` | `paziņojumi`=announcements; `ziņas`=messages; `korim`=for choir (dative). |
+| `page_notices_description` | uk | `Оголошення та повідомлення для вашого хору.` | Standard Ukrainian; both nouns in nominative. |
+| `page_settings_description` | et | `Sinu konto ja eelistused.` | `eelistused`=preferences; informal 2nd-sg (`sinu`). |
+| `page_settings_description` | lv | `Jūsu konts un iestatījumi.` | `iestatījumi` = settings — must match `nav_tab_settings`; "preferences" loanword was inconsistent. Fixed in `07191d5`. |
+| `page_settings_description` | uk | `Ваш обліковий запис та налаштування.` | `обліковий запис`=account (standard formal); `налаштування`=settings/preferences. |
 
 (*MVOX:Comenius*)
