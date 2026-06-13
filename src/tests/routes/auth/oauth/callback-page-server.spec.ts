@@ -20,11 +20,15 @@ import { load } from '../../../../routes/auth/callback/+page.server';
 
 describe('/auth/callback server load', () => {
 	beforeEach(() => {
+		// Probed array shape: accounts: [{ _id: db, name, user: { _id: personId } }]
 		vi.stubGlobal(
 			'fetch',
 			vi.fn().mockResolvedValue({
 				ok: true,
-				json: async () => ({ accounts: { testdb: 'some-person' } }),
+				json: async () => ({
+					accounts: [{ _id: 'testdb', name: 'testdb', user: { _id: 'some-person' } }],
+					token: 'tok',
+				}),
 			}),
 		);
 	});
@@ -85,13 +89,18 @@ function makeCookies() {
 	return { get: vi.fn(), set: vi.fn(), delete: vi.fn() };
 }
 
-/** Stub a global fetch that returns a valid Entu /auth response for the given personId. */
+/** Stub a global fetch that returns a valid Entu /auth response for the given personId.
+ * Uses the PROBED array shape: accounts: [{ _id: db, name, user: { _id: personId } }]
+ */
 function stubEntuExchangeOk(personId = 'person-77') {
 	vi.stubGlobal(
 		'fetch',
 		vi.fn().mockResolvedValue({
 			ok: true,
-			json: async () => ({ accounts: { testdb: personId } }),
+			json: async () => ({
+				accounts: [{ _id: 'testdb', name: 'testdb', user: { _id: personId } }],
+				token: 'tok',
+			}),
 		}),
 	);
 }
@@ -158,12 +167,37 @@ describe('/auth/callback server load — server-side Entu exchange + identity co
 		expect(cookiesMock.set).not.toHaveBeenCalled();
 	});
 
-	it('exchange 200 but accounts lacks the db → no cookies + redirect to error=exchange_no_account', async () => {
+	it('exchange 200 but accounts array has no matching db → no cookies + redirect to error=exchange_no_account', async () => {
+		// Probed array shape with a DIFFERENT db — testdb absent
 		vi.stubGlobal(
 			'fetch',
 			vi.fn().mockResolvedValue({
 				ok: true,
-				json: async () => ({ accounts: { otherdb: 'person-x' } }), // testdb absent
+				json: async () => ({
+					accounts: [{ _id: 'other_db', name: 'other_db', user: { _id: 'person-x' } }],
+					token: 'tok',
+				}),
+			}),
+		);
+		const cookiesMock = makeCookies();
+		const url = new URL('https://multivox.pages.dev/auth/callback?key=some-key');
+
+		await expect(
+			(load as unknown as (e: { url: URL; cookies: typeof cookiesMock }) => Promise<unknown>)({
+				url,
+				cookies: cookiesMock,
+			}),
+		).rejects.toMatchObject({ status: 303, location: expect.stringContaining('exchange_no_account') });
+
+		expect(cookiesMock.set).not.toHaveBeenCalled();
+	});
+
+	it('exchange 200 but accounts array is empty → no cookies + redirect to error=exchange_no_account', async () => {
+		vi.stubGlobal(
+			'fetch',
+			vi.fn().mockResolvedValue({
+				ok: true,
+				json: async () => ({ accounts: [], token: 'tok' }),
 			}),
 		);
 		const cookiesMock = makeCookies();

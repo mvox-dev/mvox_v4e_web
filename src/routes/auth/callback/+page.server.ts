@@ -31,8 +31,10 @@ export const load: ServerLoad = async ({ url, cookies }) => {
 			throw redirect(303, `/auth/login?error=exchange_http_${res.status}`);
 		}
 
-		const data = (await res.json()) as { accounts?: Record<string, string> };
-		const pid = data.accounts?.[PUBLIC_ENTU_DB];
+		const data = (await res.json()) as {
+			accounts?: Array<{ _id: string; user?: { _id: string } }>;
+		};
+		const pid = data.accounts?.find((a) => a._id === PUBLIC_ENTU_DB)?.user?._id;
 
 		if (!pid) {
 			console.error('Entu exchange: accounts missing db entry');
