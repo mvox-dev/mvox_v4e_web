@@ -583,4 +583,61 @@ Files:
 
 [PATTERN] Readability conformance tests: use `.closest('.state-msg-container')` to find the wrapping container, then assert bg class OR inline style. This is permissive enough to let Byrd choose Tailwind class vs CSS custom property approach.
 
+## [CHECKPOINT] 2026-06-13 — Session 33: S33 sub-chain 3 RED phase
+
+[DECISION] 18 RED tests across 9 spec files on `feat/s33-readability-conformance`. SHA `e20294f`. 975 existing tests unaffected.
+
+Files changed:
+- `src/lib/components/seasons/SeasonForm.spec.ts` (+2) — panel wrapper + heading bg ancestor
+- `src/lib/components/seasons/SeriesForm.spec.ts` (+2) — same
+- `src/lib/components/seasons/RehearsalEditForm.spec.ts` (+2) — same
+- `src/lib/components/seasons/RehearsalList.spec.ts` (+2) — group-header + empty-text bg ancestor
+- `src/routes/library/page.spec.ts` (+2) — library-loading/library-error bg ancestor
+- `src/lib/components/library/LibraryMobileList.spec.ts` (+2) — empty-state + row bg ancestor (row test passes vacuously — hover:bg-paper-2 matches `bg-` check; noted)
+- `src/lib/components/library/LibraryMasterDetail.spec.ts` (+1) — mobile-back bg ancestor
+- `src/routes/auth/[provider]/page.spec.ts` (+2) — source-level: no text-gray-*, has DeskSurface
+- `src/routes/auth/callback/page.spec.ts` (+4) — source-level: no text-gray-*/red-*/blue-*, has DeskSurface
+- `tests/bg-rule.spec.ts` (NEW) — Playwright bg-rule gate; stays RED until preview server
+
+[PATTERN] Ancestor bg-walk pattern: `let el = target?.parentElement; while (el && el !== container) { if cls.includes('bg-') || style.includes('background') || cls.includes('panel') → hasColoredBg = true; break; }`. Used across all conformance tests — permissive, lets Byrd choose Tailwind vs CSS-var approach.
+
+[GOTCHA] LibraryMobileList row test vacuously passes: `hover:bg-paper-2` on the row anchor's class triggers `cls.includes('bg-')`. Not a real non-transparent bg (it's hover-only). Forward guard only — documented in handoff.
+
+[PATTERN] Auth page conformance: source-level test via `readFileSync` (same as DeskSurface `?raw` approach). Avoids complex mount issues with `$app/state`, `$env/static/public`, `$app/navigation` that the auth pages depend on.
+
+[DECISION] data-desk-text decisions: NO exemption-tag tests written in sub-chain 3 RED. Landing marginalia (LandingInvitesSection, LandingRequestSection, LandingHero, LandingDashboardGreet, LibraryEmptyState marginalia) are genuinely bare on desk per the audit, but writing exemption-tag assertions requires reading and auditing each component — high judgment-call density. These are deferred to Byrd/Bentham judgment at GREEN+review phase, per handoff note. The bg-rule Playwright gate already catches unexempted bare text at runtime.
+
+## [CHECKPOINT] 2026-06-13 — Session 33: bg-rule gate fix (5f2d9f4)
+
+[DECISION] Two bugs fixed in tests/bg-rule.spec.ts, committed `5f2d9f4`:
+1. Selector collision: original walk round-tripped element identity through tag-name string → `document.querySelector(tag)` always found the FIRST element of that tag. Fixed by moving entire DOM walk + hasBgOrExemption check into one `page.evaluate()` with live element references.
+2. Auth-guarded routes: /roster, /notices, /settings → 302 to /auth/login; removed from PUBLIC_ROUTES. Correct list: ['/', '/about', '/auth/login'].
+
+[DECISION] True violation picture from corrected gate + real preview server (build `0a9bafb`):
+- `/` → 1 violation: `div[0]: «Four parts of the back office»` — LandingPillarsSection eyebrow/subtext, bare on desk. Needs `data-desk-text` OR bg chip.
+- `/about` → 0 violations (clean)
+- `/auth/login` → 0 violations (clean)
+- negative control → PASS
+
+[GOTCHA] Playwright bg-rule gate: always run inside a single page.evaluate() — never round-trip element identity through a CSS selector string between host and browser context. The describeEl() helper builds a human-readable path (tag + nth-sibling-index + text snippet) for violation reporting without needing a selector round-trip.
+
+## [CHECKPOINT] 2026-06-13 — Session 33: bg-rule gate hardening (a1fca62)
+
+[DECISION] Four fixes applied to tests/bg-rule.spec.ts, committed `a1fca62`:
+
+FIX A (RED): `isOpaqueColor(bg)` helper — parses alpha from `rgba()` and requires > 0. Old literal `!== 'rgba(0, 0, 0, 0)'` would false-pass `rgba(251,249,243,0)` (transparent with non-zero RGB components).
+
+FIX B (YELLOW): New negative-control test — injects `rgba(100,100,100,0)` span on `.wood-bg`, asserts it's still detected as a violation. Guards Fix A from regression.
+
+FIX C (YELLOW): Walk now iterates `el.childNodes` for `TEXT_NODE` entries in mixed-content elements. These bare text strings (e.g. "Hello " in `<p>Hello <b>!</b></p>`) were silently skipped by the element-only walk. Parent element used for ancestry check.
+
+FIX D (YELLOW): Added `bgImage !== 'none'` check in `hasBgOrExemption`. Safe because `.wood-bg` stop condition fires via `classList.contains('wood-bg')` BEFORE we test that element's own background-image — desk gradient cannot false-pass.
+
+[DECISION] Final gate result after all four fixes + fresh `pnpm build` + preview server:
+- 5/5 Playwright tests pass (3 routes + 2 negative controls)
+- `/` → 0 violations, `/about` → 0 violations, `/auth/login` → 0 violations
+- `pnpm test:unit` → 993/993 pass, no regressions
+
+[PATTERN] isOpaqueColor() pattern for rgba parsing in Playwright: use `/^rgba\(\s*[\d.]+\s*,\s*[\d.]+\s*,\s*[\d.]+\s*,\s*([\d.]+)\s*\)$/` regex and require `parseFloat(alpha) > 0`. rgb() and named colors are always opaque.
+
 (*MVOX:Tallis*)
