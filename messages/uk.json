@@ -236,5 +236,24 @@
 	"seasons_notice_partial_generate": "Створено {created} з {total} репетицій. Видаліть серію та спробуйте ще раз.",
 	"seasons_notice_update_failed": "Не вдалося зберегти зміни — будь ласка, спробуйте ще раз.",
 	"seasons_page_title": "Розклад репетицій",
-	"seasons_warning_outside_season": "Увага: ця серія виходить за межі дат сезону."
+	"seasons_warning_outside_season": "Увага: ця серія виходить за межі дат сезону.",
+
+	"invite_accept": "Прийняти",
+	"invite_accepting": "Приймаю…",
+	"invite_copy_link": "Копіювати посилання",
+	"invite_copy_link_copied": "Скопійовано!",
+	"invite_expired": "Цей запрошення вже не дійсне",
+	"invite_heading": "{orgName} запрошує вас",
+	"invite_loading": "Завантаження запрошення…",
+	"invite_not_found": "Запрошення не знайдено",
+	"invite_sign_in_to_accept": "Увійдіть, щоб прийняти",
+	"invite_success": "Ви приєдналися",
+
+	"members_empty": "Поки немає учасників",
+	"members_error": "Не вдалося завантажити учасників",
+	"members_heading": "Учасники",
+	"members_invite_empty": "Немає очікуваних запрошень",
+	"members_invite_heading": "Очікувані запрошення",
+
+	"nav_tab_members": "Учасники"
 }

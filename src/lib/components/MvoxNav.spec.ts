@@ -208,9 +208,9 @@ describe('MvoxNav — responsive layout (CHORE-76)', () => {
 		const { container } = render(MvoxNav, { props: signedInProps });
 		const inlineTabRow = container.querySelector('[data-testid="nav-inline-tabs"]');
 		expect(inlineTabRow).not.toBeNull();
-		// All 6 tabs must be present inside the inline row (5 existing + seasons)
+		// All 7 tabs must be present inside the inline row (5 existing + seasons + members)
 		const inlineItems = inlineTabRow?.querySelectorAll('[data-testid^="nav-inline-tab-"]');
-		expect(inlineItems?.length).toBe(6);
+		expect(inlineItems?.length).toBe(7);
 	});
 
 	// AC4 — OrgPicker chip does not force horizontal overflow on narrow viewports.
@@ -569,7 +569,10 @@ describe('MvoxNav — Members tab (slice-3)', () => {
 
 	it("'members' tab has active state when currentTab==='members'", () => {
 		const { container } = render(MvoxNav, {
-			props: { ...signedInProps, currentTab: 'members' as unknown as typeof signedInProps.currentTab },
+			props: {
+				...signedInProps,
+				currentTab: 'members' as unknown as typeof signedInProps.currentTab,
+			},
 		});
 		// After GREEN: active class or aria-current on members tab
 		// The members tab should be visually distinct when active
@@ -595,7 +598,8 @@ describe('MvoxNav — Members tab (slice-3)', () => {
 		// After GREEN: <a href="/members"> or element with href=/members
 		// RED: null (tab doesn't exist yet)
 		if (membersTab) {
-			const href = membersTab.getAttribute('href') ?? membersTab.querySelector('a')?.getAttribute('href');
+			const href =
+				membersTab.getAttribute('href') ?? membersTab.querySelector('a')?.getAttribute('href');
 			expect(href).toBe('/members');
 		} else {
 			expect(membersTab).not.toBeNull(); // RED: drive GREEN

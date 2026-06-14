@@ -236,5 +236,24 @@
 	"seasons_notice_partial_generate": "Created {created} of {total} rehearsals. Delete the series and try again.",
 	"seasons_notice_update_failed": "Couldn't save your changes — please try again.",
 	"seasons_page_title": "Rehearsal schedule",
-	"seasons_warning_outside_season": "Heads up: this series extends beyond the season's dates."
+	"seasons_warning_outside_season": "Heads up: this series extends beyond the season's dates.",
+
+	"invite_accept": "Accept invitation",
+	"invite_accepting": "Accepting…",
+	"invite_copy_link": "Copy link",
+	"invite_copy_link_copied": "Copied!",
+	"invite_expired": "This invitation has expired",
+	"invite_heading": "{orgName} invites you",
+	"invite_loading": "Loading invitation…",
+	"invite_not_found": "Invitation not found",
+	"invite_sign_in_to_accept": "Sign in to accept",
+	"invite_success": "You've joined",
+
+	"members_empty": "No members yet",
+	"members_error": "Failed to load members",
+	"members_heading": "Members",
+	"members_invite_empty": "No pending invitations",
+	"members_invite_heading": "Pending Invitations",
+
+	"nav_tab_members": "Members"
 }

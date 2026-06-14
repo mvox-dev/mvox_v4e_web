@@ -236,5 +236,24 @@
 	"seasons_notice_partial_generate": "Izveidoti {created} no {total} mēģinājumiem. Dzēsiet sēriju un mēģiniet vēlreiz.",
 	"seasons_notice_update_failed": "Izmaiņas saglabāt neizdevās — lūdzu, mēģiniet vēlreiz.",
 	"seasons_page_title": "Mēģinājumu grafiks",
-	"seasons_warning_outside_season": "Ievērojiet: šī sērija pārsniedz sezonas datumus."
+	"seasons_warning_outside_season": "Ievērojiet: šī sērija pārsniedz sezonas datumus.",
+
+	"invite_accept": "Pieņemt",
+	"invite_accepting": "Pieņemu…",
+	"invite_copy_link": "Kopēt saiti",
+	"invite_copy_link_copied": "Nokopēts!",
+	"invite_expired": "Šis ielūgums ir beidzies",
+	"invite_heading": "{orgName} aicina jūs",
+	"invite_loading": "Ielādē ielūgumu…",
+	"invite_not_found": "Ielūgums nav atrasts",
+	"invite_sign_in_to_accept": "Pierakstieties, lai pieņemtu",
+	"invite_success": "Esat pievienojies",
+
+	"members_empty": "Vēl nav dalībnieku",
+	"members_error": "Neizdevās ielādēt dalībniekus",
+	"members_heading": "Dalībnieki",
+	"members_invite_empty": "Nav gaidošu ielūgumu",
+	"members_invite_heading": "Gaidošie ielūgumi",
+
+	"nav_tab_members": "Dalībnieki"
 }

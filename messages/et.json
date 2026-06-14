@@ -236,5 +236,24 @@
 	"seasons_notice_partial_generate": "Loodi {created} / {total} proovist. Kustuta seeria ja proovi uuesti.",
 	"seasons_notice_update_failed": "Muudatuste salvestamine ebaõnnestus — palun proovi uuesti.",
 	"seasons_page_title": "Proovide ajakava",
-	"seasons_warning_outside_season": "Tähelepanu: see seeria ulatub hooaja kuupäevadest välja."
+	"seasons_warning_outside_season": "Tähelepanu: see seeria ulatub hooaja kuupäevadest välja.",
+
+	"invite_accept": "Võta vastu",
+	"invite_accepting": "Võtan vastu…",
+	"invite_copy_link": "Kopeeri link",
+	"invite_copy_link_copied": "Kopeeritud!",
+	"invite_expired": "See kutse on aegunud",
+	"invite_heading": "{orgName} kutsub sind",
+	"invite_loading": "Laadin kutset…",
+	"invite_not_found": "Kutset ei leitud",
+	"invite_sign_in_to_accept": "Logi sisse, et vastu võtta",
+	"invite_success": "Oled liitunud",
+
+	"members_empty": "Liikmeid pole veel",
+	"members_error": "Liikmete laadimine ebaõnnestus",
+	"members_heading": "Liikmed",
+	"members_invite_empty": "Ootel kutseid pole",
+	"members_invite_heading": "Ootel kutsed",
+
+	"nav_tab_members": "Liikmed"
 }

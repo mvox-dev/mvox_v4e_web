@@ -54,8 +54,7 @@ describe('CopyLink', () => {
 		const button = container.querySelector('[data-testid="copy-link-button"]');
 		// aria-label or visible text — either satisfies accessibility
 		const hasLabel =
-			button?.getAttribute('aria-label') !== null ||
-			(button?.textContent?.trim().length ?? 0) > 0;
+			button?.getAttribute('aria-label') !== null || (button?.textContent?.trim().length ?? 0) > 0;
 		expect(hasLabel).toBe(true);
 	});
 });

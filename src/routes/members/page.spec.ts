@@ -34,6 +34,11 @@ vi.mock('$lib/paraglide/messages.js', () => ({
 	members_error: () => 'Failed to load members',
 	members_invite_empty: () => 'No pending invitations',
 	nav_tab_members: () => 'Members',
+	// InviteForm keys (rendered when loadState==='ready' and isOwner)
+	invite_accept: () => 'Accept',
+	invite_accepting: () => 'Accepting…',
+	invite_copy_link: () => 'Copy link',
+	invite_copy_link_copied: () => 'Copied!',
 }));
 vi.mock('$lib/paraglide/runtime.js', () => ({
 	languageTag: () => 'en',
@@ -49,13 +54,15 @@ import Page from './+page.svelte';
 
 const mockListOrgMembers = vi.mocked(listOrgMembers);
 const mockListOrgInvitations = vi.mocked(listOrgInvitations);
-const writableSelected = selectedOrgStore as unknown as Writable<{ id: string; role: string; label: string } | null>;
+const writableSelected = selectedOrgStore as unknown as Writable<{
+	id: string;
+	role: string;
+	label: string;
+} | null>;
 
 beforeEach(() => {
 	vi.clearAllMocks();
-	mockListOrgMembers.mockResolvedValue([
-		{ personId: 'person-1', name: 'Mihkel Putrinš' },
-	]);
+	mockListOrgMembers.mockResolvedValue([{ personId: 'person-1', name: 'Mihkel Putrinš' }]);
 	mockListOrgInvitations.mockResolvedValue([
 		{
 			invitationId: 'inv-a',
@@ -74,10 +81,11 @@ describe('/members page — owner gate', () => {
 	it('renders member roster when selectedOrgStore.role === "owner"', async () => {
 		writableSelected.set({ id: 'org-111', role: 'owner', label: 'EFK' });
 		const { container } = render(Page);
-		// After GREEN: member names appear in the roster
-		// RED: stub renders loading div only
-		const roster = container.querySelector('[data-testid="members-roster"]');
-		expect(roster).not.toBeNull();
+		// After GREEN: $effect resolves listOrgMembers → loadState 'ready' → roster visible
+		await vi.waitFor(() => {
+			const roster = container.querySelector('[data-testid="members-roster"]');
+			expect(roster).not.toBeNull();
+		});
 	});
 
 	it('does NOT show InviteForm when role is not owner', () => {
@@ -99,9 +107,16 @@ describe('/members page — data hydration', () => {
 		render(Page);
 		// After GREEN: listOrgMembers called with cfg and 'org-111'
 		// RED: stub mounts, $effect fires, but stub does nothing
-		await vi.waitFor(() => {
-			// will never satisfy in RED (stub does nothing); GREEN drives this
-		}, { timeout: 100 }).catch(() => {/* RED: timeout expected */});
+		await vi
+			.waitFor(
+				() => {
+					// will never satisfy in RED (stub does nothing); GREEN drives this
+				},
+				{ timeout: 100 },
+			)
+			.catch(() => {
+				/* RED: timeout expected */
+			});
 		// Just assert the mock setup is correct; GREEN will assert call
 		expect(mockListOrgMembers).toBeDefined();
 	});
@@ -121,9 +136,10 @@ describe('/members page — roster state', () => {
 
 	it('shows member names in roster', async () => {
 		const { container } = render(Page);
-		// After GREEN: 'Mihkel Putrinš' appears in roster
-		// RED: stub renders 'loading'
-		expect(container.textContent).toContain('loading'); // RED assertion: stub shows loading
+		// After GREEN: 'Mihkel Putrinš' appears in roster after $effect resolves
+		await vi.waitFor(() => {
+			expect(container.textContent).toContain('Mihkel Putrinš');
+		});
 	});
 
 	it('shows pending invitations section with email', async () => {
