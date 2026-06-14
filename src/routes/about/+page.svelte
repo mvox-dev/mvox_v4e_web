@@ -20,6 +20,12 @@
 				<p data-testid="about-intro" class="font-sans text-[13px] text-ink-2 leading-relaxed mt-2">
 					{m.about_intro()}
 				</p>
+				<p
+					data-testid="about-intro-circle"
+					class="font-sans text-[13px] text-ink-2 leading-relaxed mt-2"
+				>
+					{m.about_intro_circle()}
+				</p>
 			</div>
 
 			<section class="mb-6">
@@ -29,7 +35,7 @@
 				>
 					{m.about_mission_heading()}
 				</h2>
-				<p class="font-sans text-[13px] text-ink-2 leading-relaxed">
+				<p data-testid="about-mission-body" class="font-sans text-[13px] text-ink-2 leading-relaxed">
 					{m.about_mission_body()}
 				</p>
 			</section>
@@ -41,7 +47,7 @@
 				>
 					{m.about_story_heading()}
 				</h2>
-				<p class="font-sans text-[13px] text-ink-2 leading-relaxed">
+				<p data-testid="about-story-body" class="font-sans text-[13px] text-ink-2 leading-relaxed">
 					{m.about_story_body()}
 				</p>
 			</section>
@@ -53,8 +59,20 @@
 				>
 					{m.about_values_heading()}
 				</h2>
-				<p class="font-sans text-[13px] text-ink-2 leading-relaxed">
+				<p data-testid="about-values-body" class="font-sans text-[13px] text-ink-2 leading-relaxed">
 					{m.about_values_body()}
+				</p>
+				<p
+					data-testid="about-values-offer"
+					class="font-sans text-[13px] text-ink-2 leading-relaxed mt-3 border-l-2 border-ink/15 pl-3"
+				>
+					{m.about_values_offer()}
+				</p>
+				<p data-testid="about-contact" class="font-sans text-[13px] text-ink-2 leading-relaxed mt-3">
+					{m.about_contact()}
+					<a href="mailto:mihkel.putrinsh@gmail.com" class="text-ink underline underline-offset-2"
+						>mihkel.putrinsh@gmail.com</a
+					>
 				</p>
 			</section>
 		</PaperCard>
