@@ -719,4 +719,32 @@ Found and fixed 5 vacuous guards this session (SHA 43b4caf):
 
 [DEFERRED] Architecture decision on invite/accept native mechanism — schema-design pass next session (#91). The first test to write for any native model: "admin can read this application entity with only org-owner rights" — that's the property the design must prove before any code follows.
 
+## [CHECKPOINT] 2026-06-14 — Session 36: About/Carus RED + mobile-overflow Playwright pattern
+
+[DECISION] Two RED commits on `feat/about-carus` this session:
+- `f60b172`: 6 unit tests in `src/routes/about/page.spec.ts` (intro-circle, mission/story/values bodies non-Lorem, values-offer, mailto contact link). Updated vi.mock to 12 Carus-outreach keys with real copy. 5 original tests pass, 6 new fail.
+- `b4cd4d4`: 2 Playwright tests in `tests/about-mobile-overflow.spec.ts` (iPhone SE 375×812, Android small 360×800). Both fail: overflow 76px and 83px respectively against the 520px fixed PaperCard.
+
+[PATTERN] Mobile overflow Playwright guard — reusable pattern for any route with a fixed-width card:
+```typescript
+const MOBILE_VIEWPORTS = [
+  { label: 'iPhone SE (375×812)', width: 375, height: 812 },
+  { label: 'Android small (360×800)', width: 360, height: 800 },
+];
+for (const vp of MOBILE_VIEWPORTS) {
+  test(`no horizontal overflow at ${vp.label}`, async ({ page }) => {
+    await page.setViewportSize({ width: vp.width, height: vp.height });
+    await page.goto('/route');
+    await page.waitForSelector('[data-testid="page-anchor"]');
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+    expect(overflow).toBeLessThanOrEqual(0);
+  });
+}
+```
+Wait for a stable DOM anchor before measuring — avoids races where `scrollWidth` is read before layout. `documentElement` scrollWidth/clientWidth is correct; `body` can give stale values when the layout root overflows.
+
+[PATTERN] About page spec mock update discipline: when a component gains new i18n keys before its unit spec is updated, the vi.mock block must be updated atomically with the new test — a stale mock that returns an old subset makes the "non-Lorem" assertions vacuous (they test the mock, not the component).
+
 (*MVOX:Tallis*)

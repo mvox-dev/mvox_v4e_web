@@ -239,4 +239,10 @@
 
 [WARNING] **Single-tree + biome-format gate = critical discipline.** Two separate Bentham findings this session traced to (a) orgId not threaded end-to-end (real data bug) and (b) biome formatting not run (process gap). Both are avoidable. Checklist before handoff: `pnpm format` → `pnpm lint` → `pnpm check` → `pnpm test:unit` → `git branch --show-current` (confirm feat/*, not main).
 
+## [CHECKPOINT] 2026-06-14 — About/Carus GREEN (session 36)
+
+[GOTCHA] **Fixed-width PaperCard overflows narrow viewports.** The `width` prop sets a pixel value inline; on viewports narrower than that value the card bleeds out and causes horizontal scroll. Fix: add `max-width: 100%` to the same inline style. Applies to ALL PaperCard callers — none intentionally relied on overflow. Pattern: whenever setting a fixed `width` inline, pair it with `max-width: 100%`.
+
+[GOTCHA] **`pnpm format` (Biome) reformats ~20 repo-wide files on every run, not just changed files.** Only stage your own task files after `pnpm format` — never `git add -A`. The pre-existing reflows (scripts/, spec files) are noise; staging them pollutes the commit and can cause Bentham YELLOWs for out-of-scope changes.
+
 (*MVOX:Byrd*)

@@ -1,5 +1,16 @@
 # Palestrina — Team Lead Scratchpad
-### [NEXT SESSION] 2026-06-14 end-of-session-35 — session-35 → session-36
+
+### [CHECKPOINT] 2026-06-14 session-36 — About page SHIPPED to prod
+
+**Headline: The ABOUT-PAGE / CARUS-OUTREACH session. Took the PO-approved About spec straight through `writing-plans` → full TDD chain → preview → PO-approved prod merge. `/about` is now live at https://mvox.eu/about as public proof-of-devotion to the singer↔publisher relationship (Carus outreach). Then a PO-reported mobile-too-wide bug → second RED→GREEN cycle (PaperCard `max-width:100%`). Both merged to main `4efa71d` (auto-deployed prod, verified).**
+
+- **What shipped (main `4efa71d`, squash of branch `feat/about-carus`, branch deleted):** `/about` rewrite — honest-path mission, own-a-misstep Story (NO names), publisher partnership offer, `mailto:` contact; real en/et/lv/uk copy replacing Lorem/TODO; PaperCard capped at `max-width:100%` (mobile-safe, benefits all 4 card callers). Plan: `docs/superpowers/plans/2026-06-14-about-page-carus-outreach.md`. Spec: `docs/superpowers/specs/2026-06-14-about-page-carus-outreach-design.md`.
+- **TDD chain ran textbook** (Tallis RED → Byrd GREEN → Comenius i18n → Bentham GREEN), twice (content + mobile fix). Finn extracted the PO's real register from the Carus/Sven Gmail threads to ground the copy — worth reusing for future outreach (see finn.md checkpoint).
+- **Decisions:** contact = `mailto:` link; CF email-obfuscation (Scrape Shield on mvox.eu) masks the address in raw HTML but decodes client-side — **PO chose to LEAVE IT ON** (scraper protection; real visitors unaffected). No German locale. No GitHub issue was tied to this work (PO-priority spec).
+- **[GOTCHA] `pnpm format` = whole-repo Biome** (`biome format --write .`) — reflows ~20 pre-existing not-Biome-clean files (specs + probe scripts) that aren't ours. Agents kept leaving that drift uncommitted in the working tree; I `git restore`d it each time so it stayed off the branch. Candidate follow-up: a dedicated `chore(format)` pass to Biome-clean the repo + consider gating. NOT filed.
+- **State:** team idle + available (finn, bentham, tallis, byrd, comenius spawned this session; josquin/victoria/perotin NOT spawned). Slice-3 / #91 still PARKED (untouched). Open issues unchanged from S35 (~21).
+
+### [PROCESSED 2026-06-14 S36] 2026-06-14 end-of-session-35 — session-35 → session-36
 
 **Headline: The INVITE/ACCEPT ARCHITECTURE-FORK session → clean conserve + priority-pivot. Slice-3 (invite & join) ran the full TDD chain to green (service-key / elevated-BFF design; 1127 tests; Bentham-reviewed) — then the PO challenged the `ENTU_SERVICE_KEY` dependency. After a probe + full team debate, the team CONVERGED (issue #91) that the NATIVE keyless + leak-free design is ALREADY the documented v4E intent — Josquin 🥇 read `schema.ts` 544–630: private `application` + singer-granted `_viewer` to org admins + `member.creators: bilateral`. So the built service-key version is a DEVIATION from the schema's own design. Slice-3 PARKED at #91 (branch `feat/invite-join` pushed @ `8b5ec86`; green but DO-NOT-MERGE — carries unfixed RED-35.1). PO DEFERRED slice-3 (acknowledged MVP blocker) in favour of the ABOUT PAGE as politically more pressing for Carus outreach. Also this session: brainstormed + PO-APPROVED the About-page/Carus design spec.**
 

@@ -461,3 +461,57 @@ Single new key added for the rehearsal inline edit form heading. All other neede
 | `page_settings_description` | uk | `Ваш обліковий запис та налаштування.` | `обліковий запис`=account (standard formal); `налаштування`=settings/preferences. |
 
 (*MVOX:Comenius*)
+
+---
+
+### New key group: `about_*` — Carus-outreach copy (session 36, 2026-06-14)
+
+12 keys for the `/about` page rewrite targeting choral music publishers. Commit `79d6523` on `feat/about-carus`. Register requirement: sincere, plain, warm, confident — no defensiveness, no hedging, own the misstep directly. ET is priority locale (PO native speaker).
+
+**`about_page_title`** — "About mvox" page title.
+- et: `mvox-ist` — elative case "about mvox"; consistent with `landing_footer_link_about` pattern already established for et. Do NOT use `Meist` (that's the nav dropdown short-form).
+- lv: `Par mvox` — consistent with `landing_footer_link_about` lv.
+- uk: `Про mvox` — consistent with `landing_footer_link_about` uk.
+
+**`about_marginalia`** — stamp/signature line. en: `~ the mvox team`.
+- et: `~ mvox meeskond` — `meeskond` = team; drop "the" (Estonian has no article).
+- lv: `~ mvox komanda` — `komanda` = team.
+- uk: `~ команда mvox` — word order flips: noun before brand name (natural Ukrainian).
+
+**`about_intro_circle`** — "larger circle" lens line connecting choir to publishers.
+- et: `Koor asub suuremal ringil` — `asub suuremal ringil` = sits on a larger circle; natural Estonian spatial metaphor.
+- lv: `Koris pastāv plašākā lokā` — `plašākā lokā` = in a broader circle.
+- uk: `Хор існує всередині більшого кола` — `існує всередині` = exists inside (slightly more contained metaphor, natural in Ukrainian).
+
+**`about_story_body`** — owns the misstep directly; register is candid and humane. Critical locale notes:
+- et: `oleme ise olnud valel poolel` — reflexive `ise` (ourselves) adds personal candour. `mõnikord valusalt` = sometimes painfully. `kangelasetegu` = act of heroism — pithy compound noun, mirrors en without calque.
+- lv: `paši esam bijuši nepareizajā pusē` — `paši` (ourselves) = same candour pattern.
+- uk: `самі бували не з того боку межі` — `бували` = imperfective past of `бувати`; signals recurrence (not a one-off slip), adds weight and candour.
+- ALL locales: no publisher/composer/dispute names. "Wrong side of the line" = canonical phrase — translate meaning.
+
+**`about_values_offer`** — publisher co-design invitation. Must read as inviting, not defensive.
+- et: `koos teiega, mitte teie eest` = with you, not for you; `ausus vaikimisi` = honesty by default (lit. honesty-by-silence).
+- lv: `kopā ar jums, nevis jūsu vietā` = together with you, not in your place; `godīgums pēc noklusējuma` = honesty by default.
+- uk: `разом з вами, а не замість вас` = together with you, not instead of you; `чесність за замовчуванням` = honesty by default (standard Ukrainian UX term for "default").
+- **JSON gotcha:** inner phrase `"honest by default"` / locale equivalents: use escaped straight quotes `\"..\"` — do NOT use typographic close-quote `"` (U+201D); its byte is 0x22 = ASCII `"` and terminates the JSON string early. Opening low-9 `„` (U+201E) is safe; the closing curly `"` is NOT.
+
+**`about_contact`** — lead-in phrase only; email rendered separately as inline `<a href="mailto:...">` link.
+- et: `Kirjastajad ja õiguste valdajad: kirjutage` — `kirjutage` = 2nd-pl imperative, formal. Colon before link.
+- lv: `Izdevēji un tiesību īpašnieki: rakstiet` — `rakstiet` = 2nd-pl imperative, formal.
+- uk: `Видавці та правовласники: пишіть` — `пишіть` = 2nd-pl imperative, formal.
+- Register: 2nd-pl formal imperative in all 3 locales — matches the formal register of the offer block above it.
+
+| Key | Locale | Value | Rationale |
+|---|---|---|---|
+| `about_page_title` | et | `mvox-ist` | Elative; matches `landing_footer_link_about` et. Do not use `Meist` (that's the nav-menu short-form). |
+| `about_page_title` | lv | `Par mvox` | Matches `landing_footer_link_about` lv. |
+| `about_page_title` | uk | `Про mvox` | Matches `landing_footer_link_about` uk. |
+| `about_marginalia` | uk | `~ команда mvox` | Noun before brand (Ukrainian word order). |
+| `about_values_offer` inner quotes | all | `\"..\"` escaped | Typographic `"` (U+201D) = ASCII `"` (0x22) → breaks JSON. Use `\"` only. |
+| `about_contact` | et | `kirjutage` | 2nd-pl formal imperative; matches offer-block register. |
+| `about_contact` | lv | `rakstiet` | 2nd-pl formal imperative. |
+| `about_contact` | uk | `пишіть` | 2nd-pl formal imperative. |
+| `about_story_body` | et | `kangelasetegu` | "Act of heroism" compound noun — pithy, mirrors en without literal calque. |
+| `about_story_body` | uk | `бували` | Imperfective past signals recurrence; adds candour to the misstep admission. |
+
+(*MVOX:Comenius*)

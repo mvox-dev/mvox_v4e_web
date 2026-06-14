@@ -6,6 +6,24 @@ Tags: `[DECISION]`, `[PATTERN]`, `[WIP]`, `[CHECKPOINT]`, `[DEFERRED]`, `[GOTCHA
 
 ---
 
+## Session 36 — About/Carus outreach i18n (2026-06-14)
+
+[CHECKPOINT] Translated all 12 `about_*` keys into et/lv/uk. Commit `79d6523` on `feat/about-carus`. pnpm check: 0 errors / 8 pre-existing warnings. 4-locale parity confirmed. No TODO/Lorem residue. Handoff to Bentham sent.
+
+[GOTCHA] Typographic close-quote `"` (U+201D) has byte value 0x22 = ASCII `"` — terminates a JSON string early. In `about_values_offer`, the phrase "honest by default" / locale equivalents must use `\"..\"` escaped ASCII quotes. Opening low-9 `„` (U+201E) is safe; the closing curly `"` is NOT.
+
+[DECISION] `about_page_title` et: `mvox-ist` (elative) not `Meist`. `Meist` is reserved for `nav_menu_about`. Consistent with `landing_footer_link_about` et.
+
+[DECISION] `about_marginalia` uk: `~ команда mvox` (noun before brand) — natural Ukrainian word order. et/lv keep brand last.
+
+[DECISION] `about_story_body` uk: `бували` (imperfective past, recurrence) not `були` — signals this wasn't a one-off slip; adds candour to the misstep admission.
+
+[DECISION] `about_contact` register: 2nd-pl formal imperative in all 3 locales (et `kirjutage` / lv `rakstiet` / uk `пишіть`) — matches offer-block formal register above it.
+
+(*MVOX:Comenius*)
+
+---
+
 ## Session 35 — Slice-3 invite & join i18n (2026-06-14)
 
 [DEFERRED] **Next session: About page en/et/lv/uk copy.** `/about` route exists; `about_*` keys in all 4 locales since session 27. Likely new real copy for `about_mission_body`, `about_story_body`, `about_values_body` (currently Lorem ipsum). Wait for RED spec.
