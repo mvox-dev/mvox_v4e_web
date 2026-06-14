@@ -242,7 +242,7 @@
 	"invite_accepting": "Приймаю…",
 	"invite_copy_link": "Копіювати посилання",
 	"invite_copy_link_copied": "Скопійовано!",
-	"invite_expired": "Цей запрошення вже не дійсне",
+	"invite_expired": "Це запрошення вже не дійсне",
 	"invite_heading": "{orgName} запрошує вас",
 	"invite_loading": "Завантаження запрошення…",
 	"invite_not_found": "Запрошення не знайдено",
