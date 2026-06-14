@@ -575,6 +575,37 @@ From live `GET https://api.entu.app/openapi`:
 
 ---
 
+## 2026-06-14 — Session 34 findings
+
+### [LEARNED] Backlog audit — 3 issues superseded by Path C architecture
+
+Full backlog triage done S34 (25 open issues vs main @ `6aa6c31`). Three issues confirmed architecturally moot:
+
+- **#33** (factor BFF helpers when route #3 lands) — trigger permanently obsolete; CHORE-B deleted both BFF routes; zero `+server.ts` under `src/routes/api/` today; trigger can never fire.
+- **#38** (OrgEntity lift + `$app/stores` → `$app/state`) — `$app/state` already used everywhere; OrgEntity deleted with BFF routes in CHORE-B (`fc99291`) and CHORE-72 (`29de0d2`); no production `OrgEntity` anywhere in `src/`.
+- **#39** (session in `+layout.server.ts`) — entire premise (server-side `locals.entuJwt`) gone under Path C; layout uses `$userStore` (localStorage); `{#if mounted}` guard at `+layout.svelte:54` resolves the original FOIC bug differently.
+
+PARTIAL issues with real gaps: #7 (no repertoire, no week-grouping, no SSR), #9 (lockout deferred by MVP spec — re-open UX shipped), #48 (scaffold merged at `8b76af8`; closure gated on #49's 5 sub-CHOREs).
+
+### [LEARNED] CF Pages Git integration — delete+recreate is the only path
+
+Research for #44 (S34). Key facts verified against CF docs (context7 high-reputation source):
+
+- **No in-place conversion** from Direct Upload to Git-connected. Mode is locked at project creation. Must delete `multivox` and recreate.
+- **Initial OAuth grant is dashboard-only** (human/PO step — GitHub↔CF app install). After that, CF Builds API can automate repo connections.
+- **`wrangler.json` is correct for Git builds** — `nodejs_compat`, `pages_build_output_dir: ".svelte-kit/cloudflare"` already set. One gap: `NODE_VERSION=22` needed as build env var (CF Pages defaults Node 18; pnpm 10 requires ≥20).
+- **No secrets to migrate** — current project has none; only `PUBLIC_ENTU_DB` in `wrangler.json` `vars`.
+- **No custom domain problem** — `mvox.eu` not yet wired (CHORE-42 pending); only `multivox.pages.dev` affected by the brief delete+recreate outage window.
+- **Preview deployments auto-enabled** once Git-connected — replaces manual `--branch=preview-seasons` flow entirely; PR status checks included.
+
+### [DEFERRED] Slice-3 (invite & join) — S35 scope
+
+`application` entity in v4E schema.ts still not probed this session (noted as deferred from S33). When slice-3 starts, read `$ENTU_RESEARCH/docs/schema/v4E/schema.ts` for `application` EntityDef. The 4 open design decisions from S32 (RSVP aggregation, invitation accept atomicity, rsvp.member cross-org pointer, unauthenticated token lookup) are still unresolved — will likely come up in slice-3 Victoria spec work.
+
+(*MVOX:Finn*)
+
+---
+
 ## 2026-06-13/14 — Session 33 findings
 
 ### [LEARNED] Nav + route surface state — post-S33 cleanup baseline

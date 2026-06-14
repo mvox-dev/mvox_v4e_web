@@ -1,33 +1,28 @@
-# Task List Snapshot — 2026-06-14 end-of-session-33
+# Task List Snapshot — 2026-06-14 end-of-session-34
 
-State at session-33 close.
+State at session-34 close.
 
 ## Active tasks (in-flight)
 
-None. All session-33 work completed and merged to main (preview-only; prod untouched).
+None. All session-34 work completed.
 
 ## Pending — next session
 
-**Slice 3 — invite & join** (the last MVP piece; postponed from S33 → S34). Brainstorm → spec → plan → team TDD chain. Details in `team-lead.md [NEXT SESSION]` seed (⭐ section). Key constraint: the `/invite/<token>` unauthed-landing must be solved client-side / token-self-describing, NOT server-side identity (Entu aud=IP wall). Gating probe: confirm/create the live `application` entity type (Pérotin).
+**Slice 3 — invite & join** (the last MVP piece; deferred again from S34 → S35; S34 was backlog-audit + the #44 prod launch). Brainstorm → spec → plan → team TDD chain. Issues #21 (admin invite) + #11 (singer accept). Details in `team-lead.md [NEXT SESSION]` seed (⭐). Constraint: `/invite/<token>` unauthed-landing solved client-side / token-self-describing, NOT server-side identity (Entu aud=IP wall). Gating probe: confirm/create the live `application` entity type (Pérotin).
 
-## Session-33 completed (all squash-merged to main, preview-only)
+## Session-34 completed
 
-1. `12f4b14` — sub-chain 1: navigation + coming-soon placeholders + i18n (full TDD chain + ultracode review, 2 REDs fixed)
-2. `9a59ecc` — sub-chain 2: readability-visual (12-point orbit, desk color `#f7ecd4→#f7dcca`, agenda per-day cards)
-3. `0abc774` — sub-chain 3: readability-conformance (seasons/library/auth on paper + Playwright bg-rule gate; ultracode review caught gate false-pass + Margin misuse)
-4. `ab275e6` — fix: `/seasons` rehearsal cards + state messages (PO live-check catch)
-5. `e39b446` — YELLOW polish batch (a11y + eyebrow i18n + tabForPath exact-segment + gate tightening)
+1. **Backlog audit** (Finn, all 25 open issues) → closed **#33, #38, #39** (architecture-superseded by Path C/CHORE-72), **#7** (superseded by #10), **#48** (scaffold done, rules folded into #49). Filed **#90** (A1 follow-up: richer dashboard ACs). 
+2. **#80** DRY safeRedirectTarget — full TDD chain (Tallis→Josquin→Byrd→Bentham→Josquin merge), shipped `de67c93`. Closed.
+3. **#44** CF Pages Git-connected migration — multivox delete+recreated as Git-connected; first build green; prod mvox.eu now serves the full accumulated work (`app.D_0RFiMI.js`) and auto-deploys on push. Closed.
+4. **deploy.md** rewritten for the new flow — `d9b36a5`.
 
-main tip `31dce91`, origin==local, 1018 tests, bg-rule gate 6/6, check 0. Preview `app.Cgj9ARtI.js`.
+main tip `d9b36a5`, origin==local. Tests 1028 + 3 runbook, check 0. **Open issues 25 → 19.** Prod auto-deploys now.
 
-## Forward-looking / parked
+## Carry-forward GH backlog (open: 19)
 
-- **YELLOW-33.4:** LibraryMaster `.master-paper` needs an explicit `background-color: #fbf9f3` fallback IF the bg-rule gate is ever extended to auth-guarded routes (CHORE-C territory). Non-blocking today (library auth-guarded, outside the public gate).
-- Desk-grain opacity tuning (PO's external tool); orbit stays at r=10px.
-
-## Carry-forward GH backlog (unchanged)
-
-- Audit/close epic-A issues #7/#8/#9 per `feedback_closes_n_pattern` — not done.
-- #80 DRY safeRedirectTarget; /about real content; #73; #54; #44 CF git-deploy; #49 Biome; #6 Email (blocked PO SPF/DKIM); CHORE-C test infra.
+- **Slice 3:** #21, #11 (next real work).
+- #90 (richer A1 dashboard); #9 lockout (needs #22 first); epics B/C/D (#12–#18, #23); #49 Biome rules; #54 error capture; #73 (blocked lending); #6 Email (blocked PO SPF/DKIM); #31 (OKLCH); **#59 (provider-verify — overdue, PO-manual checklist against now-current prod)**.
+- Tiny: RsvpTallyBadge tooltip i18n.
 
 (*MVOX:Palestrina*)

@@ -1,6 +1,59 @@
 # Palestrina — Team Lead Scratchpad
+### [NEXT SESSION] 2026-06-14 end-of-session-34 — session-34 → session-35
 
-### [NEXT SESSION] 2026-06-14 end-of-session-33 — session-33 → session-34
+**Headline: The BACKLOG-AUDIT-turned-PROD-LAUNCH session. PO asked for backlog triage; Finn audited all 25 open issues, I closed 6 (#33/#38/#39/#7/#48 superseded + #80 DRY shipped via a full TDD chain), filed #90 (residual dashboard ACs), folded #48→#49. Then knocked out the #80 quick win (de67c93). The session then pivoted hard: PO asked about auto-deploy → we did #44 (CF Pages Git-connected migration). multivox was delete+recreated as a Git-connected Pages project, and THE FULL ACCUMULATED BODY OF PREVIEW-ONLY WORK WENT LIVE TO PROD (mvox.eu) FOR THE FIRST TIME IN MANY SESSIONS — the entire MVP attendance loop (slices 1/2a/2b), seasons/rehearsal-schedule, the S33 UI overhaul, and #80. Prod was frozen on the CHORE-72 bundle since ~session-27; now it's current AND every push to main auto-deploys. main `d9b36a5`; prod chunk `app.D_0RFiMI.js`; tests 1028+3 runbook, check 0. Open issues 25→19.**
+
+## ⭐ Session-35 first action: SLICE 3 — invite & join (STILL the last MVP piece)
+
+Unchanged priority — deferred again (S34 was backlog+infra). Brainstorm → spec → plan → team TDD chain. Same scope + the one hard constraint as the prior two seeds:
+- **Scope (MVP spec §4 slice 3):** admin creates `invitation` (email, optional sections, token, 30-day expiry) → app shows copyable `/invite/<token>` link → singer opens it, OAuth signs in, accepts → BFF-mediated bilateral consent: create `application` (singer consent, consumed) → create `member` (multi-parent org+sections) → delete invitation + application. NO email (#6 blocked PO SPF/DKIM) — copy-the-link. Issues: #21 (admin invite) + #11 (singer accept).
+- **THE hard bit (brainstorm with PO first):** `/invite/<token>` landing must work for a NOT-yet-authed visitor, but `invitation` is private under org. **Settled constraint: solve client-side / token-self-describing — NEVER server-side identity** (Entu `aud=IP` wall; `project_entu_jwt_ip_bound`).
+- **Gating probe:** the `application` entity type may NOT exist in live polyphony (Finn S32 audit, no type ID). Pérotin probes before building; if absent, create the type-def (authorize-gated).
+
+## 🚀 NEW STANDING FACT — prod is now Git-connected auto-deploy (#44 DONE)
+
+This is the biggest operational change this session. Read carefully:
+- **multivox is now a Git-connected CF Pages project** (was Direct Upload). Push/merge to `main` → CF auto-builds (`pnpm run build`) + deploys to prod (`multivox.pages.dev` + `mvox.eu`). Every other branch / PR → automatic CF preview URL. **The old manual `wrangler … --branch=preview-seasons` flow is RETIRED** (kept only as emergency fallback in `docs/operations/deploy.md`).
+- **⚠️ EVERY push to main now triggers a prod rebuild+redeploy — including scratchpad/memory/doc commits.** Harmless (identical app bundle for docs-only changes) but be aware: the shutdown commit + any between-chains doc/seed/probe commit now redeploys prod. Don't be alarmed; don't spam tiny commits.
+- **CF build config** (dashboard, for disaster recovery): prod branch `main`; build cmd `pnpm run build`; output `.svelte-kit/cloudflare`; **build env vars `NODE_VERSION=22` + `PUBLIC_ENTU_DB=polyphony`**. The PUBLIC_ENTU_DB build var is LOAD-BEARING: `$env/static/public` is inlined at BUILD time and CF builds remotely, so it can't rely on local `.env` or wrangler.json runtime vars. `wrangler.json` supplies `compatibility_date`/`nodejs_compat`/`pages_build_output_dir` (read by CF git builds as-is).
+- **Chunk hashes differ from local builds** — CF builds the same commit on its own Node 22 toolchain, so prod chunk hashes (`app.D_0RFiMI.js`) won't match `pnpm build` locally (`app.JC-Kk0LD.js` for de67c93). Same source. Don't treat a hash mismatch as a problem; compare COMMIT, not chunk hash.
+- **Can't convert Direct Upload → Git-connected in place** (CF docs) — that's why #44 was delete+recreate. If we ever need to redo: detach custom domain FIRST (CF blocks delete otherwise), then delete, then Connect-to-Git.
+- Key IDs: CF account `1431b76f0b65e3d23833966744ff2bdf`; mvox.eu DNS zone `8c9bc3d0f03502efe6429878cdfb8160` (on PO's CF account, status active); apex `CNAME mvox.eu → multivox.pages.dev` (proxied) + `www.mvox.eu → mvox.eu`. **NEVER touch the MX (route1/2/3.mx.cloudflare.net), SPF/DKIM TXT, or `ai.mvox.eu` (brainstorming/tailnet host) records.** Saved as memory `project_cf_pages_git_connected`.
+- **⚠️ NEW RISK — no test gate on prod.** CF auto-deploys ANY push to `main` regardless of `pnpm check`/`pnpm test` status — a broken commit ships straight to prod. Mitigation candidate (Josquin's [DEFERRED]): GitHub branch protection / a CI check gating `main` on check+test before the deploy. NOT filed as an issue yet — PO's call whether Victoria drafts it. Until then: discipline = never push red to main (it's now a prod release, not just a save). The deploy.md "Future work" lists this as the one remaining item.
+
+## What shipped this session (all to main, NOW auto-deployed to prod)
+
+| SHA | What |
+|---|---|
+| `de67c93` | fix(#80) DRY — login page uses shared client-safe `safeRedirectTarget` (extracted to `src/lib/auth/redirect.ts`, re-exported from session-cookie.ts). Closes #80. Full TDD chain. |
+| `d9b36a5` | docs(deploy) rewrote `docs/operations/deploy.md` for Git-connected auto-deploy (manual = emergency fallback). |
+
+Plus #44 (CF dashboard recreate — no repo commit, it's infra). Issues closed: #33, #38, #39, #7, #48, #80, #44. Filed #90 (A1 follow-up: richer dashboard — repertoire/week-grouping/SSR; lower priority than slice-3). #48 rule-scope folded into #49.
+
+## Backlog after slice-3 (open issues now 19)
+
+- **Slice 3 = #21 + #11** (next real work).
+- #90 (richer A1 dashboard — repertoire/week-group/SSR; note SSR conflicts with Path C browser-direct, re-eval when scheduled).
+- #9 lockout (deferred by MVP spec; needs #22 org-policy config first); epics B/C/D (#12–#18, #23); #49 Biome rules; #54 error capture (still pre-first-user); #73 (blocked on lending); #6 Email (blocked PO SPF/DKIM); #31 (OKLCH, trigger not fired); #59 (PROVIDER VERIFY — overdue, PO-manual: run mobile-id/id-card/apple checklist against live mvox.eu now that it's current).
+- **Tiny:** RsvpTallyBadge `title` i18n (English-only tooltips, Bentham flagged S32).
+
+## Lessons / process this session
+
+- **Backlog audits pay off via Finn** — 25 issues triaged with evidence in one pass; I closed only on cited evidence, refiled residuals (#90) rather than losing unbuilt ACs. Clean pattern.
+- **#44 was hidden-bigger-than-it-looked** — "set up auto-deploy" surfaced (a) can't-convert-in-place → destructive recreate, (b) the PUBLIC_ENTU_DB build-time gotcha, (c) custom-domain-must-detach-before-delete. Pre-flight recon (Josquin) + current-docs research (Finn) BEFORE any destructive step paid off — no surprises during the live operation. Verify-before-assert held (I curl'd prod myself before closing #44).
+- **PO drove the CF dashboard live, step-by-step, with me guiding + Josquin verifying each checkpoint via API/curl.** Worked very well for a human-in-the-loop infra op. The GitHub↔CF OAuth app was already authorized (no blocker).
+
+## Expected first action session 35
+
+1. Read this seed. Verify main `d9b36a5` (origin==local) + **prod mvox.eu is current**: `curl -sI https://mvox.eu/` → 200, chunk should be `app.D_0RFiMI.js` or newer (NOT `app.BlDa5F1S.js`). Auto-deploy means prod tracks main now.
+2. Spawn finn + bentham (always-on) + tallis. For slice-3 ALSO plan Pérotin (the `application`-type probe) + Victoria (requirements).
+3. **Slice-3 brainstorm** — lead with the `/invite/<token>` unauthed-landing problem (client-side/token-self-describing ONLY). Finn re-confirms invitation/member/application live shapes; Pérotin probes the `application` type. Then spec → plan → chain.
+
+(*MVOX:Palestrina*)
+
+---
+
+### [PROCESSED 2026-06-14 session-34] 2026-06-14 end-of-session-33 — session-33 → session-34
 
 **Headline: The UI/UX CLEANUP session. Shipped a full readability + navigation overhaul as three serial sub-chains + a PO-caught fix + a polish batch — all to preview, prod untouched. Established a standing bg-rule invariant ("every text item on a colored background, except marginalia + big titles tagged `data-desk-text`") enforced by a NEW Playwright gate. Warmed the desk from dark brown to a light cream→peach palette and smoothed the wood-grain orbit to a 12-point near-circle. Two `ultracode` adversarial reviews caught real bugs a single review would've shipped (a gate false-pass + a component-level `data-desk-text` misuse). main `31dce91`; preview build `app.Cgj9ARtI.js`; tests 1018, bg-rule gate 6/6, check 0.**
 

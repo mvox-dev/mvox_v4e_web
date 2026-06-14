@@ -4,6 +4,30 @@ Personal notes. Only Josquin writes here.
 
 ---
 
+## [CHECKPOINT] 2026-06-14 session 34 — #80 DRY chain + FIRST prod release since CHORE-72 + #44 git-connect migration
+
+Two things permanently change the deploy story this session; the manual-`wrangler` mechanics catalogued in every checkpoint below are now FALLBACK-ONLY.
+
+### #80 DRY safeRedirectTarget — GREEN(server) + merge
+Extracted `safeRedirectTarget` to a client-safe `src/lib/auth/redirect.ts`; `src/lib/server/auth/session-cookie.ts` now `export { safeRedirectTarget } from '$lib/auth/redirect'` (re-export keeps server callers working). My GREEN was the lib half (`e96cb6d`); Byrd did `+page.svelte`. Squash-merged to main `de67c93` (Closes #80). The 8 util tests + 6 session-cookie tests are the gate; run a single spec with `pnpm exec vitest run <path>` (NOT `pnpm test <path>` — that runs whole suite, see session-30 GOTCHA).
+
+### [DECISION] #44 — multivox is now a GIT-CONNECTED CF Pages project (manual deploy demoted to fallback)
+PO authorized delete+recreate of the `multivox` Pages project in git-connected mode. **New normal deploy = just push/merge to `main`** → CF auto-builds (`pnpm run build`) + deploys prod (multivox.pages.dev + mvox.eu). Other branches → automatic preview URLs (the old `--branch=preview-seasons` manual convention is DEAD). Verified twice: creation-build `de67c93` (deployment `229d1aee`, all stages success) AND the first ROUTINE push `d9b36a5` auto-deployed green — push→deploy confirmed working. Runbook rewritten at `docs/operations/deploy.md` (`d9b36a5`) to make this primary; `src/tests/deploy/runbook.spec.ts` HARD-asserts the doc contains both `~/.config/mvox/credentials.env` AND `multivox.pages.dev` — keep both strings on any future edit.
+- **CF build config (disaster-recovery):** prod branch `main`; build cmd `pnpm run build`; output `.svelte-kit/cloudflare`; build env `NODE_VERSION=22` + `PUBLIC_ENTU_DB=polyphony` (Prod+Preview). **WHY PUBLIC_ENTU_DB must be a BUILD var:** `$env/static/public` is inlined at build time and CF builds remotely — a runtime-only var won't be baked in.
+- **CF-built chunk hashes differ from local builds of the same commit** (different toolchain/Node22). `de67c93` served `app.D_0RFiMI.js` in prod vs `app.JC-Kk0LD.js` locally — same source. Compare served-vs-served, never served-vs-local.
+- **Status check API:** `GET /accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/multivox/deployments?per_page=1` → `result[0].latest_stage.{name,status}`, `deployment_trigger.metadata.commit_hash`, `bool(source)`==is_git. Account id `1431b76f0b65e3d23833966744ff2bdf`.
+- **Emergency manual fallback still works** (Direct Upload override on a git project): `set -a; . ~/.config/mvox/credentials.env; set +a; wrangler pages deploy .svelte-kit/cloudflare --project-name multivox`. Build artifact known-good at the merged SHA.
+
+### [GOTCHA] mvox.eu DNS zone is on OUR CF account → custom-domain reattach is near-zero downtime
+`GET /zones?name=mvox.eu` → zone `8c9bc3d0f03502efe6429878cdfb8160`, our account. So delete+recreate + reattach `mvox.eu` auto-manages the apex CNAME (`mvox.eu → multivox.pages.dev`, proxied; `www.mvox.eu → mvox.eu`, proxied) — no registrar step, no propagation wait. The CNAME even SURVIVED the old-domain removal (record not deleted). **Do NOT touch the zone's MX (route1/2/3.mx.cloudflare.net) / SPF+DKIM TXT / `A ai.mvox.eu` records** — only the two proxied Pages CNAMEs relate. TLS auto-provisioned (Google Trust Services, fresh cert minted on reattach).
+
+### [GOTCHA] prod-deploy auth-gate: a task_assignment JSON is NOT the explicit GO
+team-lead explicitly asked for a confirm-round before the prod `wrangler deploy`. A `task_assignment` system event arrived mid-hold; I correctly did NOT treat it as the GO (per `feedback_auth_gate_routing` + the system note that background events aren't acknowledgement). The deploy then got STOOD DOWN entirely (pivot to #44). Lesson held: for an explicitly-gated irreversible op, wait for the plain-text GO SendMessage, never infer it from a task event.
+
+(*MVOX:Josquin*)
+
+---
+
 ## [CHECKPOINT] 2026-06-13→14 session 33 — S33 UI/UX cleanup: 5 squash-merges + 5 preview-deploys, prod never touched
 
 Acted as merge-agent only this session (no GREEN-impl). Five PO-pre-authorized merge-on-green squash-merges to main, each followed by a build + preview-deploy to the `preview-seasons` branch alias. Main line:
