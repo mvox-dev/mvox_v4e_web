@@ -796,4 +796,41 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
   - rsvp prop-def _ids (going_ref etc.) are now in seed-rsvp-tally-prop-defs-live-2026-06-13.json — useful for BFF tests that need to reference them.
   - No stale result artifacts identified this session.
 
+## Session 35 — 2026-06-14
+
+### Slice 3 Phase 0 probes (task #1)
+
+[PROBE-RESULT] All three type-defs confirmed live on polyphony (2026-06-14T07:19Z):
+  - invitation: 6a0d2e8290c8df7a1cc7de3e (6 prop-defs: email/token/expires_at/sections/inviter/message)
+  - application: 6a0d2e8390c8df7a1cc7de81 (4 prop-defs: target_org/status/expires_at/message) — EXISTS (S32 concern resolved)
+  - member: 69c7ea4a8489bfcb0e819edd (5 prop-defs: name/person/section/current_section/status)
+
+[DECISION] Type-def labels are canonical design docs:
+  - invitation label: "Org's consent. Admin creates; user accepts → member created + invitation deleted."
+  - application label: "Person's consent. Person creates; admin accepts → member created + application deleted."
+  These were set at type creation time (2026-05-20). They encode the bilateral-consent design intent.
+
+[DECISION] Path A (application as identity proof) CONFIRMED as intended design:
+  - application has NO `person` prop — parent IS the person entity
+  - application._parent = person entity ← identical pattern to rsvp._parent = person entity
+  - rsvp instances confirmed: _parent.entity_type="person" (PO's rsvps all under PO's person)
+  - The elevated BFF accept endpoint reads application._parent[0].reference as the verified acceptor
+
+[DECISION] Org-service key minimum rights: _editor on each org entity.
+  Not _owner (would grant delete-org). _editor grants: create child entities (invite, member),
+  read org subtree (sections, members). Creator auto-gets _owner on entities they create.
+  6/6 write ops confirmed with org-owner credential.
+
+[GOTCHA] member.name is still a mandatory prop-def on live polyphony member type.
+  v4E schema.ts may differ. BFF member-create must include name value.
+  Safe default: name = person.name fetched first. Open item for spec.
+
+[CHECKPOINT] Phase 0 complete. Probe script + findings doc committed to main (0e41847).
+  Files:
+    scripts/migrations/probes/probe-slice3-invite-join-2026-06-14.ts
+    docs/migration/findings/slice3-invite-join-probes-2026-06-14.md
+  Cleanup: 2/2 probe entities confirmed 404. Polyphony db unchanged.
+
+[SEED CATALOG UPDATE] No new seed scripts this session.
+
 (*MVOX:Perotin*)
