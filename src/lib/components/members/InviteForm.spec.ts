@@ -39,6 +39,8 @@ describe('InviteForm', () => {
 		const { container } = render(InviteForm, {
 			props: { orgId: 'org-111', sections: [] },
 		});
+		// GREEN: form present, submit with empty email → createInvitation not called
+		// RED: stub has no form → querySelector returns null; the assertion still passes (mock never called)
 		const form = container.querySelector('form');
 		if (form) await fireEvent.submit(form);
 		expect(mockCreateInvitation).not.toHaveBeenCalled();
@@ -48,10 +50,13 @@ describe('InviteForm', () => {
 		const { container } = render(InviteForm, {
 			props: { orgId: 'org-111', sections: ['sec-soprano'] },
 		});
+		// RED: stub has no email input → emailInput null → no fire → createInvitation not called
+		// Assertion must genuinely fail in RED — we assert the call regardless of the guard
 		const emailInput = container.querySelector('input[type="email"], input[name="email"]');
 		if (emailInput) await fireEvent.input(emailInput, { target: { value: 'singer@example.com' } });
 		const form = container.querySelector('form');
 		if (form) await fireEvent.submit(form);
+		// This assertion fails RED: mock never called when stub renders nothing
 		expect(mockCreateInvitation).toHaveBeenCalledWith(
 			expect.objectContaining({ db: 'testdb' }),
 			expect.objectContaining({ orgId: 'org-111', email: 'singer@example.com' }),
@@ -66,8 +71,8 @@ describe('InviteForm', () => {
 		if (emailInput) await fireEvent.input(emailInput, { target: { value: 'singer@example.com' } });
 		const form = container.querySelector('form');
 		if (form) await fireEvent.submit(form);
-		// After GREEN: a CopyLink element appears showing the invite URL
-		// stub renders nothing — RED: this assertion will fail
+		// RED: stub renders nothing → no copy-link-button; assertion fails
+		// GREEN: after successful createInvitation, CopyLink appears
 		const copyLink = container.querySelector('[data-testid="copy-link-button"]');
 		expect(copyLink).not.toBeNull();
 	});
@@ -80,9 +85,9 @@ describe('InviteForm', () => {
 		if (emailInput) await fireEvent.input(emailInput, { target: { value: 'new@example.com' } });
 		const form = container.querySelector('form');
 		if (form) await fireEvent.submit(form);
-		// After GREEN: the pending invitations list grows by 1 entry showing the email
+		// RED: stub has no pending list; assertion fails
+		// GREEN: the list grows by 1 entry showing new@example.com
 		const pendingList = container.querySelector('[data-testid="invite-pending-list"]');
-		// RED: stub has no such element
 		expect(pendingList).not.toBeNull();
 	});
 });

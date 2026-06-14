@@ -37,6 +37,8 @@ describe('CopyLink', () => {
 		const { container } = render(CopyLink, { props: { url: 'https://mvox.eu/invite/tok-abc' } });
 		const button = container.querySelector('[data-testid="copy-link-button"]');
 		if (button) await fireEvent.click(button);
+		// RED: stub renders nothing → button null → no click → writeTextMock never called; assertion fails
+		// GREEN: button present, click fires, writeText called with url
 		expect(writeTextMock).toHaveBeenCalledWith('https://mvox.eu/invite/tok-abc');
 	});
 
@@ -44,7 +46,8 @@ describe('CopyLink', () => {
 		const { container } = render(CopyLink, { props: { url: 'https://mvox.eu/invite/tok-abc' } });
 		const button = container.querySelector('[data-testid="copy-link-button"]');
 		if (button) await fireEvent.click(button);
-		// After GREEN: component shows "Copied!" or aria-live announcement
+		// RED: stub renders nothing → no copy-link-copied element; assertion fails
+		// GREEN: after click, "Copied!" aria-live element appears
 		const copied = container.querySelector('[data-testid="copy-link-copied"]');
 		expect(copied).not.toBeNull();
 	});

@@ -8,6 +8,7 @@ export type { EntuCfg };
 export interface InviteProjection {
 	valid: boolean;
 	expired?: boolean;
+	orgId?: string; // required: client reads this for createApplication call
 	orgName?: string;
 	email?: string;
 	sections?: string[];

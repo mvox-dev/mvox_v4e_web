@@ -72,10 +72,11 @@ describe('GET /api/invite/[token] — valid (not expired)', () => {
 		// GREEN: res is a Response with status 200
 		if (res instanceof Response) {
 			expect(res.status).toBe(200);
-			const body = await res.json() as Record<string, unknown>;
+			const body = (await res.json()) as Record<string, unknown>;
 			expect(body).toEqual({
 				valid: true,
 				expired: false,
+				orgId: 'org-111', // required: client reads this for createApplication identity-proof
 				orgName: 'Estonian Philharmonic Chamber Choir',
 				email: 'singer@example.com',
 				sections: ['sec-soprano', 'sec-alto'],
@@ -92,7 +93,7 @@ describe('GET /api/invite/[token] — valid (not expired)', () => {
 		const event = makeEvent('uuid-tok-abc');
 		const res = await Promise.resolve(GET(event as never)).catch((e: Error) => e);
 		if (res instanceof Response) {
-			const body = await res.json() as Record<string, unknown>;
+			const body = (await res.json()) as Record<string, unknown>;
 			// Security: projection must be minimal
 			expect(body).not.toHaveProperty('token');
 			expect(body).not.toHaveProperty('inviter');
@@ -126,7 +127,7 @@ describe('GET /api/invite/[token] — expired', () => {
 		const res = await Promise.resolve(GET(event as never)).catch((e: Error) => e);
 		if (res instanceof Response) {
 			expect(res.status).toBe(200);
-			const body = await res.json() as Record<string, unknown>;
+			const body = (await res.json()) as Record<string, unknown>;
 			expect(body).toMatchObject({ valid: true, expired: true });
 			expect(body).not.toHaveProperty('token'); // still minimal projection
 		} else {
@@ -148,7 +149,7 @@ describe('GET /api/invite/[token] — not found', () => {
 		const res = await Promise.resolve(GET(event as never)).catch((e: Error) => e);
 		if (res instanceof Response) {
 			expect(res.status).toBe(404);
-			const body = await res.json() as Record<string, unknown>;
+			const body = (await res.json()) as Record<string, unknown>;
 			expect(body).toEqual({ valid: false });
 		} else {
 			expect((res as Error).message).toContain('not implemented');

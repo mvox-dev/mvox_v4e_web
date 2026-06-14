@@ -105,25 +105,26 @@ describe('/members page — data hydration', () => {
 
 	it('calls listOrgMembers with the selected org id', async () => {
 		render(Page);
-		// After GREEN: listOrgMembers called with cfg and 'org-111'
-		// RED: stub mounts, $effect fires, but stub does nothing
-		await vi
-			.waitFor(
-				() => {
-					// will never satisfy in RED (stub does nothing); GREEN drives this
-				},
-				{ timeout: 100 },
-			)
-			.catch(() => {
-				/* RED: timeout expected */
-			});
-		// Just assert the mock setup is correct; GREEN will assert call
-		expect(mockListOrgMembers).toBeDefined();
+		// GREEN: $effect fires → listOrgMembers called with (cfg, 'org-111')
+		// RED: stub does nothing, mock never called — assertion fails
+		await vi.waitFor(() => {
+			expect(mockListOrgMembers).toHaveBeenCalledWith(
+				expect.objectContaining({ db: 'testdb' }),
+				'org-111',
+			);
+		});
 	});
 
 	it('calls listOrgInvitations with the selected org id', async () => {
 		render(Page);
-		expect(mockListOrgInvitations).toBeDefined();
+		// GREEN: $effect fires → listOrgInvitations called with (cfg, 'org-111')
+		// RED: stub does nothing, mock never called — assertion fails
+		await vi.waitFor(() => {
+			expect(mockListOrgInvitations).toHaveBeenCalledWith(
+				expect.objectContaining({ db: 'testdb' }),
+				'org-111',
+			);
+		});
 	});
 });
 
