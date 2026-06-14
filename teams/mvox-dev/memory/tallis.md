@@ -640,4 +640,28 @@ FIX D (YELLOW): Added `bgImage !== 'none'` check in `hasBgOrExemption`. Safe bec
 
 [PATTERN] isOpaqueColor() pattern for rgba parsing in Playwright: use `/^rgba\(\s*[\d.]+\s*,\s*[\d.]+\s*,\s*[\d.]+\s*,\s*([\d.]+)\s*\)$/` regex and require `parseFloat(alpha) > 0`. rgb() and named colors are always opaque.
 
+## [CHECKPOINT] 2026-06-13 — Session 33 shutdown notes
+
+[DECISION] bg-rule gate (tests/bg-rule.spec.ts) final shape at 95df9c8:
+- Fix A: isOpaqueColor() parses rgba alpha; requires > 0
+- Fix B: transparent-rgba negative control
+- Fix C: TEXT_NODE walk for mixed-content elements
+- Fix D: RETIRED — background-image is no longer a conformance signal; only opaque background-color counts. Rationale: all conforming mvox elements carry an explicit background-color; transparent/decorative gradients were false-passing Fix D's broad `!== 'none'` check.
+- Gate: 6/6 Playwright tests pass (3 public routes clean + 3 negative controls). Routes: '/', '/about', '/auth/login' only — /roster/notices/settings are auth-guarded.
+
+[DECISION] chore/s33-yellows batch (de7660a through 95df9c8) covers 7 YELLOWs:
+- YELLOW-33.1: ComingSoon label → m.page_*_label() (Byrd+Comenius); roster/page.spec.ts asserts not-hardcoded
+- YELLOW-33.2: agenda data-desk-text — assertion FLIPPED to assert ABSENCE (not deletion); .page-hdr rgba bg already covers .page-title per §2
+- YELLOW-33.3: Fix-D tightened/retired; transparent-gradient negative control now passes
+- YELLOW-33.4: AvatarMenu outside-click focus restore → triggerEl?.focus() in onMouseDown path
+- YELLOW-33.5: AvatarMenu ArrowDown/ArrowUp menuitem navigation
+- YELLOW-33.6: SoonMarker nav links need aria-label="Tab name — coming soon"
+- YELLOW-33.7 (Item F): tabForPath() exact-segment match (startsWith('/library') → false for /libraryxyz)
+
+[GAP] chore/s33-yellows RED tests for items D/E/F/G are on Byrd's GREEN queue. The unit tests for these new behaviors are written and failing; implementation is Byrd's scope. Branch not yet merged.
+
+[PATTERN] Item B (YELLOW-33.2) flipped assertion approach: when removing a misuse-of-attribute is the fix, a FLIPPED assertion (assert absence instead of presence) is strictly better than deleting the test — it creates a RED that drives the correct fix AND provides regression protection afterward. A deleted test provides no enforcement.
+
+[PATTERN] Type narrowing in spec: `ownerSection?.querySelector()` returns `Element | null | undefined` when `ownerSection` is `Element | null`. Cast to `Element | null` after a `.not.toBeNull()` guard: `const el = (expr) as Element | null;`
+
 (*MVOX:Tallis*)

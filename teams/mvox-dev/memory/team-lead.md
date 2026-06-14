@@ -1,6 +1,58 @@
 # Palestrina — Team Lead Scratchpad
 
-### [NEXT SESSION] 2026-06-13 end-of-session-32 — session-32 → session-33
+### [NEXT SESSION] 2026-06-14 end-of-session-33 — session-33 → session-34
+
+**Headline: The UI/UX CLEANUP session. Shipped a full readability + navigation overhaul as three serial sub-chains + a PO-caught fix + a polish batch — all to preview, prod untouched. Established a standing bg-rule invariant ("every text item on a colored background, except marginalia + big titles tagged `data-desk-text`") enforced by a NEW Playwright gate. Warmed the desk from dark brown to a light cream→peach palette and smoothed the wood-grain orbit to a 12-point near-circle. Two `ultracode` adversarial reviews caught real bugs a single review would've shipped (a gate false-pass + a component-level `data-desk-text` misuse). main `31dce91`; preview build `app.Cgj9ARtI.js`; tests 1018, bg-rule gate 6/6, check 0.**
+
+## ⭐ Session-34 first action: SLICE 3 — invite & join (the last MVP piece, postponed from S33)
+
+This is the MVP slice deferred at the start of S33 (PO chose UI/UX cleanup instead). The spec/plan from session 32's seed still applies. A remote `/ultraplan` session drafted a slice-3 plan this session but it EXPIRED unapproved (off-topic for S33) — re-plan fresh.
+- **Scope (MVP spec §4 slice 3):** admin creates an `invitation` (email, optional sections, token, 30-day expiry) → app shows a copyable `/invite/<token>` link → singer opens it, OAuth signs in, accepts → BFF-mediated bilateral consent: create `application` (singer consent, consumed) → create `member` (multi-parent org+sections) → delete invitation + application. NO email (#6 blocked on PO SPF/DKIM) — copy-the-link.
+- **THE hard bit (brainstorm this with PO first):** the `/invite/<token>` landing must work for a NOT-yet-authed visitor, but `invitation` is private under org → an unauthed reader can't read it. **Settled constraint: solve client-side / make the token self-describing — NEVER server-side identity** (Entu tokens are `aud=IP`-bound; server-side token exchange is a dead end, fully reverted in session 32; `project_entu_jwt_ip_bound`).
+- **Gating probe:** Finn's session-32 audit flagged the `application` entity type may NOT exist in live polyphony (no type ID recorded). Pérotin must probe before building; if absent, create the type-def (authorize-gated).
+- Brainstorm → spec → plan → team TDD chain.
+
+## What shipped this session (all on main, preview-only; prod untouched)
+
+| SHA (squash on main) | What |
+|---|---|
+| `12f4b14` | sub-chain 1 — navigation: Library/mobile links fixed, currentTab (`tabForPath`), coming-soon placeholder pages (/roster /notices /settings), About in avatar menu, 6 i18n keys |
+| `9a59ecc` | sub-chain 2 — readability-visual: 12-point wood-orbit, desk color `#f7ecd4→#f7dcca`, agenda per-day cards |
+| `0abc774` | sub-chain 3 — readability-conformance: seasons/library/auth on paper, `data-desk-text` exemptions, Playwright bg-rule gate |
+| `ab275e6` | fix — `/seasons` rehearsal rows → per-series cards + state messages on paper (PO live-check catch) |
+| `e39b446` | YELLOW batch — a11y (focus-restore, arrow-key nav, soon-marker SR labels), eyebrow i18n, tabForPath exact-segment, gate bg-image tightening |
+
+main tip `31dce91` (+ scratchpad commits). origin==local.
+
+## The bg-rule invariant (NEW standing UI rule — now codified)
+
+- **Rule:** every text item sits on a colored background EXCEPT (a) intentional marginalia and (b) big/display titles, which carry an explicit `data-desk-text` marker. Spec: `docs/superpowers/specs/2026-06-13-uiux-cleanup-design.md` §2.
+- **Enforcement (hybrid):** a reusable Playwright gate (`tests/bg-rule.spec.ts`) walks the DOM of the PUBLIC routes (`/`, `/about`, `/auth/login`) failing on bare-text-on-desk, skipping `data-desk-text`. Signed-in/auth-guarded routes (everything except `/`, `/about`, `/auth/*` per `isProtectedPath`) are OUTSIDE the gate → Bentham + PO-clicking backstop them.
+- **`data-desk-text` MISUSE is the session's recurring trap** — caught 3× (ComingSoon marker, agenda page-title, Margin component-level blanket tag). Rule: only tag genuinely-bare marginalia/big-titles; NEVER tag an element that already has a colored-bg ancestor. `Margin.svelte` uses an opt-in `exempt` prop (not a blanket tag). Small mono "eyebrows" get a `bg-paper/80` chip, NOT a tag.
+
+## Parked / forward-looking
+
+- **YELLOW-33.4 (Bentham):** `LibraryMaster .master-paper` conforms only via a transparent gradient (no bg-color); harmless today (library is auth-guarded, outside the gate). IF the gate is ever extended to auth-guarded routes (CHORE-C territory), add an explicit `background-color: #fbf9f3` fallback.
+- **Desk-grain tuning:** PO is tuning grain opacities/values in an external tool (gist). Current grain overlays kept as-is on the new light desk — may need an opacity bump (PO's call). The orbit is at r=10px (PO's `orbitPct` percentage-of-offset idea NOT folded in — "don't complicate").
+- **Carry-forward backlog (unchanged):** epic-A issue audit #7/#8/#9; #80 DRY safeRedirectTarget; /about real content; #73; #54; #44 CF git-deploy; #49 Biome; #6 Email (blocked PO SPF/DKIM); CHORE-C test infra (would also unblock extending the bg-rule gate to signed-in routes).
+
+## Lessons this session
+
+- **`ultracode` adversarial reviews pay off on broad/judgment-heavy work** — the sub-chain-1 review caught 2 REDs (data-desk-text misuse + WCAG back-link); the sub-chain-3 review (57 agents) caught the gate false-pass (transparent rgba) + the Margin blanket-tag misuse — both would've shipped. They're EXPENSIVE (~1.8–2M tokens each); reserve for broad/risky sub-chains, use Bentham-alone for small/bounded ones. `ultracode` is a PER-TURN opt-in (the keyword or an explicit ask), not a standing session mode.
+- **Live-clicking still beats every automated check** (`feedback_partial_assertions_hide_bugs` again): PO clicking found the `/seasons` rehearsal-rows-bare gap that tests + the gate + 2 reviews all missed — because `/seasons` is auth-guarded, outside the public gate. Keep deploying to preview per sub-chain for incremental PO live-check.
+- **Workflow-assisted planning worked well:** parallel drafters (one per sub-chain) → adversarial verifier → fix pass produced a deep, accurate plan fast. Same draft→verify→fix pattern is reusable.
+
+## Expected first action session 34
+
+1. Read this seed. Verify main `31dce91` (origin==local), prod `mvox.eu` health unchanged (still old chunk `app.BlDa5F1S.js` — all S33 was preview-only).
+2. Spawn finn + bentham (always-on) + tallis. For slice-3 also plan to spawn Pérotin (the `application`-type probe is his) + Victoria (requirements) if doing the brainstorm.
+3. **Slice-3 brainstorm** — lead with the `/invite/<token>` unauthed-landing problem (client-side/token-self-describing ONLY; do NOT reach for server-side identity). Finn re-confirms invitation/member/application live shapes; Pérotin probes the `application` type. Then spec → plan → chain.
+
+(*MVOX:Palestrina*)
+
+---
+
+### [PROCESSED 2026-06-14 session-33] 2026-06-13 end-of-session-32 — session-32 → session-33
 
 **Headline: The MVP push. Defined the MVP (rehearsal-attendance loop) and shipped slices 1, 2a, 2b + 2b-optimistic-polish to preview — the loop works end-to-end (agenda → RSVP → conductor/singer see the tally, instantly). Plus #88 (runtime type-ids) and #89 (stale-JWT cleanup). Survived a big auth detour: tried "trusted-identity-at-issuance" (server-side OAuth-key exchange), which was DOA because Entu tokens are aud=IP-bound (a constraint already in our own memory — I missed it; 4 deploy cycles to rediscover). Fully reverted it. The conductor tally instead uses Entu FORMULAS (sentinel refs + `_referrer COUNT` + a CONCAT'd `rsvp_tally` JSON string) — no server, no identity. Adopted the single-tree git protocol (no worktrees, no chore branches, one actor at a time). Production mvox.eu untouched all session; everything on `preview-seasons.multivox.pages.dev`.**
 

@@ -575,6 +575,32 @@ From live `GET https://api.entu.app/openapi`:
 
 ---
 
+## 2026-06-13/14 — Session 33 findings
+
+### [LEARNED] Nav + route surface state — post-S33 cleanup baseline
+
+S33 shipped a full nav/routing cleanup. State as of session-33 close (for next-session Finn to not re-audit from scratch):
+
+- **Real pages:** `/` (landing dual-mode), `/about`, `/agenda`, `/library`, `/seasons` — all real content.
+- **Auth/util:** `/auth/login`, `/auth/logout`, `/auth/callback`, `/auth/[provider]`.
+- **Missing routes:** `/roster`, `/notices`, `/settings` — nav tabs exist (as visual placeholders after S33 cleanup), no pages behind them.
+- **Wood-grain:** `DeskSurface.svelte` scoped CSS, pure gradient (no asset). Three animated `repeating-radial-gradient` layers. `background-attachment: fixed`.
+- **Theme tokens:** `src/app.css` `@theme` block — paper/ink/desk/voice color families. Fonts: Inter (sans), JetBrains Mono (mono), Caveat (display/handwritten moments).
+
+### [DEFERRED] Slice-3 (invite & join) — pushed to S34
+
+`invitation`, `member`, `application` entity shapes are already audited (see session-32 findings below). The 4 design decisions still open:
+1. RSVP aggregation pattern for conductors (BFF elevated rights design)
+2. Invitation accept atomicity (3-step BFF atomic)
+3. `rsvp.member` cross-org pointer
+4. Unauthenticated `invitation.token` lookup
+
+`application` entity shape: NOT yet probed against v4E schema.ts — only noted as absent from live polyphony DB (session-4 audit). Needs schema.ts read when slice-3 starts.
+
+(*MVOX:Finn*)
+
+---
+
 ## 2026-06-12/13 — Session 32 findings
 
 ### [LEARNED] v4E schema audit — all MVP entities confirmed present

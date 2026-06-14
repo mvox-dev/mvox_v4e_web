@@ -193,4 +193,26 @@
 
 [GOTCHA] **When Tallis's RED commit removes "ghost" mock keys, check which real keys the component now needs.** dd39b07 cleaned up 3 old ghost keys from page.spec.ts, but the new heading call needed a 4th key (`seasons_form_rehearsal_edit_heading`) that wasn't there. Pattern: after syncing to a new Tallis RED, grep the component calls against the mock to find gaps before first test run.
 
+## [CHECKPOINT] 2026-06-13 — Session 33 S33 UI/UX Cleanup (all 3 sub-chains + fix rounds)
+
+[LEARNED] **`data-desk-text` misuse patterns — both types now encountered:**
+(1) Inside a bg container (PaperCard/PaperStack/panel): element already conforms; tag is a §2 review blocker. Pattern: check ancestors BEFORE tagging.
+(2) Component-root blanket tag (e.g. `Margin.svelte`): exempts ALL instances including those inside bg containers. Fix: add `exempt?: boolean` prop (default false) and only set it on bare-desk callsites.
+
+[LEARNED] **`data-testid^="prefix-"` selector collision in Vitest (AgendaList redesign):** `querySelectorAll('[data-testid^="agenda-row-"]')` matched inner `agenda-row-time/duration/location` spans as well as top-level `agenda-row-<id>` divs. Fix: rename inner testids to drop the `agenda-row-` prefix (`row-time`, `row-duration`, `row-location`). Update existing spec selectors as a mechanical refactor. Pattern: when adding a card-level wrapper, audit whether sibling testids share the wrapping selector's prefix.
+
+[LEARNED] **Playwright bg-rule gate — selector collision for anonymous leaf elements:** Elements without `data-testid` or `id` get the tag name (`div`) as their querySelector selector. `document.querySelector('div')` always finds the FIRST div in DOM, not the specific leaf being characterized. This means all anonymous divs on a route get bucket-tested against the same element. Mitigation: add `data-testid` to any component that is a meaningful leaf (e.g. `Margin.svelte` → `data-testid="margin-note"`).
+
+[LEARNED] **Playwright bg-rule on auth-guarded routes:** `/roster`, `/notices`, `/settings` redirect unauthenticated Playwright sessions to `/auth/login`. Gate violations reported for these routes are actually auth/login violations (confirmed by identical violation text). Gate only covers public routes.
+
+[PATTERN] **AvatarMenu arrow-key nav implementation:** `onKeyDown` extended with ArrowDown/ArrowUp inside the same `$effect` as Escape. Collect `[role="menuitem"]` into an array, find current `document.activeElement`, modulo-step. `e.preventDefault()` prevents page scroll.
+
+[PATTERN] **Outside-click focus restore (AvatarMenu):** `onMouseDown` path: `close(); triggerEl?.focus()` — mirror exactly what Escape does. Consistent pattern for all menu components.
+
+[PATTERN] **tabForPath exact-segment matching:** Each segment should use `pathname === '/X' || pathname.startsWith('/X/')` instead of `pathname.startsWith('/X')` alone. Prevents false-positive matches like `/libraryxyz` → 'library'.
+
+[GOTCHA] **Nested `vi.mock()` inside an `it` block:** Works as a hoisted re-mock for that test's render call but may be order-sensitive. Tallis's roster label test uses this pattern to prove the route isn't hardcoded. After the GREEN fix (route calls `m.page_roster_label()`), the nested mock returns `'Choir roles'` and the assertion `!== 'Choir management'` passes.
+
+[LEARNED] **All 3 sub-chains of S33 completed in session 33 (branches: feat/s33-navigation, feat/s33-readability-visual, feat/s33-readability-conformance). Fix branches: fix/s33-seasons-rehearsal-bg, chore/s33-yellows.** Final unit suite at shutdown: 1018/1018. Outstanding pnpm check errors: 5 (3 from `page_*_label` + 2 from `library_loading/library_load_error`) — all await Comenius.
+
 (*MVOX:Byrd*)

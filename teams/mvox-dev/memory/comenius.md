@@ -6,6 +6,22 @@ Tags: `[DECISION]`, `[PATTERN]`, `[WIP]`, `[CHECKPOINT]`, `[DEFERRED]`, `[GOTCHA
 
 ---
 
+## Session 33 — S33 sub-chain 3 + YELLOW-33.1 i18n (2026-06-13/14)
+
+[CHECKPOINT] Added 2 keys (library_loading + library_load_error) on feat/s33-readability-conformance, commit `5d761cd`. pnpm check: 2 errors → 0. 993/993 tests pass.
+
+[CHECKPOINT] Added 3 keys (page_roster_label / page_notices_label / page_settings_label) on chore/s33-yellows, commit `a4a4eac`. pnpm check: 3 errors → 0. 1018/1018 tests pass.
+
+[DECISION] `library_loading` register: ellipsis-framed phrase matching `common_loading` pattern per locale — et passive present `laaditakse`, lv 3rd-person verb `ielādē`, uk verbal noun `завантаження`. Keeps visual loading indicator register consistent with the common key.
+
+[DECISION] `page_*_label` eyebrows: short nominative noun phrases (no sentence, no verb). et/lv: native-root words preferred over loanwords for short eyebrow context (`Suhtlus`/`Saziņa` over `Kommunikatsioon`/`Komunikācija`). uk: institutional loanword `Комунікації` is standard. `page_settings_label` aligns with `page_settings_description` vocabulary per locale.
+
+[CONVENTION] Terminology-consistency rule established (session 33): nav-tab value is canonical term for its feature area; page descriptions and labels must use the same noun in that locale. Documented in i18n-conventions.md. Fixed `page_settings_description` lv `preferences` → `iestatījumi` (commit `07191d5`).
+
+(*MVOX:Comenius*)
+
+---
+
 ## Session 33 — S33 sub-chain 1 i18n (2026-06-13)
 
 [CHECKPOINT] Added 6 keys (nav_menu_about + page_coming_soon_* + page_*_description) across 4 locales. Commit `bc57ca1` on `feat/s33-navigation`. pnpm check: 0 errors / 8 pre-existing warnings. pnpm test:unit: 112 files, 956 tests — all pass. The 6 AvatarMenu failures resolved.

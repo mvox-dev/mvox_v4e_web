@@ -4,6 +4,24 @@ Personal notes. Only Josquin writes here.
 
 ---
 
+## [CHECKPOINT] 2026-06-13→14 session 33 — S33 UI/UX cleanup: 5 squash-merges + 5 preview-deploys, prod never touched
+
+Acted as merge-agent only this session (no GREEN-impl). Five PO-pre-authorized merge-on-green squash-merges to main, each followed by a build + preview-deploy to the `preview-seasons` branch alias. Main line:
+`8280178` → **12f4b14** (sub-chain 1: nav + coming-soon placeholders + i18n) → `ed70192` base → **9a59ecc** (sub-chain 2: warm desk + 12-pt orbit + agenda per-day cards) → `c8bd5f7` base → **0abc774** (sub-chain 3 FINAL: seasons/library/auth bg-rule conformance + Playwright bg-rule gate) → **ab275e6** (fix: seasons rehearsal rows + state-msgs onto paper — PO live-check gap on auth-guarded /seasons, outside public gate) → **e39b446** (chore: a11y/i18n/gate-robustness YELLOW batch).
+Preview chunks in order: `app.CEwvcB2k.js`, `app.B336Us6I.js`, `app.4p_v-zYO.js`, `app.DRSrbPjG.js`, `app.Cgj9ARtI.js`. Prod mvox.eu untouched ALL session — verified every time it still served the OLD chunk `app.BlDa5F1S.js` (≠ each new build).
+
+### Mechanics confirmed still-current (vs session-29/30 notes)
+- Deploy: `pnpm dlx wrangler@4.92.0 pages deploy .svelte-kit/cloudflare --project-name=multivox --branch=preview-seasons`, creds inline `set -a; . ~/.config/mvox/credentials.env; set +a`. No CF 8000000 transient hit this session — all 5 deploys clean first try.
+- Squash flow: atomic chain `checkout main && pull --ff-only && merge --squash <b> && commit && push origin main && rev-parse --short HEAD`. Co-author trailer (hook) present on all 5 — body always free of any `Co-authored-by:` line. Branches were ALL local-only (no remote/PR to close). Always `git branch -D` (squash leaves branch non-ancestor) AFTER confirming `git diff --stat main <b>` EMPTY = content identical.
+- Stash discipline held: dirty peer scratchpads (bentham/tallis on most) stashed out by name pre-merge, popped back after — never folded into a feature squash. `.env` was present every merge (no fresh-worktree gap this session — single shared tree).
+
+### [GOTCHA] Stale task_assignment fires once per merge — STILL the pattern (now 5/5)
+Every one of the 5 merges produced a `task_assignment` JSON from team-lead arriving AFTER my completion+report, each with a timestamp predating my report, each describing the GREEN-phase brief (Byrd/Tallis/Comenius lanes), NOT my merge lane. Same TaskUpdate-fires-notification artifact as session-17/26. Ack one-liner ("stale, predates report, already merged at SHA"), never redo. The merge go-ahead is always the plain-text dispatch SendMessage, never the task_assignment JSON.
+
+(*MVOX:Josquin*)
+
+---
+
 ## [CHECKPOINT] 2026-06-01 session 30 — pencil-toggle + #87 edit-rehearsal + date-format fix: 3 merges + 1 data-GREEN + 3 preview redeploys
 
 Acted as GREEN-impl + merge-agent. Main went `d95508e → b3a1a6a` (pencil-toggle squash) `→ 49e625d` (#87 edit-rehearsal, Closes #87) `→ ... e7f7d49 → ddf4451` (season date-format fix). Preview-seasons redeployed each time; last verified chunk `app.x27TVohe.js`. Prod mvox.eu untouched all session. My data-GREEN: #87 `updateRehearsal` self-resolving (commit `232e9da`) + the date-format slice (`ea2cdcb`).

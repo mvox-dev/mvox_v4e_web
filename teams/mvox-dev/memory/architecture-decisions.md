@@ -6,6 +6,30 @@ Format per entry: short title, decision, rationale, date. Most recent at the top
 
 ---
 
+## Desk-readability conformance — bg-ancestor is the mechanism, `data-desk-text` is the narrow exemption (2026-06-14, session 33)
+
+**Decision**: On the warm wood-grain desk surface (`.wood-bg` / `DeskSurface`), every visible leaf text node must sit on a real colored-background ancestor OR be a genuinely-exempt element. The exemption marker `data-desk-text` (a no-CSS `data-*` attribute) is NOT a conformance mechanism — it styles nothing. Conformance is achieved one of two ways:
+
+1. **Real colored-bg ancestor** — `bg-paper` / `bg-paper-2`, a `PaperCard` / `PaperStack`, a cream panel (`#fbf9f3`, `rgba(251,249,243,0.8)`), or any element whose **computed `background-color` is opaque** (alpha > 0). This is the default and strongly-preferred path. Wrap state messages, list rows, and cards in a `bg-paper` container (e.g. `.state-msg-container`, `.series-card`, `.day-card` — all introduced session 33).
+2. **`data-desk-text` exemption** — ONLY for genuinely bare-on-desk elements in the §2 exempt categories: big display titles (h1/h2 at display size) and handwritten-style floating marginalia (`font-display`/Caveat, often `absolute`-positioned, rotated). The `<Margin>` component takes an opt-in `exempt?: boolean` prop (default `false`) rather than a blanket tag, so the same component conforms via bg-ancestor when nested in a card (library) and exempts only when bare (about / auth pages).
+
+**Review enforcement (Bentham)** — the verdict tiers, calibrated over 4 session-33 reviews:
+
+- **RED**: `data-desk-text` on a **small/body-text element that is genuinely bare on the desk** — the marker is a *lie* (it doesn't make the text readable; it just silences the gate). Fix = give it a real bg-ancestor, not a tag. (Exemplar: ComingSoon "coming soon" eyebrow, RED'd sub-chain 1, fixed `2cc9b56`.)
+- **RED**: a blanket component-level `data-desk-text` that exempts nested usages which already have a bg-ancestor (the marker leaks to conforming contexts). Fix = opt-in `exempt` prop. (Exemplar: `<Margin>` blanket tag, fixed `ea52da4`.)
+- **YELLOW**: a **redundant** marker on an element that already conforms (has a colored-bg ancestor) AND/OR is a true §2 big-title. Not broken, but noise — and a test asserting the marker's *presence* is review-gate-artifact-in-production (sibling to the i18n-mock-leak guard smell). Fix = drop the attr + flip the test to assert ABSENCE. (Exemplar: agenda `.page-title`, YELLOW sub-chain 2, closed `chore/s33-yellows`.)
+- **Audit tell**: `git grep <suspect_key_or_attr> <tip> -- src/` — a `data-desk-text` whose element has any `bg-*` / cream-bg ancestor is at best redundant; never accept the marker itself as evidence of conformance — check the actual ancestor chain.
+
+**The Playwright bg-rule gate** (`tests/bg-rule.spec.ts`) enforces this on **public routes only** (`/`, `/about`, `/auth/login`); auth-guarded routes (library, seasons, roster/notices/settings) 302 to login and are covered by unit tests + Bentham's static backstop (hybrid-gate, spec §4.3). Gate mechanics that are load-bearing: walk runs inside one `page.evaluate()` (live refs, no selector round-trip); `.wood-bg` is the stop condition (checked before its own styles, so the desk gradient never false-passes); **only an opaque `background-color` counts** — `background-image`/gradients are NOT an independent conformance signal (a transparent gradient has `background-image !== 'none'` but zero coverage). Any element that paints coverage via a gradient/image MUST also declare a `background-color` fallback.
+
+**Known latent gap (YELLOW-33.4)**: `LibraryMaster.svelte` `.master-paper` provides text coverage via a fade-to-transparent `linear-gradient` with no `background-color` fallback. Harmless today (library is auth-guarded, outside the gate), but if the gate is ever extended to authed routes, add `background-color: #fbf9f3` to `.master-paper` first (the gradient's 0–50% opaque region already gives the visual coverage; the declaration just makes the gate agree).
+
+**Source**: Session 33 readability work — sub-chains 1–3 + `fix/s33-seasons-rehearsal-bg` + `chore/s33-yellows`. Full review trail + per-exemplar SHAs in `bentham.md` (the `data-desk-text` discipline arc). Lifted to settled patterns at session-33 shutdown so future desk-surface UI work consults one rule.
+
+(*MVOX:Bentham*)
+
+---
+
 ## Verify load-bearing identifiers against ground truth before asserting (2026-05-31, session 27→28)
 
 **Decision**: Before any teammate asserts, acts on, or reports a load-bearing identifier — a commit SHA, a gate/test count, a file set, a deploy/prod status, a hash — they MUST verify it against ground truth (their own `git` / `curl` / file read) and gate the claim on a completed tool result read **in the same turn**. Never assert before the tool result returns. If you have not read the result this turn, you have no value to report.
