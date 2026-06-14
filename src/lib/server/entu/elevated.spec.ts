@@ -28,8 +28,10 @@ describe('mintJwt', () => {
 			json: async () => ({ token: 'svc-jwt', accounts: { [DB]: 'person-svc' } }),
 		});
 		vi.stubGlobal('fetch', fetchMock);
-		// Unconditional live RED: stub throws "not implemented"
-		await expect(mintJwt('raw-api-key-123', DB)).rejects.toThrow('not implemented');
+		await mintJwt('raw-api-key-123', DB);
+		const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+		expect(url).toBe(`${ENTU_API_BASE}auth?db=${DB}`);
+		expect((init?.headers as Record<string, string>)?.Authorization).toBe('Bearer raw-api-key-123');
 	});
 
 	it('returns the token string from response.token', async () => {
@@ -48,13 +50,9 @@ describe('mintJwt', () => {
 			json: async () => ({ token: 'tok', accounts: { [DB]: 'p' } }),
 		});
 		vi.stubGlobal('fetch', fetchMock);
-		await mintJwt('api-key', DB).catch(() => {});
-		if (fetchMock.mock.calls.length > 0) {
-			const url = (fetchMock.mock.calls[0] as [string])[0];
-			expect(url).toBe(`${ENTU_API_BASE}auth?db=${DB}`);
-		}
-		// Unconditional RED:
-		await expect(mintJwt('api-key', DB)).rejects.toThrow('not implemented');
+		await mintJwt('api-key', DB);
+		const url = (fetchMock.mock.calls[0] as [string])[0];
+		expect(url).toBe(`${ENTU_API_BASE}auth?db=${DB}`);
 	});
 
 	it('sends Authorization: Bearer <apiKey> header', async () => {
@@ -63,12 +61,9 @@ describe('mintJwt', () => {
 			json: async () => ({ token: 'tok', accounts: { [DB]: 'p' } }),
 		});
 		vi.stubGlobal('fetch', fetchMock);
-		await mintJwt('api-key-XYZ', DB).catch(() => {});
-		if (fetchMock.mock.calls.length > 0) {
-			const init = (fetchMock.mock.calls[0] as [string, RequestInit])[1];
-			expect((init?.headers as Record<string, string>)?.Authorization).toBe('Bearer api-key-XYZ');
-		}
-		await expect(mintJwt('api-key-XYZ', DB)).rejects.toThrow('not implemented');
+		await mintJwt('api-key-XYZ', DB);
+		const init = (fetchMock.mock.calls[0] as [string, RequestInit])[1];
+		expect((init?.headers as Record<string, string>)?.Authorization).toBe('Bearer api-key-XYZ');
 	});
 
 	it('throws when accounts is empty (service key has no db access)', async () => {
@@ -96,13 +91,10 @@ describe('readEntity', () => {
 			json: async () => ({ entity: { _id: 'ent-abc' } }),
 		});
 		vi.stubGlobal('fetch', fetchMock);
-		await readEntity('svc-jwt', DB, 'ent-abc').catch(() => {});
-		if (fetchMock.mock.calls.length > 0) {
-			const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
-			expect(url).toBe(`${ENTU_API_BASE}${DB}/entity/ent-abc`);
-			expect((init?.headers as Record<string, string>)?.Authorization).toBe('Bearer svc-jwt');
-		}
-		await expect(readEntity('svc-jwt', DB, 'ent-abc')).rejects.toThrow('not implemented');
+		await readEntity('svc-jwt', DB, 'ent-abc');
+		const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+		expect(url).toBe(`${ENTU_API_BASE}${DB}/entity/ent-abc`);
+		expect((init?.headers as Record<string, string>)?.Authorization).toBe('Bearer svc-jwt');
 	});
 
 	it('returns the entity object from response.entity', async () => {
@@ -146,13 +138,10 @@ describe('resolveInvitationByToken', () => {
 			ok: true, json: async () => makeSearchResponse(),
 		});
 		vi.stubGlobal('fetch', fetchMock);
-		await resolveInvitationByToken('svc-jwt', DB, 'uuid-tok-abc').catch(() => {});
-		if (fetchMock.mock.calls.length > 0) {
-			const url = (fetchMock.mock.calls[0] as [string])[0];
-			expect(url).toContain('_type.string=invitation');
-			expect(url).toContain('uuid-tok-abc');
-		}
-		await expect(resolveInvitationByToken('svc-jwt', DB, 'uuid-tok-abc')).rejects.toThrow('not implemented');
+		await resolveInvitationByToken('svc-jwt', DB, 'uuid-tok-abc');
+		const url = (fetchMock.mock.calls[0] as [string])[0];
+		expect(url).toContain('_type.string=invitation');
+		expect(url).toContain('uuid-tok-abc');
 	});
 
 	it('returns full InvitationProjection toEqual when found', async () => {
@@ -228,24 +217,20 @@ describe('createMember', () => {
 		vi.stubGlobal('fetch', fetchMock);
 		await createMember('svc-jwt', DB, {
 			orgId: 'org-111', sections: [], personId: 'person-77', name: 'Mihkel Putrinš',
-		}).catch(() => {});
+		});
 		const postCall = (fetchMock.mock.calls as Array<[string, { method?: string; body?: string }]>)
 			.find(([, init]) => init?.method === 'POST');
-		if (postCall) {
-			const body = JSON.parse(postCall[1].body ?? '[]') as Array<{ type: string; reference?: string; string?: string }>;
-			expect(body).toEqual(expect.arrayContaining([
-				{ type: '_type', reference: 'member-type-id' },
-				{ type: '_parent', reference: 'org-111' },
-				{ type: 'person', reference: 'person-77' },
-				{ type: 'name', string: 'Mihkel Putrinš' },
-				{ type: 'status', string: 'active' },
-			]));
-			const parentRefs = body.filter((p) => p.type === '_parent');
-			expect(parentRefs).toHaveLength(1); // only orgId — no sections
-		}
-		await expect(createMember('svc-jwt', DB, {
-			orgId: 'org-111', sections: [], personId: 'person-77', name: 'Mihkel Putrinš',
-		})).rejects.toThrow('not implemented');
+		expect(postCall).toBeDefined();
+		const body = JSON.parse(postCall?.[1].body ?? '[]') as Array<{ type: string; reference?: string; string?: string }>;
+		expect(body).toEqual(expect.arrayContaining([
+			{ type: '_type', reference: 'member-type-id' },
+			{ type: '_parent', reference: 'org-111' },
+			{ type: 'person', reference: 'person-77' },
+			{ type: 'name', string: 'Mihkel Putrinš' },
+			{ type: 'status', string: 'active' },
+		]));
+		const parentRefs = body.filter((p) => p.type === '_parent');
+		expect(parentRefs).toHaveLength(1); // only orgId — no sections
 	});
 
 	it('multi-parent POST: _parent=orgId AND one _parent per section (3 total for 2 sections)', async () => {
@@ -253,20 +238,16 @@ describe('createMember', () => {
 		vi.stubGlobal('fetch', fetchMock);
 		await createMember('svc-jwt', DB, {
 			orgId: 'org-111', sections: ['sec-1', 'sec-2'], personId: 'person-77', name: 'Test',
-		}).catch(() => {});
+		});
 		const postCall = (fetchMock.mock.calls as Array<[string, { method?: string; body?: string }]>)
 			.find(([, init]) => init?.method === 'POST');
-		if (postCall) {
-			const body = JSON.parse(postCall[1].body ?? '[]') as Array<{ type: string; reference?: string }>;
-			const parentRefs = body.filter((p) => p.type === '_parent').map((p) => p.reference);
-			expect(parentRefs).toHaveLength(3); // org + 2 sections
-			expect(parentRefs).toContain('org-111');
-			expect(parentRefs).toContain('sec-1');
-			expect(parentRefs).toContain('sec-2');
-		}
-		await expect(createMember('svc-jwt', DB, {
-			orgId: 'org-111', sections: ['sec-1', 'sec-2'], personId: 'p-77', name: 'T',
-		})).rejects.toThrow('not implemented');
+		expect(postCall).toBeDefined();
+		const body = JSON.parse(postCall?.[1].body ?? '[]') as Array<{ type: string; reference?: string }>;
+		const parentRefs = body.filter((p) => p.type === '_parent').map((p) => p.reference);
+		expect(parentRefs).toHaveLength(3); // org + 2 sections
+		expect(parentRefs).toContain('org-111');
+		expect(parentRefs).toContain('sec-1');
+		expect(parentRefs).toContain('sec-2');
 	});
 
 	it('returns the created member _id', async () => {
@@ -306,16 +287,12 @@ describe('findActiveMember', () => {
 			ok: true, json: async () => ({ entities: [memberEntity] }),
 		});
 		vi.stubGlobal('fetch', fetchMock);
-		await findActiveMember('svc-jwt', DB, { personId: 'person-77', orgId: 'org-111' }).catch(() => {});
-		if (fetchMock.mock.calls.length > 0) {
-			const url = (fetchMock.mock.calls[0] as [string])[0];
-			expect(url).toContain('_type.string=member');
-			expect(url).toContain('person-77');
-			expect(url).toContain('org-111');
-			expect(url).toContain('status.string=active');
-		}
-		await expect(findActiveMember('svc-jwt', DB, { personId: 'person-77', orgId: 'org-111' }))
-			.rejects.toThrow('not implemented');
+		await findActiveMember('svc-jwt', DB, { personId: 'person-77', orgId: 'org-111' });
+		const url = (fetchMock.mock.calls[0] as [string])[0];
+		expect(url).toContain('_type.string=member');
+		expect(url).toContain('person-77');
+		expect(url).toContain('org-111');
+		expect(url).toContain('status.string=active');
 	});
 
 	it('returns MemberRecord full shape { memberId, personId, orgId, status }', async () => {
@@ -355,15 +332,12 @@ describe('deleteEntity', () => {
 	it('sends DELETE to /entity/{id} path (NOT /property/{id}), Authorization: Bearer jwt', async () => {
 		const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => ({}) });
 		vi.stubGlobal('fetch', fetchMock);
-		await deleteEntity('svc-jwt', DB, 'inv-42').catch(() => {});
-		if (fetchMock.mock.calls.length > 0) {
-			const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
-			expect(url).toContain(`${DB}/entity/inv-42`);
-			expect(url).not.toContain('/property/');
-			expect(init?.method).toBe('DELETE');
-			expect((init?.headers as Record<string, string>)?.Authorization).toBe('Bearer svc-jwt');
-		}
-		await expect(deleteEntity('svc-jwt', DB, 'inv-42')).rejects.toThrow('not implemented');
+		await deleteEntity('svc-jwt', DB, 'inv-42');
+		const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+		expect(url).toContain(`${DB}/entity/inv-42`);
+		expect(url).not.toContain('/property/');
+		expect(init?.method).toBe('DELETE');
+		expect((init?.headers as Record<string, string>)?.Authorization).toBe('Bearer svc-jwt');
 	});
 
 	it('throws on non-ok delete response', async () => {

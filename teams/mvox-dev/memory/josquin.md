@@ -4,6 +4,41 @@ Personal notes. Only Josquin writes here.
 
 ---
 
+## [WIP] 2026-06-14 session 35 — slice-3 invite-join GREEN (server half), branch feat/invite-join
+
+### [CHECKPOINT 08:08] IMPL DONE + CORRECT, UNCOMMITTED, blocked on 2 Tallis test-bugs
+Real RED at `5a0ab35`. All 4 of my src files written + correct on working tree (NOT committed — holding for green per per-commit-GREEN). `pnpm check`=0 errors. session-cookie.spec 100% green. elevated.spec 16/25, resolve 4/5, accept 13/14 — every FAILURE is a mechanical test-bug (not impl):
+- **Bug #1**: 9 elevated.spec "shape" tests have leftover `await expect(fn()).rejects.toThrow('not implemented')` tails (fixup stripped them from behavior tests but not shape tests). Self-contradictory. Fix=delete the 9 tails.
+- **Bug #2**: both endpoint 500-tests call `makeEvent('tok', undefined)` but makeEvent has `envKey = 'svc-api-key'` DEFAULT param → passing undefined triggers the default → key present → can't be 500. Fix=pass `''` or drop the default. My `if(!serviceKey)` is correct.
+Surfaced both to team-lead 08:05 (#1) + 08:08 (#2). Recommended NOT coding around either (would be partial-assertion smell). WAITING for Tallis fixes, then: full check+test, registry append, ONE atomic GREEN commit, handoff Byrd + team-lead.
+- KEY IMPL DECISIONS: readEntity UNWRAPS body.entity (resolve-spec mock returns `{_id,name}` bare, asserts that). Endpoints: serviceKey/db from `platform.env` when platform present (authoritative, no fallback — so undefined platform.env key → 500), else `$env/dynamic/private`(key)+`$env/static/public`(db). createMember inlines its own resolveTypeId (no entuSeasons import into server). elevated.ts imports only `$lib/entu-config` ENTU_API_BASE — NO $env (db is a param).
+
+GREEN go-ahead received 07:43. My scope: `src/lib/server/entu/elevated.ts` (new), `src/routes/api/invite/[token]/+server.ts` (GET resolve), `.../accept/+server.ts` (POST), `src/app.d.ts` (App.Platform.env.ENTU_SERVICE_KEY), `src/lib/server/auth/session-cookie.ts` (allowlist `/invite/` + `/api/invite/`). Plus: APPEND the 2 endpoints to elevated-ops registry in architecture-decisions.md (I own the branch). NO Schema-Change trailer (types exist live). Tallis RED = `8ae6e47`.
+
+### [GOTCHA→SURFACED] RED specs assert the STUB (`rejects.toThrow('not implemented')`), real asserts in `// After GREEN:` comments
+Baseline: 2 failed (session-cookie allowlist = genuine RED) / 47 passed. elevated.spec + both endpoint specs PASS against stubs because they only assert the stub throws. Implementing correctly FLIPS ~45 to failing. Can't fix (Tallis's lane). Surfaced A/B/C to team-lead 07:46, recommended A (Tallis converts comments→live asserts). HOLDING.
+
+### [DECISION] env threading — TEAM-LEAD RULING 07:48: db is an EXPLICIT PARAM, elevated.ts imports NO env
+- `elevated.ts` PURE — NO `$env` import at all. db threaded as param: `mintJwt(apiKey, db)`, `readEntity(jwt, db, id)`, etc. (Match Tallis's re-RED signatures exactly — she's writing them now.) SUPERSEDES earlier `$env/dynamic/public` lean (correct-but-unneeded once db is a param). elevated.spec's `vi.stubEnv('PUBLIC_ENTU_DB')` then irrelevant to elevated.ts; spec must pass db explicitly to helpers — confirm in re-RED.
+- ENDPOINTS read db from `$env/dynamic/public` (env.PUBLIC_ENTU_DB) + service key `event.platform?.env.ENTU_SERVICE_KEY` (dev fallback `$env/dynamic/private`), then PASS db into helpers. Endpoint specs `vi.mock('$env/static/public')`+`vi.mock('$env/dynamic/private')` AND pass `platform.env.{...}`. Missing key → 500. CONFIRM in re-RED which env module the endpoint spec mocks for db — match the spec.
+
+### [CONTRACT] elevated.ts signatures (from elevated.spec.ts, authoritative)
+- `mintJwt(apiKey): Promise<string>` — GET `${BASE}auth?db=${db}` Bearer apiKey; throw if accounts empty or !ok; return token.
+- `readEntity(jwt, id): Promise<{entity:...}>` — GET `${BASE}${db}/entity/${id}`. MOCK returns `{entity:{...}}` in BOTH resolve+accept specs → readEntity returns the FULL `{entity}` wrapper; CALLERS unwrap `.entity`.
+- `resolveInvitationByToken(jwt, token): Promise<InvitationProjection|null>` — search `_type.string=invitation&token.string=${token}`; null on empty; map to {invitationId,orgId(_parent[0].reference),email,expiresAt(ms from date),sections[],message,token}.
+- `resolvePersonName(jwt, personId): Promise<string>` — GET entity, return name[0].string.
+- `createMember(jwt, {orgId,sections,personId,name}): Promise<string>` — resolveTypeId('member') THEN POST `${BASE}${db}/entity` body order: [{_type,reference:typeId},{_parent,reference:orgId},...sections.map(s=>{_parent,reference:s}),{person,reference:personId},{name,string},{status,string:'active'}]. Multi-parent test pins exact shape. Do NOT add section[]/current_section.
+- `findActiveMember(jwt,{personId,orgId}): Promise<MemberRecord|null>` — search member+person.reference+_parent.reference=orgId+status.string=active; map {memberId,personId,orgId,status} or null.
+- `deleteEntity(jwt, id): Promise<void>` — DELETE `${BASE}${db}/entity/${id}` (entity path NOT property).
+
+### [CONTRACT] endpoints (from server.spec.ts)
+- GET resolve: no key→500; resolveInvitationByToken null→404 `{valid:false}`; else readEntity(orgId).entity.name→orgName; return `{valid:true, expired:(expiresAt<now), orgName, email, sections, message}`. NEVER leak token/inviter/invitationId/_id.
+- POST accept: body `{applicationId}`; no key→500; mintJwt; resolveInvitation (recheck expiry→410 `{expired:true}`); readEntity(applicationId).entity → personId=_parent[0].reference (absent→403); target_org[0].reference must===invitation.orgId else 403; findActiveMember→ if exists skip create, still cleanup, return `{ok:true,orgId,alreadyMember:true}`; else resolvePersonName, createMember({orgId,sections:invitation.sections,personId,name}), return `{ok:true,orgId}`; deleteEntity(invitationId)+deleteEntity(applicationId) best-effort (catch→soft warn, still ok). NEVER read user JWT from request headers.
+
+(*MVOX:Josquin*)
+
+---
+
 ## [CHECKPOINT] 2026-06-14 session 34 — #80 DRY chain + FIRST prod release since CHORE-72 + #44 git-connect migration
 
 Two things permanently change the deploy story this session; the manual-`wrangler` mechanics catalogued in every checkpoint below are now FALLBACK-ONLY.

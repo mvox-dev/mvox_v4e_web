@@ -522,9 +522,12 @@ The decision narrows or expands if any of the following lands:
 
 **Decision**: The BFF (SvelteKit server + CF Worker) hosts a single explicit enumerated list of operations that genuinely cannot run in the user's browser, because their secrets or privilege cannot ship to the client. Every other operation runs browser-direct against `api.entu.app` with the user's JWT (see "Data path — browser-direct to Entu" decision above).
 
-**Current elevated-ops list** (seeded empty under Path C):
+**Current elevated-ops list** (under Path C):
 
-- *(none yet — list seeded empty; populate as real ops emerge)*
+- **`GET /api/invite/[token]`** (slice-3 invite/join, #21/#11) — resolves an org-**private** `invitation` by token for an **unauthed** singer who has no rights to read it. Mints a service JWT (`ENTU_SERVICE_KEY`, `_editor` per org) and returns a MINIMAL projection only (`valid`/`expired`/`orgName`/`email`/`sections`/`message`) — never the token, inviter, invitationId, or full entity. Cannot run browser-direct: the caller is unauthenticated and the entity is private. Rationale pre-approved by spec §6 + the cf-worker-jwt-binding probe (same-invocation mint+use satisfies Entu `aud=IP`). Approved: team-lead, 2026-06-14 session 35.
+- **`POST /api/invite/[token]/accept`** (slice-3 invite/join, #21/#11) — creates the `member` (org consent side of bilateral-consent). Service-key ONLY; **never** the user's JWT (IP-bound, 401s from CF — `project_entu_jwt_ip_bound`). Identity is proven by `application._parent` (Path A: only the singer's own JWT could create the application under their person, browser-direct). BFF verifies invitation validity + `application.target_org === invitation.org`, is idempotent on existing active member, and best-effort-deletes the invitation + application (member is the durable outcome). Cannot run browser-direct: member-create requires org `_editor` the singer does not hold. Approved: team-lead, 2026-06-14 session 35.
+
+(*MVOX:Josquin*)
 
 Anticipated future entries (no implementation today, no commitment to add):
 

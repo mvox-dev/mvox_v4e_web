@@ -309,7 +309,9 @@ describe('POST /api/invite/[token]/accept — delete fails (soft warning)', () =
 
 describe('POST /api/invite/[token]/accept — missing ENTU_SERVICE_KEY', () => {
 	it('returns 500', async () => {
-		const res = await runPost('tok', { applicationId: 'app-99' }, undefined);
+		// '' = absent/unset service key. (NOT undefined — makeEvent's `envKey` default
+		// would otherwise fill in the present key and the 500 path would be unreachable.)
+		const res = await runPost('tok', { applicationId: 'app-99' }, '');
 		if (res instanceof Response) {
 			expect(res.status).toBe(500);
 		} else {

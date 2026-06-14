@@ -43,6 +43,10 @@ const PUBLIC_EXACT = new Set(['/', '/about']);
 export function isProtectedPath(pathname: string): boolean {
 	if (PUBLIC_EXACT.has(pathname)) return false;
 	if (pathname.startsWith('/auth/')) return false;
+	// slice-3 (#21/#11): the invite landing page + its resolve/accept API are public
+	// so an unauthed singer can open /invite/<token> before signing in.
+	if (pathname.startsWith('/invite/')) return false;
+	if (pathname.startsWith('/api/invite/')) return false;
 	if (pathname.startsWith('/_app/') || pathname.startsWith('/.well-known')) return false;
 	if (/\.[a-zA-Z0-9]+$/.test(pathname)) return false; // has a file extension → asset
 	return true;

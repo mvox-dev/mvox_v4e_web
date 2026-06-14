@@ -161,7 +161,9 @@ describe('GET /api/invite/[token] — not found', () => {
 describe('GET /api/invite/[token] — missing ENTU_SERVICE_KEY', () => {
 	it('returns 500', async () => {
 		const { GET } = await import('../../../../../routes/api/invite/[token]/+server');
-		const event = makeEvent('tok', undefined);
+		// '' = absent/unset service key. (NOT undefined — makeEvent's `envKey` default
+		// would otherwise fill in the present key and the 500 path would be unreachable.)
+		const event = makeEvent('tok', '');
 		const res = await Promise.resolve(GET(event as never)).catch((e: Error) => e);
 		if (res instanceof Response) {
 			expect(res.status).toBe(500);
