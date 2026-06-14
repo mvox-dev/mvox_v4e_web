@@ -860,3 +860,24 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
 [GOTCHA] Single-API-key limitation: PO always inherits ownership via db-entity chain.
   Cross-user reads (admin sees singer's app) proven by architectural inference from
   inheritrights:false + session-32 member-tier probes, not direct empirical test.
+
+### Slice 3 schema design (#91 comment, 2026-06-14)
+
+[DECISION] Native keyless + leak-free invite/accept IS achievable via mutual _viewer grants.
+  No new entity types. No service key. No domain leak.
+  Pattern:
+    1. Admin creates invitation (private) + POST _viewer: singerPersonId → singer reads with own JWT
+    2. Singer creates application (private) + POST _viewer: adminPersonId[] → admin reads with own JWT
+       (singer gets adminPersonIds from org._owner[] — org is domain-shared, readable to signed-in)
+    3. Admin creates member (own JWT, org owner) + deletes invite + application
+  GitHub comment: https://github.com/mvox-dev/mvox_v4e_web/issues/91#issuecomment-4701405562
+
+[DECISION] Minimal v4E schema addition proposed: `invitation` reference prop on `application`.
+  Singer sets it at create time so admin can find + delete the right invitation at approve-time
+  without token enumeration. One prop add to application type-def, no other changes.
+
+[DEFERRED] Open probe for next session: does _viewer grant DELETE rights on an entity,
+  or does admin need _editor grant instead? Same mechanical cost either way, but must confirm
+  before building the no-key accept flow. Next Pérotin probe task.
+
+(*MVOX:Perotin*)
