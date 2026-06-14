@@ -48,8 +48,6 @@ export function isProtectedPath(pathname: string): boolean {
 	return true;
 }
 
-/** Return a safe local redirect target, or `/` for anything non-local (open-redirect guard). */
-export function safeRedirectTarget(raw: string | null): string {
-	if (!raw || !raw.startsWith('/') || raw.startsWith('//')) return '/';
-	return raw;
-}
+// Re-exported from the client-safe shared util so existing server callers keep working
+// without importing the server-only module (#80 DRY).
+export { safeRedirectTarget } from '$lib/auth/redirect';

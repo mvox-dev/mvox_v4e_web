@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { getLastProvider } from '$lib/auth/storage';
+	import { safeRedirectTarget } from '$lib/auth/redirect';
 	import * as m from '$lib/paraglide/messages.js';
 	import DeskSurface from '$lib/components/DeskSurface.svelte';
 	import PaperCard from '$lib/components/PaperCard.svelte';
@@ -16,11 +17,10 @@
 	const error = $derived(page.url.searchParams.get('error'));
 	// The server-side auth guard redirects here with `?redirect=<path>` (CHORE-79).
 	// Accept it as the post-login destination; fall back to the existing `return_to`.
-	// Keep only safe local paths (must start with `/`, not `//`) — open-redirect guard.
-	const returnTo = $derived.by(() => {
-		const raw = page.url.searchParams.get('redirect') ?? page.url.searchParams.get('return_to');
-		return raw && raw.startsWith('/') && !raw.startsWith('//') ? raw : '/';
-	});
+	// Open-redirect guard delegated to shared safeRedirectTarget (#80).
+	const returnTo = $derived(
+		safeRedirectTarget(page.url.searchParams.get('redirect') ?? page.url.searchParams.get('return_to')),
+	);
 	const lastProvider = $state(typeof window !== 'undefined' ? getLastProvider() : null);
 
 	onMount(() => {
