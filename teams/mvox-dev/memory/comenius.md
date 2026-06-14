@@ -6,6 +6,28 @@ Tags: `[DECISION]`, `[PATTERN]`, `[WIP]`, `[CHECKPOINT]`, `[DEFERRED]`, `[GOTCHA
 
 ---
 
+## Session 35 — Slice-3 invite & join i18n (2026-06-14)
+
+[DEFERRED] **Next session: About page en/et/lv/uk copy.** `/about` route exists; `about_*` keys in all 4 locales since session 27. Likely new real copy for `about_mission_body`, `about_story_body`, `about_values_body` (currently Lorem ipsum). Wait for RED spec.
+
+[CHECKPOINT] Reviewed Byrd's 16 stubs (invite_* + members_* + nav_tab_members) — commit `6d45b14`. Fixed 2 issues: et `invite_loading` noun form ("Kutse laadimine…"); uk `invite_expired` gender ("Це" not "Цей"). Gates: build OK · 0 errors · 1127 tests.
+
+[CHECKPOINT] YELLOW re-spin commits `8b5ec86`. Fixed YELLOW-35.1 (members_invite_submitting register: et "Saatmine…" / uk "Надсилання…" verbal nouns; lv "Sūta…" kept) + YELLOW-35.2 (nav_tab_members differentiation: et "Haldus" / lv "Dalība" / uk "Членство" — all distinct from nav_tab_roster).
+
+[DECISION] `nav_tab_members` et "Haldus" (Management) / lv "Dalība" (Membership) / uk "Членство" (Membership). Admin management tab distinct from singer roster tab. Chose shortest clear term per locale.
+
+[GOTCHA] Byrd pre-translated all stubs this session — Comenius i18n phase is now quality-review + fixes, not translation from scratch. Pattern to expect going forward.
+
+[GOTCHA] nav_tab_members/nav_tab_roster collision was pre-baked in Byrd's stubs — not caught until Bentham REVIEW. Flag nav-tab collision risk in next RED spec checklist.
+
+[DECISION] `members_invite_submitting` register: in-flight button states use verbal noun (et -mine / uk -ння suffix) NOT 1st-sg verb. Consistent with `common_loading` pattern. 3rd-sg verb (lv "Sūta…") also acceptable — matches `common_loading` lv "Ielādē…".
+
+[CONVENTION] i18n-key foresight note posted on #91: admin-approve flow needs `invite_apply_*` (singer side) + `members_application_*` (admin side) key families. Next RED spec should include these from the start.
+
+(*MVOX:Comenius*)
+
+---
+
 ## Session 33 — S33 sub-chain 3 + YELLOW-33.1 i18n (2026-06-13/14)
 
 [CHECKPOINT] Added 2 keys (library_loading + library_load_error) on feat/s33-readability-conformance, commit `5d761cd`. pnpm check: 2 errors → 0. 993/993 tests pass.

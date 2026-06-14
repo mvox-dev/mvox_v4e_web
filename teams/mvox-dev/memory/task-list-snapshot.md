@@ -1,28 +1,29 @@
-# Task List Snapshot — 2026-06-14 end-of-session-34
+# Task List Snapshot — 2026-06-14 end-of-session-35
 
-State at session-34 close.
+State at session-35 close.
 
 ## Active tasks (in-flight)
 
-None. All session-34 work completed.
+None. Session wrapped.
 
-## Pending — next session
+## Pending — next session (S36)
 
-**Slice 3 — invite & join** (the last MVP piece; deferred again from S34 → S35; S34 was backlog-audit + the #44 prod launch). Brainstorm → spec → plan → team TDD chain. Issues #21 (admin invite) + #11 (singer accept). Details in `team-lead.md [NEXT SESSION]` seed (⭐). Constraint: `/invite/<token>` unauthed-landing solved client-side / token-self-describing, NOT server-side identity (Entu aud=IP wall). Gating probe: confirm/create the live `application` entity type (Pérotin).
+**About page (Carus outreach)** — PO priority (politically pressing, ahead of the slice-3 MVP blocker). Brainstorm DONE + PO-approved. Spec: `docs/superpowers/specs/2026-06-14-about-page-carus-outreach-design.md`. Next: `writing-plans` → TDD chain (content + i18n; `about_*` keys already exist in 4 locales). Read Carus/Tormis Gmail thread `19e3f59f52444354` + "isiklik" letter `19e27cc9ff5325f3` for tone first. See team-lead.md [NEXT SESSION] seed (⭐) + memory `project_mvox_carus_publisher_outreach`.
 
-## Session-34 completed
+## Deferred — slice-3 invite/accept (MVP blocker, parked at #91)
 
-1. **Backlog audit** (Finn, all 25 open issues) → closed **#33, #38, #39** (architecture-superseded by Path C/CHORE-72), **#7** (superseded by #10), **#48** (scaffold done, rules folded into #49). Filed **#90** (A1 follow-up: richer dashboard ACs). 
-2. **#80** DRY safeRedirectTarget — full TDD chain (Tallis→Josquin→Byrd→Bentham→Josquin merge), shipped `de67c93`. Closed.
-3. **#44** CF Pages Git-connected migration — multivox delete+recreated as Git-connected; first build green; prod mvox.eu now serves the full accumulated work (`app.D_0RFiMI.js`) and auto-deploys on push. Closed.
-4. **deploy.md** rewritten for the new flow — `d9b36a5`.
+Resume via the NATIVE keyless + leak-free design (= documented v4E intent): singer creates `application` (own JWT, private) granting `_viewer` to org admins; admin approves → own owner JWT creates `member`. Run ONE probe first (does a `_viewer`-granted application appear in the admin's LIST query?); possibly add an aggregate formula on `organization`. Salvage ~70% of branch `feat/invite-join` (@ `8b5ec86`, pushed; green but DO-NOT-MERGE — unfixed RED-35.1); delete `elevated.ts` + 2 `/api/invite` endpoints. Do NOT provision `ENTU_SERVICE_KEY`. Full rationale + 7 team perspectives on issue **#91**. Issues #21 + #11 stay open.
 
-main tip `d9b36a5`, origin==local. Tests 1028 + 3 runbook, check 0. **Open issues 25 → 19.** Prod auto-deploys now.
+## Session-35 completed
 
-## Carry-forward GH backlog (open: 19)
+1. **Slice-3 Phase 0 probes** (gating) — all green; `application` type confirmed live (resolved the S32 concern).
+2. **Slice-3 plan doc** finalized + committed (`d4c1718`).
+3. **Slice-3 TDD chain → green service-key impl** (`feat/invite-join`, 1127 tests, check 0). Bentham RED caught the accept-flow `orgId` bug (every Accept 403'd, hidden by a vacuous async test); re-spin fixed it; Tallis codebase-wide vacuous-guard audit.
+4. **No-key model probe** (`cfce0c9`) + **schema-design convergence** → issue **#91** filed with 7 team perspectives; Josquin 🥇 found the native design is the documented v4E intent.
+5. **About-page/Carus design** brainstormed + PO-approved; spec committed; gist created.
 
-- **Slice 3:** #21, #11 (next real work).
-- #90 (richer A1 dashboard); #9 lockout (needs #22 first); epics B/C/D (#12–#18, #23); #49 Biome rules; #54 error capture; #73 (blocked lending); #6 Email (blocked PO SPF/DKIM); #31 (OKLCH); **#59 (provider-verify — overdue, PO-manual checklist against now-current prod)**.
-- Tiny: RsvpTallyBadge tooltip i18n.
+## State
+
+`main` tip = wrap commit. `feat/invite-join` pushed @ `8b5ec86` (parked, do-not-merge). Open issues ~21. All agents shut down clean.
 
 (*MVOX:Palestrina*)

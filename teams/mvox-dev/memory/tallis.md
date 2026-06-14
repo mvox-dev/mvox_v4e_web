@@ -664,4 +664,59 @@ FIX D (YELLOW): Added `bgImage !== 'none'` check in `hasBgOrExemption`. Safe bec
 
 [PATTERN] Type narrowing in spec: `ownerSection?.querySelector()` returns `Element | null | undefined` when `ownerSection` is `Element | null`. Cast to `Element | null` after a `.not.toBeNull()` guard: `const el = (expr) as Element | null;`
 
+## [CHECKPOINT] 2026-06-14 — Session 35: Slice-3 RED phase + vacuous-guard audit
+
+[DECISION] Slice-3 invite & join RED phase complete. 10 spec files written across branch `feat/invite-join`. Final RED state: 25 genuine RED (fixup SHA `5a0ab35`), then audit fixes (SHA `43b4caf`). All committed. 1 remaining RED at session close: resolve endpoint `orgId` assertion (Josquin's fix pending, blocked on architecture decision).
+
+Spec files written (all on feat/invite-join):
+- `src/lib/server/entu/elevated.spec.ts` — 25 tests for 7 BFF helpers (mintJwt, readEntity, resolveInvitationByToken, resolvePersonName, createMember, findActiveMember, deleteEntity). Explicit `db` param on all helpers — no $env import in elevated.ts.
+- `src/tests/routes/api/invite/token/server.spec.ts` — GET /api/invite/[token] resolve endpoint (4 cases: valid/expired/not-found/missing-key + security projection)
+- `src/tests/routes/api/invite/token/accept/server.spec.ts` — POST accept endpoint (7 cases: happy-path, SECURITY JWT-never-forwarded, expired/410, already-member/idempotent, identity-proof missing/403, org-mismatch/403, delete-failure/soft-warning)
+- `src/lib/server/auth/session-cookie.spec.ts` — extended with /invite/* and /api/invite/* allowlist tests
+- `src/lib/invite/inviteData.spec.ts` — 6 helpers: createInvitation, buildInviteUrl, listOrgInvitations, resolveInvite, createApplication, acceptInvite
+- `src/lib/components/CopyLink.spec.ts` — clipboard component (5 tests)
+- `src/lib/components/members/InviteForm.spec.ts` — form submit + CopyLink post-submit (5 tests)
+- `src/routes/members/page.spec.ts` — owner-gated; roster/pending/empty/error states (8 tests)
+- `src/routes/invite/[token]/page.spec.ts` — public landing; unauthed→sign-in-link; authed→accept→goto (7 tests)
+- `src/lib/components/MvoxNav.spec.ts` — extended: 4 'members' tab tests; tabItems count bumped 6→7
+
+[PATTERN] Route handler RED/GREEN branching idiom:
+```typescript
+const res = await Promise.resolve(GET(event as never)).catch((e: Error) => e);
+if (res instanceof Response) {
+  expect(res.status).toBe(200);
+  expect(body).toEqual({ ... }); // GREEN assertions
+} else {
+  expect((res as Error).message).toContain('not implemented'); // RED verification
+}
+```
+Both branches have live assertions — no dead code in either state.
+
+[PATTERN] Helper function RED assertion:
+```typescript
+const result = await someHelper('jwt', db, 'arg').catch(() => null);
+expect(result).toEqual({ expectedShape: 'value' }); // RED: null !== object; GREEN: shape matches
+```
+
+[GOTCHA] `rejects.toThrow('not implemented')` tail after a conditional shape-check is self-contradictory. The conditional already handles RED/GREEN split. ALWAYS strip the tail when converting stub-asserts to live conditional shape-checks.
+
+[GOTCHA] Default-param masking on "missing X → error" tests: `makeEvent(token, envKey='svc-api-key')` means passing `undefined` still gets the default. Fix: use `''` (empty string) for absent service key (not `undefined` with a default param), OR remove the default param entirely.
+
+[WARNING] VACUOUS-GUARD AUDIT — STANDING RULES:
+1. No `else { expect(true).toBe(true) }` guards, ever. The else branch must assert real contracts that fail.
+2. Async DOM tests MUST await the state transition before querying: `waitFor(() => expect(el).not.toBeNull())` — not a sync `container.querySelector()` after an async `$effect`.
+3. `expect(mock).toBeDefined()` is vacuous — mocks are always defined. Assert what they were called with.
+4. `waitFor` catch blocks must assert real contracts, not fallback truisms.
+5. Every test must be able to fail. If a test can only pass, it's not a test — it's dead code.
+
+Found and fixed 5 vacuous guards this session (SHA 43b4caf):
+1. page.spec.ts — `else { expect(true).toBe(true) }` (critical: hid real orgId→403 bug)
+2. page.spec.ts — resolveInvite mock missing orgId (mock coherence)
+3. server.spec.ts (resolve) — toEqual missing orgId in response body
+4. members/page.spec.ts ×2 — `expect(mock).toBeDefined()` → live waitFor assertions
+
+[DECISION] Architecture: slice-3 accept flow conserved on `feat/invite-join`, blocked on schema-design pass. Service-key model parked (not rejected, but elevated-ops cross-org super-credential risk flagged by PO). Next session: v4E schema investigation (#91) before resuming implementation. Reusable specs: CopyLink, InviteForm, MvoxNav members tab, members/page hydration tests survive any model pivot. accept-flow specs will need rewriting for new identity-proof mechanic.
+
+[DEFERRED] Architecture decision on invite/accept native mechanism — schema-design pass next session (#91). The first test to write for any native model: "admin can read this application entity with only org-owner rights" — that's the property the design must prove before any code follows.
+
 (*MVOX:Tallis*)

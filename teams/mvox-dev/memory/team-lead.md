@@ -1,5 +1,39 @@
 # Palestrina — Team Lead Scratchpad
-### [NEXT SESSION] 2026-06-14 end-of-session-34 — session-34 → session-35
+### [NEXT SESSION] 2026-06-14 end-of-session-35 — session-35 → session-36
+
+**Headline: The INVITE/ACCEPT ARCHITECTURE-FORK session → clean conserve + priority-pivot. Slice-3 (invite & join) ran the full TDD chain to green (service-key / elevated-BFF design; 1127 tests; Bentham-reviewed) — then the PO challenged the `ENTU_SERVICE_KEY` dependency. After a probe + full team debate, the team CONVERGED (issue #91) that the NATIVE keyless + leak-free design is ALREADY the documented v4E intent — Josquin 🥇 read `schema.ts` 544–630: private `application` + singer-granted `_viewer` to org admins + `member.creators: bilateral`. So the built service-key version is a DEVIATION from the schema's own design. Slice-3 PARKED at #91 (branch `feat/invite-join` pushed @ `8b5ec86`; green but DO-NOT-MERGE — carries unfixed RED-35.1). PO DEFERRED slice-3 (acknowledged MVP blocker) in favour of the ABOUT PAGE as politically more pressing for Carus outreach. Also this session: brainstormed + PO-APPROVED the About-page/Carus design spec.**
+
+## ⭐ Session-36 first action: THE ABOUT PAGE (PO priority — Carus outreach)
+- **Approved spec:** `docs/superpowers/specs/2026-06-14-about-page-carus-outreach-design.md` (committed this wrap; gist https://gist.github.com/mitselek/aa93f7e683174e9779bc59f5893f30a5). Brainstorm is DONE — go straight to `writing-plans` → TDD chain (light: content + i18n).
+- **Goal:** rewrite `/about` (currently intro + 3 Lorem-ipsum bodies: Mission/Story/Values) so it doubles as proof-of-devotion to Carus. Takeaway = "these people respect us"; baseline = a partnership offer; centerpiece = honest-path-by-default tooling; structure = woven; Story = own-a-misstep-NO-names; "What We Believe" = the addressable baseline; contact = mihkel.putrinsh@gmail.com; en/et/lv/uk (NO German). `about_*` keys already exist in 4 locales (Comenius) — just need real content.
+- **Before final copy:** read the full Carus/Tormis Gmail thread `19e3f59f52444354` (~551KB → subagent + jq) + the "isiklik" letter to Sven `19e27cc9ff5325f3` for tone. Context memory: `project_mvox_carus_publisher_outreach` (cast: ESL/Kaire Siiner, Sven Peterson/SP Muusika, Carus/Duecker+Weber-Steinbach; mailbox = source of truth; brilliant KNB empty on this story — candidate to populate).
+
+## Slice-3 (DEFERRED — resume at #91; do NOT touch unless PO re-prioritizes)
+- **Native design (= documented v4E intent):** singer creates `application` under own person (own JWT, private) + grants `_viewer` to the org's admin persons (found via org `_owner[]`; org is domain-readable); admin approves → admin's OWN owner JWT creates `member` (`member.creators: bilateral`). NO service key, NO leak. The resolve+accept elevated endpoints SHRINK or VANISH (pure Path-C browser-direct).
+- **One probe to run FIRST:** does a `_viewer`-granted `application` appear in the admin's LIST query (`?_type.string=application&target_org.reference=`) or only GET-by-id? If list works → ~zero schema change. Else one additive candidate: an aggregate FORMULA on `organization` for admin-person discovery.
+- **Salvage ~70% of feat/invite-join** (createInvitation/createApplication already keyless/user-rights; UI; i18n; Tallis's test-quality audit). DELETE `elevated.ts` + the 2 `/api/invite` endpoints.
+- **⚠️ `feat/invite-join` (`8b5ec86`) is green but carries unfixed RED-35.1 (accept 403s end-to-end) — DO NOT MERGE.** Resume via the native design.
+- **Do NOT provision `ENTU_SERVICE_KEY`** — PO rejected the service-key foundation (cross-org super-credential + pseudo-member of every org; intrinsic to Entu per-org rights islands). Full rationale + 7 team perspectives + Finn's schema-fetch pointers all on **#91**.
+
+## Process gaps to fix (from agent closing notes)
+- **GREEN gate MUST include `pnpm format` (Biome)** — Josquin's `7fbf697` skipped it; a foreign Prettier pass also polluted ~17 files (reverted). Repo formatter is Biome (`biome.json`), NOT Prettier — agents keep reaching for Prettier; correct them.
+- **RED-author checklist:** (a) every assertion must be able to FAIL — no `expect(true).toBe(true)` guards; await async UI transitions before querying DOM (3 inert-assertion instances this session); (b) a "missing X → error" test must actually pass an ABSENT X (default-param trap); (c) check new `nav_tab_*` keys for et/lv/uk collisions at RED time.
+
+## State at wrap
+- `main` tip = this wrap commit (auto-deploys to prod — harmless docs/state). `feat/invite-join` pushed @ `8b5ec86` (parked, do-not-merge).
+- Open issues ~21 (19 carried + #90 richer dashboard + #91 slice-3 architecture). #21 + #11 stay open.
+- All 7 agents shut down clean.
+
+## Expected first action S36
+1. Read this seed + the About spec + memory `project_mvox_carus_publisher_outreach`.
+2. Spawn finn + bentham (always-on). About: brainstorm DONE → `writing-plans` → TDD chain (Tallis→Byrd→Comenius→Bentham→Josquin merge). Read the Carus/Tormis thread + isiklik letter for tone first.
+3. Leave slice-3 / #91 alone unless PO re-prioritizes.
+
+(*MVOX:Palestrina*)
+
+---
+
+### [PROCESSED 2026-06-14 session-35] 2026-06-14 end-of-session-34 — session-34 → session-35
 
 **Headline: The BACKLOG-AUDIT-turned-PROD-LAUNCH session. PO asked for backlog triage; Finn audited all 25 open issues, I closed 6 (#33/#38/#39/#7/#48 superseded + #80 DRY shipped via a full TDD chain), filed #90 (residual dashboard ACs), folded #48→#49. Then knocked out the #80 quick win (de67c93). The session then pivoted hard: PO asked about auto-deploy → we did #44 (CF Pages Git-connected migration). multivox was delete+recreated as a Git-connected Pages project, and THE FULL ACCUMULATED BODY OF PREVIEW-ONLY WORK WENT LIVE TO PROD (mvox.eu) FOR THE FIRST TIME IN MANY SESSIONS — the entire MVP attendance loop (slices 1/2a/2b), seasons/rehearsal-schedule, the S33 UI overhaul, and #80. Prod was frozen on the CHORE-72 bundle since ~session-27; now it's current AND every push to main auto-deploys. main `d9b36a5`; prod chunk `app.D_0RFiMI.js`; tests 1028+3 runbook, check 0. Open issues 25→19.**
 

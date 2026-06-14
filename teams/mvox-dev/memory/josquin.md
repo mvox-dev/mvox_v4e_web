@@ -4,6 +4,37 @@ Personal notes. Only Josquin writes here.
 
 ---
 
+## [CHECKPOINT] 2026-06-14 session 35 — slice-3 invite/join built (service-key) then PIVOTED at #91; branch feat/invite-join PARKED green, NOT merged
+
+Built the COMPLETE service-key invite/join on `feat/invite-join` (1127/1127 unit, check 0, Bentham-reviewed). Then PO rejected the service-key foundation → parked, resume via **issue #91** next session with a NATIVE keyless design. Branch pushed (tip ~`8b5ec86`), do NOT merge as-is.
+
+### What I shipped on feat/invite-join (server half + re-spin)
+- `7fbf697` server half: `src/lib/server/entu/elevated.ts` (7 pure helpers, db as PARAM, no $env, imports only entu-config ENTU_API_BASE), `src/routes/api/invite/[token]/+server.ts` (resolve), `.../accept/+server.ts` (accept Path-A: personId from `application._parent`, service-key ONLY never user JWT, idempotent, best-effort cleanup, minimal projection), `src/app.d.ts` (App.Platform.env.{ENTU_SERVICE_KEY,PUBLIC_ENTU_DB}), `session-cookie.ts` /invite allowlist, elevated-ops registry append in architecture-decisions.md.
+- `b4eb702` biome-format (my 7fbf697 MISSED the biome GREEN-gate — see WARNING), `f3ebf58` added orgId to resolve projection (Bentham RED).
+- Endpoints read serviceKey/db from `event.platform.env` when platform present (authoritative, no fallback → undefined key=500), else `$env/dynamic/private`(key)+`$env/static/public`(db).
+
+### [PATTERN] Surface-and-stop on RED-scaffolding bugs paid off twice
+Tallis's RED had (1) 9 `rejects.toThrow('not implemented')` tails left on shape tests (self-contradictory post-GREEN) + (2) a default-param trap (`makeEvent(tok, envKey='svc-api-key')` → passing `undefined` triggers default → 500-test unreachable). I refused to code around either (partial-assertion smell), surfaced both; team-lead AUTHORIZED me (scope-override, CHORE-72 precedent) to apply both MECHANICAL test fixes myself since I held the tree. Commit body documented "no assertion weakened" for Bentham's audit.
+
+### [#91 FINDING — load-bearing for next session] The native keyless/leak-free design IS already in v4E schema.ts
+Read `entu/research` `docs/schema/v4E/schema.ts` lines 544–630 (clone IS at `~/projects/entu-research/`). The design intent is written in:
+- `application` note: *"BFF adds explicit `_viewer: <target_org admin persons>` on creation so admins can see across the person→org boundary"* + reject-lock via `_inheritrights:false` + `_viewer:<person>`.
+- `member.creators=[{kind:'bilateral',requires:['invitation','application']}]`; both invitation+application `sharing:'private'`.
+→ Native flow (approach #3, no key, no leak): singer creates private application under own person + grants `_viewer` to org-admin persons; admin approves on OWN owner JWT → creates member. No-key probe `cfce0c9` graded this "VIABLE, correct."
+- **Only candidate v4E change** = ADDITIVE aggregate formula on `organization` (admin-person discovery so singer knows whom to `_viewer`-grant), pending ONE empirical check: does a `_viewer`-granted application appear in the admin's LIST query (vs only GET-by-id)? If list works, ZERO schema change.
+- **Pivot salvage ~70%**: `createInvitation`+`createApplication` (already keyless/user-rights), all UI, i18n, Tallis test audit survive. DELETE elevated.ts + 2 endpoints (back to pure Path-C). Accept UX shifts to request→admin-approve.
+- Posted full comment: github #91 comment 4701407385.
+
+### [WARNING] GREEN gate MUST run `pnpm format` (Biome) — my 7fbf697 skipped it
+The repo formatter is **Biome** (`biome.json`; `pnpm format`=`biome format --write`; `pnpm lint`=`biome check`). My 7fbf697 server commit didn't run it → biome flagged 4 slice-3 files later (`b4eb702` cleaned). ALSO this session: a FOREIGN **Prettier** pass sprawled across ~17 unrelated src files — reverted via `git restore` on src/** only (left scratchpads + scripts/migrations/probes/*). NEVER use Prettier here. Add `pnpm format` to the per-commit GREEN gate.
+
+### [GOTCHA] Shared-tree flip at session end — working tree switched to `main` under me mid-shutdown
+After team-lead parked feat/invite-join, the working tree flipped to `main` (my uncommitted post-09:38 scratchpad edits on the feature branch were lost from the working copy, but the durables on feat/invite-join's `7fbf697` survive there). Lesson reaffirmed (`feedback_atomic_git_chaining` + session-29 GOTCHA): commit durables promptly; at shutdown, write scratchpad on WHATEVER branch is currently checked out (this entry is on main, where startup reads it).
+
+(*MVOX:Josquin*)
+
+---
+
 ## [CHECKPOINT] 2026-06-14 session 34 — #80 DRY chain + FIRST prod release since CHORE-72 + #44 git-connect migration
 
 Two things permanently change the deploy story this session; the manual-`wrangler` mechanics catalogued in every checkpoint below are now FALLBACK-ONLY.

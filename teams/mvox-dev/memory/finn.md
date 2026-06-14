@@ -606,6 +606,37 @@ Research for #44 (S34). Key facts verified against CF docs (context7 high-reputa
 
 ---
 
+## 2026-06-14 — Session 35 findings
+
+### [LEARNED] CopyChip.svelte is NOT a clipboard component
+
+`src/lib/components/CopyChip.svelte` props: `{ n: string; checked: boolean }` — renders a pencil-checkbox attendance cell. Slice-3 plan's reference to it as a "copyable invite link" component was a false claim. A new `CopyLink.svelte` component was built in `feat/invite-join` branch (`1359f69`).
+
+### [LEARNED] `createEntity` + `EntuProp` not exported from entuSeasons.ts
+
+`createEntity` (line 101) and `EntuProp` type (line 22) are private to the module. Pattern for new data modules: import `resolveTypeId` + `EntuCfg` (both exported), declare own local `authHeaders`, inline own POST-to-`/entity` call. `rsvpData.ts` is the canonical exemplar.
+
+### [LEARNED] Slice-3 `feat/invite-join` branch — state at S35 conserve
+
+Branch `feat/invite-join` (tip `8b5ec86`, origin pushed) is complete + Bentham-GREEN, using service-key elevated ops. 1127/1127 unit tests, `pnpm check` 0. NOT merged — blocked on architecture decision. Reusable parts: `createInvitation`/`createApplication` patterns, `CopyLink.svelte`, `InviteForm.svelte`, MvoxNav Members tab, i18n keys, test quality.
+
+### [LEARNED] #91 architecture tension — three keyless options + core blocker
+
+S35 probes established: `application._sharing: private`, parent = person entity (instances), NO `person` prop — identity via `_parent`. `application` type-def label encodes Path A (user JWT creates application). `_inheritrights:false` on org = private application invisible to org admin = the blocker.
+
+Three keyless options for next session:
+1. `application._sharing: domain` — leaky at multi-org scale
+2. Singer POSTs explicit `_viewer` grant on application to org owners — needs probe: does viewer-granted private entity appear in list queries?
+3. Add `invitation.person` reference property + remove application entity entirely
+
+### [DEFERRED] v4E schema fetch for #91 — S36 first action
+
+Schema-design pass needs `entu/research` (not in this container). Files to fetch: `docs/schema/v4E/schema.ts` (`invitation`, `application`, `member` EntityDef blocks), `docs/schema/v4E/README.md` §4 (bilateral-consent narrative), `docs/case-studies/2026-05-polyphony-on-entu.md` (D5 rights-island section). My #91 research pointer comment is posted — it's the S36 resume brief.
+
+(*MVOX:Finn*)
+
+---
+
 ## 2026-06-13/14 — Session 33 findings
 
 ### [LEARNED] Nav + route surface state — post-S33 cleanup baseline

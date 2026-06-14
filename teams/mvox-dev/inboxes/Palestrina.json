@@ -25,5 +25,50 @@
     "color": "yellow",
     "type": "message",
     "read": false
+  },
+  {
+    "from": "tallis",
+    "text": "Story Handoff — Slice 3 RED complete (context-resumed confirm)\n\nBranch: feat/invite-join\nLatest SHA: 5a0ab35\nTests: 25 genuine RED, 1102 passing\npnpm check: 0 errors\n\nAll 25 failures are live assertions — no comment-only dead code. Security checks are live:\n- Server specs use `Promise.resolve(handler(event)).catch(e => e)` + `instanceof Response` branch\n- elevated.spec.ts uses `.catch(() => null)` then `expect(result).toEqual(shape)` — RED because null !== expected shape\n- Accept endpoint spec includes SECURITY test: verifies no elevated helper call has first arg === 'USER-JWT-MUST-NOT-BE-USED'\n- Projection minimalism: asserts body does NOT contain token/inviter/invitationId/_id/entity\n\nJosquin's server GREEN scope:\n1. src/lib/server/entu/elevated.ts — implement all 7 functions (db explicit param, no $env import)\n2. src/routes/api/invite/[token]/+server.ts — GET resolve endpoint\n3. src/routes/api/invite/[token]/accept/+server.ts — POST accept (service key ONLY, identity proof via application._parent)\n4. src/lib/server/auth/session-cookie.ts — add /invite/* and /api/invite/* to allowlist\n5. src/app.d.ts — add ENTU_SERVICE_KEY: string to App.Platform.env\n\nByrd's client GREEN scope (after Josquin signals):\n1. src/lib/invite/inviteData.ts — 6 helpers\n2. src/lib/components/CopyLink.svelte\n3. src/lib/components/members/InviteForm.svelte\n4. src/routes/members/+page.svelte\n5. src/routes/invite/[token]/+page.svelte\n6. src/lib/components/MvoxNav.svelte — add 'members' to Tab type + TABS + TAB_LABELS\n\nTallis is idle and ready for Bentham's review findings if any gaps surface.",
+    "summary": "RED phase complete — Story Handoff for Josquin",
+    "timestamp": "2026-06-14T08:02:05.894Z",
+    "color": "purple",
+    "type": "message",
+    "read": false
+  },
+  {
+    "from": "tallis",
+    "text": "Story Handoff — RED re-spin complete\n\nSHA: 43b4caf  branch: feat/invite-join\nTests: 1 RED, 1126 passing, 0 type errors\n\nThe 1 failing test is correct and load-bearing:\n  src/tests/routes/api/invite/token/server.spec.ts — GET /api/invite/[token] — valid (not expired)\n  Assertion: toEqual expects orgId:'org-111' in response body\n  Actual: Josquin's current impl returns the 6-field shape without orgId\n  This directly catches the bug Bentham found: page reads orgId from this response for createApplication; if absent, orgId='' → 403 on every real click.\n\nAudit results — 5 vacuous guards found and fixed across the slice:\n1. page.spec.ts — `else { expect(true).toBe(true) }` → live RED: waitFor catch asserts createApplication was called with orgId (fails against broken page)\n2. page.spec.ts — resolve mock now returns orgId so createApplication assertion is coherent\n3. server.spec.ts — toEqual now requires orgId in response body (new RED)\n4. members/page.spec.ts ×2 — `expect(mock).toBeDefined()` → `waitFor(() => expect(mock).toHaveBeenCalledWith(..., 'org-111'))`\n5. InviteProjection type — added `orgId?: string` (type guard was masking the issue)\n\nCopyLink and InviteForm guards (`if (button)`, `if (emailInput)`) are inert-click guards — the assertions BELOW them (writeTextMock.toHaveBeenCalledWith / createInvitation.toHaveBeenCalledWith) are live RED; no change needed there.\n\nJosquin's one fix needed: add orgId to the GET /api/invite/[token] response body.",
+    "summary": "Story Handoff — RED re-spin committed, 1 genuine RED remaining",
+    "timestamp": "2026-06-14T09:10:03.732Z",
+    "color": "purple",
+    "type": "message",
+    "read": false
+  },
+  {
+    "from": "tallis",
+    "text": "State report — holding as instructed.\n\nCommitted (43b4caf):\n- page.spec.ts: vacuous else{expect(true).toBe(true)} eliminated; orgId added to resolveInvite mock; waitFor-based accept-button test\n- server.spec.ts (resolve): orgId added to toEqual shape → the 1 remaining RED\n- members/page.spec.ts ×2: expect(mock).toBeDefined() → live waitFor assertions (model-agnostic)\n- InviteForm.spec.ts + CopyLink.spec.ts: comment clarification on if-guards (assertions below remain live)\n- inviteData.ts: orgId?: string added to InviteProjection\n\nUncommitted on tree: all from other teammates (probe scripts, elevated.ts, accept/+server.ts, memory files). Nothing half-done from me.\n\nAudit findings breakdown:\n- Model-agnostic (survive either path): members/page.spec.ts ×2 — already committed, clean\n- Service-key-specific: page.spec.ts orgId threading + server.spec.ts orgId RED — both committed; if admin-approve pivot lands, these will need revisiting anyway as the flow changes\n- CopyLink/InviteForm/MvoxNav specs: no vacuous guards found, all assertions already live\n\nHolding for architecture decision.",
+    "summary": "State report — holding as instructed",
+    "timestamp": "2026-06-14T09:14:39.350Z",
+    "color": "purple",
+    "type": "message",
+    "read": false
+  },
+  {
+    "from": "tallis",
+    "text": "My vacuous-guard audit is already fully committed at 43b4caf. Nothing further to stage from me.\n\nState:\n- Branch: feat/invite-join ✓\n- pnpm check: 0 errors ✓\n- pnpm test: 1 RED (server.spec.ts orgId assertion), 1126 passing ✓\n\nThe 15 uncommitted spec files in the working tree are ALL Josquin's Prettier formatting pass (indentation/line-wrapping only — no assertion changes). I audited every diff: agendaData.spec.ts, userStore.spec.ts, AgendaList.spec.ts, RehearsalEditForm.spec.ts, RehearsalList.spec.ts, rsvpData.spec.ts, entuSeasons.spec.ts, elevated.spec.ts, agenda/page.spec.ts, auth specs ×3, seasons/page.spec.ts, page.integration.spec.ts, accept/server.spec.ts — all formatting-only. Route those to Josquin to commit.\n\nAudit summary (all committed in 43b4caf):\n- Specs touched by audit: 6 (page.spec.ts, server.spec.ts/resolve, members/page.spec.ts, InviteForm.spec.ts, CopyLink.spec.ts, inviteData.ts type)\n- Vacuous guards found and fixed: 5\n  1. page.spec.ts — `else { expect(true).toBe(true) }` (critical, hid orgId bug)\n  2. page.spec.ts — resolveInvite mock missing orgId (mock coherence)\n  3. server.spec.ts resolve — toEqual missing orgId → now 1 RED (Josquin's fix pending)\n  4. members/page.spec.ts ×2 — `expect(mock).toBeDefined()` → live waitFor assertions\n\nReady for Josquin to take the tree.",
+    "summary": "Audit already committed — uncommitted specs are Josquin's Prettier pass",
+    "timestamp": "2026-06-14T09:33:38.242Z",
+    "color": "purple",
+    "type": "message",
+    "read": false
+  },
+  {
+    "from": "tallis",
+    "text": "Posted at https://github.com/mvox-dev/mvox_v4e_web/issues/91#issuecomment-4701405426\n\nCovered: what's hard to verify in each model (service-key: credential scope is operational, not unit-testable; no-key admin-approve: domain leakage only verifiable live; _viewer grant: partial-grant failure surface); what the next session should plan for (waitFor/tick rules carried forward, reusable spec inventory, first test to write for any native model); and the vacuous-guard audit note for posterity. Done.",
+    "summary": "Comment posted on #91 — done",
+    "timestamp": "2026-06-14T10:02:34.020Z",
+    "color": "purple",
+    "type": "message",
+    "read": false
   }
 ]

@@ -215,4 +215,28 @@
 
 [LEARNED] **All 3 sub-chains of S33 completed in session 33 (branches: feat/s33-navigation, feat/s33-readability-visual, feat/s33-readability-conformance). Fix branches: fix/s33-seasons-rehearsal-bg, chore/s33-yellows.** Final unit suite at shutdown: 1018/1018. Outstanding pnpm check errors: 5 (3 from `page_*_label` + 2 from `library_loading/library_load_error`) — all await Comenius.
 
+## [CHECKPOINT] 2026-06-14 — Slice-3 client GREEN + YELLOW re-spin (session 35, feat/invite-join HEAD 8b5ec86)
+
+[LEARNED] **i18n chicken-and-egg: must add all new message keys to all 4 locale files AND run `pnpm build` before `pnpm check` can pass.** `pnpm check` runs svelte-kit sync but does NOT trigger Paraglide recompilation. `pnpm build` does. Until the keys are in locale files and build has run, `messages.js` lacks the exports → TS errors in components. Sequence: add stubs to `messages/{en,et,lv,uk}.json` → `pnpm build` → `pnpm check`.
+
+[LEARNED] **MvoxNav must NOT be added to individual route pages — it lives in `+layout.svelte`.** Adding `<MvoxNav>` directly to a page causes paraglide mock failures in that page's spec (mock only covers page-specific keys; MvoxNav accesses all nav keys). Pattern: MvoxNav is layout-only; page specs never need to mock nav keys.
+
+[LEARNED] **Biome format is a gate step (must run `pnpm format` before commit, not just `pnpm lint:fix`).** Josquin's commits were biome-formatted; a Bentham YELLOW in the first re-spin round traced back to Byrd files not formatted with Biome. Add `pnpm format` (not just `pnpm lint:fix`) as a required pre-commit step. `pnpm lint` catches svelte-eslint issues; `pnpm format` catches Biome formatting.
+
+[GOTCHA] **`vi.waitFor` required for async `$effect` in page specs.** When a page component uses `$effect` to call data helpers (e.g. `listOrgMembers`), the effect resolves asynchronously after render. Tests that check post-effect state (roster visible, member names) must use `await vi.waitFor(() => expect(...))` — a synchronous check immediately after `render()` only sees the loading state.
+
+[GOTCHA] **Paraglide mock in page spec must cover all i18n keys used by sub-components rendered during the test.** When `loadState` transitions to `'ready'`, sub-components like `InviteForm` render and call their own `m.*()` keys. If those keys aren't in the spec's `vi.mock('$lib/paraglide/messages.js')` factory, Vitest throws "No export is defined on the mock." Add all sub-component keys to the page spec mock as part of GREEN.
+
+[LEARNED] **`InviteProjection.orgId` must be non-optional for type safety.** The accept flow needs orgId to POST `target_org` in `createApplication`. Making it optional (`orgId?: string`) leads to wishful casts at the callsite. Josquin's resolve projection now always returns `orgId` (empty string when `!valid`); the TS type should match: `orgId: string`.
+
+[LEARNED] **`createInvitation` phantom `status` prop.** The `invitation` type has no `status` field (schema: email/token/expires_at/sections/inviter/message only). Writing `status: 'active'` to Entu creates dead data that is silently stored but never read. Always verify prop names against Pérotin's schema probes before POSTing.
+
+[PATTERN] **Two-leg accept flow.** Singer's browser: (1) `createApplication(cfg, { personId, orgId })` — browser-direct Entu POST under singer's own JWT; `_parent=personId` is the identity proof. (2) `acceptInvite(token, { applicationId })` — BFF `POST /api/invite/[token]/accept`; elevated service JWT creates the `member`. If service-key architecture is dropped, leg 2 changes; leg 1 survives.
+
+[PATTERN] **InviteForm button key register.** Admin creates an invitation → use `members_invite_submit` / `members_invite_submitting` register ("Send invite" / "Sending…"). Singer accepts an invitation → use `invite_accept` / `invite_accepting` register ("Accept invitation" / "Accepting…"). Never cross-wire these.
+
+[DEFERRED] **Slice-3 accept architecture unresolved — #91.** Service-key model (what's built on `feat/invite-join`) rejected by PO as cross-org super-credential risk at scale. No-key admin-approve model leaks pending applications (`_sharing: domain` required for admin visibility). Schema-design pass needed next session to find a native solution. Branch `feat/invite-join` (HEAD 8b5ec86) is conserved, 1127/1127 GREEN, not merged.
+
+[WARNING] **Single-tree + biome-format gate = critical discipline.** Two separate Bentham findings this session traced to (a) orgId not threaded end-to-end (real data bug) and (b) biome formatting not run (process gap). Both are avoidable. Checklist before handoff: `pnpm format` → `pnpm lint` → `pnpm check` → `pnpm test:unit` → `git branch --show-current` (confirm feat/*, not main).
+
 (*MVOX:Byrd*)
