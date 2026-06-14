@@ -834,3 +834,29 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
 [SEED CATALOG UPDATE] No new seed scripts this session.
 
 (*MVOX:Perotin*)
+
+### Slice 3 no-key model probe (task #5, 2026-06-14)
+
+[PROBE-RESULT] No-key admin-approve model — 5 probe entities, all confirmed 404.
+  Commit: cfce0c9 (main). Findings: docs/migration/findings/slice3-no-key-model-probes-2026-06-14.md
+
+[DECISION] Q1 (admin visibility of applications): CONDITIONAL GO.
+  - Private application: org admin CANNOT read (inheritrights:false on org blocks cascade)
+  - _sharing:domain application: any polyphony-authenticated user can read → admin CAN query
+  - Two-parent (person + org): does NOT help, inheritrights:false still blocks
+  - No-key model requires domain sharing on applications (privacy cost: all domain users see apps)
+
+[DECISION] Q2 (singer reads invitation by token): CONDITIONAL GO.
+  - _sharing:public exposes entity existence but NOT property values to unauthenticated callers.
+    email/token/expires_at ABSENT on anon reads. Confirmed empirically.
+  - Token-as-bearer for unauthenticated: NO-GO
+  - Viable: (a) singer signs in first (domain auth → full entity),
+    (b) BFF embeds invite detail in signed URL (no Entu read at display step)
+
+[GOTCHA] Entu _sharing:public = entity discoverable (list/fetch by ID + _type/_parent/_sharing),
+  but application-level properties absent for unauthenticated callers.
+  Domain auth is the floor for property values.
+
+[GOTCHA] Single-API-key limitation: PO always inherits ownership via db-entity chain.
+  Cross-user reads (admin sees singer's app) proven by architectural inference from
+  inheritrights:false + session-32 member-tier probes, not direct empirical test.
