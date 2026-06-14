@@ -880,4 +880,46 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
   or does admin need _editor grant instead? Same mechanical cost either way, but must confirm
   before building the no-key accept flow. Next Pérotin probe task.
 
+## Session 37 — 2026-06-14
+
+### LIST-visibility proxy probe (task #7)
+
+[PROBE-RESULT] Proxy probe complete. Core question INCONCLUSIVE — needs second OAuth account.
+  Script: scripts/migrations/probes/probe-slice3-list-visibility-proxy-2026-06-14.ts
+  Artifact: scripts/migrations/seed-results/probe-slice3-list-visibility-proxy-2026-06-14T14-49-56-021Z.json
+  Findings: docs/migration/findings/slice3-list-visibility-proxy-2026-06-14.md
+  Cleanup: all probe entities + Test User API key prop confirmed 404/deleted.
+
+[DECISION] PO is omniscient via DB root (_inheritrights:true + PO _viewer on db entity).
+  Cannot serve as "admin" identity for cross-user visibility probes. All PO LIST results contaminated.
+
+[GOTCHA] entu_api_key on person without OAuth = accounts:[] (floor credential, confirmed again).
+  Floor JWT cannot hold _viewer grants (no identity). Useful only as "no-rights = no visibility" check.
+  _owner strip blocked: Entu returns 403 "Can't delete last _owner". Proxy workaround not viable.
+
+[DECISION] Anonymous bare auth (GET /auth?db=polyphony, no bearer) = 400 "No key". No anon token.
+  Floor credential must use entu_api_key on Test User person. Add via postProperties (POST /entity/{id}),
+  not via /entity/{id}/properties (404). Delete via DELETE /property/{propValueId}.
+
+[GOTCHA] _inheritrights:false on parent blocks db-entity co-ownership at child CREATE time.
+  When singer person has _sharing:private + _inheritrights:false:
+    - Child application gets _owner = creator only (PO/singer), NOT _owner = polyphony (807a)
+  Contrast: domain-shared parents → child gets _owner = [polyphony, PO] automatically.
+  Implication: private singer subtree is rights-isolated from db-entity cascade at create time.
+
+[DECISION] ?_viewer.reference=<personId> IS a valid Entu LIST filter. Returns entities where
+  the specified person holds an explicit _viewer grant. Alternative discovery pattern for admin:
+  GET /entity?_type.string=application&_viewer.reference=<adminPersonId>
+  Untested under non-omniscient JWT — deferred with main LIST question.
+
+[HIGH-CONFIDENCE] Floor baseline confirmed: private entity invisible to no-rights identity
+  (403 GET + empty LIST) before and after _viewer grant (grant was to PO, not to floor JWT).
+
+[HIGH-CONFIDENCE] _viewer grant mechanics confirmed: POST _viewer to specific person → grant lands;
+  GET-by-id works for grantee; floor JWT remains blind (grants are identity-specific, not global).
+
+[DEFERRED] Core gating question — does non-omniscient admin's LIST return _viewer-granted
+  private application? Requires second OAuth account. GitHub issue filed by team-lead.
+  Deferred probe: same sequence (steps 0-8) but with real admin JWT.
+
 (*MVOX:Perotin*)

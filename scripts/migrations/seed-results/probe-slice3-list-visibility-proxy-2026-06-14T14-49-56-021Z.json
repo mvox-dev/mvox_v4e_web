@@ -1,0 +1,61 @@
+{
+  "timestamp": "2026-06-14T14:49:53.193Z",
+  "poAccountsBound": true,
+  "poOnDbRootViewer": true,
+  "probeSingerPersonId": "6a2ebf914cd971291c5d5bde",
+  "probeAppId": "6a2ebf914cd971291c5d5be5",
+  "a_listByTargetOrg_beforeGrant": {
+    "count": 1,
+    "appFound": true
+  },
+  "a_listUnfiltered_beforeGrant": {
+    "count": 1,
+    "appFound": true
+  },
+  "b_anonGetById_beforeGrant": {
+    "httpStatus": 403
+  },
+  "b_anonListByTargetOrg_beforeGrant": {
+    "count": 0,
+    "appFound": false
+  },
+  "b_anonListUnfiltered_beforeGrant": {
+    "count": 0,
+    "appFound": false
+  },
+  "c_poOwnerPropValueId": "6a2ebf914cd971291c5d5bec",
+  "c_stripSuccess": false,
+  "c_entitySurvived": true,
+  "c_remainingOwners": [
+    "Mihkel Putrinš(69bcfd8e9c031ab8e6ce8079)"
+  ],
+  "d_grantSuccess": true,
+  "d_poGetById_afterGrant": {
+    "httpStatus": 200,
+    "entityFound": true
+  },
+  "d_anonGetById_afterGrant": {
+    "httpStatus": 403
+  },
+  "d_anonListByTargetOrg_afterGrant": {
+    "count": 0,
+    "appFound": false
+  },
+  "d_poListByTargetOrg_afterGrant": {
+    "count": 1,
+    "appFound": true
+  },
+  "d_poListByViewerRef_afterGrant": {
+    "count": 1,
+    "appFound": true
+  },
+  "d_poListUnfiltered_afterGrant": {
+    "count": 1,
+    "appFound": true
+  },
+  "teardownComplete": true,
+  "teardownConfirmed404_app": true,
+  "teardownConfirmed404_singerPerson": true,
+  "teardownTestUserApiKeyPropId": "6a2ebf914cd971291c5d5bdd",
+  "confidenceVerdict": "LIST-filter-indexing: CONFIRMED (PO omniscient, contaminated)\nanonymous-baseline: CONFIRMED — anon cannot see private app before grant\n_viewer-grant-mechanics: CONFIRMED — grant POST works, GET-by-id works after grant\nanon-after-grant: CONFIRMED — anon cannot see app even after _viewer grant (expected: grant to PO person, not anon)\n_owner-strip: FAILED — entity survived: true\nDEFINITIVE LIST-visibility test: INCONCLUSIVE — no non-omniscient admin JWT available; second OAuth account required"
+}
