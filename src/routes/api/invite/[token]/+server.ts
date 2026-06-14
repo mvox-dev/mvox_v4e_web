@@ -47,6 +47,8 @@ export const GET: RequestHandler = async ({ params, platform }) => {
 	const orgName = (org.name as Array<{ string: string }> | undefined)?.[0]?.string ?? '';
 
 	// Minimal projection — NEVER leak token / inviter / invitationId / full entity.
+	// orgId is NOT leak-sensitive (orgName is already returned, and the singer's own
+	// application sets target_org to it); the accept page threads it into createApplication.
 	return new Response(
 		JSON.stringify({
 			valid: true,
@@ -55,6 +57,7 @@ export const GET: RequestHandler = async ({ params, platform }) => {
 			email: invitation.email,
 			sections: invitation.sections,
 			message: invitation.message,
+			orgId: invitation.orgId,
 		}),
 		{ status: 200, headers: { 'Content-Type': 'application/json' } },
 	);
