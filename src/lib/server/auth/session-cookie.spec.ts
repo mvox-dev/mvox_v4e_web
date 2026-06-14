@@ -65,6 +65,24 @@ describe('session-cookie helpers', () => {
 		expect(safeRedirectTarget('https://evil.com')).toBe('/');
 		expect(safeRedirectTarget(null)).toBe('/');
 	});
+
+	// slice-3 allowlist additions (#21/#11):
+	// /invite/* and /api/invite/* are public (unauthed singer sees the landing page)
+	it('isProtectedPath: /invite/* paths are public (slice-3)', () => {
+		expect(isProtectedPath('/invite/abc-token-123')).toBe(false);
+		expect(isProtectedPath('/invite/')).toBe(false);
+		expect(isProtectedPath('/invite/some-long-uuid-token')).toBe(false);
+	});
+
+	it('isProtectedPath: /api/invite/* paths are public (slice-3)', () => {
+		expect(isProtectedPath('/api/invite/abc-token-123')).toBe(false);
+		expect(isProtectedPath('/api/invite/tok/accept')).toBe(false);
+	});
+
+	it('isProtectedPath: existing protected paths still protected after slice-3 allowlist', () => {
+		for (const p of ['/library', '/agenda', '/roster', '/notices', '/settings', '/members'])
+			expect(isProtectedPath(p)).toBe(true);
+	});
 });
 
 // (*MVOX:Tallis*)

@@ -545,4 +545,79 @@ describe('MvoxNav — soon-marked nav links have accessible names (YELLOW-33.6)'
 	});
 });
 
+// ── MvoxNav — Members tab (slice-3 #21/#11) ──────────────────────────────────
+
+describe('MvoxNav — Members tab (slice-3)', () => {
+	const signedInProps = {
+		signedIn: true,
+		currentTab: 'agenda' as const,
+		orgLabel: 'EFK',
+		orgInitials: 'EF',
+		userInitial: 'M',
+		userName: 'Mihkel',
+	};
+
+	it("'members' tab is present in inline tabs as a real route (no SoonMarker)", () => {
+		// Members is a real route — it must appear without a SoonMarker aria-label
+		const { container } = render(MvoxNav, { props: signedInProps });
+		const membersTab = container.querySelector('[data-testid="nav-inline-tab-members"]');
+		expect(membersTab).not.toBeNull();
+		// Must NOT have "soon" in aria-label — it's a real route
+		const ariaLabel = membersTab?.getAttribute('aria-label') ?? '';
+		expect(ariaLabel.toLowerCase()).not.toContain('soon');
+	});
+
+	it("'members' tab has active state when currentTab==='members'", () => {
+		const { container } = render(MvoxNav, {
+			props: { ...signedInProps, currentTab: 'members' as unknown as typeof signedInProps.currentTab },
+		});
+		// After GREEN: active class or aria-current on members tab
+		// The members tab should be visually distinct when active
+		const membersTab = container.querySelector('[data-testid="nav-inline-tab-members"]');
+		expect(membersTab).not.toBeNull();
+		const isActive =
+			membersTab?.getAttribute('aria-current') === 'page' ||
+			membersTab?.classList.contains('active') ||
+			membersTab?.getAttribute('data-active') === 'true';
+		// RED: tab doesn't exist yet (no members in TAB_LABELS/TABS), so membersTab is null
+		// After GREEN: membersTab not null AND isActive true
+		if (membersTab) {
+			expect(isActive).toBe(true);
+		} else {
+			// explicitly fail in RED to drive implementation
+			expect(membersTab).not.toBeNull();
+		}
+	});
+
+	it("'members' tab mirrors 'seasons' in structure — real <a> link, not a button", () => {
+		const { container } = render(MvoxNav, { props: signedInProps });
+		const membersTab = container.querySelector('[data-testid="nav-inline-tab-members"]');
+		// After GREEN: <a href="/members"> or element with href=/members
+		// RED: null (tab doesn't exist yet)
+		if (membersTab) {
+			const href = membersTab.getAttribute('href') ?? membersTab.querySelector('a')?.getAttribute('href');
+			expect(href).toBe('/members');
+		} else {
+			expect(membersTab).not.toBeNull(); // RED: drive GREEN
+		}
+	});
+
+	it("mobile menu 'members' item is present and has NO 'soon' aria-label", async () => {
+		const { container } = render(MvoxNav, { props: signedInProps });
+		const hamburger = container.querySelector(
+			'[data-testid="nav-tab-menu-trigger"]',
+		) as HTMLButtonElement | null;
+		if (hamburger) await fireEvent.click(hamburger);
+		const membersItem = container.querySelector('[data-testid="nav-tab-menu-item-members"]');
+		// After GREEN: item present, no "soon" in aria-label
+		if (membersItem) {
+			const ariaLabel = membersItem.getAttribute('aria-label') ?? '';
+			expect(ariaLabel.toLowerCase()).not.toContain('soon');
+		} else {
+			// RED: item absent — drive GREEN
+			expect(membersItem).not.toBeNull();
+		}
+	});
+});
+
 // (*MVOX:Tallis*)
