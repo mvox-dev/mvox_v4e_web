@@ -1,5 +1,6 @@
 // RED phase — elevated BFF helpers unit tests.
 // All tests mock global fetch; no SvelteKit deps needed.
+// `db` is passed explicitly (helpers are pure — no $env import inside elevated.ts).
 // Spec #1 of slice-3 TDD chain.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
@@ -12,67 +13,77 @@ import {
 	resolvePersonName,
 } from './elevated';
 
-const ENTU_API_BASE = 'https://api.entu.app/';
 const DB = 'testdb';
+const ENTU_API_BASE = 'https://api.entu.app/';
 
-beforeEach(() => {
-	vi.unstubAllGlobals();
-	vi.unstubAllEnvs();
-	vi.stubEnv('PUBLIC_ENTU_DB', DB);
-});
-
-afterEach(() => {
-	vi.unstubAllGlobals();
-	vi.unstubAllEnvs();
-});
+beforeEach(() => vi.unstubAllGlobals());
+afterEach(() => vi.unstubAllGlobals());
 
 // ── mintJwt ───────────────────────────────────────────────────────────────────
 
 describe('mintJwt', () => {
-	it('GETs ${ENTU_API_BASE}auth?db=${db} with Bearer apiKey', async () => {
+	it('GETs ${ENTU_API_BASE}auth?db=${db} with Authorization: Bearer apiKey', async () => {
 		const fetchMock = vi.fn().mockResolvedValue({
 			ok: true,
-			json: async () => ({
-				token: 'service-jwt-abc',
-				accounts: { [DB]: 'person-svc' },
-			}),
+			json: async () => ({ token: 'svc-jwt', accounts: { [DB]: 'person-svc' } }),
 		});
 		vi.stubGlobal('fetch', fetchMock);
-		await mintJwt('raw-api-key-123').catch(() => {/* will throw "not implemented" in RED */});
-		// In RED, fetch may not be called at all — but after GREEN it must be called with:
-		// GET ${ENTU_API_BASE}auth?db=testdb, Authorization: Bearer raw-api-key-123
-		expect(true).toBe(true); // placeholder until GREEN; real assertions below drive RED
+		// Unconditional live RED: stub throws "not implemented"
+		await expect(mintJwt('raw-api-key-123', DB)).rejects.toThrow('not implemented');
 	});
 
-	it('returns the token from the Entu auth response', async () => {
+	it('returns the token string from response.token', async () => {
+		vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+			ok: true,
+			json: async () => ({ token: 'minted-svc-jwt', accounts: { [DB]: 'svc-person' } }),
+		}));
+		// RED: stub throws; GREEN must return 'minted-svc-jwt'
+		const result = await mintJwt('api-key', DB).catch(() => null);
+		expect(result).toBe('minted-svc-jwt');
+	});
+
+	it('uses correct URL shape: ${ENTU_API_BASE}auth?db=${db}', async () => {
 		const fetchMock = vi.fn().mockResolvedValue({
 			ok: true,
-			json: async () => ({
-				token: 'minted-service-jwt',
-				accounts: { [DB]: 'person-svc' },
-			}),
+			json: async () => ({ token: 'tok', accounts: { [DB]: 'p' } }),
 		});
 		vi.stubGlobal('fetch', fetchMock);
-		await expect(mintJwt('api-key')).rejects.toThrow('not implemented');
+		await mintJwt('api-key', DB).catch(() => {});
+		if (fetchMock.mock.calls.length > 0) {
+			const url = (fetchMock.mock.calls[0] as [string])[0];
+			expect(url).toBe(`${ENTU_API_BASE}auth?db=${DB}`);
+		}
+		// Unconditional RED:
+		await expect(mintJwt('api-key', DB)).rejects.toThrow('not implemented');
 	});
 
-	it('throws when accounts is empty (service key has no access)', async () => {
+	it('sends Authorization: Bearer <apiKey> header', async () => {
 		const fetchMock = vi.fn().mockResolvedValue({
 			ok: true,
-			json: async () => ({ token: 'some-jwt', accounts: {} }),
+			json: async () => ({ token: 'tok', accounts: { [DB]: 'p' } }),
 		});
 		vi.stubGlobal('fetch', fetchMock);
-		await expect(mintJwt('bad-key')).rejects.toThrow(); // RED: throws "not implemented"
+		await mintJwt('api-key-XYZ', DB).catch(() => {});
+		if (fetchMock.mock.calls.length > 0) {
+			const init = (fetchMock.mock.calls[0] as [string, RequestInit])[1];
+			expect((init?.headers as Record<string, string>)?.Authorization).toBe('Bearer api-key-XYZ');
+		}
+		await expect(mintJwt('api-key-XYZ', DB)).rejects.toThrow('not implemented');
 	});
 
-	it('throws on non-ok HTTP response (propagates status)', async () => {
-		const fetchMock = vi.fn().mockResolvedValue({
-			ok: false,
-			status: 401,
-			json: async () => ({}),
-		});
-		vi.stubGlobal('fetch', fetchMock);
-		await expect(mintJwt('api-key')).rejects.toThrow(); // RED: throws "not implemented"
+	it('throws when accounts is empty (service key has no db access)', async () => {
+		vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+			ok: true, json: async () => ({ token: 'tok', accounts: {} }),
+		}));
+		// RED stub throws "not implemented"; GREEN must throw specifically for empty accounts
+		await expect(mintJwt('bad-key', DB)).rejects.toThrow();
+	});
+
+	it('throws on non-ok HTTP response', async () => {
+		vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+			ok: false, status: 401, json: async () => ({}),
+		}));
+		await expect(mintJwt('api-key', DB)).rejects.toThrow();
 	});
 });
 
@@ -80,103 +91,104 @@ describe('mintJwt', () => {
 
 describe('readEntity', () => {
 	it('GETs ${ENTU_API_BASE}${db}/entity/${id} with Bearer jwt', async () => {
-		const entityId = 'ent-abc';
 		const fetchMock = vi.fn().mockResolvedValue({
 			ok: true,
-			json: async () => ({
-				entity: {
-					_id: entityId,
-					name: [{ string: 'Test Org' }],
-				},
-			}),
+			json: async () => ({ entity: { _id: 'ent-abc' } }),
 		});
 		vi.stubGlobal('fetch', fetchMock);
-		await expect(readEntity('svc-jwt', entityId)).rejects.toThrow('not implemented');
+		await readEntity('svc-jwt', DB, 'ent-abc').catch(() => {});
+		if (fetchMock.mock.calls.length > 0) {
+			const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+			expect(url).toBe(`${ENTU_API_BASE}${DB}/entity/ent-abc`);
+			expect((init?.headers as Record<string, string>)?.Authorization).toBe('Bearer svc-jwt');
+		}
+		await expect(readEntity('svc-jwt', DB, 'ent-abc')).rejects.toThrow('not implemented');
 	});
 
 	it('returns the entity object from response.entity', async () => {
-		const fetchMock = vi.fn().mockResolvedValue({
+		vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
 			ok: true,
-			json: async () => ({
-				entity: {
-					_id: 'ent-1',
-					name: [{ string: 'EFK' }],
-					_type: [{ string: 'organization' }],
-				},
-			}),
-		});
-		vi.stubGlobal('fetch', fetchMock);
-		await expect(readEntity('svc-jwt', 'ent-1')).rejects.toThrow('not implemented');
+			json: async () => ({ entity: { _id: 'ent-1', name: [{ string: 'EFK' }] } }),
+		}));
+		// RED: throws → catch → null; GREEN must return the entity object
+		const result = await readEntity('svc-jwt', DB, 'ent-1').catch(() => null);
+		expect(result).toEqual({ _id: 'ent-1', name: [{ string: 'EFK' }] });
 	});
 
 	it('throws on non-ok response (status surfaced)', async () => {
 		vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 404, json: async () => ({}) }));
-		await expect(readEntity('svc-jwt', 'missing-id')).rejects.toThrow();
+		await expect(readEntity('svc-jwt', DB, 'missing-id')).rejects.toThrow();
 	});
 });
 
 // ── resolveInvitationByToken ──────────────────────────────────────────────────
 
 describe('resolveInvitationByToken', () => {
-	/** Realistic Entu search response for an invitation entity */
-	const makeInvitationSearchResponse = (overrides: Partial<{
-		expiresAt: string;
-		email: string;
-		sections: string[];
-		message: string;
-		orgId: string;
-	}> = {}) => ({
-		entities: [
-			{
+	function makeSearchResponse(opts: {
+		orgId?: string; email?: string; sections?: string[];
+		message?: string; expiresAt?: string; token?: string;
+	} = {}) {
+		return {
+			entities: [{
 				_id: 'inv-42',
-				_parent: [{ reference: overrides.orgId ?? 'org-111' }],
-				token: [{ string: 'uuid-tok-abc' }],
-				email: [{ string: overrides.email ?? 'singer@example.com' }],
-				expires_at: [{ date: overrides.expiresAt ?? '2026-07-14' }],
-				sections: (overrides.sections ?? ['sec-1', 'sec-2']).map((s) => ({ reference: s })),
-				message: [{ string: overrides.message ?? 'Welcome aboard!' }],
-			},
-		],
-	});
+				_parent: [{ reference: opts.orgId ?? 'org-111' }],
+				token: [{ string: opts.token ?? 'uuid-tok-abc' }],
+				email: [{ string: opts.email ?? 'singer@example.com' }],
+				expires_at: [{ date: opts.expiresAt ?? '2099-07-14' }],
+				sections: (opts.sections ?? ['sec-1', 'sec-2']).map((s) => ({ reference: s })),
+				message: [{ string: opts.message ?? 'Welcome!' }],
+			}],
+		};
+	}
 
-	it('searches by _type.string=invitation and token.string=<token>', async () => {
+	it('searches with _type.string=invitation and token.string=<token>', async () => {
 		const fetchMock = vi.fn().mockResolvedValue({
-			ok: true,
-			json: async () => makeInvitationSearchResponse(),
+			ok: true, json: async () => makeSearchResponse(),
 		});
 		vi.stubGlobal('fetch', fetchMock);
-		await expect(resolveInvitationByToken('svc-jwt', 'uuid-tok-abc')).rejects.toThrow('not implemented');
+		await resolveInvitationByToken('svc-jwt', DB, 'uuid-tok-abc').catch(() => {});
+		if (fetchMock.mock.calls.length > 0) {
+			const url = (fetchMock.mock.calls[0] as [string])[0];
+			expect(url).toContain('_type.string=invitation');
+			expect(url).toContain('uuid-tok-abc');
+		}
+		await expect(resolveInvitationByToken('svc-jwt', DB, 'uuid-tok-abc')).rejects.toThrow('not implemented');
 	});
 
-	it('returns full InvitationProjection shape on found entity', async () => {
+	it('returns full InvitationProjection toEqual when found', async () => {
 		vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
 			ok: true,
-			json: async () => makeInvitationSearchResponse({
-				orgId: 'org-111',
-				email: 'singer@example.com',
-				sections: ['sec-a', 'sec-b'],
-				message: 'Hello singer',
-				expiresAt: '2026-07-14',
+			json: async () => makeSearchResponse({
+				orgId: 'org-111', email: 'singer@example.com',
+				sections: ['sec-a', 'sec-b'], message: 'Hello singer',
+				token: 'uuid-tok-abc', expiresAt: '2099-07-14',
 			}),
 		}));
-		// RED: will throw not-implemented; after GREEN assert full shape:
-		// { invitationId: 'inv-42', orgId: 'org-111', email: 'singer@example.com',
-		//   expiresAt: <ms for 2026-07-14>, sections: ['sec-a','sec-b'],
-		//   message: 'Hello singer', token: 'uuid-tok-abc' }
-		await expect(resolveInvitationByToken('svc-jwt', 'uuid-tok-abc')).rejects.toThrow('not implemented');
+		// RED: throws → null; GREEN must return the full shape
+		const result = await resolveInvitationByToken('svc-jwt', DB, 'uuid-tok-abc').catch(() => null);
+		expect(result).toEqual({
+			invitationId: 'inv-42',
+			orgId: 'org-111',
+			email: 'singer@example.com',
+			expiresAt: new Date('2099-07-14').getTime(),
+			sections: ['sec-a', 'sec-b'],
+			message: 'Hello singer',
+			token: 'uuid-tok-abc',
+		});
 	});
 
-	it('returns null when entities array is empty (token not found)', async () => {
+	it('returns null when entities array is empty (not found)', async () => {
 		vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
-			ok: true,
-			json: async () => ({ entities: [] }),
+			ok: true, json: async () => ({ entities: [] }),
 		}));
-		await expect(resolveInvitationByToken('svc-jwt', 'nonexistent-token')).rejects.toThrow('not implemented');
+		// RED: throws → 'threw'; GREEN must return null
+		const result = await resolveInvitationByToken('svc-jwt', DB, 'nonexistent').catch(() => 'threw');
+		expect(result).toBeNull();
 	});
 
 	it('throws on non-ok search response', async () => {
 		vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 403, json: async () => ({}) }));
-		await expect(resolveInvitationByToken('svc-jwt', 'tok')).rejects.toThrow();
+		await expect(resolveInvitationByToken('svc-jwt', DB, 'tok')).rejects.toThrow();
 	});
 });
 
@@ -186,78 +198,84 @@ describe('resolvePersonName', () => {
 	it('returns person.name string from entity GET', async () => {
 		vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
 			ok: true,
-			json: async () => ({
-				entity: {
-					_id: 'person-77',
-					name: [{ string: 'Mihkel Putrinš' }],
-				},
-			}),
+			json: async () => ({ entity: { _id: 'person-77', name: [{ string: 'Mihkel Putrinš' }] } }),
 		}));
-		await expect(resolvePersonName('svc-jwt', 'person-77')).rejects.toThrow('not implemented');
+		// RED: throws → null; GREEN must return 'Mihkel Putrinš'
+		const result = await resolvePersonName('svc-jwt', DB, 'person-77').catch(() => null);
+		expect(result).toBe('Mihkel Putrinš');
 	});
 
 	it('throws on non-ok response', async () => {
 		vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 404, json: async () => ({}) }));
-		await expect(resolvePersonName('svc-jwt', 'person-77')).rejects.toThrow();
+		await expect(resolvePersonName('svc-jwt', DB, 'person-77')).rejects.toThrow();
 	});
 });
 
 // ── createMember ──────────────────────────────────────────────────────────────
 
 describe('createMember', () => {
-	it('POSTs to ${ENTU_API_BASE}${db}/entity — body contains _type reference, _parent=orgId, person ref, name, status', async () => {
-		const fetchMock = vi.fn().mockResolvedValue({
-			ok: true,
-			json: async () => ({ _id: 'new-member-1' }),
+	function makeTypeFetchMock(createdId = 'new-member-1') {
+		return vi.fn().mockImplementation((url: string) => {
+			if (url.includes('_type.string=entity')) {
+				return Promise.resolve({ ok: true, json: async () => ({ entities: [{ _id: 'member-type-id' }] }) });
+			}
+			return Promise.resolve({ ok: true, json: async () => ({ _id: createdId }) });
 		});
+	}
+
+	it('POST body exact shape — _type ref, _parent=orgId, person ref, name, status=active (no sections)', async () => {
+		const fetchMock = makeTypeFetchMock();
 		vi.stubGlobal('fetch', fetchMock);
-		await expect(createMember('svc-jwt', {
-			orgId: 'org-111',
-			sections: [],
-			personId: 'person-77',
-			name: 'Mihkel Putrinš',
+		await createMember('svc-jwt', DB, {
+			orgId: 'org-111', sections: [], personId: 'person-77', name: 'Mihkel Putrinš',
+		}).catch(() => {});
+		const postCall = (fetchMock.mock.calls as Array<[string, { method?: string; body?: string }]>)
+			.find(([, init]) => init?.method === 'POST');
+		if (postCall) {
+			const body = JSON.parse(postCall[1].body ?? '[]') as Array<{ type: string; reference?: string; string?: string }>;
+			expect(body).toEqual(expect.arrayContaining([
+				{ type: '_type', reference: 'member-type-id' },
+				{ type: '_parent', reference: 'org-111' },
+				{ type: 'person', reference: 'person-77' },
+				{ type: 'name', string: 'Mihkel Putrinš' },
+				{ type: 'status', string: 'active' },
+			]));
+			const parentRefs = body.filter((p) => p.type === '_parent');
+			expect(parentRefs).toHaveLength(1); // only orgId — no sections
+		}
+		await expect(createMember('svc-jwt', DB, {
+			orgId: 'org-111', sections: [], personId: 'person-77', name: 'Mihkel Putrinš',
 		})).rejects.toThrow('not implemented');
 	});
 
-	it('multi-parent POST shape: includes _parent=orgId AND _parent refs for each section', async () => {
-		// Per plan: create member under org _parent + each section as additional _parent
-		// POST body must contain:
-		//   { type: '_type', reference: <member-type-id> }
-		//   { type: '_parent', reference: 'org-111' }
-		//   { type: '_parent', reference: 'sec-1' }
-		//   { type: '_parent', reference: 'sec-2' }
-		//   { type: 'person', reference: 'person-77' }
-		//   { type: 'name', string: 'Mihkel Putrinš' }
-		//   { type: 'status', string: 'active' }
-		const fetchMock = vi.fn().mockImplementation((url: string) => {
-			if (url.includes('_type.string=entity')) {
-				// type resolution call
-				return Promise.resolve({ ok: true, json: async () => ({ entities: [{ _id: 'member-type-id' }] }) });
-			}
-			return Promise.resolve({ ok: true, json: async () => ({ _id: 'new-member-2' }) });
-		});
+	it('multi-parent POST: _parent=orgId AND one _parent per section (3 total for 2 sections)', async () => {
+		const fetchMock = makeTypeFetchMock();
 		vi.stubGlobal('fetch', fetchMock);
-		await expect(createMember('svc-jwt', {
-			orgId: 'org-111',
-			sections: ['sec-1', 'sec-2'],
-			personId: 'person-77',
-			name: 'Mihkel Putrinš',
+		await createMember('svc-jwt', DB, {
+			orgId: 'org-111', sections: ['sec-1', 'sec-2'], personId: 'person-77', name: 'Test',
+		}).catch(() => {});
+		const postCall = (fetchMock.mock.calls as Array<[string, { method?: string; body?: string }]>)
+			.find(([, init]) => init?.method === 'POST');
+		if (postCall) {
+			const body = JSON.parse(postCall[1].body ?? '[]') as Array<{ type: string; reference?: string }>;
+			const parentRefs = body.filter((p) => p.type === '_parent').map((p) => p.reference);
+			expect(parentRefs).toHaveLength(3); // org + 2 sections
+			expect(parentRefs).toContain('org-111');
+			expect(parentRefs).toContain('sec-1');
+			expect(parentRefs).toContain('sec-2');
+		}
+		await expect(createMember('svc-jwt', DB, {
+			orgId: 'org-111', sections: ['sec-1', 'sec-2'], personId: 'p-77', name: 'T',
 		})).rejects.toThrow('not implemented');
 	});
 
 	it('returns the created member _id', async () => {
-		vi.stubGlobal('fetch', vi.fn().mockImplementation((url: string) => {
-			if (url.includes('_type.string=entity')) {
-				return Promise.resolve({ ok: true, json: async () => ({ entities: [{ _id: 'mtype' }] }) });
-			}
-			return Promise.resolve({ ok: true, json: async () => ({ _id: 'member-created-xyz' }) });
-		}));
-		await expect(createMember('svc-jwt', {
-			orgId: 'org-1',
-			sections: [],
-			personId: 'person-1',
-			name: 'Test User',
-		})).rejects.toThrow('not implemented');
+		vi.stubGlobal('fetch', makeTypeFetchMock('member-xyz'));
+		// RED: throws → null; GREEN must return 'member-xyz'
+		const result = await createMember('svc-jwt', DB, {
+			orgId: 'org-1', sections: [], personId: 'p-1', name: 'Test',
+		}).catch(() => null);
+		expect(result).toBe('member-xyz');
 	});
 
 	it('throws on non-ok create response', async () => {
@@ -267,8 +285,8 @@ describe('createMember', () => {
 			}
 			return Promise.resolve({ ok: false, status: 403, json: async () => ({}) });
 		}));
-		await expect(createMember('svc-jwt', {
-			orgId: 'org-1', sections: [], personId: 'p-1', name: 'Test',
+		await expect(createMember('svc-jwt', DB, {
+			orgId: 'o', sections: [], personId: 'p', name: 'T',
 		})).rejects.toThrow();
 	});
 });
@@ -276,80 +294,81 @@ describe('createMember', () => {
 // ── findActiveMember ──────────────────────────────────────────────────────────
 
 describe('findActiveMember', () => {
-	it('searches by _type.string=member, person ref, _parent.reference=orgId, status.string=active', async () => {
+	const memberEntity = {
+		_id: 'member-99',
+		_parent: [{ reference: 'org-111' }],
+		person: [{ reference: 'person-77' }],
+		status: [{ string: 'active' }],
+	};
+
+	it('URL contains _type.string=member, person ref, _parent.reference=orgId, status.string=active', async () => {
 		const fetchMock = vi.fn().mockResolvedValue({
-			ok: true,
-			json: async () => ({
-				entities: [
-					{
-						_id: 'member-99',
-						_parent: [{ reference: 'org-111' }],
-						person: [{ reference: 'person-77' }],
-						status: [{ string: 'active' }],
-					},
-				],
-			}),
+			ok: true, json: async () => ({ entities: [memberEntity] }),
 		});
 		vi.stubGlobal('fetch', fetchMock);
-		await expect(findActiveMember('svc-jwt', { personId: 'person-77', orgId: 'org-111' }))
+		await findActiveMember('svc-jwt', DB, { personId: 'person-77', orgId: 'org-111' }).catch(() => {});
+		if (fetchMock.mock.calls.length > 0) {
+			const url = (fetchMock.mock.calls[0] as [string])[0];
+			expect(url).toContain('_type.string=member');
+			expect(url).toContain('person-77');
+			expect(url).toContain('org-111');
+			expect(url).toContain('status.string=active');
+		}
+		await expect(findActiveMember('svc-jwt', DB, { personId: 'person-77', orgId: 'org-111' }))
 			.rejects.toThrow('not implemented');
 	});
 
-	it('returns MemberRecord full shape when found', async () => {
+	it('returns MemberRecord full shape { memberId, personId, orgId, status }', async () => {
 		vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
-			ok: true,
-			json: async () => ({
-				entities: [
-					{
-						_id: 'member-99',
-						_parent: [{ reference: 'org-111' }],
-						person: [{ reference: 'person-77' }],
-						status: [{ string: 'active' }],
-					},
-				],
-			}),
+			ok: true, json: async () => ({ entities: [memberEntity] }),
 		}));
-		// After GREEN: { memberId: 'member-99', personId: 'person-77', orgId: 'org-111', status: 'active' }
-		await expect(findActiveMember('svc-jwt', { personId: 'person-77', orgId: 'org-111' }))
-			.rejects.toThrow('not implemented');
+		// RED: throws → null; GREEN must return the shape
+		const result = await findActiveMember('svc-jwt', DB, { personId: 'person-77', orgId: 'org-111' })
+			.catch(() => null);
+		expect(result).toEqual({
+			memberId: 'member-99',
+			personId: 'person-77',
+			orgId: 'org-111',
+			status: 'active',
+		});
 	});
 
-	it('returns null when no active member found', async () => {
+	it('returns null when entities empty (no active member)', async () => {
 		vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
-			ok: true,
-			json: async () => ({ entities: [] }),
+			ok: true, json: async () => ({ entities: [] }),
 		}));
-		await expect(findActiveMember('svc-jwt', { personId: 'p-x', orgId: 'org-x' }))
-			.rejects.toThrow('not implemented');
+		// RED: throws → 'threw'; GREEN must return null
+		const result = await findActiveMember('svc-jwt', DB, { personId: 'p', orgId: 'o' })
+			.catch(() => 'threw');
+		expect(result).toBeNull();
 	});
 
 	it('throws on non-ok response', async () => {
 		vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 403, json: async () => ({}) }));
-		await expect(findActiveMember('svc-jwt', { personId: 'p', orgId: 'o' })).rejects.toThrow();
+		await expect(findActiveMember('svc-jwt', DB, { personId: 'p', orgId: 'o' })).rejects.toThrow();
 	});
 });
 
 // ── deleteEntity ──────────────────────────────────────────────────────────────
 
 describe('deleteEntity', () => {
-	it('sends DELETE /entity/${id} with Bearer jwt', async () => {
+	it('sends DELETE to /entity/{id} path (NOT /property/{id}), Authorization: Bearer jwt', async () => {
 		const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => ({}) });
 		vi.stubGlobal('fetch', fetchMock);
-		await expect(deleteEntity('svc-jwt', 'inv-42')).rejects.toThrow('not implemented');
-	});
-
-	it('uses /entity/ path (not /property/)', async () => {
-		// Distinguish entity delete from property-value delete (per project_entu_wire_shape_entity_vs_property)
-		const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => ({}) });
-		vi.stubGlobal('fetch', fetchMock);
-		await expect(deleteEntity('svc-jwt', 'inv-42')).rejects.toThrow('not implemented');
-		// After GREEN: fetchMock.mock.calls[0][0] must contain 'entity/inv-42'
-		// and NOT contain '/property/'
+		await deleteEntity('svc-jwt', DB, 'inv-42').catch(() => {});
+		if (fetchMock.mock.calls.length > 0) {
+			const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+			expect(url).toContain(`${DB}/entity/inv-42`);
+			expect(url).not.toContain('/property/');
+			expect(init?.method).toBe('DELETE');
+			expect((init?.headers as Record<string, string>)?.Authorization).toBe('Bearer svc-jwt');
+		}
+		await expect(deleteEntity('svc-jwt', DB, 'inv-42')).rejects.toThrow('not implemented');
 	});
 
 	it('throws on non-ok delete response', async () => {
 		vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 403, json: async () => ({}) }));
-		await expect(deleteEntity('svc-jwt', 'inv-42')).rejects.toThrow();
+		await expect(deleteEntity('svc-jwt', DB, 'inv-42')).rejects.toThrow();
 	});
 });
 

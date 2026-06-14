@@ -183,7 +183,7 @@ describe('MvoxNav — responsive layout (CHORE-76)', () => {
 		// We check for the paraglide message keys' output — not hardcoded strings,
 		// but verify the tab entries exist structurally via data-testid pattern.
 		const tabItems = menu?.querySelectorAll('[data-testid^="nav-tab-menu-item-"]');
-		expect(tabItems?.length).toBe(6);
+		expect(tabItems?.length).toBe(7); // 6 existing + members (slice-3 real route)
 	});
 
 	// AC2 — librarian chip co-locates with the library entry in the collapsed menu
@@ -375,7 +375,7 @@ describe('MvoxNav — /seasons tab (#82)', () => {
 		await fireEvent.click(hamburger);
 		const menu = container.querySelector('[data-testid="nav-tab-menu"]');
 		const tabItems = menu?.querySelectorAll('[data-testid^="nav-tab-menu-item-"]');
-		expect(tabItems?.length).toBe(6);
+		expect(tabItems?.length).toBe(7); // 6 existing + members (slice-3 real route)
 	});
 
 	it('hamburger menu contains nav-tab-menu-item-seasons', async () => {
