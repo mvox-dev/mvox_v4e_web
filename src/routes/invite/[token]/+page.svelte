@@ -8,13 +8,14 @@
 	import { resolveInvite, createApplication, acceptInvite } from '$lib/invite/inviteData';
 	import type { InviteProjection } from '$lib/invite/inviteData';
 
-	type PageState = 'loading' | 'not-found' | 'expired' | 'valid';
+	type PageState = 'loading' | 'not-found' | 'expired' | 'valid' | 'error';
 
 	const token = $derived(page.params.token ?? '');
 
 	let pageState = $state<PageState>('loading');
 	let projection = $state<InviteProjection | null>(null);
 	let accepting = $state(false);
+	let acceptError = $state<string | null>(null);
 
 	$effect(() => {
 		const tok = token;
@@ -22,6 +23,7 @@
 
 		pageState = 'loading';
 		projection = null;
+		acceptError = null;
 
 		resolveInvite(tok)
 			.then((proj) => {
@@ -52,10 +54,10 @@
 		const clientToken = getToken();
 		if (!clientToken) return;
 
-		// orgId from projection (server may include it for the accept flow)
-		const orgId = (projection as (InviteProjection & { orgId?: string }) | null)?.orgId ?? '';
+		const orgId = projection?.orgId ?? '';
 
 		accepting = true;
+		acceptError = null;
 		try {
 			const applicationId = await createApplication(
 				{ db: PUBLIC_ENTU_DB, token: clientToken },
@@ -63,8 +65,9 @@
 			);
 			await acceptInvite(tok, { applicationId });
 			await goto('/agenda');
-		} catch {
-			// TODO: surface error state
+		} catch (err) {
+			acceptError = err instanceof Error ? err.message : 'Accept failed';
+			pageState = 'error';
 		} finally {
 			accepting = false;
 		}
@@ -82,6 +85,10 @@
 {:else if pageState === 'expired'}
 	<div data-testid="invite-expired" class="flex items-center justify-center min-h-screen">
 		<p class="font-sans text-ink-3">{m.invite_expired()}</p>
+	</div>
+{:else if pageState === 'error'}
+	<div data-testid="invite-error" class="flex items-center justify-center min-h-screen">
+		<p class="font-sans text-ink-3">{acceptError ?? m.invite_not_found()}</p>
 	</div>
 {:else}
 	<div data-testid="invite-valid" class="flex items-center justify-center min-h-screen">

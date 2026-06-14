@@ -254,6 +254,8 @@
 	"members_heading": "Members",
 	"members_invite_empty": "No pending invitations",
 	"members_invite_heading": "Pending Invitations",
+	"members_invite_submit": "Send invite",
+	"members_invite_submitting": "Sending…",
 
 	"nav_tab_members": "Members"
 }

@@ -15,7 +15,10 @@ vi.mock('$lib/auth/storage', () => ({ getToken: () => 'user-jwt' }));
 vi.mock('$lib/auth/userStore', async () => {
 	const { writable } = await import('svelte/store');
 	const selectedOrgStore = writable<{ id: string; role: string; label: string } | null>(null);
-	const userStore = writable({ status: 'loading' });
+	const userStore = writable<{ status: string; personId?: string }>({
+		status: 'ready',
+		personId: 'person-owner-1',
+	});
 	return { selectedOrgStore, userStore };
 });
 
@@ -35,8 +38,8 @@ vi.mock('$lib/paraglide/messages.js', () => ({
 	members_invite_empty: () => 'No pending invitations',
 	nav_tab_members: () => 'Members',
 	// InviteForm keys (rendered when loadState==='ready' and isOwner)
-	invite_accept: () => 'Accept',
-	invite_accepting: () => 'Accepting…',
+	members_invite_submit: () => 'Send invite',
+	members_invite_submitting: () => 'Sending…',
 	invite_copy_link: () => 'Copy link',
 	invite_copy_link_copied: () => 'Copied!',
 }));

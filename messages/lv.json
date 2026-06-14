@@ -254,6 +254,8 @@
 	"members_heading": "Dalībnieki",
 	"members_invite_empty": "Nav gaidošu ielūgumu",
 	"members_invite_heading": "Gaidošie ielūgumi",
+	"members_invite_submit": "Sūtīt ielūgumu",
+	"members_invite_submitting": "Sūta…",
 
 	"nav_tab_members": "Dalībnieki"
 }

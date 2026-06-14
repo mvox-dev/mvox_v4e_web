@@ -254,6 +254,8 @@
 	"members_heading": "Liikmed",
 	"members_invite_empty": "Ootel kutseid pole",
 	"members_invite_heading": "Ootel kutsed",
+	"members_invite_submit": "Saada kutse",
+	"members_invite_submitting": "Saadan…",
 
 	"nav_tab_members": "Liikmed"
 }

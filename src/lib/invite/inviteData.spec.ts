@@ -36,7 +36,7 @@ describe('createInvitation', () => {
 		});
 	}
 
-	it('POST body contains _type reference, _parent=orgId, email, token (UUID), expires_at (+30d), status=active', async () => {
+	it('POST body contains _type reference, _parent=orgId, email, token (UUID), expires_at (+30d), inviter reference', async () => {
 		const fetchMock = makeFetchMock('inv-type-42');
 		vi.stubGlobal('fetch', fetchMock);
 		await createInvitation(cfg, {
@@ -58,9 +58,11 @@ describe('createInvitation', () => {
 				{ type: 'email', string: 'singer@example.com' },
 				expect.objectContaining({ type: 'token', string: expect.any(String) }),
 				expect.objectContaining({ type: 'expires_at', date: expect.any(String) }),
-				{ type: 'status', string: 'active' },
+				{ type: 'inviter', reference: 'person-owner' },
 			]),
 		);
+		// no phantom 'status' prop — invitation type has no status field
+		expect(body.some((p) => p.type === 'status')).toBe(false);
 	});
 
 	it('token value is a crypto.randomUUID()-shaped string (injectable/spy)', async () => {
@@ -270,6 +272,7 @@ describe('resolveInvite', () => {
 			json: async () => ({
 				valid: true,
 				expired: false,
+				orgId: 'org-111',
 				orgName: 'EFK',
 				email: 'singer@example.com',
 				sections: [],
@@ -281,6 +284,7 @@ describe('resolveInvite', () => {
 		expect(result).toEqual({
 			valid: true,
 			expired: false,
+			orgId: 'org-111',
 			orgName: 'EFK',
 			email: 'singer@example.com',
 			sections: [],
@@ -298,16 +302,16 @@ describe('resolveInvite', () => {
 		expect(fetchMock.mock.calls[0][0]).toBe('/api/invite/my-token-xyz');
 	});
 
-	it('returns { valid: false } on 404-shaped response', async () => {
+	it('returns { valid: false, orgId: "" } on 404-shaped response', async () => {
 		vi.stubGlobal(
 			'fetch',
 			vi.fn().mockResolvedValue({
 				ok: true,
-				json: async () => ({ valid: false }),
+				json: async () => ({ valid: false, orgId: '' }),
 			}),
 		);
 		const result = await resolveInvite('missing');
-		expect(result).toEqual({ valid: false });
+		expect(result).toEqual({ valid: false, orgId: '' });
 	});
 });
 

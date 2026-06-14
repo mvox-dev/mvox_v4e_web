@@ -254,6 +254,8 @@
 	"members_heading": "Учасники",
 	"members_invite_empty": "Немає очікуваних запрошень",
 	"members_invite_heading": "Очікувані запрошення",
+	"members_invite_submit": "Надіслати запрошення",
+	"members_invite_submitting": "Надсилаю…",
 
 	"nav_tab_members": "Учасники"
 }

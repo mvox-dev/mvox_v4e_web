@@ -77,7 +77,7 @@ describe('/invite/[token] — loading', () => {
 
 describe('/invite/[token] — not found', () => {
 	it('shows not-found state when resolveInvite returns { valid: false }', async () => {
-		mockResolveInvite.mockResolvedValue({ valid: false });
+		mockResolveInvite.mockResolvedValue({ valid: false, orgId: '' });
 		const { container } = render(Page);
 		// After GREEN: "Invitation not found" shown
 		// RED: stub shows loading
@@ -92,6 +92,7 @@ describe('/invite/[token] — expired', () => {
 		mockResolveInvite.mockResolvedValue({
 			valid: true,
 			expired: true,
+			orgId: 'org-111',
 			orgName: 'EFK',
 			email: 'singer@example.com',
 			sections: [],
@@ -111,6 +112,7 @@ describe('/invite/[token] — unauthed + valid', () => {
 		mockResolveInvite.mockResolvedValue({
 			valid: true,
 			expired: false,
+			orgId: 'org-111',
 			orgName: 'Estonian Philharmonic Chamber Choir',
 			email: 'singer@example.com',
 			sections: ['Soprano'],

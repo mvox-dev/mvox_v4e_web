@@ -8,7 +8,7 @@ export type { EntuCfg };
 export interface InviteProjection {
 	valid: boolean;
 	expired?: boolean;
-	orgId?: string; // required: client reads this for createApplication call
+	orgId: string; // always present in valid projection; empty string when !valid
 	orgName?: string;
 	email?: string;
 	sections?: string[];
@@ -46,7 +46,7 @@ export async function createInvitation(
 		{ type: 'email', string: input.email },
 		{ type: 'token', string: token },
 		{ type: 'expires_at', date: expiresAt },
-		{ type: 'status', string: 'active' },
+		{ type: 'inviter', reference: input.inviterPersonId },
 	];
 
 	if (input.sections) {

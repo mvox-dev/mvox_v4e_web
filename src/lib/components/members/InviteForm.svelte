@@ -2,6 +2,7 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import { PUBLIC_ENTU_DB } from '$env/static/public';
 	import { getToken } from '$lib/auth/storage';
+	import { userStore } from '$lib/auth/userStore';
 	import { createInvitation, buildInviteUrl } from '$lib/invite/inviteData';
 	import CopyLink from '$lib/components/CopyLink.svelte';
 
@@ -28,6 +29,9 @@
 		if (!token) return;
 		const cfg = { db: PUBLIC_ENTU_DB, token };
 
+		const user = $userStore;
+		const inviterPersonId = user.status === 'ready' ? (user as { status: 'ready'; personId: string }).personId : '';
+
 		submitting = true;
 		try {
 			const result = await createInvitation(cfg, {
@@ -35,7 +39,7 @@
 				email,
 				sections: sections.length > 0 ? sections : undefined,
 				message: message || undefined,
-				inviterPersonId: '',
+				inviterPersonId,
 			});
 			const url = buildInviteUrl(window.location.origin, result.token);
 			inviteUrl = url;
@@ -83,6 +87,6 @@
 		disabled={submitting || !email}
 		class="font-sans text-[12px] font-medium px-3 py-1.5 bg-ink text-paper rounded self-start disabled:opacity-50"
 	>
-		{submitting ? m.invite_accepting() : m.invite_accept()}
+		{submitting ? m.members_invite_submitting() : m.members_invite_submit()}
 	</button>
 </form>
