@@ -118,7 +118,11 @@ export async function resolveInvitationByToken(
 }
 
 /** Resolve a person's name from their entity. */
-export async function resolvePersonName(jwt: string, db: string, personId: string): Promise<string> {
+export async function resolvePersonName(
+	jwt: string,
+	db: string,
+	personId: string,
+): Promise<string> {
 	const res = await fetch(`${ENTU_API_BASE}${db}/entity/${personId}?props=name`, {
 		headers: authHeaders(jwt),
 	});

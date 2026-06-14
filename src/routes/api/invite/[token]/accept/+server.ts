@@ -63,7 +63,8 @@ export const POST: RequestHandler = async ({ params, platform, request }) => {
 
 	// Read the application; application._parent is the verified person (identity proof).
 	const application = await readEntity(jwt, db, applicationId ?? '');
-	const personId = (application._parent as Array<{ reference: string }> | undefined)?.[0]?.reference;
+	const personId = (application._parent as Array<{ reference: string }> | undefined)?.[0]
+		?.reference;
 	if (!personId) {
 		return json({ error: 'identity proof missing' }, 403);
 	}

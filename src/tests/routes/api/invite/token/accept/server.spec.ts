@@ -104,7 +104,7 @@ describe('POST /api/invite/[token]/accept — happy path', () => {
 		const res = await runPost('uuid-tok-abc', { applicationId: 'app-99' });
 		if (res instanceof Response) {
 			expect(res.status).toBe(200);
-			const body = await res.json() as Record<string, unknown>;
+			const body = (await res.json()) as Record<string, unknown>;
 			expect(body).toEqual({ ok: true, orgId: 'org-111' });
 		} else {
 			expect((res as Error).message).toContain('not implemented');
@@ -114,16 +114,12 @@ describe('POST /api/invite/[token]/accept — happy path', () => {
 	it('calls createMember with orgId + sections from invitation, personId from application._parent, name from resolvePersonName', async () => {
 		const res = await runPost('uuid-tok-abc', { applicationId: 'app-99' });
 		if (res instanceof Response) {
-			expect(mockCreateMember).toHaveBeenCalledWith(
-				'service-jwt-abc',
-				'testdb',
-				{
-					orgId: 'org-111',
-					sections: ['sec-soprano'],
-					personId: 'person-77',
-					name: 'Mihkel Putrinš',
-				},
-			);
+			expect(mockCreateMember).toHaveBeenCalledWith('service-jwt-abc', 'testdb', {
+				orgId: 'org-111',
+				sections: ['sec-soprano'],
+				personId: 'person-77',
+				name: 'Mihkel Putrinš',
+			});
 		} else {
 			expect((res as Error).message).toContain('not implemented');
 		}
@@ -150,7 +146,7 @@ describe('POST /api/invite/[token]/accept — happy path', () => {
 			request: {
 				json: async () => ({ applicationId: 'app-99' }),
 				headers: {
-					get: (k: string) => k === 'authorization' ? 'Bearer USER-JWT-MUST-NOT-BE-USED' : null,
+					get: (k: string) => (k === 'authorization' ? 'Bearer USER-JWT-MUST-NOT-BE-USED' : null),
 				},
 			},
 		};
@@ -193,7 +189,7 @@ describe('POST /api/invite/[token]/accept — expired at accept time', () => {
 		const res = await runPost('expired-tok', { applicationId: 'app-99' });
 		if (res instanceof Response) {
 			expect(res.status).toBe(410);
-			const body = await res.json() as Record<string, unknown>;
+			const body = (await res.json()) as Record<string, unknown>;
 			expect(body).toMatchObject({ expired: true });
 		} else {
 			expect((res as Error).message).toContain('not implemented');
@@ -215,7 +211,10 @@ describe('POST /api/invite/[token]/accept — expired at accept time', () => {
 describe('POST /api/invite/[token]/accept — already a member', () => {
 	beforeEach(() => {
 		mockFindActiveMember.mockResolvedValue({
-			memberId: 'existing-55', personId: 'person-77', orgId: 'org-111', status: 'active',
+			memberId: 'existing-55',
+			personId: 'person-77',
+			orgId: 'org-111',
+			status: 'active',
 		});
 	});
 
@@ -223,7 +222,7 @@ describe('POST /api/invite/[token]/accept — already a member', () => {
 		const res = await runPost('uuid-tok-abc', { applicationId: 'app-99' });
 		if (res instanceof Response) {
 			expect(res.status).toBe(200);
-			const body = await res.json() as Record<string, unknown>;
+			const body = (await res.json()) as Record<string, unknown>;
 			expect(body).toEqual({ ok: true, orgId: 'org-111', alreadyMember: true });
 			expect(mockCreateMember).not.toHaveBeenCalled();
 		} else {
@@ -295,7 +294,7 @@ describe('POST /api/invite/[token]/accept — delete fails (soft warning)', () =
 		if (res instanceof Response) {
 			// member was created; cleanup failed but we still return ok
 			expect(res.status).toBe(200);
-			const body = await res.json() as Record<string, unknown>;
+			const body = (await res.json()) as Record<string, unknown>;
 			expect(body).toMatchObject({ ok: true, orgId: 'org-111' });
 			// member must still have been created
 			expect(mockCreateMember).toHaveBeenCalled();
