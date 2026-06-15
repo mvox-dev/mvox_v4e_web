@@ -100,4 +100,76 @@ From these two probes (`_viewer` probe + this `_editor` probe), Entu's rights hi
 | `_editor` | YES | YES | NO |
 | `_owner` | YES | YES | YES |
 
+---
+
+## Addendum: `_editor` status-write (soft-close) smoke — 2026-06-15
+
+**Authorization:** team-lead 09:30, session 37. Same second-account harness (`6a2fc05e4cd971291c5d5ddc`).
+
+### Setup
+
+Same pattern as above. Probe app (`6a2fc5fe4cd971291c5d5e05`) created with `status:'pending'`; admin granted `_editor`; confirmed in pending LIST (count=1) before status-write test.
+
+### The multi-value trap: plain POST appends
+
+`POST [{type:'status', string:'approved'}]` by the `_editor` admin **appended** a second value — both `pending` and `approved` coexisted on the entity:
+
+```json
+"status": [
+  { "_id": "…e0c", "string": "pending" },
+  { "_id": "…e10", "string": "approved" }
+]
+```
+
+Result: entity appeared in BOTH `?status.string=pending` (count=1) AND `?status.string=approved` (count=1) LISTs simultaneously. Plain POST alone is insufficient for a clean soft-close.
+
+### Clear-first works — `_editor` CAN delete property values
+
+`DELETE /polyphony/property/<pending-prop-_id>` by the `_editor` admin:
+
+```
+HTTP 200 — { "deleted": true }
+```
+
+After the delete, only `approved` remained. The entity **dropped from the pending LIST** (count=0) and appeared only in the approved LIST (count=1).
+
+**Key finding:** `_editor` permits `DELETE /property/{propValueId}` (deleting individual property values) even though `_editor` cannot `DELETE /entity/{id}`. These are different endpoints with different rights requirements — see `project_entu_wire_shape_entity_vs_property`.
+
+### Exact wire sequence for Josquin
+
+To soft-close an application (pending → approved) as an `_editor`-granted admin:
+
+```
+# Step 1: Read current status prop _id(s)
+GET /{db}/entity/{applicationId}?props=status
+→ capture each status value's "_id"
+
+# Step 2: Delete the old value(s)
+DELETE /{db}/property/{pendingPropValueId}
+→ { "deleted": true }
+
+# Step 3: POST the new value
+POST /{db}/entity/{applicationId}
+Body: [{"type": "status", "string": "approved"}]
+→ { "_id": "...", "properties": [{ "_id": "...", "type": "status", "string": "approved" }] }
+```
+
+This is the standard Entu replace-semantics pattern per `project_entu_post_appends_multi_value` (clear existing prop _ids, then POST new value). **All three steps succeed with `_editor` rights** — no `_owner` required.
+
+### Updated rights table
+
+| Right | LIST/GET | POST (add/append prop) | DELETE prop value | DELETE entity |
+|---|---|---|---|---|
+| `_viewer` | YES | NO | NO | NO |
+| `_editor` | YES | YES | YES | NO |
+| `_owner` | YES | YES | YES | YES |
+
+### Confidence
+
+HIGH. Live probe on polyphony playground with non-omniscient second account. All steps confirmed on real Entu API.
+
+### Teardown
+
+5/5 clean, all probe entities 404-confirmed. Admin person `6a2fc05e4cd971291c5d5ddc` left intact.
+
 (*MVOX:Pérotin*)
