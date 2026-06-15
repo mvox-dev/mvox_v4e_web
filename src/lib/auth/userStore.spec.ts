@@ -443,7 +443,9 @@ describe('hydrateUserStore — founder-as-org-affiliation union', () => {
 		}
 	});
 
-	it('preserves member-derived role when org appears in both queries', async () => {
+	it('upgrades role to owner when org appears in both queries (owner wins)', async () => {
+		// Bug: when person is BOTH a member AND _owner of the same org, role resolved to
+		// undefined (member-pass sets undefined; owner-pass continue-skips). Policy: owner wins.
 		localStorage.setItem('token', JWT_FOUNDER);
 		const fetchMock = globalThis.fetch as ReturnType<typeof vi.fn>;
 		setupFounderFetch({
@@ -455,6 +457,7 @@ describe('hydrateUserStore — founder-as-org-affiliation union', () => {
 		const state = get(userStore.userStore);
 		expect(state.status).toBe('ready');
 
+		// Confirm both queries fired — ensures the both-present path is exercised
 		const ownerQueryFired = fetchMock.mock.calls.some(
 			(c: unknown[]) =>
 				typeof c[0] === 'string' &&
@@ -466,7 +469,8 @@ describe('hydrateUserStore — founder-as-org-affiliation union', () => {
 		if (state.status === 'ready') {
 			const efkEntries = state.orgs.filter((o) => o.id === EFK_ORG_ID);
 			expect(efkEntries).toHaveLength(1);
-			expect(efkEntries[0].role).not.toBe('owner');
+			// Policy: owner role WINS — must not be undefined or 'member'
+			expect(efkEntries[0].role).toBe('owner');
 		}
 	});
 

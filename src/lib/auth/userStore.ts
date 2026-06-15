@@ -118,11 +118,14 @@ export async function hydrateUserStore(): Promise<void> {
 			}
 		}
 		for (const org of ownerData.entities) {
-			if (orgMap.has(org._id)) continue;
+			// owner-wins: if org already in map via member-pass, upgrade its role to 'owner'.
+			// Preserves id/label/initials from the member-pass entry (richer parent.string
+			// label) — only role is overwritten.
+			const existing = orgMap.get(org._id);
 			orgMap.set(org._id, {
-				id: org._id,
-				label: org.name?.[0]?.string ?? '',
-				initials: deriveInitials(org.name?.[0]?.string ?? ''),
+				id: existing?.id ?? org._id,
+				label: existing?.label || (org.name?.[0]?.string ?? ''),
+				initials: existing?.initials || deriveInitials(org.name?.[0]?.string ?? ''),
 				role: 'owner',
 			});
 		}

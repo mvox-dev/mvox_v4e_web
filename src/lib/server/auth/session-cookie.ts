@@ -43,6 +43,7 @@ const PUBLIC_EXACT = new Set(['/', '/about']);
 export function isProtectedPath(pathname: string): boolean {
 	if (PUBLIC_EXACT.has(pathname)) return false;
 	if (pathname.startsWith('/auth/')) return false;
+	if (pathname.startsWith('/invite/')) return false; // unauthed invite landing (slice-3)
 	if (pathname.startsWith('/_app/') || pathname.startsWith('/.well-known')) return false;
 	if (/\.[a-zA-Z0-9]+$/.test(pathname)) return false; // has a file extension → asset
 	return true;

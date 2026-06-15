@@ -179,11 +179,11 @@ describe('MvoxNav — responsive layout (CHORE-76)', () => {
 		await fireEvent.click(hamburger);
 		const menu = container.querySelector('[data-testid="nav-tab-menu"]');
 		expect(menu).not.toBeNull();
-		// All 6 tab labels must appear in the opened dropdown (5 existing + seasons).
+		// All 7 tab labels must appear in the opened dropdown (5 existing + seasons + members).
 		// We check for the paraglide message keys' output — not hardcoded strings,
 		// but verify the tab entries exist structurally via data-testid pattern.
 		const tabItems = menu?.querySelectorAll('[data-testid^="nav-tab-menu-item-"]');
-		expect(tabItems?.length).toBe(6);
+		expect(tabItems?.length).toBe(7);
 	});
 
 	// AC2 — librarian chip co-locates with the library entry in the collapsed menu
@@ -208,9 +208,9 @@ describe('MvoxNav — responsive layout (CHORE-76)', () => {
 		const { container } = render(MvoxNav, { props: signedInProps });
 		const inlineTabRow = container.querySelector('[data-testid="nav-inline-tabs"]');
 		expect(inlineTabRow).not.toBeNull();
-		// All 6 tabs must be present inside the inline row (5 existing + seasons)
+		// All 7 tabs must be present inside the inline row (5 existing + seasons + members)
 		const inlineItems = inlineTabRow?.querySelectorAll('[data-testid^="nav-inline-tab-"]');
-		expect(inlineItems?.length).toBe(6);
+		expect(inlineItems?.length).toBe(7);
 	});
 
 	// AC4 — OrgPicker chip does not force horizontal overflow on narrow viewports.
@@ -367,7 +367,7 @@ describe('MvoxNav — /seasons tab (#82)', () => {
 		expect(tab?.textContent).toContain('Rehearsals');
 	});
 
-	it('hamburger menu lists 6 tabs (5 existing + seasons)', async () => {
+	it('hamburger menu lists 7 tabs (5 existing + seasons + members)', async () => {
 		const { container } = render(MvoxNav, { props: signedInProps });
 		const hamburger = container.querySelector(
 			'[data-testid="nav-tab-menu-trigger"]',
@@ -375,7 +375,7 @@ describe('MvoxNav — /seasons tab (#82)', () => {
 		await fireEvent.click(hamburger);
 		const menu = container.querySelector('[data-testid="nav-tab-menu"]');
 		const tabItems = menu?.querySelectorAll('[data-testid^="nav-tab-menu-item-"]');
-		expect(tabItems?.length).toBe(6);
+		expect(tabItems?.length).toBe(7);
 	});
 
 	it('hamburger menu contains nav-tab-menu-item-seasons', async () => {

@@ -59,6 +59,14 @@ describe('session-cookie helpers', () => {
 			expect(isProtectedPath(p)).toBe(true);
 	});
 
+	it('isProtectedPath: /invite/* is public (slice-3 unauthed landing)', () => {
+		// The singer must reach the landing page before signing in — token param varies.
+		expect(isProtectedPath('/invite/some-base64url-token')).toBe(false);
+		expect(isProtectedPath('/invite/')).toBe(false);
+		// /members is still protected (admin-only, requires sign-in)
+		expect(isProtectedPath('/members')).toBe(true);
+	});
+
 	it('safeRedirectTarget: local path kept, unsafe → /', () => {
 		expect(safeRedirectTarget('/library?work=a')).toBe('/library?work=a');
 		expect(safeRedirectTarget('//evil.com')).toBe('/');

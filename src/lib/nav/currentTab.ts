@@ -1,4 +1,4 @@
-export type Tab = 'agenda' | 'library' | 'roster' | 'notices' | 'settings' | 'seasons';
+export type Tab = 'agenda' | 'library' | 'roster' | 'notices' | 'settings' | 'seasons' | 'members';
 
 /**
  * Pure function: map URL pathname to tab key.
@@ -11,5 +11,6 @@ export function tabForPath(pathname: string): Tab {
 	if (pathname === '/roster' || pathname.startsWith('/roster/')) return 'roster';
 	if (pathname === '/notices' || pathname.startsWith('/notices/')) return 'notices';
 	if (pathname === '/settings' || pathname.startsWith('/settings/')) return 'settings';
+	if (pathname === '/members' || pathname.startsWith('/members/')) return 'members';
 	return 'agenda'; // default for /, /agenda, and unknown paths
 }

@@ -6,7 +6,7 @@
 	import SoonMarker from './SoonMarker.svelte';
 	import type { OrgPickerMode } from '$lib/auth/userStore';
 
-	type Tab = 'agenda' | 'library' | 'roster' | 'notices' | 'settings' | 'seasons';
+	type Tab = 'agenda' | 'library' | 'roster' | 'notices' | 'settings' | 'seasons' | 'members';
 	const TAB_LABELS: Record<Tab, () => string> = {
 		agenda: m.nav_tab_agenda,
 		library: m.nav_tab_library,
@@ -14,8 +14,9 @@
 		notices: m.nav_tab_notices,
 		settings: m.nav_tab_settings,
 		seasons: m.nav_tab_rehearsals,
+		members: m.nav_tab_members,
 	};
-	const TABS: Tab[] = ['agenda', 'library', 'roster', 'notices', 'settings', 'seasons'];
+	const TABS: Tab[] = ['agenda', 'library', 'roster', 'notices', 'settings', 'seasons', 'members'];
 	const {
 		signedIn = false,
 		currentTab = 'agenda' as Tab,
@@ -112,7 +113,7 @@
 			<!-- Desktop inline tab row — hidden on mobile, visible at sm+ -->
 			<div data-testid="nav-inline-tabs" class="hidden sm:flex gap-3">
 				{#each TABS as tab (tab)}
-					{#if tab === 'agenda' || tab === 'seasons' || tab === 'library'}
+					{#if tab === 'agenda' || tab === 'seasons' || tab === 'library' || tab === 'members'}
 						<a
 							data-testid="nav-inline-tab-{tab}"
 							href="/{tab}"
@@ -173,7 +174,7 @@
 								href="/{tab}"
 								data-testid="nav-tab-menu-item-{tab}"
 								role="menuitem"
-								aria-label={tab !== 'agenda' && tab !== 'library' && tab !== 'seasons'
+								aria-label={tab !== 'agenda' && tab !== 'library' && tab !== 'seasons' && tab !== 'members'
 									? `${TAB_LABELS[tab]()} — coming soon`
 									: undefined}
 								class="flex items-center gap-1 font-sans text-[12px] {tab === currentTab
@@ -187,7 +188,7 @@
 										class="font-sans text-[7px] tracking-wider py-px px-1 bg-ink text-paper rounded-sm font-semibold"
 										>{m.nav_chip_librarian()}</span
 									>
-								{:else if tab !== 'agenda' && tab !== 'library' && tab !== 'seasons'}
+								{:else if tab !== 'agenda' && tab !== 'library' && tab !== 'seasons' && tab !== 'members'}
 									<SoonMarker />
 								{/if}
 							</a>
