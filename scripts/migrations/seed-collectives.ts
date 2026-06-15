@@ -258,6 +258,7 @@ async function seedSection(
 		{ type: 'voice', reference: voiceId },
 		{ type: 'display_order', number: spec.display_order },
 		{ type: '_sharing', string: 'public' },
+		{ type: '_inheritrights', boolean: true },
 	];
 
 	const r = await findOrCreateByName(client, 'section', spec.name, collective._id, props);
@@ -327,6 +328,7 @@ async function seedMember(
 		{ type: 'person', reference: personId },
 		{ type: 'status', string: 'active' },
 		{ type: '_sharing', string: 'private' },
+		{ type: '_inheritrights', boolean: true },
 	]);
 	if (r.created) {
 		console.log(

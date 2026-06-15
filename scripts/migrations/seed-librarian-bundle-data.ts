@@ -318,6 +318,7 @@ async function runSeed(client: EntuClient, manifest: Manifest): Promise<ResultPa
 				{ type: '_parent', reference: ekfId },
 				{ type: '_sharing', string: 'private' },
 				{ type: 'name', string: manifest.choir.library_name },
+				{ type: '_inheritrights', boolean: true },
 			]);
 			libraryId = r._id;
 			result.library = { action: 'CREATE', id: libraryId, label: manifest.choir.library_name };
@@ -407,6 +408,7 @@ async function runSeed(client: EntuClient, manifest: Manifest): Promise<ResultPa
 					{ type: '_sharing', string: 'private' },
 					{ type: 'person', reference: personId },
 					{ type: 'status', string: 'active' },
+					{ type: '_inheritrights', boolean: true },
 				];
 				if (sectionId) props.push({ type: '_parent', reference: sectionId });
 				const r = await createEntity(client, props);

@@ -82,6 +82,7 @@ async function main() {
 			{ type: '_parent', reference: EFK_ID },
 			{ type: 'person', reference: PO_PERSON_ID },
 			{ type: 'status', string: 'active' },
+			{ type: '_inheritrights', boolean: true },
 		];
 
 		const res = await fetch(url, {
