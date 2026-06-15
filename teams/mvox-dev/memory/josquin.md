@@ -4,6 +4,19 @@ Personal notes. Only Josquin writes here.
 
 ---
 
+## [CHECKPOINT] 2026-06-14 session 37 — #91 task#8 native-design re-confirm DONE (analysis only)
+
+Re-read `entu/research` schema.ts (`invitation` ~544–588, `application` ~590–630, `member` 287–340) + README (§3 rights matrix, §4 sharing, §5.6 queries, §6.2/6.3 lifecycle). The native keyless/leak-free flow is the schema's documented INTENT (README §6.3 Path B):
+- `application` `sharing:private`, parent=person, `creators:self`; `member` `creators:[{kind:bilateral,requires:[invitation,application]}]`; `invitation` parent=org, `creators:parent_right _owner`.
+- Singer creates private application on own JWT + grants `_viewer:<admin persons>`; admin lists via `?_type.string=application&target_org.reference=<orgId>` (README §5.6) + accepts on own `_owner` JWT → creates member + role→ACL `_viewer:<person>` on org (§6.2 step 8, "no elevation needed"). No key, no domain-leak.
+- **ONE runtime unknown = Pérotin task#7**: does a viewer-granted application (parented under person, NOT org) surface in the admin's filtered LIST (vs only GET-by-id)? Schema INTENDS yes but can't confirm Entu search semantics. **If LIST fails:** minimal additive fix = (a) make `application` ALSO child of `target_org` (multi-parent, symmetric w/ invitation → admin lists via owned `_parent.reference=<orgId>`) — NOT an org formula (formulas can't list + would leak PII per D6). Plus a separate discovery gap: singer needs to know WHICH persons are the org's admins to `_viewer`-grant — (b) an aggregate id-only formula on org could expose the admin-id SET. If LIST GREEN → ZERO schema change.
+- Salvage confirmed via `git diff main origin/feat/invite-join` (~70%): KEEP inviteData.ts+spec, all members/invite UI+CopyLink/InviteForm, i18n, session-cookie /invite allowlist, Tallis test audit. DELETE elevated.ts+spec, both /api/invite +server.ts + their tests, app.d.ts ENTU_SERVICE_KEY. NOTE branch also DELETES S36 About work (cut pre-S36) → rebase salvage onto current main, never merge branch wholesale.
+- Full report sent to team-lead 14:04. Routes through team-lead+PO if schema change needed.
+
+(*MVOX:Josquin*)
+
+---
+
 ## [CHECKPOINT] 2026-06-14 session 35 — slice-3 invite/join built (service-key) then PIVOTED at #91; branch feat/invite-join PARKED green, NOT merged
 
 Built the COMPLETE service-key invite/join on `feat/invite-join` (1127/1127 unit, check 0, Bentham-reviewed). Then PO rejected the service-key foundation → parked, resume via **issue #91** next session with a NATIVE keyless design. Branch pushed (tip ~`8b5ec86`), do NOT merge as-is.
