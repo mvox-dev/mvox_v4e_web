@@ -1,29 +1,30 @@
-# Task List Snapshot — 2026-06-14 end-of-session-35
+# Task List Snapshot — 2026-06-15 end-of-session-37
 
-State at session-35 close.
+State at session-37 close.
 
 ## Active tasks (in-flight)
 
-None. Session wrapped.
+None. Session wrapped. (Team task list is empty — the session's chain tasks were created + completed/cleared during S37.)
 
-## Pending — next session (S36)
+## Session-37 completed
 
-**About page (Carus outreach)** — PO priority (politically pressing, ahead of the slice-3 MVP blocker). Brainstorm DONE + PO-approved. Spec: `docs/superpowers/specs/2026-06-14-about-page-carus-outreach-design.md`. Next: `writing-plans` → TDD chain (content + i18n; `about_*` keys already exist in 4 locales). Read Carus/Tormis Gmail thread `19e3f59f52444354` + "isiklik" letter `19e27cc9ff5325f3` for tone first. See team-lead.md [NEXT SESSION] seed (⭐) + memory `project_mvox_carus_publisher_outreach`.
+1. **Slice-3 invite/join (native keyless) — SHIPPED to prod.** Full TDD chain (Tallis RED → Josquin GREEN data → Byrd GREEN UI → Comenius i18n → Bentham GREEN), + a soft-close fix (`_editor` can't delete entity, so approve sets `status:'approved'`), + userStore owner-wins fix, + SSR-safety fix + Playwright guard. Merged `7b2aa1b` (Closes #21 / #11 / #91). PO click-tested end-to-end on live polyphony. Gist: https://gist.github.com/mitselek/9b838b01fe7a91399324b1828e801859
+2. **`_inheritrights` rights-model:** rule documented (architecture-decisions.md 2026-06-15); create helpers fixed in code (`6e583d8`, `src/lib/entu/inherit.ts`); live EFK data aligned (org false, children true).
+3. **Deployment prerequisites applied to polyphony:** `add_user` on db entity; `application`/`invitation`/`member` type-defs → `_sharing:domain`.
+4. Probes/findings committed to main (LIST-visibility #92 GREEN, `_editor` rights table, membership-content-visibility model).
 
-## Deferred — slice-3 invite/accept (MVP blocker, parked at #91)
+## Open follow-ups (next session — see team-lead.md [NEXT SESSION] seed for detail)
 
-Resume via the NATIVE keyless + leak-free design (= documented v4E intent): singer creates `application` (own JWT, private) granting `_viewer` to org admins; admin approves → own owner JWT creates `member`. Run ONE probe first (does a `_viewer`-granted application appear in the admin's LIST query?); possibly add an aggregate formula on `organization`. Salvage ~70% of branch `feat/invite-join` (@ `8b5ec86`, pushed; green but DO-NOT-MERGE — unfixed RED-35.1); delete `elevated.ts` + 2 `/api/invite` endpoints. Do NOT provision `ENTU_SERVICE_KEY`. Full rationale + 7 team perspectives on issue **#91**. Issues #21 + #11 stay open.
-
-## Session-35 completed
-
-1. **Slice-3 Phase 0 probes** (gating) — all green; `application` type confirmed live (resolved the S32 concern).
-2. **Slice-3 plan doc** finalized + committed (`d4c1718`).
-3. **Slice-3 TDD chain → green service-key impl** (`feat/invite-join`, 1127 tests, check 0). Bentham RED caught the accept-flow `orgId` bug (every Accept 403'd, hidden by a vacuous async test); re-spin fixed it; Tallis codebase-wide vacuous-guard audit.
-4. **No-key model probe** (`cfce0c9`) + **schema-design convergence** → issue **#91** filed with 7 team perspectives; Josquin 🥇 found the native design is the documented v4E intent.
-5. **About-page/Carus design** brainstormed + PO-approved; spec committed; gist created.
+1. `rsvp` + `attendance` type-defs still `_sharing:private` → "Couldn't save RSVP" for members; domain-share them.
+2. Member → agenda content-visibility design (within the content subtree, never flip the org). Confirm whether the member sees the agenda post-revert.
+3. Seed scripts (4) `_inheritrights` create gap (Pérotin — import `inherit.ts` lookup).
+4. #93 new-person `_sharing` model (PO/Victoria).
+5. HMAC-sign the invite token before multi-org prod.
+6. Mirror the `_inheritrights` rule into the v4E README (`entu/research`).
+7. Slice-3 YELLOW-S3.2: carry `invitationId` to approve so the invitation is deleted (currently self-expires).
 
 ## State
 
-`main` tip = wrap commit. `feat/invite-join` pushed @ `8b5ec86` (parked, do-not-merge). Open issues ~21. All agents shut down clean.
+`main` tip = `6e583d8` (auto-deploys prod). No active feature branch. Slice-3 done; #21/#11/#91 closed. All agents shut down clean.
 
 (*MVOX:Palestrina*)

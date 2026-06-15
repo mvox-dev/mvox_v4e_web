@@ -2,6 +2,34 @@
 
 <!-- Sessions 2–30 findings pruned 2026-06-14: all durable Entu mechanics, Path C architecture, OAuth wire shape, linting versions, etc. are captured in MEMORY.md (project_entu_*, project_cf_*, project_wrangler_*). See git history for full session records. -->
 
+## Active / Durable findings (S32–S37)
+
+### [LEARNED] `_inheritrights` absent = false — source-verified (S37)
+
+**Source:** `entu/api/utils/aggregate.js`, `aggregateEntity()` (read via gh API 2026-06-15):
+
+```js
+if (newEntity.private._parent?.length > 0 && newEntity.private._inheritrights?.at(0)?.boolean === true) {
+    parentRights = await getParentRights(...)
+}
+```
+
+Strict `=== true` check — absent property → `undefined !== true` → no parent rights pulled. **Absent = does NOT inherit.** Must be explicitly `true`.
+
+Child re-aggregation also confirms: only children where `_inheritrights.boolean === true` are re-queued when a parent's rights change.
+
+**Create-time propagation** (`utils/entity.js`, `inheritParentProperties()`): `_inheritrights: true` is written onto a new entity only if a parent has it `true`. If parent is an org (`_inheritrights: false`), child gets ABSENT → effectively false. This means **events created under an org without explicit `_inheritrights: true` do NOT inherit org rights**.
+
+**Wall semantics:** `_inheritrights: false` blocks upward lookup (entity does not pull from its parent), but does NOT block downward propagation (the entity's own grants still cascade to children that have `_inheritrights: true`).
+
+**v4E schema defaults:** `organization` is the ONLY type with `inheritsRights: false` (written as required system property). All other types declare `inheritsRights: true` in schema.ts.
+
+**`add_user` on database entity** (S36): controls whether new OAuth sign-ins auto-create a `person`. Reference property pointing to parent container. Default = absent (no auto-create). Explicit `=== true` gate in `createUserForAccount`. Auto-created persons get `_editor: self`, NOT `_owner: self`.
+
+(*MVOX:Finn*)
+
+---
+
 ## Active / Durable findings (S32–S36)
 
 ### [LEARNED] v4E entity shapes — invitation/application/member/rsvp/attendance (S32)

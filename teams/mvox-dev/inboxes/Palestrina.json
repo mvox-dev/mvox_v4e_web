@@ -70,5 +70,59 @@
     "color": "purple",
     "type": "message",
     "read": false
+  },
+  {
+    "from": "tallis",
+    "text": "Task #15 complete. Commit 3817d41 on feat/invite-join-native.\n\nStory handoff — Bentham for GREEN review:\n\nThree spec files changed:\n\n1. src/lib/server/auth/session-cookie.spec.ts — 1 new test: /invite/* is public, /members is still protected. This is a forward-guard (implementation already correct); included to lock the behaviour.\n\n2. src/routes/invite/[token]/page.spec.ts — 5 new tests in a new \"authed accept flow\" describe block:\n   - authed user sees Accept button, not sign-in link\n   - createApplication called with {personId: user.personId, orgId: tok.orgId}\n   - grantEditorToAdmin called with {applicationId: returned-id, adminPersonId: tok.inviterPersonId}\n   - invite-success rendered on success\n   - invite-error rendered on reject\n\n3. src/routes/members/page.spec.ts — NEW, 9 tests:\n   - listPendingApplications called with org id; skipped when org is null\n   - loading spinner while pending; error state on reject\n   - owner-gate: non-owner sees no pending list or approve button\n   - owner sees pending items; applicantName shown\n   - approveApplication called with full shape including invitationId: ''\n   - optimistic removal: approved item gone, second item remains\n\nAll 1081 tests green. pnpm check 0 errors. Ready for Bentham GREEN pass on slice-3.",
+    "summary": "Task #15 done — story handoff to Bentham",
+    "timestamp": "2026-06-15T01:15:08.217Z",
+    "color": "yellow",
+    "type": "message",
+    "read": false
+  },
+  {
+    "from": "tallis",
+    "text": "All green, no bugs.\n\n1. Every new test passes — accept path (5 tests), /members (9 tests), /invite/* allowlist (1 test). No wiring bug surfaced; the implementations are correct.\n\n2. No bug to route.\n\n3. pnpm test:unit: 1081 tests, 118 files, all passed. pnpm check: 0 errors. Tip SHA: 3817d41.",
+    "summary": "Task #15 result — all green, no bugs",
+    "timestamp": "2026-06-15T01:15:47.641Z",
+    "color": "yellow",
+    "type": "message",
+    "read": false
+  },
+  {
+    "from": "tallis",
+    "text": "TESTS_WRITTEN. Tip SHA: f34f3e3 on feat/invite-join-native.\n\nChanged: src/lib/invite/inviteData.spec.ts\n\nReplaced the old 'DELETEs both invitation and application entities' test with two new ones:\n\n1. 'soft-closes the application: GET status prop id, DELETE /property/<id>, POST status=approved' — asserts the exact 3-step Pérotin-confirmed sequence: GET ?props=status to read the pending prop _id, DELETE /property/<pendingStatusPropValueId> to clear it (plain POST would append), POST status:'approved' to the application entity.\n\n2. 'does NOT DELETE /entity/<applicationId>...' — asserts zero DELETE /entity/app1 calls (admin _editor cannot delete; would 403).\n\nmakeApproveMock extended to handle ?props=status GETs, returning a status prop with a known _id so tests can assert DELETE /property/<that-id>.\n\nState: 2 new tests FAIL against current delete-based code. 1080 others green. pnpm check 0. Ready for Josquin GREEN.",
+    "summary": "Task done — RED soft-close, tip f34f3e3",
+    "timestamp": "2026-06-15T09:36:34.669Z",
+    "color": "yellow",
+    "type": "message",
+    "read": false
+  },
+  {
+    "from": "tallis",
+    "text": "TESTS_WRITTEN. Tip SHA: 829a1b0 on feat/invite-join-native.\n\nChanged: src/lib/auth/userStore.spec.ts — single test edit (~line 446).\n\nRenamed 'preserves member-derived role when org appears in both queries' → 'upgrades role to owner when org appears in both queries (owner wins)'. Flipped assertion from `.not.toBe('owner')` to `.toBe('owner')`. Added inline comment naming the bug (member-pass sets undefined; owner-pass continue-skips).\n\nScenario already has EFK_ORG_ID in both ownerOrgs and memberOrgParents — exercises the both-present path. Owner query fired assertion retained as-is.\n\nState: 1 test fails (current code yields undefined, not 'owner'); 1081 green. pnpm check 0. Ready for Byrd.",
+    "summary": "TESTS_WRITTEN — owner-wins RED, tip 829a1b0",
+    "timestamp": "2026-06-15T09:58:16.359Z",
+    "color": "yellow",
+    "type": "message",
+    "read": false
+  },
+  {
+    "from": "tallis",
+    "text": "Done. Tip SHA: 8ab0b0c on feat/invite-join-native.\n\nNew file: tests/invite-ssr-safety.spec.ts\n\nTwo tests against the real preview-build SSR path:\n- valid token → 200 + invite-heading visible with 'Eesti Filharmoonia Kammerkoor'\n- malformed token (/invite/garbage) → 200 + invite-invalid visible (not 500)\n\nToken encoding inlined as Buffer.from().toString('base64') + base64url normalisation — avoids $lib alias resolution issues in Playwright's preview context; mirrors encodeInviteToken exactly.\n\nBoth tests green. pnpm check 0. Branch is hardened.",
+    "summary": "SSR safety Playwright spec done, tip 8ab0b0c",
+    "timestamp": "2026-06-15T10:44:37.144Z",
+    "color": "yellow",
+    "type": "message",
+    "read": false
+  },
+  {
+    "from": "tallis",
+    "text": "TESTS_WRITTEN. Tip SHA: d9cff85 on fix/inheritrights-on-create.\n\n5 new failing assertions across two spec files:\n\ninviteData.spec.ts:\n- createInvitation: POST body contains { type:'_inheritrights', boolean:true }\n- approveApplication: member-create POST body contains same (found via the same url-pattern filter as the existing no-name test)\n\nentuSeasons.spec.ts:\n- createSeason: POST body contains { type:'_inheritrights', boolean:true }\n- createSeriesWithEvents: event_series create body (createCalls[0]) contains it\n- createSeriesWithEvents: each event create body (createCalls[1..]) contains it — two-event window (endDate: '2026-09-15') so the loop is exercised\n\nAll 5 fail with AssertionError (body doesn't contain the prop — correct RED). 1082 existing tests green. pnpm check 0. Ready for Josquin.",
+    "summary": "TESTS_WRITTEN — _inheritrights RED, tip d9cff85",
+    "timestamp": "2026-06-15T12:57:24.939Z",
+    "color": "yellow",
+    "type": "message",
+    "read": false
   }
 ]

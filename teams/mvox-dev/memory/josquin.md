@@ -4,6 +4,61 @@ Personal notes. Only Josquin writes here.
 
 ---
 
+## [CHECKPOINT] 2026-06-15 session 37 — soft-close + _inheritrights fix (both committed on branches, NOT pushed; tree flipped to main at shutdown)
+
+Two more GREENs after the data-fns ship (entries below). Tree flipped to `main` mid-shutdown (documented GOTCHA) so this lives on main where startup reads it.
+
+### slice-3 approve SOFT-CLOSE @ `8c0bbdf` on `feat/invite-join-native`
+[GOTCHA load-bearing] **`_editor` CANNOT `DELETE /entity/{id}` (403, needs `_owner`)** but CAN LIST + write props + `DELETE /property/{valueId}`. Pérotin smoke on main `beb1c87`/`91daa4b`. So `approveApplication` soft-closes the application instead of deleting it: `GET entity/<id>?props=status` → `DELETE /property/<statusValueId>` (clear 'pending' — plain POST APPENDS, must clear first) → `POST entity/<id> [{type:'status',string:'approved'}]` (best-effort). Member create + org `_viewer` unchanged (throw on !ok). Invitation still best-effort `DELETE /entity` (admin IS org `_owner` of it). 28/28 invite tests.
+
+### `_inheritrights`-on-create fix @ `332e4ab` on `fix/inheritrights-on-create`
+[GOTCHA load-bearing] **Entu only auto-writes `_inheritrights` when the PARENT already has it true.** `organization` is the ONLY `inheritsRights:false` type (rights island) → entities created DIRECTLY under an org are born with `_inheritrights` ABSENT (=false), breaking the admin `_owner`→child cascade. Fix: NEW `src/lib/entu/inherit.ts` (per-type `INHERITS_RIGHTS` lookup: organization=false, all else true, unknown→true; `inheritRightsProp(type)` helper). Wired into all 5 org-direct creates: `createInvitation`(invitation), `approveApplication` member(member), `createSeason`(season), `createSeriesWithEvents`(event_series+event). `createApplication`/`createRsvp` left alone (person-parented, parent true → auto). By-construction via lookup. Full unit 1087/1087, check 0.
+- **Follow-up flagged (not done):** 4 SEED-script org-direct creates ALSO miss `_inheritrights` (seed-collectives member+section, seed-po-member-ekf, seed-librarian library) — out of dispatch scope; could import the same `inherit.ts` lookup, or moot if regenerated.
+- [PATTERN] Both commits avoided biome whole-tree sprawl by `pnpm exec biome format --write <my file>` (NOT `pnpm format`). Staged-set verified = only my files; peer `bentham.md` left unstaged.
+
+(*MVOX:Josquin*)
+
+---
+
+## [CHECKPOINT] 2026-06-15 session 37 — slice-3 GREEN data fns SHIPPED on feat/invite-join-native @ 9aae6ed (NOT pushed)
+
+Tallis RED @ `5fb6d1b` (to my P1–P5 corrections — spec header documents C1–C5). I GREENed task #11:
+- `inviteToken.ts` (encode/decode base64url + required-field validation), `inviteData.ts` (createInvitation/buildInviteUrl/createApplication/grantEditorToAdmin/listPendingApplications/approveApplication), `types.ts` (+optional `orgName` on CreateInvitationInput — token needs it). All bare-fetch + array-of-props, user JWT, zero BFF route.
+- 27/27 invite tests (4 token + 23 data); 3 landing tests stay RED for Byrd (expected). check 0. Commit = EXACTLY 3 src files.
+- **[GOTCHA recurrence] `pnpm format` (Biome) STILL sprawls whole-tree** — reformatted ~24 unrelated files (probes + peer specs + Tallis's committed spec). `git restore`d ALL non-mine before staging; verified `git diff --cached --name-only` = 3 files. SAME hazard as session-35 WARNING. LESSON: after `pnpm format`, ALWAYS `git status` + restore everything except your actual edits; never `git add -A`. Better: `pnpm exec biome check <my files>` to verify clean instead of whole-tree `format`.
+- approveApplication: member-create + org `_viewer` THROW on !ok (durable outcome); the 2 deletes are best-effort (OD-1 stale-app self-expires). listPendingApplications uses Promise.all two-fetch name resolve.
+- Handed to Byrd for UI (Tasks 1.3/2.3/3.3). `/invite/` session-cookie allowlist is MY lane — add when Byrd wires landing. Live GREEN smoke (3.2) DEFERRED to PO-auth (2nd acct `6a2f3f964cd971291c5d5ca2`, NOT db-root).
+
+(*MVOX:Josquin*)
+
+---
+
+## [CHECKPOINT] 2026-06-15 session 37 — #91/#92 native build DESIGN delivered (design only, no branch yet)
+
+Probe #92 DEFINITIVE (`docs/migration/findings/slice3-list-visibility-definitive-2026-06-15.md`): **Q1 GREEN** — `_viewer`-granted private application surfaces in admin LIST (all variants); **Q2** — non-member singer CANNOT read org `_owner` (discovery gap), closed by **admin-initiated** flow (invitation carries `inviter` person id; singer grants `_viewer` to that id). **GOTCHA: `_viewer` = READ not DELETE** (untested) → breaks naive app-cleanup at approve.
+
+Full build design sent to team-lead 00:07. Key decisions:
+- Branch `feat/invite-join-native` off CURRENT main (NOT parked feat/invite-join — predates About + carries service-key). Salvage = RECREATE/port file-by-file, NOT cherry-pick.
+- DELETE: `elevated.ts`, both `/api/invite/*/+server.ts`, `app.d.ts ENTU_SERVICE_KEY`, arch-decisions elevated-ops append. SALVAGE: inviteData.ts (createInvitation/createApplication/buildInviteUrl/listOrgInvitations), all UI, i18n, session-cookie /invite allowlist. NEW: `inviteToken.ts` (self-describing token), grantViewerToAdmin/listPendingApplications/approveApplication.
+- 4 flows all browser-direct user-JWT, ZERO new BFF route (only isProtectedPath /invite/ allowlist). Landing = **self-describing base64url token** `{orgId,orgName,inviterPersonId,sections,email?,exp}` decoded client-side (unauthed singer can't read private invitation); token rides OAuth `state` through login. Accept = createApplication(status:'pending' NOT 'active') + grantViewer to inviter. Approve = createMember(NO `name` prop — parked elevated.ts had it wrong) + org `_viewer` sync + delete invitation (app cleanup blocked by OD-1).
+- Person id from `jwt.claims.accounts[db]` (src/lib/auth/types.ts contract).
+- BUGS to RED against schema (parked branch had them): application `status:'active'`→should be `'pending'`; member POSTed `name`→schema has none.
+- 4 OPEN DECISIONS flagged: OD-1 (`_viewer` no-delete → app cleanup; lean: flip status:'accepted' + cron, needs 1-shot probe), OD-2 (token plain base64url vs HMAC — lean plain, forge=spam-only no escalation), OD-3 (new-person `_sharing:domain` leak fix — own sub-task, needs leak-surface clarity + federation-public-directory reconcile, PO/Victoria), OD-4 (MVP = admin-initiated only, NOT cold Path-B).
+
+**ODs RESOLVED (team-lead 00:45):** OD-1 → grant **`_editor`** (not _viewer) at accept (covers LIST + delete); fn = `grantEditorToAdmin`; verify LIST+DELETE in 3.2 GREEN smoke, fallback = skip delete + 30d expiry + cron note. OD-2 → plain base64url. OD-3 → carved to **issue #93**, NOT in this chain (no bootstrapPerson.ts). OD-4 → admin-initiated only.
+
+### [CHECKPOINT 01:20] Plan review punch-list (`docs/superpowers/plans/2026-06-15-slice3-invite-join-native.md`) — sent to team-lead
+Design GREEN; RED-test snippets need 2 BLOCKING fixes before Tallis writes RED:
+- **P1**: plan snippets assume a `cfg.post('entity',{...})`/`get`/`del` client — WRONG. Real convention (entuSeasons.spec/rsvpData/salvaged inviteData): bare `fetch(\`${ENTU_API_BASE}${cfg.db}/entity\`,{method,headers,body})`; specs `vi.stubGlobal('fetch',...)`, assert URL via `mock.calls[i][0].toContain(...)` + body via `JSON.parse(calls[i][1].body)` which is an **ARRAY of `{type,string|reference|date}` prop objs**, NOT a keyed object. Use `toContainEqual({type:'_type',reference:ID})` per-prop. (`EntuClient` class exists at src/lib/entu/client.ts but the seasons/rsvp/invite data layer does NOT use it.)
+- **P2**: `expires_at` is type `date` (schema.ts:569,618) not `datetime`; plan asserts `.datetime` — wrong. Post/assert `{type:'expires_at',date:'YYYY-MM-DD'}`.
+- **P3 (already right, don't "fix")**: application MUST POST `{type:'_sharing',string:'private'}` — child-of-person, person default `public` (§4) → born public unless explicit (project_entu_sharing_create_time). Do NOT copy rsvpData's _sharing skip.
+- **P5**: 3.2 GREEN smoke must use genuine non-omniscient admin (2nd OAuth acct `6a2f3f964cd971291c5d5ca2`), NOT PO db-root (else DELETE test meaningless); live-mutating → needs explicit auth-gate routed via team-lead.
+- **P6**: verified main has zero service-key files → 0.2 is a no-op.
+
+(*MVOX:Josquin*)
+
+---
+
 ## [CHECKPOINT] 2026-06-14 session 37 — #91 task#8 native-design re-confirm DONE (analysis only)
 
 Re-read `entu/research` schema.ts (`invitation` ~544–588, `application` ~590–630, `member` 287–340) + README (§3 rights matrix, §4 sharing, §5.6 queries, §6.2/6.3 lifecycle). The native keyless/leak-free flow is the schema's documented INTENT (README §6.3 Path B):

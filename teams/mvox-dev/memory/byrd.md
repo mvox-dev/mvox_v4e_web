@@ -245,4 +245,12 @@
 
 [GOTCHA] **`pnpm format` (Biome) reformats ~20 repo-wide files on every run, not just changed files.** Only stage your own task files after `pnpm format` — never `git add -A`. The pre-existing reflows (scripts/, spec files) are noise; staging them pollutes the commit and can cause Bentham YELLOWs for out-of-scope changes.
 
+## [CHECKPOINT] 2026-06-15 — Slice-3 native-path GREEN + userStore owner-wins + SSR fix (session 37, feat/invite-join-native)
+
+[LEARNED] **Slice-3 path C (no service key, no BFF routes).** Full browser-direct accept flow: admin creates invitation (JWT-authed Entu POST), singer gets link, landing page decodes self-describing token client-side (C5 — zero fetch), singer POSTs `createApplication` under own JWT + calls `grantEditorToAdmin` to notify admin. Admin sees pending applications via `listPendingApplications` (queries `application._parent=personId` visible to admin via `_owner` rights on org). `approveApplication` creates member + grants `_viewer` on org — all browser-direct, no service key. Token: base64url `{orgId, orgName, inviterPersonId, sections, exp}`.
+
+[GOTCHA] **`userStore.ts` owner pass skipped upsert for dual-role founders.** The two-pass org-map builder (member pass → owner pass) originally did `if (orgMap.has(org._id)) continue` in the owner pass. Founders who have both a `member` record and `_owner` rights on an org had `role: undefined` — the owner pass skipped them. Fix: remove the guard, always upsert with `existing?.id ?? org._id` / `existing?.label || ...` / `role: 'owner'`. Owner-wins: preserves richer label/initials from member pass, always sets role.
+
+[GOTCHA] **`$derived(browser && getToken() !== null && ...)` required for any localStorage read in a top-level derived.** CF Workers SSR runs the top-level `$derived` block without a `window`/`localStorage` global. `getToken()` throws → 500. Pattern: always guard localStorage/sessionStorage/`getToken()` reads in top-level script scope with `browser` from `$app/environment`. Event handlers (`onclick`, `async function handleX()`) are client-only and do not need the guard.
+
 (*MVOX:Byrd*)
