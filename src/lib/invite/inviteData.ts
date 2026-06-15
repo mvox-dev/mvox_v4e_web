@@ -15,6 +15,7 @@
 import { ENTU_API_BASE } from '$lib/entu-config';
 import { resolveTypeId, type EntuCfg } from '$lib/seasons/entuSeasons';
 import { encodeInviteToken } from '$lib/invite/inviteToken';
+import { inheritRightsProp } from '$lib/entu/inherit';
 import type {
 	CreateInvitationInput,
 	CreateInvitationResult,
@@ -38,7 +39,8 @@ function expiresAtDate(): string {
 type EntuProp =
 	| { type: string; string: string }
 	| { type: string; reference: string }
-	| { type: string; date: string };
+	| { type: string; date: string }
+	| { type: string; boolean: boolean };
 
 // ── createInvitation (admin) ────────────────────────────────────────────────────
 
@@ -59,6 +61,8 @@ export async function createInvitation(
 	const props: EntuProp[] = [
 		{ type: '_type', reference: invitationTypeId },
 		{ type: '_parent', reference: input.orgId },
+		// org-direct child: org is _inheritrights:false, so set it explicitly per schema.
+		inheritRightsProp('invitation'),
 		{ type: 'email', string: input.email },
 		{ type: 'token', string: token },
 		{ type: 'expires_at', date: expiresAtDate() },
@@ -228,6 +232,8 @@ export async function approveApplication(
 		{ type: '_type', reference: memberTypeId },
 		{ type: '_parent', reference: input.orgId },
 		...input.sections.map((sectionId) => ({ type: '_parent', reference: sectionId })),
+		// org-direct child: org is _inheritrights:false, so set it explicitly per schema.
+		inheritRightsProp('member'),
 		{ type: 'person', reference: input.personId },
 		{ type: 'status', string: 'active' },
 	];

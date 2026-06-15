@@ -130,6 +130,15 @@ describe('createInvitation', () => {
 		expect(result.token.length).toBeGreaterThan(0);
 	});
 
+	it('POST body contains _inheritrights:true (org-direct child — schema inheritsRights:true)', async () => {
+		const fetchMock = makeFetchMock();
+		vi.stubGlobal('fetch', fetchMock);
+		await createInvitation(cfg, { orgId: 'org1', email: 'e@t.ee', inviterPersonId: 'p1' });
+		const [, init] = findPostCall(fetchMock);
+		const body = JSON.parse(init.body) as Array<Record<string, unknown>>;
+		expect(body).toContainEqual({ type: '_inheritrights', boolean: true });
+	});
+
 	it('throws on !ok create response', async () => {
 		vi.stubGlobal(
 			'fetch',
@@ -413,6 +422,26 @@ describe('approveApplication', () => {
 		);
 		const body = JSON.parse(memberCreate![1].body) as Array<{ type: string }>;
 		expect(body.some((p) => p.type === 'name')).toBe(false);
+	});
+
+	it('member create POST body contains _inheritrights:true (org-direct child — schema inheritsRights:true)', async () => {
+		const fetchMock = makeApproveMock();
+		vi.stubGlobal('fetch', fetchMock);
+		await approveApplication(cfg, {
+			applicationId: 'app1',
+			invitationId: 'inv1',
+			orgId: 'org123',
+			personId: 'p789',
+			sections: ['sopr1'],
+		});
+		const memberCreate = (
+			fetchMock.mock.calls as Array<[string, { method: string; body: string }]>
+		).find(
+			([url, init]) =>
+				init?.method === 'POST' && !url.match(/entity\/(?:org|app|inv|p)/),
+		);
+		const body = JSON.parse(memberCreate![1].body) as Array<Record<string, unknown>>;
+		expect(body).toContainEqual({ type: '_inheritrights', boolean: true });
 	});
 
 	it('POSTs _viewer grant on the org entity for the new member person', async () => {

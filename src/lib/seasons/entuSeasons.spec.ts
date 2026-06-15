@@ -142,6 +142,31 @@ describe('createSeason', () => {
 		expect(url).toContain('entity');
 	});
 
+	it('POST body contains _inheritrights:true (org-direct child — schema inheritsRights:true)', async () => {
+		const fetchMock = vi.fn().mockImplementation((url: string) => {
+			if (url.includes('_type.string=entity')) {
+				return Promise.resolve({
+					ok: true,
+					json: async () => ({ entities: [{ _id: 'resolved-season-type' }] }),
+				});
+			}
+			return Promise.resolve({ ok: true, json: async () => ({ _id: 'season1' }) });
+		});
+		vi.stubGlobal('fetch', fetchMock);
+		resetTypeIdCache();
+		await createSeason(cfg, {
+			orgId: 'org1',
+			name: '2026/27',
+			startDate: '2026-09-01',
+			endDate: '2027-05-31',
+		});
+		const createCall = fetchMock.mock.calls.find(
+			(c) => !(c[0] as string).includes('_type.string=entity'),
+		)!;
+		const body = JSON.parse((createCall[1] as { body: string }).body) as Array<Record<string, unknown>>;
+		expect(body).toContainEqual({ type: '_inheritrights', boolean: true });
+	});
+
 	it('throws when Entu returns ok: false', async () => {
 		vi.stubGlobal(
 			'fetch',
@@ -516,6 +541,78 @@ describe('createSeriesWithEvents', () => {
 				{ type: '_parent', reference: seriesId },
 			]),
 		);
+	});
+
+	it('event_series create POST body contains _inheritrights:true (org-direct child)', async () => {
+		resetTypeIdCache();
+		const createCalls: Array<Array<Record<string, unknown>>> = [];
+		vi.stubGlobal(
+			'fetch',
+			vi.fn().mockImplementation((url: string, init?: { body: string }) => {
+				if (url.includes('_type.string=entity')) {
+					const typeName = url.match(/name\.string=([^&]+)/)?.[1] ?? '';
+					return Promise.resolve({
+						ok: true,
+						json: async () => ({ entities: [{ _id: `resolved-${typeName}` }] }),
+					});
+				}
+				createCalls.push(JSON.parse(init!.body));
+				return Promise.resolve({ ok: true, json: async () => ({ _id: `id${createCalls.length}` }) });
+			}),
+		);
+		await createSeriesWithEvents(
+			{ db: 'd', token: 't' },
+			{
+				orgId: 'org1',
+				seasonId: 'seas1',
+				name: 'Mon',
+				intervalDays: 7,
+				startTime: '19:00',
+				durationMinutes: 90,
+				startDate: '2026-09-01',
+				endDate: '2026-09-01',
+			},
+		);
+		// createCalls[0] is the event_series create
+		expect(createCalls[0]).toContainEqual({ type: '_inheritrights', boolean: true });
+	});
+
+	it('event create POST bodies contain _inheritrights:true (org-direct child)', async () => {
+		resetTypeIdCache();
+		const createCalls: Array<Array<Record<string, unknown>>> = [];
+		vi.stubGlobal(
+			'fetch',
+			vi.fn().mockImplementation((url: string, init?: { body: string }) => {
+				if (url.includes('_type.string=entity')) {
+					const typeName = url.match(/name\.string=([^&]+)/)?.[1] ?? '';
+					return Promise.resolve({
+						ok: true,
+						json: async () => ({ entities: [{ _id: `resolved-${typeName}` }] }),
+					});
+				}
+				createCalls.push(JSON.parse(init!.body));
+				return Promise.resolve({ ok: true, json: async () => ({ _id: `id${createCalls.length}` }) });
+			}),
+		);
+		await createSeriesWithEvents(
+			{ db: 'd', token: 't' },
+			{
+				orgId: 'org1',
+				seasonId: 'seas1',
+				name: 'Mon',
+				intervalDays: 7,
+				startTime: '19:00',
+				durationMinutes: 90,
+				startDate: '2026-09-01',
+				endDate: '2026-09-15', // two events
+			},
+		);
+		// createCalls[0] = series, createCalls[1..] = events
+		const eventBodies = createCalls.slice(1);
+		expect(eventBodies.length).toBeGreaterThan(0);
+		for (const eventBody of eventBodies) {
+			expect(eventBody).toContainEqual({ type: '_inheritrights', boolean: true });
+		}
 	});
 
 	it('winter DST: Jan 19:00 EET → 17:00 UTC', async () => {

@@ -1,4 +1,5 @@
 import { ENTU_API_BASE } from '$lib/entu-config';
+import { inheritRightsProp } from '$lib/entu/inherit';
 import { parseTally } from '$lib/rsvp/rsvpData';
 import { occurrenceDates, toStartDatetime } from './recurrence';
 import type {
@@ -23,7 +24,8 @@ type EntuProp =
 	| { type: string; reference: string }
 	| { type: string; date: string }
 	| { type: string; datetime: string }
-	| { type: string; number: number };
+	| { type: string; number: number }
+	| { type: string; boolean: boolean };
 
 const typeIdCache = new Map<string, string>();
 
@@ -116,6 +118,8 @@ export async function createSeason(cfg: EntuCfg, input: CreateSeasonInput): Prom
 	return createEntity(cfg, [
 		{ type: '_type', reference: seasonTypeId },
 		{ type: '_parent', reference: input.orgId },
+		// org-direct child: org is _inheritrights:false, so set it explicitly per schema.
+		inheritRightsProp('season'),
 		{ type: '_sharing', string: 'public' },
 		{ type: 'name', string: input.name },
 		{ type: 'start_date', date: input.startDate },
@@ -158,6 +162,8 @@ export async function createSeriesWithEvents(
 		{ type: '_sharing', string: 'private' },
 		{ type: '_parent', reference: input.orgId },
 		{ type: '_parent', reference: input.seasonId },
+		// org-direct child: org is _inheritrights:false, so set it explicitly per schema.
+		inheritRightsProp('event_series'),
 		{ type: 'event_type', string: 'rehearsal' },
 		{ type: 'name', string: input.name },
 		{ type: 'interval_days', number: input.intervalDays },
@@ -183,6 +189,8 @@ export async function createSeriesWithEvents(
 			{ type: '_parent', reference: input.orgId },
 			{ type: '_parent', reference: input.seasonId },
 			{ type: '_parent', reference: seriesId },
+			// org-direct child: org is _inheritrights:false, so set it explicitly per schema.
+			inheritRightsProp('event'),
 			{ type: 'event_type', string: 'rehearsal' },
 			{ type: 'name', string: input.name },
 			{ type: 'start_datetime', datetime: toStartDatetime(date, input.startTime) },
