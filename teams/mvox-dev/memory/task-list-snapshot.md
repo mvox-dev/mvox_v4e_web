@@ -1,30 +1,32 @@
-# Task List Snapshot — 2026-06-15 end-of-session-37
+# Task List Snapshot — 2026-06-15 end-of-session-38
 
-State at session-37 close.
+State at session-38 close.
 
 ## Active tasks (in-flight)
 
-None. Session wrapped. (Team task list is empty — the session's chain tasks were created + completed/cleared during S37.)
+None. Team task list is empty. (Task #1 — seed `_inheritrights` fix — created + completed during S38.)
 
-## Session-37 completed
+## Session-38 completed
 
-1. **Slice-3 invite/join (native keyless) — SHIPPED to prod.** Full TDD chain (Tallis RED → Josquin GREEN data → Byrd GREEN UI → Comenius i18n → Bentham GREEN), + a soft-close fix (`_editor` can't delete entity, so approve sets `status:'approved'`), + userStore owner-wins fix, + SSR-safety fix + Playwright guard. Merged `7b2aa1b` (Closes #21 / #11 / #91). PO click-tested end-to-end on live polyphony. Gist: https://gist.github.com/mitselek/9b838b01fe7a91399324b1828e801859
-2. **`_inheritrights` rights-model:** rule documented (architecture-decisions.md 2026-06-15); create helpers fixed in code (`6e583d8`, `src/lib/entu/inherit.ts`); live EFK data aligned (org false, children true).
-3. **Deployment prerequisites applied to polyphony:** `add_user` on db entity; `application`/`invitation`/`member` type-defs → `_sharing:domain`.
-4. Probes/findings committed to main (LIST-visibility #92 GREEN, `_editor` rights table, membership-content-visibility model).
+1. **Item 3 — seed-script `_inheritrights` create gap fixed.** `de6ce8d` (Pérotin): the org-direct child creates in `seed-collectives.ts` (section + member), `seed-po-member-ekf.ts` (member), `seed-librarian-bundle-data.ts` (library + member) now set `_inheritrights:true` explicitly. Code-only, no live run. Bentham GREEN.
+2. **`_inheritrights` over-theorization correction** (PO-driven). Scrapped the source-archaeology framing across the docs:
+   - `5090069` — removed one misleading type-vs-instance sentence from `finn.md`.
+   - `23621f8` — scrapped the over-theorized rationale block from `architecture-decisions.md` (kept Decision + Robust convention + Source).
+   - **PR `entu/research`#53 CLOSED** (+branch deleted) — the over-theorized v4E README addition; spec needs no addition. → S37 follow-up item-6 DROPPED.
+   - Reviewed + left as-is (correct): `inherit.ts`, `josquin.md`, `bentham.md`, `team-lead.md`.
 
-## Open follow-ups (next session — see team-lead.md [NEXT SESSION] seed for detail)
+## Open follow-ups (next session — see team-lead.md [NEXT SESSION] seed)
 
-1. `rsvp` + `attendance` type-defs still `_sharing:private` → "Couldn't save RSVP" for members; domain-share them.
-2. Member → agenda content-visibility design (within the content subtree, never flip the org). Confirm whether the member sees the agenda post-revert.
-3. Seed scripts (4) `_inheritrights` create gap (Pérotin — import `inherit.ts` lookup).
-4. #93 new-person `_sharing` model (PO/Victoria).
+1. `rsvp` + `attendance` type-defs still `_sharing:private` → member RSVP fails; domain-share each. [highest-value]
+2. Member → agenda content-visibility — calm design pass within the content subtree.
+4. #93 new-OAuth-person `_sharing` privacy model.
 5. HMAC-sign the invite token before multi-org prod.
-6. Mirror the `_inheritrights` rule into the v4E README (`entu/research`).
-7. Slice-3 YELLOW-S3.2: carry `invitationId` to approve so the invitation is deleted (currently self-expires).
+7. YELLOW-S3.2 — invitation lingers 30d; `application` has no schema back-link to `invitation` (Finn-confirmed). Fix = schema PR / email-match / accept self-expiry. Lower priority.
+
+(item 3 DONE; item 6 DROPPED.)
 
 ## State
 
-`main` tip = `6e583d8` (auto-deploys prod). No active feature branch. Slice-3 done; #21/#11/#91 closed. All agents shut down clean.
+`main` tip = session-38 shutdown commit (auto-deploys prod; docs/data-script only, harmless). No active feature branch. All agents shut down clean.
 
 (*MVOX:Palestrina*)

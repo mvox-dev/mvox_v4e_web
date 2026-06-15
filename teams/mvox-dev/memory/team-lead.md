@@ -1,6 +1,48 @@
 # Palestrina — Team Lead Scratchpad
 
-### [NEXT SESSION] 2026-06-15 end-of-session-37 — session-37 → session-38
+### [NEXT SESSION] 2026-06-15 end-of-session-38 — session-38 → session-39
+
+**Headline: A DOCUMENTATION-CORRECTION session. Shipped item-3 (seed-script `_inheritrights` fix, `de6ce8d`, Bentham GREEN) early. Then the PO drove a deep correction of an OVER-THEORIZED `_inheritrights` framing that S37 (and I) had propagated across the docs. Core realization (PO + official Entu docs): `_inheritrights` is a one-line rule — DON'T dress it up.**
+
+## THE SIMPLE TRUTH about `_inheritrights` (PO-confirmed; from official Entu docs)
+- `_inheritrights` is **per-entity**: when `true`, the entity inherits its parent's access rights. **Full stop.** NO "absent=false / strict `===true` / parent-gated auto-write" theory; and a TYPE's `inheritsRights` does NOT govern its instances (type-level and instance-level are unrelated — the conflation that caused this whole detour).
+- v4E create rule (all we say): **orgs are created with explicit `_inheritrights:false`; entities created as children of an org are created with explicit `_inheritrights:true`.**
+
+## ⚠️ WHERE ENTU DOCS LIVE (internalize — this gap caused the detour)
+- **Entu PLATFORM mechanics** (`_inheritrights`, `_sharing`, rights eval, API) → the **`entu/www` repo at `~/projects/entu-www`** is canonical. Key files: `src/overview/entities/index.md`, `src/overview/properties/index.md`. **Consult this FIRST**, before reading `entu/api` source. (S37 did source-archaeology of `entu/api` to "discover" a rule `entu/www` states in one plain sentence.)
+- v4E **schema design** → `entu/research` (`~/projects/entu-research`).
+- Our **applied decisions** → `architecture-decisions.md`.
+
+## What changed this session
+- `de6ce8d` — seed-script `_inheritrights` fix (Pérotin; KEPT — correct).
+- `5090069` — removed one misleading sentence from `finn.md` (type-vs-instance conflation).
+- `23621f8` — scrapped the over-theorized "Rationale / runtime facts / Discovered / Do-NOT-flip" block from `architecture-decisions.md` (Bentham). KEPT the **Decision** + **Robust convention** + **Source** — they stand on their own.
+- **PR `entu/research`#53 CLOSED** (+branch deleted) — it had mirrored the over-theorized rationale into the v4E README. Decision: spec needs NO addition (README already documents `org=false` rights-island). **Item-6 follow-up is therefore DROPPED.**
+- Reviewed and LEFT AS-IS (NOT over-theorized): `inherit.ts` (per-type table + helper + comment), `josquin.md`, `bentham.md`, `team-lead.md`.
+
+## ⚠️ PROCESS LESSON (mine — read before any doc/spec work)
+Don't over-theorize a simple platform rule. Ground doc/spec changes in the **primary human-readable doc** (`entu/www`), not in derived memory or source-code archaeology. This session I generated several confidently-wrong "corrections" from reasoning instead of from source — the PO caught each. When unsure of a platform mechanic: open `entu/www` and quote it; don't paraphrase from memory. Saved as memories `project_entu_platform_docs_location` + `feedback_no_over_theorizing`.
+
+## Open follow-ups carried from S37 (item-3 DONE, item-6 DROPPED)
+1. `rsvp` + `attendance` type-defs still `_sharing:private` → member RSVP fails; domain-share them (one mutation each, like `application`). **[highest-value for member experience]**
+2. Member → agenda content-visibility — calm design pass WITHIN the content subtree, never flip the org. Not cleanly verified post-revert.
+4. #93 new-OAuth-person `_sharing` privacy model (PO/Victoria).
+5. HMAC-sign the invite token before multi-org prod.
+7. YELLOW-S3.2 (invitation lingers 30d instead of delete-on-approve). Finn confirmed this session: `application` declares NO back-link to `invitation`; the schema matches by EMAIL + deletes both. A real fix = a schema PR (add a link) OR email-match at approve OR accept the self-expiry. Lower priority.
+
+## State at wrap
+`main` tip = this shutdown commit. `de6ce8d` / `5090069` / `23621f8` on main (all docs/data-script; auto-deploy harmless). No feature branch. Task list empty. finn / bentham / perotin shut down clean.
+
+## Expected first action S39
+1. Read this seed. Verify `main` current.
+2. Spawn finn + bentham. Others on demand.
+3. If resuming product: items 1+2 (complete the member experience) are the highest-value thread. Bring item 1 (rsvp/attendance domain-share) to PO first — small, well-understood unblock.
+
+(*MVOX:Palestrina*)
+
+---
+
+### [PROCESSED 2026-06-15 S38] 2026-06-15 end-of-session-37 — session-37 → session-38
 
 **Headline: SLICE-3 INVITE/JOIN SHIPPED to prod (native keyless), AND a deep `_inheritrights` rights-model thread. The native invite/join MVP (the last MVP-blocking slice) ran the full TDD chain to green + PO click-tested end-to-end on live polyphony (invite → public landing → OAuth → application + `_editor` grant → admin approve → member). Merged `7b2aa1b` (Closes #21/#11/#91), live on mvox.eu. NO service key, NO new BFF data route, NO schema change. Then the PO probed "why can't a new member see the agenda?" → a long rights-model investigation (some of it me over-rotating — see LESSONS) that landed solid facts: absent `_inheritrights` = FALSE; org = false (deliberate rights-island, DO NOT flip); all other types = true; org-direct children must set `_inheritrights:true` EXPLICITLY at create (Entu's auto-write is parent-gated). Documented the rule in architecture-decisions.md, fixed the create helpers in code (`6e583d8`, src/lib/entu/inherit.ts), and aligned live EFK data.**
 

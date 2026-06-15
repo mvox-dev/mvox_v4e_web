@@ -833,8 +833,6 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
 
 [SEED CATALOG UPDATE] No new seed scripts this session.
 
-(*MVOX:Perotin*)
-
 ### Slice 3 no-key model probe (task #5, 2026-06-14)
 
 [PROBE-RESULT] No-key admin-approve model — 5 probe entities, all confirmed 404.
@@ -1047,5 +1045,22 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
   - Second OAuth person 6a2fc05e4cd971291c5d5ddc: exists, no api_key prop currently
   - Singer member entity 6a2fdb434cd971291c5d5e85: created this session (PO E2E test)
   - Invitation from E2E test: still present (admin must DELETE manually)
+
+## Session 38 — 2026-06-15
+
+[CHECKPOINT] Single task this session: fix _inheritrights create gap in seed scripts (task #1).
+  Commit: de6ce8d on main. Code-only, no live execution.
+  5 insertions across 3 files:
+    seed-collectives.ts: section create + member create → added { type: '_inheritrights', boolean: true }
+    seed-po-member-ekf.ts: member create → same
+    seed-librarian-bundle-data.ts: library create + member create → same
+  Implementation: inline literal (matches existing style — org create already uses inline false).
+  Path to inherit.ts would have been ../../src/lib/entu/inherit.ts (viable), but inline accepted by team-lead.
+  pnpm check: 0 errors.
+  Bentham post-commit review routed by team-lead; verdict not yet received at shutdown.
+
+[SEED CATALOG UPDATE]
+  seed-po-member-ekf.ts   — 1 PO member in EFK, idempotent by person.reference+_parent, last live: 2026-06-13
+  (item missing from prior catalog — added now per session-32 [NEXT SESSION] note)
 
 (*MVOX:Perotin*)
