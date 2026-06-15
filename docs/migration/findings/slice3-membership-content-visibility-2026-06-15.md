@@ -99,7 +99,26 @@ PO directive: organization entities must stay `_inheritrights:false` for load-be
 | POST | `_inheritrights:false` on EFK `69c7f8718489bfcb0e81b065` | New prop `6a2ff12a487a9c1f02f705c2` |
 | Verify GET | `_inheritrights` on EFK | `[{_id:'6a2ff12a487a9c1f02f705c2', boolean:false}]` ✓ |
 
-Everything else retained as-is: agenda chain (seasons, event_series, 21 events) stays `_inheritrights:true`, EPCC Library guard stays `_inheritrights:false`.
+Agenda chain (seasons, event_series, 21 events) stays `_inheritrights:true`.
+
+---
+
+## Library guard removal + full children alignment (2026-06-15, same session)
+
+PO directive + schema.ts (`library` has `inheritsRights:true`): the `_inheritrights:false` guard on EPCC Library was a mistake contradicting the schema. Removed. All EFK direct children aligned to `_inheritrights:true` (idempotent — skipped anything already true).
+
+| Entity | Action | New prop _id / note |
+|---|---|---|
+| EPCC Library `6a12036c4ff8277cd4306b26` | DELETE false guard `6a2fe1964cd971291c5d5eba`, POST true | `6a2ff4bc487a9c1f02f705c3` |
+| Soprano section `69c7f8728489bfcb0e81b07b` | SKIP — already true | — |
+| Alto section `69c7f8748489bfcb0e81b0cd` | SKIP — already true | — |
+| Tenor section `69c7f8758489bfcb0e81b113` | SKIP — already true | — |
+| Bass section `69c7f8768489bfcb0e81b163` | SKIP — already true | — |
+| 62 existing members | SKIP — all already true | — |
+| member `6a2ba6c84cd971291c5d5320` | SET true (was absent) | `6a2ff4c5487a9c1f02f705c4` |
+| member `6a2fdb434cd971291c5d5e85` | SET true (was absent) | `6a2ff4c5487a9c1f02f705c5` |
+
+EFK confirmed still `_inheritrights:false` (prop `6a2ff12a487a9c1f02f705c2`) after all mutations.
 
 ---
 
@@ -112,12 +131,16 @@ organization      _inheritrights:false  ← ISOLATION: orgs don't inherit from u
   season          _inheritrights:true   ← org _viewer grant cascades FROM season down
     event_series  _inheritrights:true
     event         _inheritrights:true   ← member can read rehearsal schedule
-  library         _inheritrights:false  ← GUARD: rights island, librarian-only
-    copy          (inherits false from library — private)
-    lending       (inherits false from library — private)
+  library         _inheritrights:true   ← schema.ts: library inheritsRights:true
+    copy          _inheritrights:true   ← schema.ts: copy inheritsRights:true
+    lending       _inheritrights:true   ← schema.ts: lending inheritsRights:true
+  section         _inheritrights:true   ← schema.ts: section inheritsRights:true
+  member          _inheritrights:true   ← schema.ts: member inheritsRights:true
 ```
 
-**Key insight:** `_inheritrights:false` on org blocks the umbrella→org cascade (correct isolation). Org-level `_viewer` grants to members still cascade DOWN through seasons/events because THOSE nodes have `_inheritrights:true`. The org's own `_inheritrights` controls what it receives FROM its parent, not what it passes to its children — those are governed by the children's own `_inheritrights` values.
+**Key insight:** `_inheritrights:false` on org blocks the umbrella→org cascade (correct isolation). Org-level `_viewer` grants to members still cascade DOWN through all children (seasons, library, sections, members) because those nodes have `_inheritrights:true`. The org's own `_inheritrights` controls what it receives FROM its parent, not what it passes to its children — those are governed by the children's own `_inheritrights` values.
+
+**Library access control** is NOT via `_inheritrights:false` — it is via explicit `_viewer`/`_editor` grants on the library entity scoped to librarian members. The library subtree is accessible by anyone who has a grant on it; the org `_viewer` grant cascades there just like to events.
 
 Private subtrees that should NOT be member-visible must have their own `_inheritrights:false` guard. The library subtree is the canonical example.
 
