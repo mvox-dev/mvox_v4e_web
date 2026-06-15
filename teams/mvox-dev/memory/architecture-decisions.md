@@ -745,14 +745,6 @@ Zero `.svelte` / `.ts` files touched. Zero tests rewritten (specs assert key inv
 
 **Robust convention (preferred):** BFF create helpers + Pérotin's seed scripts should set `_inheritrights` explicitly to the schema's declared `inheritsRights` value for **every** type they create — this removes all dependence on Entu's create-time auto-propagation and the absent-default, and the org-boundary gap disappears by construction.
 
-**Rationale**: Two confirmed Entu runtime facts (NOT in the v4E schema, which only declares per-type `inheritsRights`):
-1. **Absent `_inheritrights` = `false`** (non-inheriting). `entu/api utils/aggregate.js` does a strict `=== true` check; absent → `undefined` → not inherited.
-2. **Create-time auto-write is parent-gated.** `entu/api utils/entity.js inheritParentProperties()` writes `_inheritrights:true` onto a new child ONLY if *some parent already has* `_inheritrights:true`. An `organization` parent is `false`, so its direct children are born with the property **absent** (= false) unless set explicitly — and so they never inherit the org's rights (e.g. a member's org `_viewer` grant does not reach them).
-
-Discovered S37: a freshly-approved EFK member with org `_viewer` could not see the agenda, because the seasons/events were created under the `false` org with absent `_inheritrights`. Confirmed by Finn (`entu/api` source-read) + Pérotin (live probe).
-
-**⚠️ Do NOT "fix" this by flipping the organization to `_inheritrights:true`.** `organization`'s `false` is the load-bearing umbrella↔collective rights-island (see "Org rights isolation" / `project_polyphony_org_rights_isolation`). Member→content visibility is solved **within** the content subtree (explicit grants there + the subtree's own `inheritrights:true` chain), never by opening the org boundary. (S37 briefly flipped EFK live by mistake during a probe cascade and reverted it; org stays `false`.)
-
 **Source**: Finn `entu/api` source-read + Pérotin live probe, S37 2026-06-15. Findings: `docs/migration/findings/slice3-membership-content-visibility-2026-06-15.md`. **Follow-up**: reflect this create-time gap in the v4E README (`entu/research`) rights section, which currently states only "org = `false` rights-island" without the children-must-set-explicitly consequence. PO-requested.
 
 (*MVOX:Palestrina*)
