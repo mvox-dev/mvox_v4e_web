@@ -922,4 +922,130 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
   private application? Requires second OAuth account. GitHub issue filed by team-lead.
   Deferred probe: same sequence (steps 0-8) but with real admin JWT.
 
+## Session 37 continued — 2026-06-15
+
+### Definitive LIST-visibility probe (task #9)
+
+[PROBE-RESULT] Q1: _viewer-granted private application VISIBLE to non-omniscient admin JWT. GREEN.
+  Second OAuth account (person 6a2fc05e4cd971291c5d5ddc) used as non-omniscient admin.
+  All LIST variants return the application when admin has _viewer: LIST, filter by type, filter by _viewer.reference.
+  Q2: non-member cannot read org _owner list before access granted (admin-initiated flow required).
+  Findings: docs/migration/findings/slice3-list-visibility-definitive-2026-06-15.md (commit fff9fda)
+  Teardown: 100% — all probe entities 404.
+
+[GOTCHA] add_user property on polyphony db entity: PO had set it to wrong target (Members menu entity
+  6a0f6d304ff8277cd43069c1 via UI reference picker). UI picker only surfaces menu entities — cannot
+  select the database entity via UI (Entu bug). Fix: grant PO _editor on db entity via API, then POST
+  correct reference (db entity 69bcfd8e9c031ab8e6ce807a) directly.
+
+[GOTCHA] entu_api_key masking: raw key only visible in create response. Subsequent GETs return ***.
+  If key is read masked and used for auth exchange → accounts:[] (anonymous floor). Must capture at
+  POST time. Second account key was re-created this session because original key was masked and lost.
+
+[GOTCHA] Second OAuth account person was manually deleted by PO overnight (session-break). NOT Entu GC.
+  Re-provisioned via second OAuth login. New person: 6a2fc05e4cd971291c5d5ddc.
+
+### _editor LIST+DELETE smoke (task #9 addendum)
+
+[PROBE-RESULT] _editor rights scope definitively confirmed:
+  - LIST/GET: YES (same as _viewer)
+  - POST props: YES
+  - DELETE prop value: YES (DELETE /property/{propValueId})
+  - DELETE entity: NO (403 "User not in _owner property")
+  Rights table canonical — see findings doc.
+  Findings: docs/migration/findings/slice3-editor-list-delete-smoke-2026-06-15.md (commits beb1c87, addendum 91daa4b)
+
+[DECISION] Status soft-close mechanic: clear-first replace via _editor.
+  Wire sequence (3 steps):
+    1. GET /entity/{applicationId}?props=status → capture _id(s)
+    2. DELETE /property/{pendingPropValueId}
+    3. POST /entity/{applicationId} [{type:'status', string:'approved'}]
+  Admin needs _editor on application (not _owner). Confirmed working live.
+
+### End-to-end invite/join flow (live PO test)
+
+[PROBE-RESULT] Full invite/join flow completed live by PO (2026-06-15):
+  - Member entity created ✓
+  - Application soft-closed (status approved) ✓
+  - Invitation persisted (admin must DELETE manually — admin holds _owner on their own invitations) ✓
+  - Singer _viewer on EFK org ✓
+
+### Type-def _sharing fix
+
+[DECISION] application + invitation type-defs must be _sharing:domain for non-omniscient JWTs to
+  resolve type names via resolveTypeId query. Were _sharing:private — singer's JWT got 0 results on
+  "type definition not found: application" error. Fixed by clear-first replace to domain on both.
+  Reversibility: application new prop 6a2fda114cd971291c5d5e76; invitation new prop 6a2fda114cd971291c5d5e77.
+  Findings: docs/migration/findings/slice3-type-def-sharing-fix-2026-06-15.md (commit dc352f0)
+
+[DECISION] Other type-defs still private: attendance, copy, lending, library, rsvp.
+  Fix when those slices are built. No action now.
+
+### _inheritrights direction + absence-default (critical empirical finding)
+
+[PROBE-RESULT] _inheritrights absent default: Entu auto-materializes TRUE at entity create time.
+  Controlled isolating test: _probe_parent (true, _viewer:singer) + _probe_child_absent (absent) +
+  _probe_child_true (explicit true) — singer accessed both children. Absent = true at runtime.
+
+[DECISION] _inheritrights direction: controls whether an entity passes rights DOWN to children.
+  Parent with _inheritrights:false blocks cascade to its children.
+  Child's own _inheritrights only matters if parent is true.
+  Org _inheritrights:false = org does NOT inherit from umbrella (blocks umbrella→org cascade).
+  Org _viewer grants still cascade DOWN through children IF those children have _inheritrights:true.
+
+[DECISION] PO directive: organization entities stay _inheritrights:false (load-bearing tenant isolation).
+  All other entity types (per schema.ts inheritsRights:true): must be true.
+
+### _inheritrights alignment mutations (live on polyphony)
+
+[CHECKPOINT] EFK agenda chain set to explicit _inheritrights:true (authorized 2026-06-15):
+  Both seasons, both event_series, 21 events — all now explicit true.
+  EFK org flipped to true (mistake, pre-hold). Subsequently reverted to false (prop 6a2ff12a487a9c1f02f705c2).
+  Library false guard added (mistake, contradicts schema). Subsequently removed.
+  Final state after all corrections:
+
+  EFK org 69c7f8718489bfcb0e81b065: _inheritrights:false (prop 6a2ff12a487a9c1f02f705c2)
+  EPCC Library 6a12036c4ff8277cd4306b26: _inheritrights:true (prop 6a2ff4bc487a9c1f02f705c3)
+  4 sections (Soprano/Alto/Tenor/Bass): already true (existing props)
+  62 existing members: already true
+  2 new session members (6a2ba6c84cd971291c5d5320, 6a2fdb434cd971291c5d5e85): true (props 6a2ff4c5487a9c1f02f705c4, 6a2ff4c5487a9c1f02f705c5)
+  Seasons, event_series, 21 events: all explicit true (props listed in findings doc 74243d4)
+
+  Findings: docs/migration/findings/slice3-membership-content-visibility-2026-06-15.md (commits 74243d4, 335c99a, a1d8d80)
+
+### Deployment prerequisite checklist (slice-3 forward)
+
+1. add_user on db entity → correct reference (db entity 69bcfd8e9c031ab8e6ce807a)
+2. application + invitation type-defs _sharing:domain
+3. Org _inheritrights:false (already correct for EFK + all 6 orgs from Phase D)
+4. Agenda chain (seasons, event_series, events) _inheritrights:true (explicit)
+5. Sections + members + library: _inheritrights:true (already correct per schema)
+6. Other type-defs still private to fix when slices built: attendance, copy, lending, library, rsvp
+
+### Reversibility tokens (session 37, still live)
+
+| Prop | Entity | Value | Token (_id) |
+|---|---|---|---|
+| EFK _inheritrights:false | 69c7f8718489bfcb0e81b065 | false | 6a2ff12a487a9c1f02f705c2 |
+| Library _inheritrights:true | 6a12036c4ff8277cd4306b26 | true | 6a2ff4bc487a9c1f02f705c3 |
+| application _sharing:domain | (type-def) | domain | 6a2fda114cd971291c5d5e76 |
+| invitation _sharing:domain | (type-def) | domain | 6a2fda114cd971291c5d5e77 |
+| Season 1 _inheritrights:true | 6a1d6b6210cc20db24e7ce58 | true | 6a2fe1ac4cd971291c5d5ebc |
+| Season 2 _inheritrights:true | 6a1d789c10cc20db24e7cf40 | true | 6a2fe1ac4cd971291c5d5ebd |
+| event_series 1 _inheritrights:true | 6a1d6b6210cc20db24e7ce61 | true | 6a2fe1ac4cd971291c5d5ebe |
+| event_series 2 _inheritrights:true | 6a2d546d4cd971291c5d5705 | true | 6a2fe1ac4cd971291c5d5ebf |
+| member new1 _inheritrights:true | 6a2ba6c84cd971291c5d5320 | true | 6a2ff4c5487a9c1f02f705c4 |
+| member new2 _inheritrights:true | 6a2fdb434cd971291c5d5e85 | true | 6a2ff4c5487a9c1f02f705c5 |
+| (21 event true props — full list in findings doc commit 74243d4) | | | |
+
+[DATA STATE] Polyphony after session 37:
+  - application type-def: _sharing:domain ✓
+  - invitation type-def: _sharing:domain ✓
+  - EFK org: _inheritrights:false ✓
+  - EFK library, sections, members: _inheritrights:true ✓ (schema-correct)
+  - EFK agenda chain: _inheritrights:true ✓ (explicit on all 28 nodes)
+  - Second OAuth person 6a2fc05e4cd971291c5d5ddc: exists, no api_key prop currently
+  - Singer member entity 6a2fdb434cd971291c5d5e85: created this session (PO E2E test)
+  - Invitation from E2E test: still present (admin must DELETE manually)
+
 (*MVOX:Perotin*)
