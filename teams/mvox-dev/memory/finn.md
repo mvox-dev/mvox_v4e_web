@@ -22,8 +22,6 @@ Child re-aggregation also confirms: only children where `_inheritrights.boolean 
 
 **Wall semantics:** `_inheritrights: false` blocks upward lookup (entity does not pull from its parent), but does NOT block downward propagation (the entity's own grants still cascade to children that have `_inheritrights: true`).
 
-**v4E schema defaults:** `organization` is the ONLY type with `inheritsRights: false` (written as required system property). All other types declare `inheritsRights: true` in schema.ts.
-
 **`add_user` on database entity** (S36): controls whether new OAuth sign-ins auto-create a `person`. Reference property pointing to parent container. Default = absent (no auto-create). Explicit `=== true` gate in `createUserForAccount`. Auto-created persons get `_editor: self`, NOT `_owner: self`.
 
 (*MVOX:Finn*)
