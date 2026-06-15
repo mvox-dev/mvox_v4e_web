@@ -8,9 +8,9 @@
 
 ## Summary
 
-Org-level `_viewer` grant does NOT automatically cascade to private agenda content when the org has `_inheritrights:false`. The fix: set `_inheritrights:true` explicitly on the org and every node in the agenda chain, and guard private subtrees (library) with their own `_inheritrights:false`.
+Org-level `_viewer` grant does NOT automatically cascade to private agenda content when the org has `_inheritrights:false`. The fix: set `_inheritrights:true` explicitly on EVERY node in the agenda chain (seasons, event_series, events), and guard private subtrees (library) with their own `_inheritrights:false`. The org entity itself stays `_inheritrights:false` (load-bearing tenant isolation).
 
-Applied live to EFK (polyphony playground) and verified.
+Applied live to EFK (polyphony playground), verified, and subsequently partially reverted: EFK org flipped back to `_inheritrights:false` per PO directive (orgs must stay isolated from umbrella). Agenda chain and library guard retained.
 
 ---
 
@@ -52,7 +52,7 @@ Isolated test: `_inheritrights:true` parent with explicit `_viewer:singer` + `_i
 
 | Entity | _id | Old prop (deleted) | New prop _id |
 |---|---|---|---|
-| EFK org | `69c7f8718489bfcb0e81b065` | `6a0e96a54ff8277cd430667b` (was `false`) | `6a2fe1a24cd971291c5d5ebb` |
+| EFK org | `69c7f8718489bfcb0e81b065` | `6a0e96a54ff8277cd430667b` (was `false`) | `6a2fe1a24cd971291c5d5ebb` ← **REVERTED** (see below) |
 | Fila hooaeg season | `6a1d6b6210cc20db24e7ce58` | none (was absent) | `6a2fe1ac4cd971291c5d5ebc` |
 | suvekool '26 season | `6a1d789c10cc20db24e7cf40` | none (was absent) | `6a2fe1ac4cd971291c5d5ebd` |
 | Tuesday rehearsals (series) | `6a1d6b6210cc20db24e7ce61` | none (was absent) | `6a2fe1ac4cd971291c5d5ebe` |
@@ -89,19 +89,35 @@ Isolated test: `_inheritrights:true` parent with explicit `_viewer:singer` + `_i
 
 ---
 
+## EFK org revert (2026-06-15, same session)
+
+PO directive: organization entities must stay `_inheritrights:false` for load-bearing tenant isolation from the umbrella. EFK reverted:
+
+| Step | Action | Result |
+|---|---|---|
+| DELETE | Prop `6a2fe1a24cd971291c5d5ebb` (`_inheritrights:true`) | `deleted: true` |
+| POST | `_inheritrights:false` on EFK `69c7f8718489bfcb0e81b065` | New prop `6a2ff12a487a9c1f02f705c2` |
+| Verify GET | `_inheritrights` on EFK | `[{_id:'6a2ff12a487a9c1f02f705c2', boolean:false}]` ✓ |
+
+Everything else retained as-is: agenda chain (seasons, event_series, 21 events) stays `_inheritrights:true`, EPCC Library guard stays `_inheritrights:false`.
+
+---
+
 ## Membership content visibility model (v4E deployment standard)
 
 For a member to see org content via the org `_viewer` grant, every node in the chain from org to content must have `_inheritrights:true`. Set explicitly (don't rely on absent-default, even though runtime auto-materializes true).
 
 ```
-organization      _inheritrights:true   ← org _viewer grant cascades from here
-  season          _inheritrights:true
+organization      _inheritrights:false  ← ISOLATION: orgs don't inherit from umbrella
+  season          _inheritrights:true   ← org _viewer grant cascades FROM season down
     event_series  _inheritrights:true
     event         _inheritrights:true   ← member can read rehearsal schedule
   library         _inheritrights:false  ← GUARD: rights island, librarian-only
     copy          (inherits false from library — private)
     lending       (inherits false from library — private)
 ```
+
+**Key insight:** `_inheritrights:false` on org blocks the umbrella→org cascade (correct isolation). Org-level `_viewer` grants to members still cascade DOWN through seasons/events because THOSE nodes have `_inheritrights:true`. The org's own `_inheritrights` controls what it receives FROM its parent, not what it passes to its children — those are governed by the children's own `_inheritrights` values.
 
 Private subtrees that should NOT be member-visible must have their own `_inheritrights:false` guard. The library subtree is the canonical example.
 
