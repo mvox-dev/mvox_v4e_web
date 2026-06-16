@@ -5,5 +5,17 @@
   "statusLine": {
     "type": "command",
     "command": "bash \"${CLAUDE_PROJECT_DIR:-.}/.claude/statusline-command.sh\""
+  },
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"Current time: $(TZ=Europe/Tallinn date '+%a %Y-%m-%d %H:%M:%S %Z') | $(date -u '+%Y-%m-%d %H:%M:%S UTC')\""
+          }
+        ]
+      }
+    ]
   }
 }

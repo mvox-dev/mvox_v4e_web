@@ -1046,6 +1046,43 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
   - Singer member entity 6a2fdb434cd971291c5d5e85: created this session (PO E2E test)
   - Invitation from E2E test: still present (admin must DELETE manually)
 
+## Session 39 — 2026-06-15
+
+### rsvp + attendance type-def _sharing:domain (team-lead task)
+
+[CHECKPOINT] Both type-defs set to _sharing:domain. 4/4 ops, 0 failures. Verified.
+  rsvp type-def 6a0d2e8590c8df7a1cc7df1b: old prop 6a0d2e8590c8df7a1cc7df20 (private) DELETED; new prop 6a303835487a9c1f02f705c7 (domain) POSTED
+  attendance type-def 6a0d2e8690c8df7a1cc7df4b: old prop 6a0d2e8690c8df7a1cc7df50 (private) DELETED; new prop 6a303835487a9c1f02f705c8 (domain) POSTED
+  Same root cause as S37 application/invitation fix: non-omniscient JWTs couldn't resolve type IDs.
+  Authorization: team-lead explicit "I authorize this run" in spawn message.
+
+[DATA STATE] After this session:
+  rsvp type-def: _sharing:domain (prop 6a303835487a9c1f02f705c7)
+  attendance type-def: _sharing:domain (prop 6a303835487a9c1f02f705c8)
+  Deployment prerequisite checklist item 6 (from session-37):
+    "Other type-defs still private to fix when slices built: attendance, copy, lending, library, rsvp"
+  rsvp + attendance now DONE. Still private: copy, lending, library.
+
+### Member agenda-visibility probe (task #2, 2026-06-15)
+
+[PROBE-RESULT] org _viewer does NOT cascade to private events/seasons. BLOCKED.
+  Test person 6a2fc05e4cd971291c5d5ddc has _viewer on EFK org (prop 6a2fdb434cd971291c5d5e8d).
+  EFK org has _inheritrights:false — blocks downward cascade from org.
+  Admin GET shows "inherited:true" on season + event _viewer for test person — this is display-only.
+  Member JWT: 403 on GET private event 6a1d6b6210cc20db24e7ce70, 0 results on LIST.
+  Event _parent chain: org + season + event_series (multi-parent); org is direct parent with _inheritrights:false.
+  Season is _sharing:public → accessible to domain-authed users. Events are private → blocked.
+  Probe keys: prop 6a303ba4487a9c1f02f705c9 + 6a303bb2487a9c1f02f705ca — both deleted. DB clean.
+
+[DECISION] org _viewer grant alone is NOT sufficient for agenda visibility.
+  _inheritrights:false on org is load-bearing (tenant isolation) — must not be flipped.
+  To give members access to private events: need direct _viewer on seasons or events, OR change
+  event _sharing to domain. Design question for team-lead.
+
+[GOTCHA] Entu admin-view "inherited:true" in _viewer is display denormalization, NOT access proof.
+  Real enforcement blocks cascade when _inheritrights:false is on an ancestor.
+  Must always verify with member JWT — admin GET "_viewer inherited" can be misleading.
+
 ## Session 38 — 2026-06-15
 
 [CHECKPOINT] Single task this session: fix _inheritrights create gap in seed scripts (task #1).
