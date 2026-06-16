@@ -1063,25 +1063,42 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
     "Other type-defs still private to fix when slices built: attendance, copy, lending, library, rsvp"
   rsvp + attendance now DONE. Still private: copy, lending, library.
 
-### Member agenda-visibility probe (task #2, 2026-06-15)
+### Member agenda-visibility probe (task #2, 2026-06-15) — CORRECTED 2026-06-16
 
-[PROBE-RESULT] org _viewer does NOT cascade to private events/seasons. BLOCKED.
-  Test person 6a2fc05e4cd971291c5d5ddc has _viewer on EFK org (prop 6a2fdb434cd971291c5d5e8d).
-  EFK org has _inheritrights:false — blocks downward cascade from org.
-  Admin GET shows "inherited:true" on season + event _viewer for test person — this is display-only.
-  Member JWT: 403 on GET private event 6a1d6b6210cc20db24e7ce70, 0 results on LIST.
-  Event _parent chain: org + season + event_series (multi-parent); org is direct parent with _inheritrights:false.
-  Season is _sharing:public → accessible to domain-authed users. Events are private → blocked.
-  Probe keys: prop 6a303ba4487a9c1f02f705c9 + 6a303bb2487a9c1f02f705ca — both deleted. DB clean.
+[CORRECTION] Original probe conclusions were wrong. Two errors:
 
-[DECISION] org _viewer grant alone is NOT sufficient for agenda visibility.
-  _inheritrights:false on org is load-bearing (tenant isolation) — must not be flipped.
-  To give members access to private events: need direct _viewer on seasons or events, OR change
-  event _sharing to domain. Design question for team-lead.
+  ERROR 1 — Wrong _inheritrights direction model:
+  Per official Entu docs (entu-www src/overview/entities/index.md):
+    "When _inheritrights: true is set on a child entity, it inherits the access rights from its parent."
+  _inheritrights is a CHILD-side property. The org's own _inheritrights:false means the org does
+  NOT inherit from ITS parent (federation/db level). It has no bearing on whether children with
+  _inheritrights:true inherit from the org. The cascade org→season→event is controlled by the
+  child entities' _inheritrights, all of which are set to true.
+  The original entries claiming "_inheritrights:false on org blocks downward cascade" were WRONG.
 
-[GOTCHA] Entu admin-view "inherited:true" in _viewer is display denormalization, NOT access proof.
-  Real enforcement blocks cascade when _inheritrights:false is on an ancestor.
-  Must always verify with member JWT — admin GET "_viewer inherited" can be misleading.
+  ERROR 2 — entu_api_key on OAuth person = anonymous floor credential:
+  The test person 6a2fc05e4cd971291c5d5ddc has a real Google OAuth account (entu_user present).
+  But entu_api_key auth returns accounts:[] regardless — the API key is not linked to the OAuth
+  identity. Re-confirmed in session 39 recheck: auth response has "accounts":[], "user":{}.
+  The 403 on private event + 0 results on LIST was caused by accounts:[] (no identity, no rights
+  lookup) — NOT by cascade blocking. The probe used a broken identity and reached the wrong conclusion.
+
+  WHAT IS ACTUALLY TRUE:
+  - Admin GET shows _viewer: [{reference: 6a2fc05e, "inherited": true}] on season and event.
+    This is genuine Entu rights denormalization, not display-only. The cascade IS working in the DB.
+  - org _viewer → season (_inheritrights:true) → event (_inheritrights:true) cascade is correct.
+  - Cannot verify end-to-end with entu_api_key on an OAuth person (always returns floor credential).
+    Real test requires a second OAuth login session, as in S37 definitive probe.
+  - The GOTCHA about "inherited:true is display-only" was wrong. Retract it.
+
+  Probe keys used this session: 6a303ba4, 6a303bb2, 6a31de8c — all deleted. DB clean.
+
+[LEARNED] entu_api_key on any person returns accounts:[] regardless of whether that person has
+  OAuth. The key is not identity-linked. Floor credential only. Cannot synthesize a real member
+  JWT for access testing this way. The S37 definitive probe used an actual second OAuth login —
+  that is the only valid approach for cross-user access verification.
+  Cross-ref: session-32 GOTCHA (first confirmed this for seed persons without OAuth — but it
+  applies equally to persons WITH OAuth).
 
 ## Session 38 — 2026-06-15
 
