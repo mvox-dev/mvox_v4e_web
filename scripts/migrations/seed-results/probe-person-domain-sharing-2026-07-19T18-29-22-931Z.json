@@ -1,0 +1,83 @@
+{
+  "timestamp": "2026-07-19T18:29:21.558Z",
+  "readerAccountsBound": true,
+  "readerAccountId": "6a2fc05e4cd971291c5d5ddc",
+  "reads": [
+    {
+      "targetId": "6a097dcc90c8df7a1cc7d6dd",
+      "tier": "domain",
+      "httpStatus": 200,
+      "propsReturned": [
+        "name"
+      ],
+      "body": {
+        "entity": {
+          "_id": "6a097dcc90c8df7a1cc7d6dd",
+          "name": [
+            {
+              "_id": "6a0e9b2b4ff8277cd4306681",
+              "string": "Test User"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "targetId": "6a0dd2384ff8277cd4305e9e",
+      "tier": "public",
+      "httpStatus": 200,
+      "propsReturned": [],
+      "body": {
+        "entity": {
+          "_id": "6a0dd2384ff8277cd4305e9e"
+        }
+      }
+    },
+    {
+      "targetId": "69bcfd8e9c031ab8e6ce8079",
+      "tier": "private",
+      "httpStatus": 403,
+      "propsReturned": [],
+      "body": {
+        "error": true,
+        "url": "https://api.entu.app/polyphony/entity/69bcfd8e9c031ab8e6ce8079?props=name%2Cemail%2Cphone%2Cforename%2Csurname%2Caddress%2Cbirthdate%2Cidcode",
+        "status": 403,
+        "statusText": "No accessible properties",
+        "message": "No accessible properties"
+      }
+    },
+    {
+      "targetId": "6a2fc05e4cd971291c5d5ddc",
+      "tier": "self(domain)",
+      "httpStatus": 200,
+      "propsReturned": [
+        "email",
+        "name"
+      ],
+      "body": {
+        "entity": {
+          "_id": "6a2fc05e4cd971291c5d5ddc",
+          "email": [
+            {
+              "_id": "6a2fc05e4cd971291c5d5de1",
+              "string": "mihkel.putrinsh@gmail.com"
+            }
+          ],
+          "name": [
+            {
+              "_id": "6a2fc05e4cd971291c5d5de2",
+              "string": "Mihkel Putrinš"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "verdict": "REFUTED — domain DOES expose person properties: name",
+  "selfReadControl": "VALID — reader sees own properties (email, name), so the empty reads above are a rights result, not a broken credential",
+  "teardown": {
+    "keyPropId": "6a5d1782b11ea7f3c7c09d89",
+    "status": 200,
+    "ok": true
+  }
+}

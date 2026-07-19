@@ -1,0 +1,142 @@
+{
+  "timestamp": "2026-07-19T18:38:35.735Z",
+  "personTotal": 131,
+  "apiReportedCount": 131,
+  "sharingCensus": {
+    "private": 1,
+    "domain": 2,
+    "public": 128
+  },
+  "fieldCensusByTier": {
+    "private": {
+      "name": 1,
+      "email": 1
+    },
+    "domain": {
+      "name": 2,
+      "email": 1
+    },
+    "public": {
+      "name": 128
+    }
+  },
+  "oauthBoundPersons": [
+    {
+      "_id": "69bcfd8e9c031ab8e6ce8079",
+      "sharing": "private",
+      "name": "Mihkel Putrinš"
+    },
+    {
+      "_id": "6a2fc05e4cd971291c5d5ddc",
+      "sharing": "domain",
+      "name": "Mihkel Putrinš"
+    }
+  ],
+  "propertyDefs": [
+    {
+      "name": "address",
+      "sharing": null
+    },
+    {
+      "name": "bio",
+      "sharing": null
+    },
+    {
+      "name": "birthdate",
+      "sharing": null
+    },
+    {
+      "name": "county",
+      "sharing": null
+    },
+    {
+      "name": "email",
+      "sharing": null
+    },
+    {
+      "name": "entu_api_key",
+      "sharing": null
+    },
+    {
+      "name": "entu_passkey",
+      "sharing": null
+    },
+    {
+      "name": "entu_user",
+      "sharing": null
+    },
+    {
+      "name": "idcode",
+      "sharing": null
+    },
+    {
+      "name": "language",
+      "sharing": null
+    },
+    {
+      "name": "locale",
+      "sharing": null
+    },
+    {
+      "name": "name",
+      "sharing": null
+    },
+    {
+      "name": "notes",
+      "sharing": null
+    },
+    {
+      "name": "phone",
+      "sharing": null
+    },
+    {
+      "name": "photo",
+      "sharing": null
+    },
+    {
+      "name": "postalcode",
+      "sharing": null
+    },
+    {
+      "name": "preferences",
+      "sharing": null
+    },
+    {
+      "name": "preferred_contact_email",
+      "sharing": null
+    },
+    {
+      "name": "timezone",
+      "sharing": null
+    },
+    {
+      "name": "town",
+      "sharing": null
+    },
+    {
+      "name": "voice",
+      "sharing": null
+    }
+  ],
+  "propertyDefsWithSharing": [],
+  "anonymousReads": [
+    {
+      "tier": "public",
+      "entityId": "6a0dd2384ff8277cd4305e9e",
+      "httpStatus": 200,
+      "propsReturned": []
+    },
+    {
+      "tier": "domain",
+      "entityId": "6a097dcc90c8df7a1cc7d6dd",
+      "httpStatus": 403,
+      "propsReturned": []
+    },
+    {
+      "tier": "private",
+      "entityId": "69bcfd8e9c031ab8e6ce8079",
+      "httpStatus": 403,
+      "propsReturned": []
+    }
+  ]
+}
