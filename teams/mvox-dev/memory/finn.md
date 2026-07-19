@@ -2,6 +2,47 @@
 
 <!-- Sessions 2–30 findings pruned 2026-06-14: all durable Entu mechanics, Path C architecture, OAuth wire shape, linting versions, etc. are captured in MEMORY.md (project_entu_*, project_cf_*, project_wrangler_*). See git history for full session records. -->
 
+## Active / Durable findings (S38-39, issue #93 rights probes)
+
+### [PATTERN] Non-omniscient second-account probe setup (reusable) — CORRECTED 2026-07-19, stale ID fixed
+
+**Stale entity ID (corrected):** the "genuine 2nd OAuth admin" person I previously cited, `6a2f3f964cd971291c5d5ca2` ("Mihkel Putrinš by Gmail"), is **deleted — 404s as of 2026-07-19**. The PO's second Google OAuth account re-provisioned under a new id: `6a2fc05e4cd971291c5d5ddc` (same Google uid, `_sharing:domain`, has `entu_user`). Any doc still citing the old id (including `slice3-list-visibility-definitive-2026-06-15.md`) is now referencing a deleted entity.
+
+**Credential-synthesis technique — UNRESOLVED, do not treat as reliable.** The pattern was: POST `entu_api_key` onto an OAuth-linked person, exchange for JWT, get a properly account-bound in-domain credential. Pérotin's session-39 scratchpad recorded this failing **twice** on this exact technique — `entu_api_key` on a person yielded `accounts:[]` (unbound/anonymous), "regardless of whether that person has OAuth." On 2026-07-19 the identical technique on the identical person (`6a2fc05e4cd971291c5d5ddc`) yielded a properly bound JWT. Both results are internally consistent and neither has been retracted — this is a live, unreconciled contradiction, not a settled "it works now." Full writeup + a live hypothesis (seeded person → unbound vs. genuinely-OAuth-bound person → bound, untested) at `docs/migration/findings/entu-property-bucket-visibility-2026-07-19.md` flagged discrepancy #4. **Don't cite this technique as a reusable pattern without re-running a controlled probe first.**
+
+The rest of the original entry (auto-provisioned persons get `_sharing:domain` by default; the two-key `ENTU_API_KEY`+`ENTU_ADMIN_KEY` env pattern) still stands and is unaffected by the above.
+
+(*MVOX:Finn*)
+
+---
+
+## Active / Durable findings (S38-39 continued)
+
+### [LEARNED] `_sharing` is `_owner`-tier, not `_editor`-tier (source-verified S38)
+
+`entu/api` source is cloned locally at `~/projects/entu-api` (not entu-research — separate repo). `routes/[db]/property/[_id]/index.delete.js` and `utils/entity.js` both define a `rightTypes` array — `['_noaccess','_viewer','_expander','_editor','_owner','_sharing','_parent','_inheritrights']` — and gate any POST/DELETE touching a property whose `type` is in that list behind `_owner` membership (`403 User not in _owner property` otherwise). `_editor` can freely POST/DELETE ordinary (non-rights) properties and LIST the entity, but cannot touch `_sharing`, `_viewer`, `_owner`, `_editor`, `_parent`, or `_inheritrights` values, and cannot `DELETE /entity/{id}` (needs `_owner`). Verified by reading the route file directly (grep for `rightTypes` in `~/projects/entu-api`).
+
+### [LEARNED] No entity-to-entity `_viewer`/`_owner`/`_editor` grants — person-only, no group primitive
+
+Every observed `_viewer`/`_editor`/`_owner` reference in the codebase and in live probes points at a PERSON `_id`, never an organization or other entity. `docs/migration/findings/member-tier-rights-visibility-2026-06-12.md` confirms mechanically: POSTing `_viewer` referencing a person's `_id` works and grants that person read access; anonymous/non-matching JWTs still get 403. No probe or source reference found where a rights property references a non-person entity to create transitive "anyone in org O can see this" access. The **only** transitive-visibility primitive in v4E is the `_inheritrights` parent→child cascade (see `architecture-decisions.md` "Entities created directly under an organization MUST set `_inheritrights:true`"). If a design needs "org members can resolve person X's name," it must either (a) grant `_viewer` to each person individually, or (b) restructure via `_parent`/`_inheritrights` cascade — there is no org-as-viewer shortcut.
+
+### [LEARNED] CORRECTED 2026-07-19 — Per-property `sharing` IS first-class; `_sharing` gates three write-time buckets, not existence-only
+
+**My prior entry here was wrong.** It relied on `docs/migration/v4e-divergence-2026-05-19.md` §5.2 ("per-property sharing not a first-class Entu concept") without checking `~/projects/entu-api` source directly. That doc's claim is itself wrong and is now formally superseded. Team-lead relayed my wrong version to the PO twice on #93 before a live probe caught it — the doc looked authoritative and I didn't verify it against source, which is exactly the failure this correction exists to prevent.
+
+**The actual model** (full citations in `docs/migration/findings/entu-property-bucket-visibility-2026-07-19.md` — cite that doc, don't restate this summary as if independently re-derived):
+- Per-property sharing lives on the **property-definition** entity's own `sharing` field (`private`/`domain`/`public`), not on instance values.
+- At write time, `aggregateEntity` (`utils/aggregate.js`) builds three buckets (`private`/`domain`/`public`) per entity. A property's bucket placement = its definition's `sharing`, **capped** by the entity type's own `_sharing` (a `domain`-shared type downgrades a `public`-shared property to `domain`; an unshared type exposes nothing at domain/public tier regardless of what the property definition says).
+- At read time, `cleanupEntity` (`utils/entity.js:569-612`) returns exactly ONE whole bucket based on the reader's rights: explicit grant → full `private` bucket; else authenticated + domain access → full `domain` bucket; else public access → full `public` bucket; else 403 "No accessible properties."
+- **This means a reader who matches the `domain` or `public` tier gets a real property leak (e.g. `name`), not just a signal that the entity exists.** My original "entity-level only, existence-signal only" framing was categorically wrong.
+- **Load-bearing gotcha:** buckets are write-time snapshots. Changing a property definition's `sharing` does NOT retroactively update already-aggregated instances — `startRelativeAggregation` only re-triggers on name/rights/formula changes to the changed entity itself, never propagates from a definition edit to that type's instances. A stale bucket persists until something else writes to that specific instance.
+
+**Standing lesson for me:** repo docs (`docs/migration/*.md`, findings docs, even architecture-decisions) are convenience summaries, not ground truth for Entu mechanics — `~/projects/entu-api` source is the authority. When a question is about a specific Entu behavior (not just "what did the team decide"), read the source directly before reporting, even if a findings doc already seems to answer it.
+
+(*MVOX:Finn*)
+
+---
+
 ## Active / Durable findings (S32–S37)
 
 ### [LEARNED] `_inheritrights` absent = false — source-verified (S37)
