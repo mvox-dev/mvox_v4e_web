@@ -2,6 +2,29 @@
 
 <!-- Sessions 2–30 findings pruned 2026-06-14: all durable Entu mechanics, Path C architecture, OAuth wire shape, linting versions, etc. are captured in MEMORY.md (project_entu_*, project_cf_*, project_wrangler_*). See git history for full session records. -->
 
+## Active / Durable findings (S40, single-collective pivot — domain-sharing source verification)
+
+### [LEARNED] `entu.userStr` (domain-tier gate) is per-db, gated by a genuine person entity in THAT db — source-verified, not doc-relayed
+
+Full chain read directly from `~/projects/entu-api`, no repo doc used as authority (per team-lead's explicit instruction after the 2026-07-19 wrong-doc incident):
+- `middleware/auth.js:21` — target db comes from the URL path segment, not the JWT.
+- `middleware/auth.js:35-36` — ONE shared `jwtSecret` for the whole Entu platform (all dbs). Signature alone proves nothing about which db(s) a token is valid for.
+- `middleware/auth.js:46-48` — `entu.userStr` is set ONLY if `token.accounts[urlDbName]` exists. No Bearer token at all → whole block skipped → `userStr` stays `undefined` (anonymous correctly excluded).
+- `routes/auth/index.get.js:132` — `/auth` exchange enumerates **every Mongo db on the platform** (`listDatabases()`), and for each one independently checks (separate `connectDb` per db, line 145) whether a `person` entity matching this OAuth identity exists **inside that specific db**. `accounts` map only gets an entry for dbs where a real match was found (lines 141-190, 254).
+- Same gate independently re-implemented for GraphQL: `utils/graphql/schema.js:109-111`.
+
+**Bottom line for "db boundary = collective boundary":** holds — a user can't get `userStr` (and therefore domain-tier reads) in install Y just by being authenticated against install X; `accounts.Y` requires a real person entity in Y. **Nuance:** nothing stops the SAME identity from having a genuine person entity in TWO installs and getting BOTH in one JWT if `/auth` is called without a `?db=` param (line 124 `onlyForAccount`) — that's correct multi-membership, not a leak, but means "one JWT ⇒ one collective" isn't structurally enforced, only "one JWT ⇒ only collectives you're genuinely in." If the design needs strict one-JWT-one-db, force `?db=` at every `/auth` call.
+
+### [LEARNED] Per-property `sharing` on a prop-def controls domain/public bucket placement — source-verified independently (not relayed from the 2026-07-19 doc, which agrees)
+
+`utils/aggregate.js`: prop-def's own `_sharing` read via aggregation pipeline (`sharing: {$arrayElemAt:['$private._sharing.string',0]}`, line 86); capped by the owning type's `_sharing` (line 94, 113-121 — unset type `_sharing` ⇒ property never exposed at domain/public regardless of prop-def setting; `domain`-type caps a `public`-marked prop-def down to `domain`); written to buckets at line 148-154 (prop-def with no `sharing` never reaches `newEntity.domain`/`.public`, only `.private`); bucket retention double-gated again by the ENTITY's own `_sharing` at line 269-275. This is the exact mechanism a "contact info visible, sensitive fields private" per-field design on one person type depends on — confirmed real, not aspirational. Full context: `docs/migration/findings/entu-property-bucket-visibility-2026-07-19.md`, corroborated independently 2026-08-05.
+
+**Standing practice reminder (recurrence of the 2026-07-19 lesson):** for Entu mechanics questions, read `~/projects/entu-api` source directly every time, even when a findings doc already seems to answer it — cite the doc as corroboration only, never as the basis.
+
+(*MVOX:Finn*)
+
+---
+
 ## Active / Durable findings (S38-39, issue #93 rights probes)
 
 ### [PATTERN] Non-omniscient second-account probe setup (reusable) — CORRECTED 2026-07-19, stale ID fixed
