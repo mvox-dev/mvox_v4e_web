@@ -24,7 +24,7 @@ All paths derived from two anchors:
 
 Execute in order. State each phase name before executing.
 
-**CRITICAL: Do NOT call `TaskCreate` before Phase 2 completes.** Until then, the active task list is session-scoped (`~/.claude/tasks/<sessionId>/`). When `TeamCreate` runs in Phase 2, the active list switches to team-scoped (`~/.claude/tasks/mvox-dev/`). Any tasks created earlier are orphaned — invisible to teammates but their numbers can still leak into agent context and cause confusion (e.g., a teammate seeing a "task #N" that doesn't exist on the team list). Track Phase 0-1 progress mentally or in plain text. Create formal tasks starting Phase 4 (task restore, if needed) or Phase 5 (routing new work to teammates).
+**Task scope (implicit teams).** The active task list is **session-scoped for the whole session** — `~/.claude/tasks/session-<id>/`. There is no `TeamCreate` and no mid-startup switch to a team-scoped list: verified 2026-08-05, no `~/.claude/tasks/mvox-dev/` exists, only `session-<id>` dirs. Tasks do **not** survive a restart, so cross-session continuity relies on the `memory/task-list-snapshot.md` shutdown/restore ceremony (Phase 4). It's still fine to defer formal `TaskCreate` until you're routing real work in Phase 4/5.
 
 ### Phase 0: Orient
 
@@ -49,25 +49,23 @@ cd "$REPO" && git pull
 
 ### Phase 2: Establish team
 
-Probe the harness's lead state by attempting `TeamCreate`. Branch on the result — there are three possible states:
+**Implicit teams** (CLI 2.1.211+, `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`, verified 2026-08-05). There is **no `TeamCreate`/`TeamDelete`** — those tools do not exist on this CLI — and the old State A/B/C probe-and-branch does not apply. There is nothing to create: the team is established automatically for the session. Ownership: each team reconciles its own startup/lifecycle docs against its own live CLI (ai-teams#105).
 
-1. Try `TeamCreate(team_name="mvox-dev")`.
-2. Classify:
-   - **Succeeds** → **State B (fresh start).** No prior team in harness state. Verify `ls "$HOME/.claude/teams/mvox-dev/config.json"` exists. No prior task list. Proceed to Phase 3.
-   - **Fails with `"Already leading team"`** → harness session state survived from a prior session (typical cause: `/clear` was used instead of exiting the CLI). Inspect disk to distinguish A from C:
-     - `config.json` present AND `leadAgentId == "team-lead@mvox-dev"` → **State A (warm reconnect).** Harness and disk agree; team is already operational. No action needed. Proceed to Phase 3. The existing task list survives untouched.
-     - `config.json` absent OR `leadAgentId` mismatched → **State C (inconsistent).** Disk got wiped while the harness held the lead (e.g. someone ran the old "Phase 2: Clean" `rm -rf`). Only recovery is `TeamDelete` + `TeamCreate`, which destroys `~/.claude/tasks/mvox-dev/` as a side effect. Sequence: `TeamDelete(team_name="mvox-dev")` → `TeamCreate(team_name="mvox-dev")` → verify `config.json`. **Set a flag: task restore needed in Phase 4** (snapshot at `memory/task-list-snapshot.md` is the source of truth).
-   - **Fails with any other error** → unexpected; read the error and decide manually. Do not blindly retry.
+What to know instead:
 
-**Why State A is common:** `/clear` clears conversation context but does NOT exit the CLI process. The harness keeps its in-memory team-lead tracking. If the prior session's shutdown left `~/.claude/teams/mvox-dev/config.json` on disk, both halves of state are intact and `TeamCreate` is unnecessary — and will fail by design.
+- The runtime dir is `~/.claude/teams/session-<id>/` (verified 2026-08-05), **session-scoped and rotating on restart** — NOT a stable `~/.claude/teams/mvox-dev/` dir. `team_name: "mvox-dev"` passed to Agent/SendMessage is a cosmetic label.
+- **Fresh CLI start:** you lead a fresh session team with no teammates. Nothing to create — proceed. You respawn teammates in Phase 5 (the restart-recovery duty — see ai-teams#102).
+- **`/clear` (same process, warm):** teammates spawned earlier in this process may still be alive. Do not re-spawn blindly — Phase 5 checks the live roster first (`config.json` in the current session dir).
 
-**Why the old "Phase 2: Clean" step was removed:** the previous procedure ran `rm -rf "$HOME/.claude/teams/mvox-dev"` before `TeamCreate`. With `/clear` (where harness state survives), this turns State A into State C — manufactured inconsistency, forced `TeamDelete`, wiped task list as collateral damage. Don't clean preemptively; let `TeamDelete` happen only when actually needed.
+**Expected outcome:** you know you're under implicit teams; no team-creation step; whether teammates already exist determines what Phase 5 spawns.
 
-**Expected outcome:** `config.json` is current; you know whether tasks need restoring in Phase 4.
+**CRITICAL:** it's still fine to hold formal `TaskCreate` until you're routing real work (Phase 4/5) — see the task-scope note at the top of this file.
 
-**CRITICAL:** Do NOT spawn any agents until Phase 2 verification passes. Do NOT call `TaskCreate` until Phase 2 settles (see CRITICAL banner at the top of this file).
+> `[unverified]` The exact cross-session **restore target paths** below (Phase 3 inbox restore, Phase 4 task restore) were written for the old stable `~/.claude/teams/mvox-dev/` runtime. Under a rotating `session-<id>` dir they need re-confirming against a live restart (which cannot be tested mid-session). The persistence *intent* — repo inboxes + task snapshot carry state across sessions — still holds; the concrete destination path is the open detail. Confirm on the next real restart before relying on the Phase 3 script verbatim.
 
 ### Phase 3: Restore inboxes
+
+> `[unverified]` `TEAM_DIR` below still points at the old stable `~/.claude/teams/mvox-dev/`. Under implicit teams the live runtime is `~/.claude/teams/session-<id>/` (rotating). Before relying on this script, resolve the current session's dir and confirm the restore target — see the flag in Phase 2. The repo→runtime restore *intent* is unchanged; only the destination path is unconfirmed.
 
 ```bash
 TEAM_CONFIG="$(git rev-parse --show-toplevel)/teams/mvox-dev"
@@ -90,15 +88,15 @@ else
 fi
 ```
 
-**Note on State A:** inboxes from the prior session may still be in the runtime dir (they weren't wiped). The `cp` above is idempotent — it overwrites runtime copies with the repo copies, which should be equal or newer (per shutdown protocol).
+**Note (warm `/clear` continuation):** inboxes from earlier in this same process may still be in the runtime dir. The `cp` above is idempotent — it overwrites runtime copies with the repo copies, which should be equal or newer (per shutdown protocol).
 
 **Expected outcome:** Inboxes restored from repo (or no-op if first session). Team operational.
 
 ### Phase 4: Restore tasks (conditional)
 
-**Skip this phase if Phase 2 ended in State A or State B.** The task list is intact (State A: never touched; State B: empty and fine).
+**Skip if teammates are already alive from this same process** (a `/clear` warm continuation — the session task list is untouched).
 
-**Run only if Phase 2 ended in State C** — `TeamDelete` wiped `~/.claude/tasks/mvox-dev/` and the snapshot is now the only source. Recreate the active rows from `memory/task-list-snapshot.md`:
+**Run on a fresh CLI start** — the task list is session-scoped and starts empty, so `memory/task-list-snapshot.md` is the only source of prior task state. Recreate the active rows from it:
 
 1. Read `teams/mvox-dev/memory/task-list-snapshot.md`.
 2. For each non-completed row, call `TaskCreate(subject, description)` with the snapshot's subject + description verbatim.
@@ -145,7 +143,7 @@ Send ready message to user. Wait for task assignment.
 
 ### Common (both envs)
 
-- **TeamCreate silent failure** — can return success but not write `config.json`. Always verify with `ls "$HOME/.claude/teams/mvox-dev/config.json"` after TeamCreate. Max 1 retry with TeamDelete before retry.
+- **Implicit teams — no `TeamCreate`/`TeamDelete`** (CLI 2.1.211+). The old "TeamCreate silent failure / verify config.json / retry with TeamDelete" workaround is obsolete; there is nothing to create or retry. See Phase 2.
 - **pnpm, not npm** — this is a pnpm workspace. All commands use `pnpm`.
 
 ### Container env
@@ -160,4 +158,4 @@ Send ready message to user. Wait for task assignment.
 - `$HOME=/home/<user>` (no rewrite needed). Workspace path: resolve via `REPO="$(git rev-parse --show-toplevel)"`.
 - No tmux Pane Map. Spawn agents via the `Agent` tool with `run_in_background: true`, `name: "<name>"`, `team_name: "mvox-dev"`. The agent's prompt is the content of `teams/mvox-dev/prompts/<name>.md`.
 
-(*FR:Volta*)
+(*FR:Volta*) — Phase 2 / task-scope / known-issues reconciled to implicit teams 2026-08-05 per ai-teams#105 (*MVOX:Palestrina*)
