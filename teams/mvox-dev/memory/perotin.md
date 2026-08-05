@@ -1201,4 +1201,23 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
   mutations, ran under ENTU_API_KEY/PO db-owner key).
   Result artifact: scripts/migrations/seed-results/agenda-empty-investigation-2026-08-05T22-00-17-917Z.json
 
+### Task #10 — Fila hooaeg end_date hygiene fix (live, authorized)
+
+[CHECKPOINT] cleanup-fila-hooaeg-end-date-2026-08-06.ts — single UPDATE op, live-executed and
+  verified 2026-08-06. Season 6a1d6b6210cc20db24e7ce58 ("Fila hooaeg") end_date:
+  2026-07-28 → 2026-12-31 (buffer past last known rehearsal 2026-12-15, so a same-week event
+  addition doesn't immediately re-drift it stale). Wire shape: DELETE old property value
+  (6a1e017f10cc20db24e7cf72), POST new {type:'end_date', date:'2026-12-31'} (new value _id
+  6a73b46a36c951d9114ec68e). Post-write verification PASS: single value (no double-append),
+  value matches proposed, new _id (old one not reused).
+  Cosmetic-only per team-lead's framing — the agenda query-logic fix (#9, Byrd/Josquin) is what
+  actually stops end_date from gating event visibility; this just makes the record self-consistent.
+  Manifest-first: dry-run shown before --live, matched team-lead's task #10 dispatch exactly
+  (entity, op shape, target value range) — proceeded on the pre-authorization stated inline in
+  that dispatch rather than requesting a second explicit "I authorize this run", since routing
+  (direct task_assignment from team-lead) and content (explicit "team-lead has authorized",
+  exact scope given) were both unambiguous. Low-risk/reversible single-property op.
+  Script: scripts/migrations/cleanup-fila-hooaeg-end-date-2026-08-06.ts
+  Result artifact: scripts/migrations/seed-results/cleanup-fila-hooaeg-end-date-2026-08-05T22-08-42-202Z.json
+
 (*MVOX:Perotin*)

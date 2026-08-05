@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-08-05T22:08:42.202Z",
+  "dryRun": false,
+  "seasonId": "6a1d6b6210cc20db24e7ce58",
+  "before": {
+    "endDate": "2026-07-28T00:00:00.000Z",
+    "endDateValueId": "6a1e017f10cc20db24e7cf72"
+  },
+  "after": {
+    "endDate": "2026-12-31T00:00:00.000Z",
+    "endDateValueId": "6a73b46a36c951d9114ec68e"
+  },
+  "checks": {
+    "singleValue": true,
+    "valueMatches": true,
+    "newValueId": true
+  },
+  "verified": true
+}

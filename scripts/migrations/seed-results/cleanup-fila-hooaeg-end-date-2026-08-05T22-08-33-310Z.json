@@ -1,0 +1,9 @@
+{
+  "timestamp": "2026-08-05T22:08:33.310Z",
+  "dryRun": true,
+  "seasonId": "6a1d6b6210cc20db24e7ce58",
+  "currentEndDate": "2026-07-28T00:00:00.000Z",
+  "currentEndDateValueId": "6a1e017f10cc20db24e7cf72",
+  "proposedEndDate": "2026-12-31",
+  "wouldExecute": true
+}
