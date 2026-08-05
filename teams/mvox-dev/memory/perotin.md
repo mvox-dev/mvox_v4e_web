@@ -1117,4 +1117,54 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
   seed-po-member-ekf.ts   — 1 PO member in EFK, idempotent by person.reference+_parent, last live: 2026-06-13
   (item missing from prior catalog — added now per session-32 [NEXT SESSION] note)
 
+## Session — 2026-08-05
+
+[CORRECTION] `architecture-decisions.md` (session 3, "Test data strategy") describes polyphony
+  as "production-shaped... 6 real Estonian choirs, 116 real members" — that characterization is
+  STALE. PO confirmed directly (2026-08-05, relayed by Palestrina): "There is still no real data
+  in Entu; import is last." Polyphony is synthetic/fixture data. Flagging here rather than editing
+  that doc myself (not mine to rewrite) — it nearly changed a risk calculation on the
+  mvox_collective seed task before PO corrected it.
+
+[SEED CATALOG UPDATE]
+  seed-mvox-collective-marker-2026-08-05.ts — creates entity TYPE `mvox_collective` (_sharing:domain,
+  PO-approved app-extension, not canonical v4E) + `name` prop-def (_sharing:domain) + one singleton
+  instance ("Eesti Filharmoonia Kammerkoor", _sharing:domain). Idempotent by name-existence check at
+  each of the 3 levels. Live: 2026-08-05. ids: type=6a73880336c951d9114ec63d,
+  propdef=6a73880436c951d9114ec646, instance=6a73880436c951d9114ec650.
+
+[GOTCHA] `lib/v4e-translator.ts` `translatePropertyDef` does not set `_sharing` on property-DEFINITION
+  entities at all — checked the function body directly, no such field in its payload. This is
+  presumably why the person-type census (`entu-property-bucket-visibility-2026-07-19.md`) found 0/21
+  person prop-defs carrying a sharing value: the standard schema-driven creation path never sets it,
+  even when v4E schema.json specifies one. Flagged to Josquin/team-lead as a follow-up bug — did not
+  fix (lib/*.ts is Josquin's). Worked around in seed-mvox-collective-marker by hand-rolling the
+  prop-def payload with an explicit `_sharing:domain` instead of calling the translator.
+
+[GOTCHA] Live api.entu.app rejects an `entu_api_key` POST from an `_editor`-only caller with 403
+  "User not in _owner property" — this specific rightTypes gate on `entu_api_key` is NOT present in
+  the local `~/projects/entu-api` clone (`utils/entity.js` `checkEntityAccess`'s `rightTypes` list has
+  no `entu_api_key` entry). Confirmed by direct reproduction (curl-equivalent POST), not assumed —
+  live/local source drift. This blocked the mvox_collective seed's automated member-tier verification:
+  reader person `6a2fc05e4cd971291c5d5ddc` has only inherited `_editor` (not `_owner`) from PO, and
+  granting `_owner` to fix it ALSO 403s (`_owner` is itself in `rightTypes`, circular — only an
+  existing owner can grant it; no `systemUser`-equivalent credential is available via a personal API
+  key — confirmed via grep, `systemUser:true` is only ever set server-side for bootstrap/stripe/
+  aggregation/invite routes). Worked on 2026-07-19 against this exact same entity (see
+  `entu-property-bucket-visibility-2026-07-19.md` probe) — either live rights on that entity changed,
+  or live API behavior changed, between then and now. Unresolved; needs PO to grant `_owner` on that
+  reader person directly (Entu UI, or a fresh OAuth login) — not fixable via any credential I hold.
+
+[PROBE-RESULT] entu-api `inheritParentProperties` auto-injects `_sharing` on a NEW entity from its
+  `_parent`'s `_sharing` whenever the create payload omits `_sharing` — confirmed empirically
+  2026-08-05 (probe-mvox-collective-unshared-prop). Created a prop-def under the domain-shared
+  `mvox_collective` type with no `_sharing` in the payload; read-back showed `_sharing:domain` had
+  been auto-set anyway. Consequence: "just omit `_sharing`" does NOT produce an unshared entity when
+  its parent is domain/public-shared — you have to explicitly DELETE the auto-injected property
+  value afterward if you actually want no `_sharing` at all (which is what this probe did). Relevant
+  to the `translatePropertyDef`-never-sets-`_sharing` gotcha logged above: that gap is harmless (or
+  even correct-by-accident) when the parent TYPE itself has no `_sharing` — as `person`'s apparently
+  doesn't, hence the 0/21 census — but would silently produce unwanted domain/public-shared prop-defs
+  under any FUTURE type that IS shared. Worth folding into the ticket for Josquin.
+
 (*MVOX:Perotin*)

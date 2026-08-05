@@ -36,6 +36,7 @@ Lives at `teams/mvox-dev/`:
 - Co-author trailer `Co-authored-by: Mihkel Putrinš <mihkel.putrinsh@gmail.com>` on all commits
 - TDD chain: Tallis (RED) → Byrd + Josquin (GREEN) → Comenius (i18n) → Bentham (review) → Josquin (merge)
 - v4E schema mutations require a PR against `entu/research` first, then a mvox PR with `Schema-Change:` + `PO-Approved:` commit trailers — see `teams/mvox-dev/memory/architecture-decisions.md`
+- **The `polyphony` Entu db is the DEV/TEST collective — its data is SYNTHETIC (no real data; import is last).** Routine synthetic-data ops on it (fixtures, markers, test props, refreshes) are **pre-authorized** — no per-op PO escalation. Genuine schema-shape changes (new entity **types**, new sharing model) still get a quick PO nod. Real collectives will be separate clones (polyphony as template); polyphony never holds real data. This supersedes the stale "116 real members / production-shaped" line in `architecture-decisions.md` (Mihkel, 2026-08-05). NOTE: mvox-app-specific marker/config types (e.g. `mvox_collective`) are app extensions, **not** canonical v4E — they skip the `entu/research` PR flow (PO sign-off + direct seed suffices).
 
 ## Where things live
 

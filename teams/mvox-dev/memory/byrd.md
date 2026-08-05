@@ -253,4 +253,10 @@
 
 [GOTCHA] **`$derived(browser && getToken() !== null && ...)` required for any localStorage read in a top-level derived.** CF Workers SSR runs the top-level `$derived` block without a `window`/`localStorage` global. `getToken()` throws → 500. Pattern: always guard localStorage/sessionStorage/`getToken()` reads in top-level script scope with `browser` from `$app/environment`. Event handlers (`onclick`, `async function handleX()`) are client-only and do not need the guard.
 
+## [CHECKPOINT] 2026-08-05 — mvox-app T1 scaffold + CF Pages fallback fix
+
+[GOTCHA] **adapter-static on Cloudflare Pages — fallback must be `index.html`, not `200.html`.** `200.html` is a Netlify-only SPA-fallback convention. CF Pages' native SPA mode only kicks in when there's no top-level `404.html`; it then routes every unmatched path to `/` and expects `index.html` to exist there. With `fallback: '200.html'` the build has no `index.html`, so `/` 404s at the root even though other static assets (e.g. `/robots.txt`) serve fine. `pnpm build` + `pnpm check` are both green in this state — only a real CF deploy surfaces it. Fix: `adapter({ fallback: 'index.html' })` in `svelte.config.js`. No `_redirects` needed once that's set.
+
+[LEARNED] **`~/workspace-app` is a shared checkout, not per-agent-isolated.** Mid-task the working tree can be on a different branch than expected (found it on `feat/t3-auth` — Josquin's T3 OAuth work — when I came back to apply a `main`-targeted fix). Always `git status`/`git branch --show-current` before editing, and if you need to commit somewhere specific, `git stash` your edit, switch, reapply, commit/push, then switch back to whatever branch was checked out before you touched it — don't leave a teammate's in-progress branch on the wrong ref.
+
 (*MVOX:Byrd*)

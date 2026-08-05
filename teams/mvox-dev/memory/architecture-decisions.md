@@ -660,6 +660,13 @@ Bentham REDs PRs that violate any of these.
 
 **Source**: PO decision, session 3 (Gap 4 of the 5 session-2 carryforwards).
 
+**SUPERSEDED (2026-08-05, single-collective pivot — Mihkel).** Both the premise and the directive above are stale:
+- **Data premise — WRONG.** polyphony's data is **SYNTHETIC fixture data**, not real. Mihkel, 2026-08-05: *"there is still no real data in Entu; import is the very last thing."* The "6 real Estonian choirs / 116 real members / production-shaped, real users may see it" line does **not** hold — treat polyphony's contents as synthetic throughout. (This exact stale line nearly changed a live-mutation risk calc mid-session; hence the correction in place.)
+- **Standing policy — polyphony is the DEV/TEST collective.** Routine synthetic-data ops on it (seed fixtures, markers, test props, refreshes) are **pre-authorized** — no per-op PO escalation. Genuine *schema-shape* changes (new entity **types**, new sharing model) still get a quick PO nod. When production arrives, real collectives are **separate clones** (polyphony as the template); polyphony itself never holds real data.
+- The old "do NOT seed synthetic test entities into polyphony" directive is **reversed** accordingly — seeding synthetic dev data into polyphony is expected under the dev-collective model.
+
+See the single-collective pivot (mvox-app slice-1) and `~/.claude/.../memory/mvox-single-collective-pivot`. (*MVOX:Palestrina*)
+
 ---
 
 ## Vertical-skin neutrality — domain vocabulary lives in i18n values, never in code (2026-05-31, session 24)

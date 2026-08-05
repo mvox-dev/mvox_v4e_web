@@ -1,0 +1,33 @@
+{
+  "dryRun": false,
+  "startedAt": "2026-08-05T19:03:42.059Z",
+  "typeDef": {
+    "action": "skip",
+    "_id": "6a73880336c951d9114ec63d"
+  },
+  "propertyDef": {
+    "action": "skip",
+    "_id": "6a73880436c951d9114ec646"
+  },
+  "instance": {
+    "action": "skip",
+    "_id": "6a73880436c951d9114ec650",
+    "existingInstanceCount": 1
+  },
+  "memberTierVerification": {
+    "blocked": true,
+    "error": "key POST failed: 403 {\n  \"error\": true,\n  \"url\": \"https://api.entu.app/polyphony/entity/6a2fc05e4cd971291c5d5ddc\",\n  \"status\": 403,\n  \"statusText\": \"User not in _owner property\",\n  \"message\": \"User not in _owner property\"\n}",
+    "pass": false
+  },
+  "templateSpotCheck": {
+    "httpStatus": 200,
+    "count": 0,
+    "pass": true
+  },
+  "reversibilityTokens": {
+    "typeId": "6a73880336c951d9114ec63d",
+    "propDefId": "6a73880436c951d9114ec646",
+    "instanceId": "6a73880436c951d9114ec650"
+  },
+  "completedAt": "2026-08-05T19:03:42.703Z"
+}

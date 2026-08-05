@@ -1,0 +1,18 @@
+{
+  "dryRun": false,
+  "startedAt": "2026-08-05T19:16:50.962Z",
+  "propertyDef": {
+    "action": "created",
+    "_id": "6a738c2336c951d9114ec657"
+  },
+  "autoInheritedSharing": {
+    "detected": true,
+    "value": "domain",
+    "removedPropId": "6a738c2336c951d9114ec65d"
+  },
+  "instanceValue": {
+    "action": "created",
+    "_id": "6a738c2336c951d9114ec661"
+  },
+  "completedAt": "2026-08-05T19:16:51.834Z"
+}

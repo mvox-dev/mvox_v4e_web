@@ -1,0 +1,13 @@
+{
+  "dryRun": false,
+  "startedAt": "2026-08-05T19:25:03.533Z",
+  "instanceValueCleanup": "already_absent",
+  "propDefCleanup": "already_absent",
+  "markerVerification": {
+    "count": 1,
+    "name": "Eesti Filharmoonia Kammerkoor",
+    "expected": "Eesti Filharmoonia Kammerkoor",
+    "pass": true
+  },
+  "completedAt": "2026-08-05T19:25:04.073Z"
+}

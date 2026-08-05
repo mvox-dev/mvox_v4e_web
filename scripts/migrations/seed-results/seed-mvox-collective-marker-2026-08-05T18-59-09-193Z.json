@@ -1,0 +1,24 @@
+{
+  "dryRun": true,
+  "startedAt": "2026-08-05T18:59:09.193Z",
+  "typeDef": {
+    "action": "would_create",
+    "_id": null
+  },
+  "propertyDef": {
+    "action": "would_create",
+    "_id": null
+  },
+  "instance": {
+    "action": "would_create",
+    "_id": null
+  },
+  "memberTierVerification": null,
+  "templateSpotCheck": null,
+  "reversibilityTokens": {
+    "typeId": null,
+    "propDefId": null,
+    "instanceId": null
+  },
+  "completedAt": "2026-08-05T18:59:09.653Z"
+}

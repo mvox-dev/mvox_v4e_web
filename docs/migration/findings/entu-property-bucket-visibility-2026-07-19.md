@@ -11,6 +11,8 @@
 - `scripts/migrations/seed-results/probe-person-domain-sharing-2026-07-19T18-29-22-931Z.json`
 - `scripts/migrations/seed-results/probe-person-sharing-census-2026-07-19T18-38-36-647Z.json`
 
+**Update, 2026-08-05:** the model's central claim — a property reaches the domain tier only if its *definition* carries `_sharing:domain`, independent of the entity's own `_sharing` — was live-confirmed end-to-end via a real (non-synthesized) member browser token, using a dedicated PO-directed experiment. See "LIVE-CONFIRMED, 2026-08-05" below. Scripts: `scripts/migrations/probes/probe-mvox-collective-unshared-prop-2026-08-05.ts`, `scripts/migrations/cleanup-mvox-collective-test-hidden-2026-08-05.ts`. Artifacts: `scripts/migrations/seed-results/probe-mvox-collective-unshared-prop-2026-08-05T19-16-50-962Z.json`, `scripts/migrations/seed-results/cleanup-mvox-collective-test-hidden-2026-08-05T19-25-03-533Z.json`.
+
 **Supersedes:** `docs/migration/v4e-divergence-2026-05-19.md` §5.2 — see "Supersession" below. Note the path correction: that file lives at `docs/migration/v4e-divergence-2026-05-19.md`, **not** under `docs/migration/findings/`.
 
 ---
@@ -175,6 +177,28 @@ The population is overwhelmingly `public`-shared seed/fixture data, not `domain`
 | private | 403 | — |
 
 Matches the source model exactly: `cleanupEntity` (`utils/entity.js:573-586`) requires `entu.userStr` truthy to reach the `domain` branch at all; an anonymous caller has none, so a `domain`-shared entity 403s outright while a `public`-shared one still resolves (to whatever's in its `public` bucket — empty here, consistent with no property definition carrying `sharing`).
+
+---
+
+## LIVE-CONFIRMED, 2026-08-05: the `mvox_collective` prop-def-sharing experiment
+
+The 2026-07-19 probe above established the model using a synthesized reader credential (`entu_api_key` injected on an OAuth-bound person). This is a second, independent confirmation using a real member browser token (Mihkel's actual second-account login, not a synthesized JWT), run against a purpose-built control/test pair rather than pre-existing person data — closes the loop for issue #93/slice-1 T4.
+
+**Setup:** a new app-extension type `mvox_collective` (PO-approved, not canonical v4E), `_sharing:domain`, with two sibling properties on one singleton instance ("Eesti Filharmoonia Kammerkoor", `_sharing:domain`):
+- `name` — prop-def `_sharing:domain` (the control; matches the domain-shared population already tested on 2026-07-19)
+- `test_hidden` — prop-def with **no `_sharing` value at all** (the test; value `"MEMBER_SHOULD_NOT_SEE"`), isolating the one variable the model claims should matter
+
+**Result (Mihkel's own report, member-tier browser-token read of the instance):** `name="Eesti Filharmoonia Kammerkoor"` (visible), `test_hidden=null` (absent). Exactly the prediction from the source model: `sharing` in `utils/aggregate.js:112-121` is forced to `undefined` for a property whose own definition carries no `_sharing`, so it's never written into `newEntity.domain` (`utils/aggregate.js:148-155`), and `cleanupEntity`'s domain branch (`utils/entity.js:578-579`) can only ever return what's actually in that bucket.
+
+**Cleanup:** `test_hidden`'s prop-def and its instance value were both deleted after the read (`scripts/migrations/cleanup-mvox-collective-test-hidden-2026-08-05.ts`, idempotent, artifact-confirmed); the real marker (type, `name` prop-def, instance) is untouched and still reads `count=1, name="Eesti Filharmoonia Kammerkoor"` via `?_type.string=mvox_collective&props=name`.
+
+### [GOTCHA] `_sharing` inherits from `_parent` at create time — "just omit it" doesn't mean "unshared"
+
+Discovered while building the experiment above, and load-bearing for the experiment's validity: entu-api's `inheritParentProperties` (called unconditionally by `setEntity` for every new-entity create) auto-injects `_sharing` onto a new entity from its `_parent`'s `_sharing` whenever the create payload doesn't include one. Confirmed by direct reproduction, not read-only inference: creating `test_hidden`'s prop-def under the domain-shared `mvox_collective` type **without** `_sharing` in the payload produced a prop-def with `_sharing:domain` auto-set anyway (removed by an explicit follow-up `DELETE` on that specific property value, then re-verified absent).
+
+**Consequence:** a naive "just don't set `_sharing`" approach to creating an unshared property definition under any domain- or public-shared type silently produces a *shared* property definition instead — the opposite of what's usually intended. Anyone doing schema work under a shared type needs to either explicitly set `_sharing:private`, or create-then-verify-then-delete-if-inherited as this experiment did.
+
+**Connects to a prior finding in this document:** `lib/v4e-translator.ts`'s `translatePropertyDef` (Josquin's territory, not modified) never includes `_sharing` in its payload for any property definition it creates — checked directly, no such field. Combined with this inheritance behavior, that means the *actual* sharing outcome for any prop-def created through the standard schema pipeline depends entirely on whether its **parent type** happens to carry `_sharing` at creation time, not on anything in the v4E schema source (which does have a per-property `sharing` field that's simply never read by the translator). For `person` — whose type-def apparently carries no `_sharing` — this is currently harmless by coincidence (nothing to inherit, matches the "0/21 have sharing" census). It would **not** be harmless under any type that does carry `_sharing`, where every prop-def created through the untouched translator would silently inherit that same sharing level regardless of what the v4E schema intended per-property. Worth a ticket for Josquin: `translatePropertyDef` should either read and set `sharing` from the v4E def, or the caller needs to explicitly pin `_sharing:private` for properties the schema doesn't intend to share, to avoid relying on accidental non-inheritance.
 
 ---
 

@@ -2,6 +2,20 @@
 
 <!-- Sessions 2–30 findings pruned 2026-06-14: all durable Entu mechanics, Path C architecture, OAuth wire shape, linting versions, etc. are captured in MEMORY.md (project_entu_*, project_cf_*, project_wrangler_*). See git history for full session records. -->
 
+## Active / Durable findings (S41, single-collective pivot — multi-db platform topology)
+
+### [LEARNED] Entu is one platform, many Mongo dbs = many "collectives" — single host, path-routed, no per-db registration gate
+
+Source-verified `~/projects/entu-api`, full detail sent to team-lead (not restated here — see message thread for citations):
+- **One shared `mongodbUrl` + one `jwtSecret`** for the whole deployment (`.config/nitro.ts:6-29`, `.env.example`). All "collectives" are separate Mongo databases on ONE connection, served by ONE Nitro host. DB selection is purely the URL's first path segment (`middleware/auth.js:21`, `middleware/mongodb.js:17`) — `<samehost>/<dbname>/entity/...`. No per-collective host/endpoint anywhere.
+- **`/auth` (no `?db=` param) enumerates EVERY non-system db on the connection** (`routes/auth/index.get.js:132,141-144`) and adds an `accounts[dbName]` entry for each one where a matching `person` entity exists inside that specific db. **One token CAN span multiple collective-dbs** if the same OAuth identity has a person entity in more than one. Pass `?db=`/`?account=` at `/auth` time to scope a token to exactly one db.
+- **No db-registration step for reads.** `connectDb` (`utils/mongodb.js:8-46`) just checks `listDatabases()` live — any Mongo db that exists on the connection with a valid name (`^[a-z][a-z0-9_]*$`, not a Mongo system db) is immediately usable. The only GATED creation path is the Stripe-billing `routes/new.put.js` → `initializeNewDatabase` (seeds from a literal `template` db) — irrelevant if a collective db is created by a raw Mongo-level clone of `polyphony` instead (which is what mvox's single-collective plan actually does).
+- **`/refresh` does NOT re-enumerate dbs** — it only re-validates accounts already in the presented token (`routes/auth/refresh.get.js:106-133`). A new collective membership requires a fresh `/auth` call, not `/refresh`.
+
+(*MVOX:Finn*)
+
+---
+
 ## Active / Durable findings (S40, single-collective pivot — domain-sharing source verification)
 
 ### [LEARNED] `entu.userStr` (domain-tier gate) is per-db, gated by a genuine person entity in THAT db — source-verified, not doc-relayed

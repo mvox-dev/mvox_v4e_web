@@ -1,0 +1,18 @@
+{
+  "dryRun": true,
+  "startedAt": "2026-08-05T19:16:46.155Z",
+  "propertyDef": {
+    "action": "would_create",
+    "_id": null
+  },
+  "autoInheritedSharing": {
+    "detected": false,
+    "value": null,
+    "removedPropId": null
+  },
+  "instanceValue": {
+    "action": "would_create",
+    "_id": null
+  },
+  "completedAt": "2026-08-05T19:16:46.432Z"
+}
