@@ -1167,4 +1167,38 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
   doesn't, hence the 0/21 census — but would silently produce unwanted domain/public-shared prop-defs
   under any FUTURE type that IS shared. Worth folding into the ticket for Josquin.
 
+## Session — 2026-08-06
+
+### T5 agenda "No upcoming rehearsals" investigation (read-only, PO-key authenticated)
+
+[PROBE-RESULT] probe-agenda-empty-investigation-2026-08-06 — COMPLETE. Root cause found: NOT
+  rights, NOT data-absence. Ground truth (queried as PO/db-owner, omniscient — rights not a
+  confound for this read):
+  - Season 1 "Fila hooaeg" (6a1d6b6210cc20db24e7ce58): start=2026-06-02, end=2026-07-28 (PAST
+    as of today 2026-08-06) → agenda's "ongoing" filter (endDate empty OR endDate>=today)
+    EXCLUDES it. sharing=public, inheritRights=true, PO in _viewer — rights are fine.
+  - Season 2 "suvekool '26" (6a1d789c10cc20db24e7cf40): start=2026-06-02, end=2026-06-30 (PAST)
+    → also excluded by the ongoing filter. 0 rehearsal events under it anyway (genuinely empty).
+  - Season 1 owns 21 rehearsal events (event_series "Tuesday rehearsals" 6a1d6b6210cc20db24e7ce61,
+    default_location "Method hall"; event_series "october sprint" 6a2d546d4cd971291c5d5705,
+    default_location "Method Hall") with start_datetimes 2026-09-01 through 2026-12-15 — ALL in
+    the future relative to today. rights on events fine (same chain, confirmed session-37/39).
+  - Root cause: the agenda queries events PER ongoing-season (season-first, then events-within-
+    season). Season 1's own end_date (2026-07-28) is stale relative to its own events (which run
+    through Dec 2026) — likely PO dogfood test data (architecture-decisions.md: "do not seed
+    events; real test data created through mvox itself") whose end_date was never extended as the
+    rehearsal series grew. Because season 1 fails the ongoing check, its 21 future events are never
+    queried at all — agenda shows empty despite real upcoming data existing.
+  Verdict: BUG (data/query mismatch), not correct-empty and not a rights bug. This is task #1's
+  inverse: task #1 fixed "open-ended season wrongly dropped" (empty end_date case); this is "season
+  with a real, now-past end_date wrongly gates a still-active event series." Two independent fix
+  paths exist (which one is right is a Byrd/Josquin/PO call, not mine): (a) data fix — extend
+  season 1's end_date past 2026-12-15 (single live property write, needs authorization+PO decision
+  on whether that's the correct semantic), or (b) query-logic fix — don't gate event visibility on
+  season.end_date at all (code change, Byrd/Josquin territory). NOT a seeding task — 21 real future
+  events already exist; seeding would duplicate, not fix, the problem.
+  Script: scripts/migrations/probes/probe-agenda-empty-investigation-2026-08-06.ts (READ-ONLY, no
+  mutations, ran under ENTU_API_KEY/PO db-owner key).
+  Result artifact: scripts/migrations/seed-results/agenda-empty-investigation-2026-08-05T22-00-17-917Z.json
+
 (*MVOX:Perotin*)
