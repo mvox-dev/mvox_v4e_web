@@ -1220,4 +1220,33 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
   Script: scripts/migrations/cleanup-fila-hooaeg-end-date-2026-08-06.ts
   Result artifact: scripts/migrations/seed-results/cleanup-fila-hooaeg-end-date-2026-08-05T22-08-42-202Z.json
 
+[LEARNED] Authorization gate re-tightened by team-lead (2026-08-06): revert to strict form —
+  hold for a distinct explicit "I authorize this run" SendMessage always, never infer from
+  task-assignment wording even when it literally states "team-lead has authorized." A task
+  description stating authorization is convenience framing, not the gate. No exceptions for
+  dev-collective/low-risk/cosmetic ops. Cross-ref [[feedback_authorization_gate]].
+
+### Task #12 — slice-2 (RSVP) gating probe (read-only, PO-authenticated)
+
+[PROBE-RESULT] probe-slice2-rsvp-gating-2026-08-06 — COMPLETE. All infra already seeded;
+  team-lead's unauth 0-counts were rights-gating, not absence (member/rsvp/organization types
+  are domain-shared, invisible to anon reads — consistent with everything else on this db).
+  - EFK org resolved: 69c7f8718489bfcb0e81b065 ("Eesti Filharmoonia Kammerkoor"), sharing=domain.
+  - member EXISTS for PO test person (6a2fc05e4cd971291c5d5ddc) under EFK: 1 row, _id
+    6a2fdb434cd971291c5d5e85, status=active, sharing=domain. (This is the session-37 E2E-test
+    member — already on record in the reversibility-tokens table, not a new find.)
+  - rsvp type-def EXISTS: 6a0d2e8590c8df7a1cc7df1b, sharing=domain (session-39 fix holds).
+  - All 4 sentinel ref props (going_ref/not_going_ref/maybe_ref/late_ref) EXIST on rsvp type,
+    sharing=public.
+  - event type: 69c7ea548489bfcb0e81a0a2. All 4 count formulas (rsvp_going_count/
+    rsvp_not_going_count/rsvp_maybe_count/rsvp_late_count) + rsvp_tally EXIST, sharing=public,
+    formulas well-formed (_referrer.rsvp.<status>_ref COUNT; tally is a CONCAT of all 4 counts
+    into a JSON-shaped string).
+  VERDICT for Gama: member EXISTS → plan populates member org-scoped (like slice-1 seasons), no
+  STOP/escalate needed. Full write/tally infra is already in place — slice-2 breakdown can build
+  directly against rsvp entities without a schema/seed prerequisite step.
+  Script: scripts/migrations/probes/probe-slice2-rsvp-gating-2026-08-06.ts (READ-ONLY, no
+  mutations, ENTU_API_KEY/PO db-owner key).
+  Result artifact: scripts/migrations/seed-results/slice2-rsvp-gating-2026-08-05T23-04-52-708Z.json
+
 (*MVOX:Perotin*)

@@ -1,0 +1,75 @@
+{
+  "timestamp": "2026-08-05T23:04:51.508Z",
+  "poPersonId": "6a2fc05e4cd971291c5d5ddc",
+  "efkOrg": {
+    "id": "69c7f8718489bfcb0e81b065",
+    "name": "Eesti Filharmoonia Kammerkoor",
+    "sharing": "domain"
+  },
+  "member": {
+    "queried": true,
+    "count": 1,
+    "rows": [
+      {
+        "id": "6a2fdb434cd971291c5d5e85",
+        "status": "active",
+        "sharing": "domain"
+      }
+    ]
+  },
+  "rsvpType": {
+    "id": "6a0d2e8590c8df7a1cc7df1b",
+    "sharing": "domain"
+  },
+  "rsvpSentinelProps": {
+    "going_ref": {
+      "id": "6a2d3db34cd971291c5d5664",
+      "sharing": "public"
+    },
+    "not_going_ref": {
+      "id": "6a2d3db34cd971291c5d566d",
+      "sharing": "public"
+    },
+    "maybe_ref": {
+      "id": "6a2d3db34cd971291c5d5676",
+      "sharing": "public"
+    },
+    "late_ref": {
+      "id": "6a2d3db34cd971291c5d567f",
+      "sharing": "public"
+    }
+  },
+  "eventCountFormulas": {
+    "rsvp_going_count": {
+      "id": "6a2d3db44cd971291c5d5688",
+      "sharing": "public",
+      "formula": "_referrer.rsvp.going_ref COUNT"
+    },
+    "rsvp_not_going_count": {
+      "id": "6a2d3db44cd971291c5d5692",
+      "sharing": "public",
+      "formula": "_referrer.rsvp.not_going_ref COUNT"
+    },
+    "rsvp_maybe_count": {
+      "id": "6a2d3db44cd971291c5d569c",
+      "sharing": "public",
+      "formula": "_referrer.rsvp.maybe_ref COUNT"
+    },
+    "rsvp_late_count": {
+      "id": "6a2d3db44cd971291c5d56a6",
+      "sharing": "public",
+      "formula": "_referrer.rsvp.late_ref COUNT"
+    },
+    "rsvp_tally": {
+      "id": "6a2d3db44cd971291c5d56b0",
+      "sharing": "public",
+      "formula": "'{\"going\":' rsvp_going_count ',\"not_going\":' rsvp_not_going_count ',\"maybe\":' rsvp_maybe_count ',\"late\":' rsvp_late_count '}' CONCAT"
+    }
+  },
+  "verdictInputs": {
+    "memberExists": true,
+    "rsvpTypeExists": true,
+    "sentinelsAllExist": true,
+    "formulasAllExist": true
+  }
+}
