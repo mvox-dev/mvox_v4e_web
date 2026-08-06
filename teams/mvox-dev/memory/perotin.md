@@ -1378,4 +1378,46 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
   (includes a followUpVerification block documenting the control-check + full-OAuth-scan that
   ruled out a query-methodology gap before trusting the absence finding).
 
+### Task #17 follow-up — Gama's probes A+B (read-only, GO, non-blocking)
+
+[PROBE-RESULT] probe-slice3-sharing-and-addUser-2026-08-06 — COMPLETE.
+
+  PROBE A — person prop-def _sharing, 4 fields (schema-level, verbatim):
+    name=domain, email=domain, notes=domain, preferred_contact_email=domain (propDef
+    6a0d2e8690c8df7a1cc7df7b). ALL FOUR are domain. Canonical v4E: email/notes/
+    preferred_contact_email are all private (name has no canonical stance given). So it's not
+    just notes — polyphony diverges from canonical on THREE fields, all in the LOOSENING
+    direction (private -> domain), not just the one Gama initially flagged.
+
+  PROBE B — add_user mechanism, source-cited (not guessed): read
+    ~/projects/entu-api/routes/auth/index.get.js directly per the entu-mechanics-cite-source
+    discipline.
+    [DECISION] Gate: L224 `if (onlyForAccount && accounts.length===0 && session &&
+      !inviteAttempted) -> createUserForAccount(...)`. onlyForAccount = the db= query param
+      scoping OAuth to one account; inviteAttempted = true only if invite= param present.
+    [DECISION] createUserForAccount (L289-323): looks up the db entity's add_user.reference as
+      the new person's _parent, POSTs {_type:person, _parent:<add_user.reference>,
+      _inheritrights:true, entu_user:{...}, email, name}, then sets _editor:self on the new person.
+    [PROBE-RESULT] polyphony db entity (69bcfd8e9c031ab8e6ce807a) HAS add_user set: 1 value,
+      reference=69bcfd8e9c031ab8e6ce807a (self-referencing — new persons get created as
+      children of the db entity itself). This is present and structurally valid, not absent.
+    [PROBE-RESULT] Cross-checked against both existing OAuth-linked persons: 6a2fc05e...ddc
+      (mihkel.putrinsh@gmail.com) and 69bcfd8e...79 (mitselek@gmail.com) BOTH have
+      _parent=69bcfd8e...7a — exactly matching createUserForAccount's assignment. Strong
+      evidence this exact code path created both of them successfully in the past.
+    VERDICT: add_user misconfiguration is RULED OUT as the explanation for B's missing person —
+      it's present, valid, and has demonstrably worked twice. The gap must be in B's specific
+      sign-in request: db= param not 'polyphony', or an invite= param present (routes to the
+      invite-acceptance branch instead, which no-ops silently since no stored invite exists for
+      B), or the session didn't complete server-side. Next diagnostic (outside my remit): check
+      the actual login-initiation URL/params the app used for B, or server auth logs.
+
+  [speculative → now resolved by source-read] My earlier report flagged "possible db-mismatch"
+  as unverified; this probe rules that specific worry out (add_user config is fine) without
+  fully resolving WHY B's request didn't hit this path — narrower unknown now, not a broader one.
+
+  Script: scripts/migrations/probes/probe-slice3-sharing-and-addUser-2026-08-06.ts (READ-ONLY).
+  Result artifact: scripts/migrations/seed-results/slice3-sharing-and-addUser-2026-08-06T09-12-58-702Z.json
+  (includes a probeB_mechanismTrace block citing the exact source lines).
+
 (*MVOX:Perotin*)

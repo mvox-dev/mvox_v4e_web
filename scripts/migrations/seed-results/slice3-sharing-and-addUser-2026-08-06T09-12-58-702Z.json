@@ -1,0 +1,105 @@
+{
+  "timestamp": "2026-08-06T09:12:57.990Z",
+  "probeA_personFieldSharing": {
+    "name": {
+      "propDefId": "69bcfd8e9c031ab8e6ce8068",
+      "sharing": {
+        "value": "domain",
+        "valueId": "69bcfd8e9c031ab8e6ce8182"
+      }
+    },
+    "email": {
+      "propDefId": "69bcfd8e9c031ab8e6ce8063",
+      "sharing": {
+        "value": "domain",
+        "valueId": "69bcfd8e9c031ab8e6ce80ef"
+      }
+    },
+    "notes": {
+      "propDefId": "69bcfd8e9c031ab8e6ce8069",
+      "sharing": {
+        "value": "domain",
+        "valueId": "69bcfd8e9c031ab8e6ce810d"
+      }
+    },
+    "preferred_contact_email": {
+      "propDefId": "6a0d2e8690c8df7a1cc7df7b",
+      "sharing": {
+        "value": "domain",
+        "valueId": "6a0d2e8690c8df7a1cc7df81"
+      }
+    }
+  },
+  "probeA_divergenceVsCanonical": {
+    "name": {
+      "live": "domain",
+      "canonical": null,
+      "diverges": false
+    },
+    "email": {
+      "live": "domain",
+      "canonical": "private",
+      "diverges": true
+    },
+    "notes": {
+      "live": "domain",
+      "canonical": "private",
+      "diverges": true
+    },
+    "preferred_contact_email": {
+      "live": "domain",
+      "canonical": "private",
+      "diverges": true
+    }
+  },
+  "probeB_dbEntity": {
+    "id": "69bcfd8e9c031ab8e6ce807a",
+    "allKeys": [
+      "_id",
+      "_created",
+      "_editor",
+      "_inheritrights",
+      "_owner",
+      "_sharing",
+      "_type",
+      "add_user",
+      "_reference",
+      "billing_customer_id",
+      "email",
+      "entu_user",
+      "name",
+      "plan",
+      "_expander",
+      "_viewer"
+    ],
+    "add_user": [
+      {
+        "_id": "6a2f3f564cd971291c5d5ca0",
+        "reference": "69bcfd8e9c031ab8e6ce807a",
+        "property_type": "add_user",
+        "string": "polyphony",
+        "entity_type": "database"
+      }
+    ]
+  },
+  "probeB_verdict": {
+    "addUserPresent": true,
+    "valueCount": 1,
+    "values": [
+      {
+        "_id": "6a2f3f564cd971291c5d5ca0",
+        "reference": "69bcfd8e9c031ab8e6ce807a",
+        "property_type": "add_user",
+        "string": "polyphony",
+        "entity_type": "database"
+      }
+    ]
+  },
+  "probeB_mechanismTrace": {
+    "note": "Followed up the raw add_user value by reading entu-api source (~/projects/entu-api/routes/auth/index.get.js) rather than guessing at add_user's semantics -- per team convention, Entu behavior claims need a source cite, not a docs summary.",
+    "citedSource": "routes/auth/index.get.js:224-238 (gating condition) + :289-323 (createUserForAccount)",
+    "mechanism": "On OAuth callback, if (onlyForAccount && accounts.length===0 && session && !inviteAttempted) -> createUserForAccount(onlyForAccount, session) runs. It looks up the db entity's add_user.reference as the PARENT for a new person, then POSTs {_type:person, _parent:<that reference>, _inheritrights:true, entu_user:{...}, email, name} and sets _editor:self. onlyForAccount is the db= query param scoping the OAuth request to a single account; inviteAttempted is true only when an invite= query param was present.",
+    "crossCheck": "Confirmed both existing OAuth-linked persons have _parent = 69bcfd8e9c031ab8e6ce807a (the db entity itself) -- 6a2fc05e4cd971291c5d5ddc (mihkel.putrinsh@gmail.com) and 69bcfd8e9c031ab8e6ce8079 (mitselek@gmail.com). This exactly matches createUserForAccount's _parent assignment, strongly indicating BOTH were created by this exact code path in the past.",
+    "conclusion": "add_user is present and correctly configured (a valid self-referencing parent) -- the mechanism is NOT broken or misconfigured at the db level, and has demonstrably worked twice before. add_user absence/misconfiguration is RULED OUT as the explanation for B's missing person. The gap must be in the specific request B's sign-in made: either onlyForAccount (db= param) was not 'polyphony', or an invite= param was present routing through the (no-op, since no stored invite exists for B) invite-acceptance branch instead, or the session did not complete server-side. Recommend checking the mvox app's actual login-initiation URL/params for whatever flow B used, and/or server-side auth logs for B's request, as the next diagnostic step -- outside my remit/access to pursue further."
+  }
+}
