@@ -1249,4 +1249,45 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
   mutations, ENTU_API_KEY/PO db-owner key).
   Result artifact: scripts/migrations/seed-results/slice2-rsvp-gating-2026-08-05T23-04-52-708Z.json
 
+### Task #10 opening move — rsvp CREATE wire-shape smoke test (LIVE, authorized)
+
+[PROBE-RESULT] probe-slice2-rsvp-create-smoke-2026-08-06 — COMPLETE. Wire shape confirmed clean.
+  Authorization: team-lead explicit "I authorize this run", distinct token — gate honored per
+  the re-tightened discipline (no inference from task wording this time).
+  POST body (matches src/lib/rsvp/rsvpData.ts createRsvp() exactly, verified by reading the
+  source before writing the probe): _type ref, _parent ref (person), event ref, member ref,
+  status string, <status>_ref ref.
+  CREATE accepted: _id 6a73ce8836c951d9114ec68f. Entu auto-added _sharing, _inheritrights:true,
+  _owner (API-key identity 69bcfd8e9c031ab8e6ce8079), _created — none of these were in the POST.
+  Re-GET verified: event/member/going_ref stored as references (_id present, reference field
+  set); status stored as string; not_going_ref/maybe_ref/late_ref correctly absent.
+  [GOTCHA] My own probe's automated checks initially read as FAIL (eventIsReference=false,
+  memberIsReference=false) — false negative in the CHECK LOGIC, not Entu: I asserted
+  string===undefined on reference-type fields, but Entu denormalizes a display string alongside
+  every reference on GET (event.string="Tuesday rehearsals", member.string=null) — documented
+  behavior, session-22 finding. Corrected interpretation appended to the result artifact
+  (correctedInterpretation key) rather than re-running live. All wire-shape checks actually PASS.
+  [GOTCHA — GENUINE, not a check-logic bug] _sharing:domain was auto-materialized on the created
+  rsvp. This CONTRADICTS the code comment in src/lib/rsvp/rsvpData.ts ("No _sharing: parent
+  (person) is private -> child inherits private by default"). Verified directly (separate
+  read-only GET): person 6a2fc05e4cd971291c5d5ddc has _sharing:domain, not private/absent — so
+  the entu-api auto-inherit rule (inheritParentProperties, confirmed 2026-08-05
+  probe-mvox-collective-unshared-prop) materialized domain onto the child rsvp. The code's
+  privacy assumption does not hold for this real PO person and may not hold for other real
+  singers. Practical implication: a domain-shared rsvp is readable by ANY domain-authenticated
+  user, not private as the comment implies — worth Josquin/team-lead reviewing before #10 build
+  (does slice-2's rights model actually want rsvp private-by-default, and if so the create path
+  needs an explicit _sharing:private-equivalent, i.e. no-op since absent=private, which means
+  actively correcting the auto-inherit the same way probe-mvox-collective-unshared-prop did for
+  test_hidden — DELETE the auto-injected _sharing value after create if private really is wanted).
+  DELETE cleanup confirmed: re-GET after DELETE returned 404 "Entity ... not found". DB is clean,
+  no smoke residue.
+  RIGHTS CAVEAT (per team-lead's ask): this used ENTU_API_KEY (PO/db-owner) — pins WIRE SHAPE
+  only. The singer-writes-on-own-token RIGHTS path (does a real singer's own OAuth JWT succeed
+  at this same create, does _owner end up as the singer not the API-key identity) is NOT
+  validated here — that's #13, Mihkel's real token.
+  Script: scripts/migrations/probes/probe-slice2-rsvp-create-smoke-2026-08-06.ts (LIVE: one
+  create + one delete, nothing else mutated).
+  Result artifact: scripts/migrations/seed-results/slice2-rsvp-create-smoke-2026-08-06T00-00-08-909Z.json
+
 (*MVOX:Perotin*)
