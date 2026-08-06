@@ -1,0 +1,131 @@
+{
+  "timestamp": "2026-08-06T13:30:57.182Z",
+  "correctsArtifact": "probe-person-sharing-census-2026-08-06T13-25-31-545Z.json (and the 2026-07-19 original)",
+  "bugFound": "Original script queried HTTP props='name,sharing' (no underscore). Entu's real system field is '_sharing'. 'sharing' (no underscore) matches no property on any entity, so the script silently read null/none for all 21 defs -- a false negative, not a true absence.",
+  "personTypeSharing": "domain",
+  "propertyDefs_CORRECTED": [
+    {
+      "name": "address",
+      "sharing": "domain"
+    },
+    {
+      "name": "bio",
+      "sharing": "domain"
+    },
+    {
+      "name": "birthdate",
+      "sharing": "domain"
+    },
+    {
+      "name": "county",
+      "sharing": "domain"
+    },
+    {
+      "name": "email",
+      "sharing": "domain"
+    },
+    {
+      "name": "entu_api_key",
+      "sharing": "domain"
+    },
+    {
+      "name": "entu_passkey",
+      "sharing": "domain"
+    },
+    {
+      "name": "entu_user",
+      "sharing": "domain"
+    },
+    {
+      "name": "idcode",
+      "sharing": "domain"
+    },
+    {
+      "name": "language",
+      "sharing": "domain"
+    },
+    {
+      "name": "locale",
+      "sharing": "domain"
+    },
+    {
+      "name": "name",
+      "sharing": "domain"
+    },
+    {
+      "name": "notes",
+      "sharing": "domain"
+    },
+    {
+      "name": "phone",
+      "sharing": "domain"
+    },
+    {
+      "name": "photo",
+      "sharing": "domain"
+    },
+    {
+      "name": "postalcode",
+      "sharing": "domain"
+    },
+    {
+      "name": "preferences",
+      "sharing": "domain"
+    },
+    {
+      "name": "preferred_contact_email",
+      "sharing": "domain"
+    },
+    {
+      "name": "timezone",
+      "sharing": "domain"
+    },
+    {
+      "name": "town",
+      "sharing": "domain"
+    },
+    {
+      "name": "voice",
+      "sharing": "domain"
+    }
+  ],
+  "propertyDefsWithSharing_CORRECTED": "21 of 21",
+  "domainTierPersonsWithValues": [
+    {
+      "_id": "6a097dcc90c8df7a1cc7d6dd",
+      "_sharing": [
+        {
+          "_id": "6a097dcc90c8df7a1cc7d6e1",
+          "string": "domain"
+        }
+      ],
+      "name": [
+        {
+          "_id": "6a0e9b2b4ff8277cd4306681",
+          "string": "Test User"
+        }
+      ]
+    },
+    {
+      "_id": "6a2fc05e4cd971291c5d5ddc",
+      "_sharing": [
+        {
+          "_id": "6a2fc05e4cd971291c5d5de3",
+          "string": "domain"
+        }
+      ],
+      "email": [
+        {
+          "_id": "6a2fc05e4cd971291c5d5de1",
+          "string": "mihkel.putrinsh@gmail.com"
+        }
+      ],
+      "name": [
+        {
+          "_id": "6a2fc05e4cd971291c5d5de2",
+          "string": "Mihkel Putrinš"
+        }
+      ]
+    }
+  ]
+}
