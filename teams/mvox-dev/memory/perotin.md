@@ -1676,4 +1676,41 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
   is documentation-only, didn't alter behavior.
   Cross-check artifact: scripts/migrations/seed-results/probe-person-sharing-census-2026-08-06T13-42-33-367Z.json
 
+### T4.3 (#24) — profile type created, person reduced (LIVE, authorized) — VERIFIED
+
+[CHECKPOINT] Explicit "I authorize this run. Execute now." received from team-lead, after Mihkel's
+  go + team-lead's own independent cross-check. Executed Josquin's locked design doc verbatim
+  (workspace-app: docs/design/2026-08-06-T4.3-profile-type-and-person-reduction.md §4, payloads
+  copied not reconstructed). Identity: db-root key (ENTU_API_KEY → 69bcfd8e...8079), required —
+  an _editor gets 403 on DELETE /entity.
+
+  Step 0 drift check (read-only, ran even in --live): all 3 person prop-defs (name/email/notes)
+  resolved correctly, profile type count 0 — no drift from the design doc's snapshot. Proceeded.
+
+  Step 1: created profile type — 6a74933f36c951d9114ec817 (_sharing:public in the SAME create
+  POST, per the design doc's "create-time trap" — db-root parent is domain, omitting _sharing
+  would have inherited domain and downgraded the cap wrongly).
+  Step 2: created profile.name (6a74934036c951d9114ec822) + profile.email (6a74934036c951d9114ec82e)
+  prop-defs, both _sharing:public, type:string.
+  Step 3: DELETE'd person.name (...8068), person.email (...8063), person.notes (...8069) —
+  DELETE /entity/{id} (prop-defs are entities, NOT DELETE /property/).
+
+  Step 4 read-back (not inferred from POST/DELETE 200s), ALL PASS:
+  - profile type: _sharing=public, _owner includes db-root, _inheritrights=true.
+  - profile prop-defs: exactly 2 (name+email), both public, type=string.
+  - person prop-defs: 18 remaining (name/email/notes GONE; entu_user/entu_api_key/entu_passkey
+    KEPT, as designed — the other ~15 self-supplied fields untouched, narrow scope per Mihkel).
+  - Purge check: name/email VALUES survive prop-def deletion on all 3 sampled persons (db-root
+    private Mihkel: name+email present; domain Mihkel: name+email present; sample public person
+    "Aino Kask": name present, email null — expected, she never had one set). Confirms the design
+    doc's source-traced prediction (propertiesToEntity builds private[] from raw property rows
+    regardless of any prop-def) — values are NOT purged by removing the prop-def, only demoted
+    out of the domain bucket.
+
+  VERIFIED: true, all checks.
+  Script: scripts/migrations/cleanup-t4-3-profile-type-person-reduction-2026-08-06.ts (drift-check
+  guard + manifest-first default DRY_RUN, --live to execute — same pattern as prior cleanup
+  scripts).
+  Result artifact: scripts/migrations/seed-results/t4-3-profile-type-person-reduction-2026-08-06T13-59-29-013Z.json
+
 (*MVOX:Perotin*)

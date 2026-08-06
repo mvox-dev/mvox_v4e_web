@@ -1,0 +1,76 @@
+{
+  "timestamp": "2026-08-06T13:59:29.013Z",
+  "profileTypeId": "6a74933f36c951d9114ec817",
+  "profilePropDefIds": {
+    "name": "6a74934036c951d9114ec822",
+    "email": "6a74934036c951d9114ec82e"
+  },
+  "readBack": {
+    "profileType": {
+      "sharing": "public",
+      "ownerIncludesDbRoot": true,
+      "inheritRights": true
+    },
+    "profilePropDefs": [
+      {
+        "id": "6a74934036c951d9114ec822",
+        "name": "name",
+        "sharing": "public",
+        "type": "string"
+      },
+      {
+        "id": "6a74934036c951d9114ec82e",
+        "name": "email",
+        "sharing": "public",
+        "type": "string"
+      }
+    ],
+    "personPropDefsRemaining": [
+      "address",
+      "bio",
+      "birthdate",
+      "county",
+      "entu_api_key",
+      "entu_passkey",
+      "entu_user",
+      "idcode",
+      "language",
+      "locale",
+      "phone",
+      "photo",
+      "postalcode",
+      "preferences",
+      "preferred_contact_email",
+      "timezone",
+      "town",
+      "voice"
+    ],
+    "nameGone": true,
+    "emailGone": true,
+    "notesGone": true,
+    "keptEntuUser": true,
+    "keptEntuApiKey": true,
+    "keptEntuPasskey": true
+  },
+  "purgeCheck": [
+    {
+      "label": "db-root Mihkel (private)",
+      "id": "69bcfd8e9c031ab8e6ce8079",
+      "name": "Mihkel Putrinš",
+      "email": "mitselek@gmail.com"
+    },
+    {
+      "label": "domain Mihkel",
+      "id": "6a2fc05e4cd971291c5d5ddc",
+      "name": "Mihkel Putrinš",
+      "email": "mihkel.putrinsh@gmail.com"
+    },
+    {
+      "label": "sample public person",
+      "id": "6a0dd2384ff8277cd4305e9e",
+      "name": "Aino Kask",
+      "email": null
+    }
+  ],
+  "verified": true
+}
