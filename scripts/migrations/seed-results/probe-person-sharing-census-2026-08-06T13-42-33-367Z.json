@@ -1,0 +1,227 @@
+{
+  "timestamp": "2026-08-06T13:42:32.788Z",
+  "personTotal": 131,
+  "apiReportedCount": 131,
+  "sharingCensus": {
+    "private": 1,
+    "domain": 2,
+    "public": 128
+  },
+  "fieldCensusByTier": {
+    "private": {
+      "name": 1,
+      "email": 1
+    },
+    "domain": {
+      "name": 2,
+      "email": 1
+    },
+    "public": {
+      "name": 128
+    }
+  },
+  "oauthBoundPersons": [
+    {
+      "_id": "69bcfd8e9c031ab8e6ce8079",
+      "sharing": "private",
+      "name": "Mihkel Putrinš"
+    },
+    {
+      "_id": "6a2fc05e4cd971291c5d5ddc",
+      "sharing": "domain",
+      "name": "Mihkel Putrinš"
+    }
+  ],
+  "propertyDefs": [
+    {
+      "name": "address",
+      "sharing": "domain"
+    },
+    {
+      "name": "bio",
+      "sharing": "domain"
+    },
+    {
+      "name": "birthdate",
+      "sharing": "domain"
+    },
+    {
+      "name": "county",
+      "sharing": "domain"
+    },
+    {
+      "name": "email",
+      "sharing": "domain"
+    },
+    {
+      "name": "entu_api_key",
+      "sharing": "domain"
+    },
+    {
+      "name": "entu_passkey",
+      "sharing": "domain"
+    },
+    {
+      "name": "entu_user",
+      "sharing": "domain"
+    },
+    {
+      "name": "idcode",
+      "sharing": "domain"
+    },
+    {
+      "name": "language",
+      "sharing": "domain"
+    },
+    {
+      "name": "locale",
+      "sharing": "domain"
+    },
+    {
+      "name": "name",
+      "sharing": "domain"
+    },
+    {
+      "name": "notes",
+      "sharing": "domain"
+    },
+    {
+      "name": "phone",
+      "sharing": "domain"
+    },
+    {
+      "name": "photo",
+      "sharing": "domain"
+    },
+    {
+      "name": "postalcode",
+      "sharing": "domain"
+    },
+    {
+      "name": "preferences",
+      "sharing": "domain"
+    },
+    {
+      "name": "preferred_contact_email",
+      "sharing": "domain"
+    },
+    {
+      "name": "timezone",
+      "sharing": "domain"
+    },
+    {
+      "name": "town",
+      "sharing": "domain"
+    },
+    {
+      "name": "voice",
+      "sharing": "domain"
+    }
+  ],
+  "propertyDefsWithSharing": [
+    {
+      "name": "address",
+      "sharing": "domain"
+    },
+    {
+      "name": "bio",
+      "sharing": "domain"
+    },
+    {
+      "name": "birthdate",
+      "sharing": "domain"
+    },
+    {
+      "name": "county",
+      "sharing": "domain"
+    },
+    {
+      "name": "email",
+      "sharing": "domain"
+    },
+    {
+      "name": "entu_api_key",
+      "sharing": "domain"
+    },
+    {
+      "name": "entu_passkey",
+      "sharing": "domain"
+    },
+    {
+      "name": "entu_user",
+      "sharing": "domain"
+    },
+    {
+      "name": "idcode",
+      "sharing": "domain"
+    },
+    {
+      "name": "language",
+      "sharing": "domain"
+    },
+    {
+      "name": "locale",
+      "sharing": "domain"
+    },
+    {
+      "name": "name",
+      "sharing": "domain"
+    },
+    {
+      "name": "notes",
+      "sharing": "domain"
+    },
+    {
+      "name": "phone",
+      "sharing": "domain"
+    },
+    {
+      "name": "photo",
+      "sharing": "domain"
+    },
+    {
+      "name": "postalcode",
+      "sharing": "domain"
+    },
+    {
+      "name": "preferences",
+      "sharing": "domain"
+    },
+    {
+      "name": "preferred_contact_email",
+      "sharing": "domain"
+    },
+    {
+      "name": "timezone",
+      "sharing": "domain"
+    },
+    {
+      "name": "town",
+      "sharing": "domain"
+    },
+    {
+      "name": "voice",
+      "sharing": "domain"
+    }
+  ],
+  "anonymousReads": [
+    {
+      "tier": "public",
+      "entityId": "6a0dd2384ff8277cd4305e9e",
+      "httpStatus": 200,
+      "propsReturned": []
+    },
+    {
+      "tier": "domain",
+      "entityId": "6a097dcc90c8df7a1cc7d6dd",
+      "httpStatus": 403,
+      "propsReturned": []
+    },
+    {
+      "tier": "private",
+      "entityId": "69bcfd8e9c031ab8e6ce8079",
+      "httpStatus": 403,
+      "propsReturned": []
+    }
+  ]
+}

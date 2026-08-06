@@ -108,6 +108,12 @@ async function main() {
 	log(`OAuth-bound persons: ${oauthBound.length}`);
 
 	section('C. sharing value on each person property DEFINITION');
+	// GUARD: Entu's stored field is `_sharing` (underscore); `sharing` is ONLY an internal
+	// aggregate.js pipeline alias (aggregate.js:86). Query `_sharing`. If a query for `sharing`
+	// returns nothing across an entire type, that is the SIGNATURE of this bug, not a finding.
+	// Canonical schema.ts's `sharing?: Sharing` describes the projected shape, not stored data.
+	// See docs/architecture/entu-rights-and-visibility-model.md §3 (+ its supersession list,
+	// which already names this error from 2026-07-19).
 	const defUrl =
 		`${API_BASE}/${DB}/entity?_type.string=property` +
 		`&_parent.reference=${PERSON_TYPE_ID}&props=name,_sharing&limit=200`;

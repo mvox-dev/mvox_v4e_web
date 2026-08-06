@@ -1664,4 +1664,16 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
   header note added documenting the bug + fix date).
   Corrected artifact: scripts/migrations/seed-results/probe-person-sharing-census-2026-08-06T13-39-53-895Z.json
 
+[LEARNED] Gama's follow-up (same day): fixing the bug + marking prior conclusions "superseded" in
+  a doc isn't enough — a doc supersession doesn't stop the SAME buggy query re-deriving the same
+  wrong "0/21" from live data with a fresh timestamp on the next run (this exact error recurred
+  ~3x since July). The guard belongs where the next runner actually meets it: inline, at the query
+  line, in the script itself. Added a comment at the defUrl query in
+  probe-person-sharing-census-2026-07-19.ts naming the field-name gotcha explicitly and stating
+  "if a query for `sharing` returns nothing across an entire type, that is the SIGNATURE of this
+  bug, not a finding" — plus the cross-ref to docs/architecture/entu-rights-and-visibility-model.md
+  §3. Re-ran after adding the comment: output unchanged, still 21/21 domain — confirms the guard
+  is documentation-only, didn't alter behavior.
+  Cross-check artifact: scripts/migrations/seed-results/probe-person-sharing-census-2026-08-06T13-42-33-367Z.json
+
 (*MVOX:Perotin*)
