@@ -1584,4 +1584,37 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
   Script: scripts/migrations/probes/probe-add-user-provisioned-persons-2026-08-06.ts (READ-ONLY).
   Result artifact: scripts/migrations/seed-results/add-user-provisioned-persons-2026-08-06T10-05-07-550Z.json
 
+### T4.1 / issue #22 — PREP done, WAITING on team-lead's per-run "execute now" (2026-08-06)
+
+[WIP] Confirmed live (READ-ONLY, no mutation): polyphony db entity (69bcfd8e9c031ab8e6ce807a)
+  has exactly ONE `add_user` property value: propValueId=6a2f3f564cd971291c5d5ca0,
+  reference=69bcfd8e9c031ab8e6ce807a (self-referencing — matches the earlier
+  probe-slice3-sharing-and-addUser-2026-08-06 finding, same value, re-confirmed fresh).
+  Script: scripts/migrations/probes/probe-t41-add-user-prep-2026-08-06.ts (committed 451f9b3,
+  direct to main per data-manager convention — read-only, no gate needed).
+
+[DECISION] Draft mutation for the live run (uses Josquin's lib, no new lib code needed):
+  `deletePropertyValue(client, '6a2f3f564cd971291c5d5ca0')` → `DELETE
+  /polyphony/property/6a2f3f564cd971291c5d5ca0`. This is a property-VALUE delete (add_user is a
+  reference property value on the db entity, not a prop-def entity), so `deletePropertyValue`
+  is the correct primitive, not `deleteEntity`.
+
+[DECISION] Read-back plan: `fetchEntity(client, POLYPHONY_DB_ENTITY_ID)` again post-delete,
+  assert `entity.add_user` is `undefined` or `[]`. Do not infer success from the DELETE's 200 —
+  read the entity back per the issue's check 1.
+
+[DEFERRED] Two of the three verification checks are NOT mine to close:
+  - Check 2 (behavioural, fresh identity `mikela.biri@gmail.com` → `/auth?db=polyphony` → no
+    person) needs a real OAuth browser sign-in. I can't drive that as a script; team-lead/Mihkel
+    needs to run it post-fix.
+  - Check 3 (regression, existing member still signs in) — same constraint, needs a real
+    browser OAuth sign-in with an existing member's account.
+  My scope covers check 1 (config read-back) directly; checks 2+3 I can only prep the "what to
+  click" instructions for, not execute myself.
+
+[WIP] Did NOT touch add_user. Waiting for team-lead's explicit "I authorize this run" /
+  "execute now" per common-prompt authority rules — not inferred from #22's existence, not from
+  #21's epic-level sign-off (both already on record, per issue-standard.md §8.6 neither retires
+  the per-run token).
+
 (*MVOX:Perotin*)
