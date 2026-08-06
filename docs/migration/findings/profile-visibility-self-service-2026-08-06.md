@@ -79,16 +79,25 @@ token, on two independent grounds:**
    `checkEntityAccess`'s owner-gate (Q1).
 
 **Conclusion: visibility is a global prop-def/admin decision, not self-service, as the system is
-built today.** A profile-opt-out feature, if wanted, needs one of:
+built today.**
 
-- An app-side field (e.g., `contact_visibility_opt_out: boolean`) that the BFF/frontend reads and
-  applies as an additional filter on TOP of Entu's domain/public projection — Entu keeps deciding
-  the coarse bucket, the app narrows further. No entu-api change needed.
-- A genuine entu-api change to support per-value `_sharing` overrides in `aggregateEntity` — out
-  of scope for mvox to build/maintain; would diverge from upstream Entu.
-- Granting real `_owner` to users on their own person (undoes the current, deliberate `_editor`-
-  only auto-provision boundary) — plausible but a rights-model change with its own blast radius,
-  and still wouldn't solve Q2's uniform-bucket limitation on its own.
+**CORRECTED (team-lead, same day):** my first draft recommended an app-side opt-out field
+applied "by the BFF." mvox has **no BFF** — it's browser-direct, and structurally can't have one
+(Entu's JWT `aud` claim is IP-bound at mint time; a server-side proxy would break that binding).
+Any client-side filtering of an already-domain-shared field is exactly the client-side-filtering
+pattern Gama explicitly forbade for the roster slice: the data still reaches the client, so the
+"boundary" is cosmetic, not real. That option is off the table for this app's architecture, not
+just a nice-to-have simplification.
 
-Recommend the first option to Mihkel if a profile opt-out is wanted: it's additive, doesn't touch
-entu-api, and doesn't change the current rights boundary for auto-provisioned users.
+Honest option set, given no BFF exists or can exist:
+
+- A genuine entu-api change to support per-value `_sharing` overrides in `aggregateEntity` — a
+  real (upstream) rights-model change, big, out of scope for mvox to build/maintain solo.
+- Granting real `_owner` to users on their own person, undoing the current deliberate
+  `_editor`-only auto-provision boundary — plausible but its own blast radius, and STILL doesn't
+  solve Q2's uniform-bucket limitation on its own (an owner could flip the whole entity's
+  `_sharing`, but not a single field within it, without the aggregate.js change above too).
+
+**Both require touching the rights model, not a near-term bolt-on.** No additive, architecture-
+compatible middle option exists for this app as built. This is a forward-looking design decision
+for Mihkel/Gama, not something to implement opportunistically.

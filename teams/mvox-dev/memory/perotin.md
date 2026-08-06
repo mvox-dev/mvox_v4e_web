@@ -1451,4 +1451,16 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
   Findings doc: docs/migration/findings/profile-visibility-self-service-2026-08-06.md (full
   source citations, all 4 questions answered with exact file:line).
 
+[LEARNED] Team-lead correction (same day): my "app-side opt-out applied by the BFF" recommendation
+  was wrong for THIS app — mvox is browser-direct, no BFF, and structurally can't have one (Entu
+  JWT aud is IP-bound at mint; a server proxy breaks that binding). A client-side filter on an
+  already-domain-shared field is exactly the client-side-filtering pattern Gama forbade for the
+  roster slice (data still reaches the client, "boundary" is cosmetic). Corrected the findings doc
+  in place: honest option set is either an entu-api rights-model change (upstream, big) or granting
+  real _owner to users on themselves (own blast radius, still doesn't solve Q2's uniform-bucket
+  limit alone) — no additive near-term bolt-on exists for this architecture. Lesson: when
+  recommending a fix, check it against the actual deployment shape (browser-direct here) before
+  proposing a component (BFF) the app doesn't have — don't default to a generic pattern from
+  habit/training data.
+
 (*MVOX:Perotin*)
