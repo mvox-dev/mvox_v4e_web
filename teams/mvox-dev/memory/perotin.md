@@ -1617,4 +1617,26 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
   #21's epic-level sign-off (both already on record, per issue-standard.md §8.6 neither retires
   the per-run token).
 
+### T4.1 (#22) — add_user removed, LIVE, authorized — CLOSED my half
+
+[CHECKPOINT] Explicit "I authorize this run" received from team-lead (2026-08-06), after
+  team-lead independently re-verified the target read-only (single add_user value, self-
+  referencing, matching my prep exactly). Executed the single authorized op:
+  DELETE /property/6a2f3f564cd971291c5d5ca0 (the sole add_user value on db entity
+  69bcfd8e9c031ab8e6ce807a). Nothing else touched.
+
+  Check 1 (config read-back, MINE): re-fetched the db entity post-delete — add_user is null
+  (absent), NOT inferred from the DELETE 200. CONFIRMED closed as of 2026-08-06T13:13:47Z —
+  **auto-provisioning window for polyphony OPENS at that timestamp** (no new person can be
+  created via OAuth until T4.5/#31 lands) — flagging per team-lead's ask, on the record.
+
+  Checks 2 (fresh identity mikela.biri@ → no person) and 3 (existing member still signs in) —
+  NOT executed by me, as flagged in the prior [DEFERRED] entry: both need a real browser OAuth
+  sign-in, a human action. Team-lead is routing both to Mihkel via the PO channel, to be closed
+  at the human/T4.9 gate — not by me minting anything.
+
+  Script: scripts/migrations/cleanup-scope-add-user-t4-1-2026-08-06.ts (single DELETE + read-back
+  verify, manifest logged pre-execution).
+  Result artifact: scripts/migrations/seed-results/t4-1-scope-add-user-2026-08-06T13-13-47-326Z.json
+
 (*MVOX:Perotin*)

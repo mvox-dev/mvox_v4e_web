@@ -1,0 +1,18 @@
+{
+  "timestamp": "2026-08-06T13:13:46.373Z",
+  "op": "T4.1 scope add_user",
+  "dbEntityId": "69bcfd8e9c031ab8e6ce807a",
+  "deletedValueId": "6a2f3f564cd971291c5d5ca0",
+  "addUserBefore": [
+    {
+      "_id": "6a2f3f564cd971291c5d5ca0",
+      "reference": "69bcfd8e9c031ab8e6ce807a",
+      "property_type": "add_user",
+      "string": "polyphony",
+      "entity_type": "database"
+    }
+  ],
+  "addUserAfter": null,
+  "configReadBackConfirmedAbsent": true,
+  "note": "Mutation done + config read-back verified. Behavioural checks 2/3 (fresh OAuth -> no person; existing member still signs in) PENDING human sign-in — routed by team-lead to Mihkel via PO channel, not executed here. Auto-provisioning window CLOSED as of this timestamp (no new polyphony person can be created until T4.5/#31 lands)."
+}
