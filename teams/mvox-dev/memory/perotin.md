@@ -1420,4 +1420,35 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
   Result artifact: scripts/migrations/seed-results/slice3-sharing-and-addUser-2026-08-06T09-12-58-702Z.json
   (includes a probeB_mechanismTrace block citing the exact source lines).
 
+### Task #17 follow-up — profile-visibility self-service, settled against source (READ-ONLY)
+
+[DECISION] Q1 — `_editor` does NOT let a user write `_sharing` (or any right-type property).
+  `utils/entity.js` `checkEntityAccess` (L83-118): base gate checks `_editor` only (L100-110);
+  SEPARATE gate at L113-118 requires `_owner` for any property whose `type` is in `rightTypes`
+  (L21-27: `_noaccess/_viewer/_expander/_editor/_owner/_sharing/_inheritrights`). `_editor` alone
+  is insufficient for `_sharing` writes, full stop.
+
+[DECISION] Q2 — NO per-VALUE `_sharing` override exists anywhere in entu-api. `utils/aggregate.js`
+  `aggregateEntity` (L60-155) computes domain/public bucket membership purely from the PROPERTY-
+  DEFINITION's own `_sharing` (`definition[d].sharing`), further capped by the entity TYPE's own
+  `_sharing` (`definitionSharing`) — never inspects the individual property value. Bucket
+  membership is uniform across every instance of that type's field; per-user field visibility is
+  structurally unrepresentable in the current data model, not just gated by rights.
+
+[DECISION] Q3 — CONFIRMED. Auto-provisioned persons get `_editor:self` only, never `_owner:self`
+  — `routes/auth/index.get.js:330` `await setEntity(entu, person._id, [{type:'_editor',
+  reference:person._id}])`. Combined with Q1's gate: an auto-provisioned user can never write
+  `_sharing` on their own person. Cross-ref [[entu-mechanics-cite-source]] discipline — this
+  reconfirms/generalizes the 2026-08-05 entu_api_key-needs-_owner gotcha to `_sharing` writes too.
+
+  VERDICT (Q4): per-user per-field visibility control is NOT achievable on a normal member's own
+  token — two independent walls (no per-value override slot exists even in principle; users don't
+  hold `_owner` on themselves anyway). Visibility is a global prop-def/admin decision as the
+  system is built today. If a profile opt-out is wanted, recommend an app-side field
+  (e.g. contact_visibility_opt_out) that the BFF applies ON TOP of Entu's bucket — additive, no
+  entu-api change, no rights-boundary change.
+
+  Findings doc: docs/migration/findings/profile-visibility-self-service-2026-08-06.md (full
+  source citations, all 4 questions answered with exact file:line).
+
 (*MVOX:Perotin*)
