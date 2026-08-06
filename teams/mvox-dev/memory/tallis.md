@@ -510,7 +510,9 @@ Files created/modified:
 
 [SCOPE] Did NOT touch `src/lib/agenda/types.ts` despite it being named in the issue's "landing zone" — nothing in #10's 5 stated behaviors touches `AgendaItem`; that wiring is #11's job. Also did not add member-id memoization (old app had a `memberIdCache`) — not in #10's stated ACs, skipped to avoid scope creep; trivial for Josquin to add at GREEN if wanted.
 
-[OPEN] GREEN — Josquin implements against `feat/slice2-rsvp`. Checkout free (I made no further edits after the RED commit). Pérotin's live smoke-create (parallel, different repo) pins the exact wire-shape for `_type`/ref fields — reconcile against that at GREEN if it disagrees with my mocks (behavior tests should still hold; only URL/body literals might need adjustment).
+[OPEN] GREEN — Josquin implements against `feat/slice2-rsvp`. Checkout free. Pérotin's live smoke-create (parallel, different repo) pins the exact wire-shape for `_type`/ref fields — reconcile against that at GREEN if it disagrees with my mocks (behavior tests should still hold; only URL/body literals might need adjustment).
+
+[DECISION] Follow-up commit `f09c9f3` (same session, before handoff): Pérotin's smoke-create found Entu auto-inherits `_sharing:domain` from the domain-shared person parent when `_sharing` is omitted on create — leaks the private rsvp. Added `{type:'_sharing', string:'private'}` to createRsvp's full-shape assertion; replaced the old (now-wrong) "does NOT contain _sharing" test rather than leaving it alongside the corrected one. Still 25 RED total (swap, not addition), pnpm check clean.
 
 [GOTCHA] Inline `import` inside an `it()` body is invalid TS ("can only be used at the top level"). Type the resolver fn and Promise explicitly at the closure level and import the type at top level.
 
