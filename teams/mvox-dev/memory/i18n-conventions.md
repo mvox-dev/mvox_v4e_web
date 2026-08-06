@@ -513,5 +513,18 @@ Single new key added for the rehearsal inline edit form heading. All other neede
 | `about_contact` | uk | `пишіть` | 2nd-pl formal imperative. |
 | `about_story_body` | et | `kangelasetegu` | "Act of heroism" compound noun — pithy, mirrors en without literal calque. |
 | `about_story_body` | uk | `бували` | Imperfective past signals recurrence; adds candour to the misstep admission. |
+| `agenda_gap_weeks` | en | `{weeks} weeks later` | Reworded (task #11) from `In {weeks} weeks` — PO flagged as ambiguous ("from today" vs. gap after prior rehearsal). Relative-jump phrasing removes the ambiguity. |
+| `agenda_gap_weeks` | et | `{weeks} nädalat hiljem` | "N weeks later"; partitive-sg `nädalat` correct for numeral N≥2 (Estonian numeral agreement). |
+| `agenda_gap_weeks` | lv | `{weeks} nedēļas vēlāk` | "N weeks later"; nominative-plural `nedēļas`, same pattern as `darbi`/`eksemplāri`. |
+| `agenda_gap_weeks` | uk | `{weeks} тижнів по тому` | "N weeks after that" — idiomatic relative-later construction; avoids `через`, which retains English "in"'s from-now ambiguity. Genitive-plural `тижнів` per convention. |
+
+**Re-confirmed 2026-08-06 (task #11):** ICU plural (`{n, plural, one {...} other {...}}`) is still unsupported by `@inlang/plugin-message-format` (checked `project.inlang/settings.json` + `package.json` — `@inlang/paraglide-js ^2.23.1`, same module). Team-lead's task brief asked for "proper ICU plural" as a tracked follow-up on this key; flagged back and resolved by applying the existing plain-`{n}`-template convention instead (matches `library_master_count` precedent). [DEFERRED] item is unchanged — still blocked on upstream plugin support.
+
+| `rsvp_status_going` | en/et/lv/uk | Going / Tulen / Būšu / Буду | Harvested verbatim from old app (`~/workspace/messages/*.json` `rsvp_going`) — same schema enum. |
+| `rsvp_status_not_going` | en/et/lv/uk | Not going / Ei tule / Nebūšu / Не буду | Harvested verbatim (`rsvp_not_going`). |
+| `rsvp_status_maybe` | en/et/lv/uk | Maybe / Võib-olla / Varbūt / Можливо | Harvested verbatim (`rsvp_maybe`). |
+| `rsvp_status_late` | en/et/lv/uk | Late / Tulen hilja / Ar kavēšanos / Запізнюся | Harvested verbatim (`rsvp_late`). Note: Tallis's RED spec mock (`RsvpControl.spec.ts`) uses local placeholder `"Running late"` — that mock is self-contained and doesn't bind the real key; flagged to team-lead as FYI in case it was intended copy. |
+| `rsvp_non_member_hint` | en | `Only members can RSVP.` | New copy (task #12) — team-lead's brief phrasing, shorter than old app's `rsvp_not_member` sentence to fit the 9px hint-line UI pattern. Not a harvest. |
+| `rsvp_non_member_hint` | et/lv/uk | Ainult liikmed saavad RSVP kinnitada. / Tikai dalībnieki var apstiprināt RSVP. / Лише учасники можуть підтвердити RSVP. | Concept-translated (not the old app's longer `rsvp_not_member` sentence). `RSVP` kept as untranslated loanword in all 3, matching old app's `rsvp_error`/`rsvp_not_member` precedent. lv uses `dalībnieki` (matches `seasons_notice_assign_not_member` lv, not the old app's one-off `loceklis`). |
 
 (*MVOX:Comenius*)
