@@ -1,0 +1,325 @@
+{
+  "timestamp": "2026-08-06T09:02:07.807Z",
+  "personB": {
+    "found": false
+  },
+  "personA": {
+    "id": "6a2fc05e4cd971291c5d5ddc",
+    "entuUserEmail": "mihkel.putrinsh@gmail.com",
+    "matchesExpected": true,
+    "name": [
+      {
+        "_id": "6a2fc05e4cd971291c5d5de2",
+        "string": "Mihkel Putrinš"
+      }
+    ],
+    "sharing": {
+      "value": "domain",
+      "valueId": "6a2fc05e4cd971291c5d5de3"
+    }
+  },
+  "personFieldPropDefSharing": {
+    "name": {
+      "propDefId": "69bcfd8e9c031ab8e6ce8068",
+      "sharing": {
+        "value": "domain",
+        "valueId": "69bcfd8e9c031ab8e6ce8182"
+      }
+    },
+    "email": {
+      "propDefId": "69bcfd8e9c031ab8e6ce8063",
+      "sharing": {
+        "value": "domain",
+        "valueId": "69bcfd8e9c031ab8e6ce80ef"
+      }
+    },
+    "notes": {
+      "propDefId": "69bcfd8e9c031ab8e6ce8069",
+      "sharing": {
+        "value": "domain",
+        "valueId": "69bcfd8e9c031ab8e6ce810d"
+      }
+    }
+  },
+  "personA_fields": {
+    "name": [
+      {
+        "_id": "6a2fc05e4cd971291c5d5de2",
+        "string": "Mihkel Putrinš"
+      }
+    ],
+    "email": [
+      {
+        "_id": "6a2fc05e4cd971291c5d5de1",
+        "string": "mihkel.putrinsh@gmail.com"
+      }
+    ],
+    "notes": null
+  },
+  "memberTemplate": {
+    "_id": "6a2fdb434cd971291c5d5e85",
+    "_created": [
+      {
+        "_id": "6a2fdb434cd971291c5d5e8c",
+        "reference": "69bcfd8e9c031ab8e6ce8079",
+        "datetime": "2026-06-15T11:00:19.123Z",
+        "property_type": "_created",
+        "string": "Mihkel Putrinš",
+        "entity_type": "person"
+      }
+    ],
+    "_inheritrights": [
+      {
+        "_id": "6a2ff4c5487a9c1f02f705c5",
+        "boolean": true
+      }
+    ],
+    "_owner": [
+      {
+        "_id": "6a168454642e9524e33fedfb",
+        "reference": "69bcfd8e9c031ab8e6ce807a",
+        "property_type": "_owner",
+        "string": "polyphony",
+        "entity_type": "database",
+        "inherited": true
+      },
+      {
+        "_id": "6a2fdb434cd971291c5d5e8b",
+        "reference": "69bcfd8e9c031ab8e6ce8079",
+        "property_type": "_owner",
+        "string": "Mihkel Putrinš",
+        "entity_type": "person"
+      }
+    ],
+    "_parent": [
+      {
+        "_id": "6a2fdb434cd971291c5d5e87",
+        "reference": "69c7f8718489bfcb0e81b065",
+        "property_type": "_parent",
+        "string": "Eesti Filharmoonia Kammerkoor",
+        "entity_type": "organization"
+      }
+    ],
+    "_sharing": [
+      {
+        "_id": "6a2fdb434cd971291c5d5e8a",
+        "string": "domain"
+      }
+    ],
+    "_type": [
+      {
+        "_id": "6a2fdb434cd971291c5d5e86",
+        "reference": "69c7ea4a8489bfcb0e819edd",
+        "property_type": "_type",
+        "string": "member",
+        "entity_type": "entity"
+      }
+    ],
+    "person": [
+      {
+        "_id": "6a2fdb434cd971291c5d5e88",
+        "reference": "6a2fc05e4cd971291c5d5ddc",
+        "property_type": "person",
+        "string": "Mihkel Putrinš",
+        "entity_type": "person"
+      }
+    ],
+    "_reference": [
+      {
+        "_id": "6a2fdb434cd971291c5d5e88",
+        "reference": "6a2fc05e4cd971291c5d5ddc",
+        "property_type": "person",
+        "string": "Mihkel Putrinš",
+        "entity_type": "person"
+      }
+    ],
+    "status": [
+      {
+        "_id": "6a2fdb434cd971291c5d5e89",
+        "string": "active"
+      }
+    ],
+    "_parent_viewer": [
+      {
+        "_id": "6a2fdb434cd971291c5d5e8d",
+        "reference": "6a2fc05e4cd971291c5d5ddc",
+        "property_type": "_viewer",
+        "string": "Mihkel Putrinš",
+        "entity_type": "person",
+        "inherited": true
+      },
+      {
+        "_id": "69c7f8728489bfcb0e81b06e",
+        "reference": "69bcfd8e9c031ab8e6ce8079",
+        "property_type": "_owner",
+        "string": "Mihkel Putrinš",
+        "entity_type": "person",
+        "inherited": true
+      },
+      {
+        "_id": "6a168454642e9524e33fedfb",
+        "reference": "69bcfd8e9c031ab8e6ce807a",
+        "property_type": "_owner",
+        "string": "polyphony",
+        "entity_type": "database",
+        "inherited": true
+      }
+    ],
+    "_parent_expander": [
+      {
+        "_id": "69c7f8728489bfcb0e81b06e",
+        "reference": "69bcfd8e9c031ab8e6ce8079",
+        "property_type": "_owner",
+        "string": "Mihkel Putrinš",
+        "entity_type": "person",
+        "inherited": true
+      },
+      {
+        "_id": "6a168454642e9524e33fedfb",
+        "reference": "69bcfd8e9c031ab8e6ce807a",
+        "property_type": "_owner",
+        "string": "polyphony",
+        "entity_type": "database",
+        "inherited": true
+      }
+    ],
+    "_parent_editor": [
+      {
+        "_id": "69c7f8728489bfcb0e81b06e",
+        "reference": "69bcfd8e9c031ab8e6ce8079",
+        "property_type": "_owner",
+        "string": "Mihkel Putrinš",
+        "entity_type": "person",
+        "inherited": true
+      },
+      {
+        "_id": "6a168454642e9524e33fedfb",
+        "reference": "69bcfd8e9c031ab8e6ce807a",
+        "property_type": "_owner",
+        "string": "polyphony",
+        "entity_type": "database",
+        "inherited": true
+      }
+    ],
+    "_parent_owner": [
+      {
+        "_id": "69c7f8728489bfcb0e81b06e",
+        "reference": "69bcfd8e9c031ab8e6ce8079",
+        "property_type": "_owner",
+        "string": "Mihkel Putrinš",
+        "entity_type": "person",
+        "inherited": true
+      },
+      {
+        "_id": "6a168454642e9524e33fedfb",
+        "reference": "69bcfd8e9c031ab8e6ce807a",
+        "property_type": "_owner",
+        "string": "polyphony",
+        "entity_type": "database",
+        "inherited": true
+      }
+    ],
+    "_editor": [
+      {
+        "_id": "6a168454642e9524e33fedfb",
+        "reference": "69bcfd8e9c031ab8e6ce807a",
+        "property_type": "_owner",
+        "string": "polyphony",
+        "entity_type": "database",
+        "inherited": true
+      },
+      {
+        "_id": "6a2fdb434cd971291c5d5e8b",
+        "reference": "69bcfd8e9c031ab8e6ce8079",
+        "property_type": "_owner",
+        "string": "Mihkel Putrinš",
+        "entity_type": "person"
+      }
+    ],
+    "_expander": [
+      {
+        "_id": "6a168454642e9524e33fedfb",
+        "reference": "69bcfd8e9c031ab8e6ce807a",
+        "property_type": "_owner",
+        "string": "polyphony",
+        "entity_type": "database",
+        "inherited": true
+      },
+      {
+        "_id": "6a2fdb434cd971291c5d5e8b",
+        "reference": "69bcfd8e9c031ab8e6ce8079",
+        "property_type": "_owner",
+        "string": "Mihkel Putrinš",
+        "entity_type": "person"
+      }
+    ],
+    "_viewer": [
+      {
+        "_id": "6a2fdb434cd971291c5d5e8d",
+        "reference": "6a2fc05e4cd971291c5d5ddc",
+        "property_type": "_viewer",
+        "string": "Mihkel Putrinš",
+        "entity_type": "person",
+        "inherited": true
+      },
+      {
+        "_id": "6a168454642e9524e33fedfb",
+        "reference": "69bcfd8e9c031ab8e6ce807a",
+        "property_type": "_owner",
+        "string": "polyphony",
+        "entity_type": "database",
+        "inherited": true
+      },
+      {
+        "_id": "6a2fdb434cd971291c5d5e8b",
+        "reference": "69bcfd8e9c031ab8e6ce8079",
+        "property_type": "_owner",
+        "string": "Mihkel Putrinš",
+        "entity_type": "person"
+      }
+    ]
+  },
+  "sizing": {
+    "aMemberCount": 1,
+    "aMembers": [
+      {
+        "_id": "6a2fdb434cd971291c5d5e85",
+        "_parent": [
+          {
+            "_id": "6a2fdb434cd971291c5d5e87",
+            "reference": "69c7f8718489bfcb0e81b065",
+            "property_type": "_parent",
+            "string": "Eesti Filharmoonia Kammerkoor",
+            "entity_type": "organization"
+          }
+        ],
+        "status": [
+          {
+            "_id": "6a2fdb434cd971291c5d5e89",
+            "string": "active"
+          }
+        ]
+      }
+    ],
+    "bMemberCount": 0,
+    "bMembers": []
+  },
+  "followUpVerification": {
+    "note": "personB.found=false above is surprising given the task premise ('B just signed in on prod'). Ran two follow-up checks (ad hoc, not committed as separate probe scripts) to rule out a query-methodology gap before reporting absence as fact.",
+    "controlCheck": {
+      "purpose": "Confirm the LIST endpoint (not just single-entity GET) actually returns entu_user via props= — otherwise a false-negative on B is just a query gap, not a real absence.",
+      "finding": "_id is NOT a usable list-filter param (silently ignored; returned the default page instead of one match). entu_user.email IS reliably returned via props on the list endpoint, confirmed against person 69bcfd8e9c031ab8e6ce8079 (entu_user.email=mitselek@gmail.com) as a known control. Matching methodology validated."
+    },
+    "fullOAuthScan": {
+      "purpose": "Enumerate every OAuth-linked person in polyphony (131 total persons scanned, limit=500, api count=131 confirms no pagination truncation) to rule out an email-format/casing mismatch.",
+      "personsWithOAuthLink": [
+        { "id": "69bcfd8e9c031ab8e6ce8079", "email": "mitselek@gmail.com", "name": "Mihkel Putrinš", "created": "2026-03-20T07:55:58.462Z" },
+        { "id": "6a2fc05e4cd971291c5d5ddc", "email": "mihkel.putrinsh@gmail.com", "name": "Mihkel Putrinš", "created": "2026-06-15T09:05:34.146Z" }
+      ],
+      "totalOAuthLinkedPersons": 2,
+      "matchForMikelaBiri": false,
+      "newestPersonByCreated": { "id": "6a2fc05e4cd971291c5d5ddc", "created": "2026-06-15T09:05:34.146Z" },
+      "conclusion": "No person has been created in polyphony since 2026-06-15. If B signed in moments before this task was dispatched, an auto-created person should be the newest entity by _created and should carry an entu_user with mikela.biri@gmail.com. Neither is true. B's person does not exist in polyphony as of this read (2026-08-06T09:02Z)."
+    }
+  }
+}

@@ -1327,4 +1327,55 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
   creates + two deletes, nothing else mutated).
   Result artifact: scripts/migrations/seed-results/slice2-rsvp-private-sharing-2026-08-06T00-05-06-506Z.json
 
+### Task #17 — slice-3 onboarding OBSERVE (read-only) — B's person NOT FOUND, blocking step 3
+
+[PROBE-RESULT] probe-slice3-onboarding-b-observe-2026-08-06 — COMPLETE for steps 1/2/5.
+  Step 3 (provision B's member) and step 4 (conditional _sharing fix) are HELD — not a
+  discretionary hold, a structural one: there is no person B entity in polyphony to attach a
+  member to. Did not proceed. Reported to team-lead; did not improvise.
+
+  Step 1 (B's person, _sharing verbatim): NOT FOUND. Full scan of all 131 person entities in
+  polyphony (limit=500, api count=131, no pagination truncation) found only 2 with an
+  entu_user (OAuth) link at all:
+    - 69bcfd8e9c031ab8e6ce8079: entu_user.email=mitselek@gmail.com, name="Mihkel Putrinš",
+      created 2026-03-20T07:55:58Z (this is the identity my ENTU_API_KEY authenticates AS —
+      shows up as _owner/_created on everything I've ever written via this key. Likely the
+      account Gama's OLD record for "B" pointed at, now corrected away from by team-lead.)
+    - 6a2fc05e4cd971291c5d5ddc: entu_user.email=mihkel.putrinsh@gmail.com, "Person A" per
+      team-lead, confirmed matches expected identity.
+  Neither matches mikela.biri@gmail.com. Newest person by _created is 6a2fc05e... at
+  2026-06-15T09:05:34Z — no person has been created in polyphony since then. If B's OAuth
+  sign-in ("just signed in on prod") had landed here, a fresh person should be the newest
+  entity and should carry the mikela.biri@gmail.com entu_user link. Neither is true.
+  [GOTCHA] Ruled out a query-methodology false-negative before reporting absence as fact:
+  `_id` is NOT a usable filter param on the list endpoint (silently ignored, returns the
+  default page) — don't reach for it again, use GET /entity/{id} (fetchEntity) for single-
+  entity lookups. entu_user.email IS reliably returned via props= on the LIST endpoint though
+  — confirmed against 69bcfd8e9c031ab8e6ce8079 as a known control before trusting the 0-match
+  result on B.
+  VERDICT: B's person does not exist in polyphony as of 2026-08-06T09:02Z. [speculative]
+  possibilities not verified: prod OAuth landed in a different Entu db than polyphony (though
+  Josquin's CF build config sets PUBLIC_ENTU_DB=polyphony for Prod+Preview per josquin.md —
+  if that's still accurate, this shouldn't be the explanation); a propagation delay; the
+  sign-in didn't actually complete. Did not guess further — flagged to team-lead.
+
+  Step 2 (field-level _sharing boundary, person type prop-defs — schema-level, applies
+  identically to A and B once B exists): name domain (propDef 69bcfd8e...8068), email domain
+  (propDef 69bcfd8e...8063), notes domain (propDef 69bcfd8e...8069). All THREE are domain, not
+  a name/email-domain vs notes-private split — if the boundary the team wants is "notes stays
+  private," that's not what's currently configured at the schema level; flagging, not fixing
+  (schema/prop-def changes are Josquin's territory + a data-model call, not mine to make solo).
+  A's raw fields: name+email present (both plain string values), notes absent (never set,
+  consistent with A being a fixture person not a real user profile).
+
+  Step 5 (sizing): A has 1 member (EFK, active — the session-37 fixture, already on record).
+  B has 0 (no person to attach to). Existing-member template captured in full (A's own EFK
+  member, 6a2fdb434cd971291c5d5e85) for whenever B's provisioning becomes actionable.
+
+  Script: scripts/migrations/probes/probe-slice3-onboarding-b-observe-2026-08-06.ts (READ-ONLY,
+  no mutations).
+  Result artifact: scripts/migrations/seed-results/slice3-onboarding-b-observe-2026-08-06T09-02-09-210Z.json
+  (includes a followUpVerification block documenting the control-check + full-OAuth-scan that
+  ruled out a query-methodology gap before trusting the absence finding).
+
 (*MVOX:Perotin*)
