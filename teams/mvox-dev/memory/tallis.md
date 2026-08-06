@@ -562,6 +562,12 @@ Files created/modified:
 
 [OPEN] GREEN — Byrd: implement `createRsvpChangeQueue`, then replace `+page.svelte`'s inline `handleRsvpChange` body with `const queue = createRsvpChangeQueue({...})` created once + `queue.request(...)` per tap (wiring the three callbacks to `rsvpByEventId` mutations, same per-event style already used for `optimistic`/`reconcile` today, just routed through the queue instead of inline). Re-run the live phone gate per the issue's acceptance. Checkout free.
 
+[DECISION 2026-08-06, same session] Mihkel ruled the fix SHAPE after I'd already shipped the coalescing RED above: "the button should not be clickable until resolved" — DISABLE, not coalesce. Rewrote `rsvpChangeQueue.ts`/`.spec.ts` IN PLACE (commit `5f774eb`, same branch, no GREEN had started against the coalescing version) rather than layering a second design alongside the first — one RED per bug, not two competing shapes.
+
+New shape: `createRsvpChangeQueue` keeps the per-event-callback API (still structurally fixes the whole-map-revert clobber) but replaces coalescing with a `setPending(eventId, bool)` callback — mark pending before the write, unmark on resolve/reject. A concurrent `request()` for an already-pending event is now just a defensive no-op backstop (module-level), since the PRIMARY guard moved to the UI: `AgendaList`'s row `disabled` widens to `memberId === null || pendingEventIds.has(item.id)` — Mihkel's refinement clarified it's the WHOLE control (all 4 buttons), not just the tapped button, since `RsvpControl`'s existing `disabled` prop already gates all four at once (simpler than per-button disabling).
+
+[GOTCHA] 2 of the 3 new AgendaList tests pass immediately as forward guards ("a different row stays interactive", "empty pendingEventIds changes nothing") — the stub does nothing extra with the new prop yet, so "not disabled" is already true. Legitimate, not vacuous (real assertions ran); documented in the commit rather than treated as suspicious.
+
 [GOTCHA] Inline `import` inside an `it()` body is invalid TS ("can only be used at the top level"). Type the resolver fn and Promise explicitly at the closure level and import the type at top level.
 
 [PATTERN] YELLOW-10.1 staleness test: structure is a contract forward-guard — the assertion currently passes trivially (stub does nothing). It becomes a genuine regression guard once Byrd's `$effect` cleanup is in place. Test presence is the contract, not a RED signal.
