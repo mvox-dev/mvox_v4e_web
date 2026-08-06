@@ -25,10 +25,11 @@
   all idle / stood down. Spawn on demand via Agent tool; don't re-spawn ones already in `config.json`.
 - PO = Mihkel (direct) + Gama via comms `po-team`.
 
-## Git hygiene note (as of this trim)
+## Git hygiene note
 
-- `~/workspace`: local `main` was **21 commits ahead of origin** (today's S41/S42 memory/probe/governance work) +
-  uncommitted agent scratchpad edits -- pending PO review before push (shutdown-protocol pause). This trim adds to that batch.
+- `~/workspace`: **synced with origin as of 2026-08-06 (S42)** — the 26-commit S41/S42 batch (memory/probe/governance
+  work + agent scratchpad checkpoints + this trim) was committed in logical per-agent chunks and pushed at Mihkel's
+  direction (`c629b5b..bbe66cd`). Working tree clean. App repo `~/workspace-app` unaffected (separate, already in sync).
 
 ## How to resume (for future-Palestrina)
 
