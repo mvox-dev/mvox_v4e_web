@@ -496,6 +496,22 @@ Files created/modified:
 
 [GOTCHA] URL-assertion tests on stubs that throw before fetch: must await the call (not `.catch(() => {})`) OR assert `fetchMock.toHaveBeenCalled()` first. `mock.calls[0]` is undefined if no fetch was issued (stub throws before reaching fetch).
 
+## [CHECKPOINT] 2026-08-06 — mvox-app (NEW app) #10 RSVP data-layer RED phase
+
+[DECISION] 25 tests, 2 files, on `feat/slice2-rsvp` (checkout `~/workspace-app`, repo mvox-dev/mvox-app — NOT the old mvox_v4e_web app). SHA `42a6a65`. pnpm check: 0 errors. 25 failed (all new, all on the stub's `throw new Error('not implemented')` — right reason, zero forward guards), 125 pre-existing pass, no regressions.
+- `src/lib/rsvp/rsvpData.ts` — new stub: `findMyMemberId`, `createRsvp`, `updateRsvpStatus`, `deleteRsvp` + `RsvpStatus`/`CreateRsvpInput` types. `listMyRsvps` intentionally OMITTED — reads belong to #11, not #10.
+- `src/lib/rsvp/rsvpData.spec.ts` — 20 tests: findMyMemberId(4), createRsvp(7, incl. `it.each` full-set sentinel check per status), updateRsvpStatus(7, incl. a corrupted-state defense case with TWO sentinels present at once to prove the delete is generic, not hardcoded to the old status's own sentinel), deleteRsvp(2).
+- `src/lib/seasons/entuSeasons.ts` — ADDED `resolveTypeId`/`resetTypeIdCache` (stub). Did NOT exist in this app yet (dispatch brief assumed it did, mirroring the old app) — createRsvp needs it to send `_type` as a `reference` per #10's pinned wire-shape requirement. Ported 1:1 from the old app's version, adapted to `entuFetch`/`fetchImpl` injection.
+- `src/lib/seasons/entuSeasons.spec.ts` — +5 tests direct-covering `resolveTypeId` (query shape, per-db+typeName cache, not-found throw, !ok throw), mirroring the old app's own coverage of this function.
+
+[DECISION] `findMyMemberId` is DE-FANNED — dropped the old app's `orgId` param. Query is `_type.string=member&person.reference=<id>&status.string=active` only, no `_parent.reference`. Rationale: epic #8 says resolve member "the same pragmatic org-scoped way slice 1 resolves seasons" — and slice 1's LANDED code (`listSeasons`) actually dropped org scoping entirely for single-collective ("in polyphony all seasons are EFK's"), so the literal precedent to follow is de-fanned, not the old app's orgId-taking signature. Flagged to team-lead as a call made, not a silent guess — epic's prose is ambiguous enough that Josquin/PO could reasonably override at GREEN if a person can ever have >1 active member row across orgs within one db.
+
+[PATTERN] New-app spec convention differs from the old app: inject `fetchImpl: typeof fetch = fetch` as an explicit param (not `vi.stubGlobal('fetch', ...)`), and mock responses as real `new Response(JSON.stringify(body), {status})` via a local `json()` helper (not `{ok, json: async()=>...}` plain objects) — matches `entuSeasons.spec.ts`/`agendaData.spec.ts` exactly. Carried this convention into rsvpData.spec.ts even though the old app (canonical harvest source) uses the older global-stub style.
+
+[SCOPE] Did NOT touch `src/lib/agenda/types.ts` despite it being named in the issue's "landing zone" — nothing in #10's 5 stated behaviors touches `AgendaItem`; that wiring is #11's job. Also did not add member-id memoization (old app had a `memberIdCache`) — not in #10's stated ACs, skipped to avoid scope creep; trivial for Josquin to add at GREEN if wanted.
+
+[OPEN] GREEN — Josquin implements against `feat/slice2-rsvp`. Checkout free (I made no further edits after the RED commit). Pérotin's live smoke-create (parallel, different repo) pins the exact wire-shape for `_type`/ref fields — reconcile against that at GREEN if it disagrees with my mocks (behavior tests should still hold; only URL/body literals might need adjustment).
+
 [GOTCHA] Inline `import` inside an `it()` body is invalid TS ("can only be used at the top level"). Type the resolver fn and Promise explicitly at the closure level and import the type at top level.
 
 [PATTERN] YELLOW-10.1 staleness test: structure is a contract forward-guard — the assertion currently passes trivially (stub does nothing). It becomes a genuine regression guard once Byrd's `$effect` cleanup is in place. Test presence is the contract, not a RED signal.
