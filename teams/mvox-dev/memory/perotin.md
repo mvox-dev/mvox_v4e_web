@@ -1463,4 +1463,42 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
   proposing a component (BFF) the app doesn't have — don't default to a generic pattern from
   habit/training data.
 
+### Task #17 follow-up — invitation/member creation rights: the premise was false (READ-ONLY)
+
+[DECISION] False premise caught: the question was "owners-only vs any-member natively achievable"
+  — but entu-api enforces NO `_parent`-rights check on entity CREATE at all, for anyone, ever.
+  `routes/[db]/entity/index.post.js:96-108`: the only gate is `entu.user` existing. `utils/entity.js`
+  `checkEntityAccess` (L83-118) opens `if (!entityId) return` (L84-85) — a no-op on create, since
+  `setEntity(entu, undefined, body)` passes entityId=undefined for new entities. The `_owner`-gate
+  I found in the profile-visibility probe (L113-118) only fires on writes to EXISTING entities.
+  `inheritParentProperties` (L297-326) reads the parent's `_sharing`/`_inheritrights` via a direct
+  Mongo query, bypassing rights filtering entirely — doesn't even check the caller can READ the
+  parent, let alone hold `_owner`/`_editor` on it.
+
+[DECISION] v4E schema's `creators: CreatorRule[]` (schema.ts:37-43: self/system/cron/parent_right/
+  bilateral/custom) is a DESIGN-DOCUMENTATION convention with zero entu-api enforcement. `bilateral`
+  isn't even a real Entu right — it's v4E-invented, meaning nothing in Entu itself knows what it
+  means. README.md repeatedly names the intended enforcer explicitly: "BFF creates the member"
+  (invitation notes, application notes), "BFF atomic operation" (acceptance flow walkthrough), and
+  the "BFF user-rights principle" (L544-546: BFF should act only within the caller's own rights —
+  implying bilateral member-creation was always meant to be an explicitly-privileged server op,
+  since neither inviter nor invitee alone naturally holds create-rights on a member under the org).
+  mvox has no BFF (confirmed by team-lead same day, re: the profile-visibility probe correction) —
+  no enforcement point exists for ANY of these rules, not just invitation/member.
+
+  VERDICT: right now, ANY authenticated Entu user (any valid JWT in the db) can POST an
+  `invitation` OR a `member` entity under ANY organization's `_parent`, holding zero rights on
+  that org, with no matching application/invitation pair required — Entu doesn't check any of it.
+  "Any member invites" isn't blocked by owner-tier construction; NOTHING is currently enforced,
+  for either policy. This is the same structural gap as the profile-visibility probe (no
+  server-side enforcement point in a browser-direct architecture), now confirmed on a second,
+  independent area of the schema (creation-time `creators` rules generally, not just visibility).
+  Reported as a scope-defining finding, not a narrow answer — flagged options (accept-as-is for
+  synthetic-data phase / build a scoped server enforcement point / investigate an Entu plugin-hook
+  extension point) without recommending one; this is bigger than my remit to resolve solo.
+
+  Findings doc: docs/migration/findings/invitation-member-creation-rights-2026-08-06.md (full
+  source citations: schema.ts creators + parents for invitation/member, entu-api route + setEntity
+  + checkEntityAccess + inheritParentProperties trace, README BFF-principle quotes).
+
 (*MVOX:Perotin*)
