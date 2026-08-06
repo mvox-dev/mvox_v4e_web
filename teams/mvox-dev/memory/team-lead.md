@@ -5,19 +5,22 @@
 > The authoritative cross-session **resume vehicle is the auto-memory** `mvox-app-slice1-resume-state.md`
 > (`~/.claude/projects/-home-ai-teams/memory/`) + the `MEMORY.md` index — read those first, not this file's history.
 
-## Current state (2026-08-06)
+### [NEXT SESSION] 2026-08-06 end-of-S42 — CHECKPOINT: ultracode the Slice-4 build wave
 
-- **Product track: `mvox-app`.** App repo `~/workspace-app` (`mvox-dev/mvox-app`, `main` = prod at **mvox.eu**,
-  main->CF-Pages auto-deploy). main @ `848fed1`, 222 tests. **Slice-1 (agenda) + slice-2 (RSVP singer-side) SHIPPED + live.**
-- **Memory/harvest repo: `~/workspace`** (this repo -- old `mvox_v4e_web`). Holds team config + memory + Perotin's
-  probe/seed scripts + result artifacts. NOT the app code.
-- **BLOCKING open item -- HELD with Mihkel, no timeline, slower pace requested:** a *confirmed live* security
-  finding -- any Google account can self-provision into polyphony (`GET /auth?db=polyphony`) and read the db's
-  domain+public data with no membership/approval. See auto-memory `[[mvox-domain-read-exposure]]` (compounds with
-  `[[entu-creation-rights-unenforced]]`). **Do NOT act on it.** New questions -> **Gama via comms `po-team`**, not upward.
-  Candidate close (prepped, not executed): scope polyphony's `add_user`.
-- **Next slice when unblocked:** ONBOARDING (Mihkel ruled INVITED path) -- grooming with Gama. Slice-3 ROSTER (#16,
-  tasks #17-#20) is ready but **parked behind the security decision**.
+**Mihkel's directive at wrap: checkpoint now; NEXT SESSION ULTRACODE the remaining Slice-4 build wave (Workflow / multi-agent).**
+Full state = auto-memory `mvox-app-slice1-resume-state.md` (top block is the checkpoint; read it FIRST).
+
+- **Product track: `mvox-app`** (`~/workspace-app`, `main` = prod at mvox.eu, auto-deploy). **main @ `7838989`, 238 tests.**
+- **Slice-4 Onboarding (#21) FOUNDATION DONE + merged:** T4.1 (remove `add_user`, #22 closed) · T4.2 (binding=token-possession,
+  #23) · T4.3 (`person` reduced, `profile` type live `6a74933f…817`, #24 closed) · T4.4 (single create path `createProfile` on
+  main, #25 closed). This CLOSED the old HELD `[[mvox-domain-read-exposure]]` stranger-vector (add_user gone).
+- **NEXT = ultracode the build wave:** T4.5 invite (#31) · T4.6 edit UI (#26) · T4.7 moves (#27) · T4.8 fallback (#28) ·
+  T4.10 migration (#30) · T4.9 live gate (#29). T4.5 unblocked + first (closes no-new-person window). Build tasks serialize
+  on the single `~/workspace-app` checkout.
+- **Open PO decisions (auto-memory has detail):** T4.5 reconcile old `/invite/[token]` page (read: REPLACE w/ native flow) ·
+  display-name field vs drop fallback · T4.10 128-synthetic-singers scope. None block starting T4.5.
+- **Carry:** YELLOW-T4.4.1 (downstream reviews: verify each create funnels through `createProfile`) · residual exposure
+  (~15 person fields still domain-readable by members — NOT closed by slice, on #21; never describe as handled).
 
 ## Team / session
 
