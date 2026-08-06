@@ -1639,4 +1639,29 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
   verify, manifest logged pre-execution).
   Result artifact: scripts/migrations/seed-results/t4-1-scope-add-user-2026-08-06T13-13-47-326Z.json
 
+### Census script field-name bug fix (probe-person-sharing-census-2026-07-19.ts)
+
+[GOTCHA] Section C queried `props=name,sharing` and read `.sharing` off the response — the real
+  Entu field is `_sharing` (underscore); `sharing` is only an internal aggregate.js pipeline
+  alias, never exposed over the HTTP API. `props=sharing` matched nothing → silent null → false
+  "0/21 have sharing" reading that nearly shaped a wrong exposure assessment. Caught by finn-2
+  against source, confirmed live by team-lead independently. Fixed: `props=name,_sharing` /
+  `d._sharing` (both the query param and the response read — the query alone silently returning
+  nothing was the root cause, not just a display bug).
+  Re-ran the fixed script live (read-only, no mutation) to confirm + produce a fresh committed
+  artifact rather than relying solely on finn-2's separate corrected file: 21/21 person prop-defs
+  ARE `_sharing:domain` (address/bio/birthdate/county/email/entu_api_key/entu_passkey/entu_user/
+  idcode/language/locale/name/notes/phone/photo/postalcode/preferences/
+  preferred_contact_email/timezone/town/voice) — matches team-lead's independent re-query exactly.
+  [LEARNED] For a committed provenance/measurement script (not a one-off), a query that silently
+  returns nothing (wrong field name, no error) is worse than one that 403s or 404s — it produces
+  a confident-looking false negative. Worth a habit: when a census/probe script reports "0 of N
+  have X," sanity-check that finding against at least one entity known to have X, before trusting
+  the aggregate — the discipline "verify the mechanism/query against source before relaying a
+  load-bearing claim" (team-lead's framing, this session) applies to my OWN scripts too, not just
+  claims I relay from elsewhere.
+  Script: scripts/migrations/probes/probe-person-sharing-census-2026-07-19.ts (fixed in place,
+  header note added documenting the bug + fix date).
+  Corrected artifact: scripts/migrations/seed-results/probe-person-sharing-census-2026-08-06T13-39-53-895Z.json
+
 (*MVOX:Perotin*)

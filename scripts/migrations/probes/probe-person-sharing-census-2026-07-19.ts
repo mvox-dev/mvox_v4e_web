@@ -18,6 +18,14 @@
  *
  * READ-ONLY. Creates nothing, mutates nothing. No teardown.
  *
+ * [FIXED 2026-08-06] Section C queried `props=name,sharing` and read `.sharing` off the
+ * response. Entu's real field is `_sharing` (underscore) — `sharing` is only an internal
+ * `aggregate.js` pipeline alias, never exposed over the HTTP API. `props=sharing` matched
+ * nothing and silently returned null for every prop-def, producing a false "0/21 have
+ * sharing" reading. Caught by finn-2 against source, confirmed live by team-lead: real state
+ * is 21/21 person prop-defs `_sharing:domain`. Fixed to `props=name,_sharing` / `._sharing`.
+ *
+
  * Requires via env (~/.config/mvox/credentials.env):
  *   ENTU_API_KEY — PO's key (db-owner; needed to enumerate the private bucket)
  *
@@ -102,13 +110,13 @@ async function main() {
 	section('C. sharing value on each person property DEFINITION');
 	const defUrl =
 		`${API_BASE}/${DB}/entity?_type.string=property` +
-		`&_parent.reference=${PERSON_TYPE_ID}&props=name,sharing&limit=200`;
+		`&_parent.reference=${PERSON_TYPE_ID}&props=name,_sharing&limit=200`;
 	const defBody = (await (await fetch(defUrl, { headers: h })).json()) as {
 		entities?: Array<Record<string, any>>;
 	};
 	const defs = (defBody.entities ?? []).map((d) => ({
 		name: d.name?.[0]?.string ?? '(unnamed)',
-		sharing: d.sharing?.[0]?.string ?? null,
+		sharing: d._sharing?.[0]?.string ?? null,
 	}));
 	defs.sort((a, b) => a.name.localeCompare(b.name));
 	result.propertyDefs = defs;
