@@ -1534,4 +1534,28 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
   Folded into the same findings doc as an Addendum section (same file, doesn't split the report):
   docs/migration/findings/invitation-member-creation-rights-2026-08-06.md
 
+### URGENT — logged-in-anywhere → domain-read CONFIRMED (READ-ONLY, security-severity)
+
+[DECISION] Gama's hypothesis CONFIRMED, not just plausible — a real 3-step chain, source-cited:
+  1. middleware/auth.js:46-48 sets entu.user/userStr ONLY from entu.token.accounts[entu.account]
+     (entu.account = target db, parsed from URL path, :19). db-scoped, but that's not a wall.
+  2. routes/auth/index.get.js:236-241 auto-provisions a person + addAccount() on ANY first-time
+     GET /auth?db=polyphony with a Google login, gated only by polyphony's add_user being present
+     (confirmed present+valid in the earlier probe). :254 tokenData.accounts=accountUsersIds signs
+     the new accounts.polyphony entry into the SAME response's JWT.
+  3. routes/[db]/entity/index.get.js:566-570: `if (entu.user) filter.access = {$in:[entu.user,
+     'domain','public']}` — matches the literal string 'domain' (pushed by getAccessArray,
+     utils/aggregate.js:219 / utils/rights.js, whenever entity._sharing==='domain') with ZERO
+     further check — no org membership, no section membership, no relationship to the entity
+     beyond "holds ANY userStr for this db at all."
+  VERDICT: any Google-account holder, zero prior relationship to polyphony/EFK/mvox, reads every
+  domain-shared entity/field in the ENTIRE db within one browser visit. Compounds with two
+  earlier findings this session: person name/email/notes/preferred_contact_email are ALL domain
+  (3/4 diverge from canonical-private), member rosters are domain, season/event/event_series were
+  found PUBLIC (broader still). Also compounds with the creation-rights finding (anyone can also
+  CREATE invitation/member) — two independent problems, write-side and read-side, same root cause
+  (no server-side enforcement point + permissive db-level defaults).
+  Findings doc: docs/migration/findings/logged-in-anywhere-domain-read-2026-08-06.md. Not
+  proposing a fix — reported urgently per team-lead's framing, Mihkel/Gama triage.
+
 (*MVOX:Perotin*)
