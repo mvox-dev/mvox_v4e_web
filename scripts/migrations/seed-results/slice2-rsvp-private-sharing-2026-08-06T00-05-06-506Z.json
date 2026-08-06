@@ -1,0 +1,148 @@
+{
+  "timestamp": "2026-08-06T00:05:05.354Z",
+  "phaseA": {
+    "postBody": [
+      {
+        "type": "_type",
+        "reference": "6a0d2e8590c8df7a1cc7df1b"
+      },
+      {
+        "type": "_parent",
+        "reference": "6a2fc05e4cd971291c5d5ddc"
+      },
+      {
+        "type": "event",
+        "reference": "6a1d6b6210cc20db24e7ce70"
+      },
+      {
+        "type": "member",
+        "reference": "6a2fdb434cd971291c5d5e85"
+      },
+      {
+        "type": "status",
+        "string": "going"
+      },
+      {
+        "type": "going_ref",
+        "reference": "6a1d6b6210cc20db24e7ce70"
+      },
+      {
+        "type": "_sharing",
+        "string": "private"
+      }
+    ],
+    "createdId": "6a73cfb136c951d9114ec69b",
+    "createResponseProperties": [
+      {
+        "_id": "6a73cfb136c951d9114ec69c",
+        "type": "_type",
+        "reference": "6a0d2e8590c8df7a1cc7df1b"
+      },
+      {
+        "_id": "6a73cfb136c951d9114ec69d",
+        "type": "_parent",
+        "reference": "6a2fc05e4cd971291c5d5ddc"
+      },
+      {
+        "_id": "6a73cfb136c951d9114ec69e",
+        "type": "event",
+        "reference": "6a1d6b6210cc20db24e7ce70"
+      },
+      {
+        "_id": "6a73cfb136c951d9114ec69f",
+        "type": "member",
+        "reference": "6a2fdb434cd971291c5d5e85"
+      },
+      {
+        "_id": "6a73cfb136c951d9114ec6a0",
+        "type": "status",
+        "string": "going"
+      },
+      {
+        "_id": "6a73cfb136c951d9114ec6a1",
+        "type": "going_ref",
+        "reference": "6a1d6b6210cc20db24e7ce70"
+      },
+      {
+        "_id": "6a73cfb136c951d9114ec6a2",
+        "type": "_sharing",
+        "string": "private"
+      },
+      {
+        "_id": "6a73cfb136c951d9114ec6a3",
+        "type": "_inheritrights",
+        "boolean": true
+      },
+      {
+        "_id": "6a73cfb136c951d9114ec6a4",
+        "type": "_owner",
+        "reference": "69bcfd8e9c031ab8e6ce8079"
+      },
+      {
+        "_id": "6a73cfb136c951d9114ec6a5",
+        "type": "_created",
+        "reference": "69bcfd8e9c031ab8e6ce8079",
+        "datetime": "2026-08-06T00:05:05.559Z"
+      }
+    ],
+    "readBackSharing": {
+      "value": "private",
+      "valueId": "6a73cfb136c951d9114ec6a2"
+    },
+    "sticks": true
+  },
+  "phaseC_viaA": {
+    "ownerCanRead": true
+  },
+  "phaseB": {
+    "postBody": [
+      {
+        "type": "_type",
+        "reference": "6a0d2e8590c8df7a1cc7df1b"
+      },
+      {
+        "type": "_parent",
+        "reference": "6a2fc05e4cd971291c5d5ddc"
+      },
+      {
+        "type": "event",
+        "reference": "6a1d6b6210cc20db24e7ce70"
+      },
+      {
+        "type": "member",
+        "reference": "6a2fdb434cd971291c5d5e85"
+      },
+      {
+        "type": "status",
+        "string": "going"
+      },
+      {
+        "type": "going_ref",
+        "reference": "6a1d6b6210cc20db24e7ce70"
+      }
+    ],
+    "createdId": "6a73cfb136c951d9114ec6a6",
+    "sharingBeforeCorrection": {
+      "value": "domain",
+      "valueId": "6a73cfb136c951d9114ec6ad"
+    },
+    "sharingAfterCorrection": {
+      "value": null,
+      "valueId": null
+    },
+    "yieldsAbsent": true
+  },
+  "phaseC_viaB": {
+    "ownerCanRead": true
+  },
+  "cleanup": {
+    "6a73cfb136c951d9114ec69b": true,
+    "6a73cfb136c951d9114ec6a6": true
+  },
+  "verdict": {
+    "explicitPrivateAtCreateSticks": true,
+    "deleteAutoInjectedFallbackYieldsAbsent": true,
+    "recommendedMechanism": "Add {type:'_sharing', string:'private'} to the createRsvp() props array — sticks through create, no follow-up needed.",
+    "allCleanedUp": true
+  }
+}

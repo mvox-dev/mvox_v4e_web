@@ -1290,4 +1290,41 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
   create + one delete, nothing else mutated).
   Result artifact: scripts/migrations/seed-results/slice2-rsvp-create-smoke-2026-08-06T00-00-08-909Z.json
 
+### Task #10 follow-up — private-create mechanism confirmed (LIVE, authorized)
+
+[PROBE-RESULT] probe-slice2-rsvp-private-sharing-2026-08-06 — COMPLETE. Both candidate
+  mechanisms WORK; recommending the simpler one. Authorization: team-lead explicit
+  "I authorize this run", distinct token.
+
+  Phase A — explicit {type:'_sharing', string:'private'} added to the create props: STICKS.
+    Created 6a73cfb136c951d9114ec69b, re-GET _sharing.value='private' (value _id
+    6a73cfb136c951d9114ec6a2). entu-api's create-time parent-inherit does NOT override an
+    explicit _sharing in the same POST — inherit only fires when the payload omits _sharing
+    (consistent with the 2026-08-05 mvox_collective probe's framing, now confirmed for a
+    domain-shared PARENT specifically, not just type-defs).
+  Phase B — fallback (omit _sharing, then DELETE the auto-injected value): ALSO works.
+    Created 6a73cfb136c951d9114ec6a6, auto-injected _sharing.value='domain' (value _id
+    6a73cfb136c951d9114ec6ad) as expected from the prior smoke test. DELETE'd that property
+    value; re-GET showed _sharing absent entirely (no re-materialization on a bare re-GET —
+    matches the session-30 DELETE-idempotency finding, now confirmed for this entity type too).
+  Phase C (owner-key read-back), both phases: PASS. Owner key (ENTU_API_KEY/PO db-owner) reads
+    the private/absent-sharing rsvp back by id with no issue in both cases — expected, since
+    _owner always includes the API-key-linked identity regardless of _sharing tier.
+  Cleanup: both smoke rsvps DELETE'd, both confirmed gone via 404 re-GET. DB clean.
+
+  RECOMMENDED MECHANISM for Josquin's #10 build: explicit {type:'_sharing', string:'private'}
+  in the createRsvp() props array (Phase A) — sticks immediately, no follow-up call needed.
+  Simpler than the delete-fallback (Phase B also works but costs an extra round-trip and a
+  transient domain-visible window between create and the correction DELETE — Phase A has no
+  such window). This directly answers the finding from the prior smoke test: the code comment's
+  "parent is private -> child inherits private" assumption is false for a domain-shared person,
+  but an explicit _sharing:private on the SAME create call closes that gap cleanly.
+
+  RIGHTS CAVEAT unchanged from prior probe: ENTU_API_KEY/owner-key only, pins the mechanism —
+  singer-writes-on-own-token path is #13.
+
+  Script: scripts/migrations/probes/probe-slice2-rsvp-private-sharing-2026-08-06.ts (LIVE: two
+  creates + two deletes, nothing else mutated).
+  Result artifact: scripts/migrations/seed-results/slice2-rsvp-private-sharing-2026-08-06T00-05-06-506Z.json
+
 (*MVOX:Perotin*)
