@@ -36,4 +36,6 @@ Format: `[GAP] <area> — <what's missing> — <risk level: low/med/high> — <d
 
 [GAP] CHORE-79 — Auth guard E2E flow not Playwright-tested. Deferred checks: (1) logged-out user navigates to `/library` → redirected to `/auth/login?redirect=%2Flibrary`; (2) completes login → cookie set → redirected back to `/library`; (3) logout → cookie cleared → `/library` redirects again. Requires preview deploy + real OAuth or a test-Entu mock harness. Deferred — HIGH. 2026-05-31.
 
+[GAP] mvox-app #12 (RsvpControl) — the actual "tap → optimistic UI update → revert on failure" behavior (issue #12's headline AC) is not driven through a live DOM anywhere in the RED. It can't be: RsvpControl-in-AgendaList-in-Page is a stub chain at RED time, assembled only at GREEN. What IS unit-tested: RsvpControl's tap→callback mapping, AgendaList's prop-to-control wiring, and `applyRsvpChange`'s write-dispatch logic (create/update/delete/no-op decision) — separately, each real. What's NOT tested anywhere: that a real tap on the real assembled control (a) flips the DOM immediately before the write resolves and (b) snaps back to the prior state when the write rejects. A Playwright E2E (mock the #10/#11 fetch layer, assert DOM state mid-flight on a manually-controlled promise) would close this — same shape as the other deferred-to-Playwright entries above. HIGH. 2026-08-06.
+
 (*MVOX:Tallis*)
