@@ -1,5 +1,20 @@
 # Finn — Research Coordinator Scratchpad
 
+## [CHECKPOINT] 2026-08-06 — S42 `_sharing` create-time copy + change-feed probes (full detail sent to team-lead)
+
+### [LEARNED] `_sharing` create-time parent-copy — separate mechanism from `_inheritrights`, source-verified
+
+`utils/entity.js:296-327` `inheritParentProperties()`, called from `setEntity()` create branch (`entity.js:47`, before `createEntityRecord` at line 49). Gated on: (1) request has a `_parent` reference (bails at line 300-301 if not), (2) request omits `_sharing` (`needsSharing` check, line 303/306). If gated-in: parent `_sharing` is scanned — `public` wins over `domain`; if neither, NOTHING is pushed (child ends up with no `_sharing` property = private-by-absence). Explicit `_sharing` anywhere in the create payload (any value, incl. `'private'`) fully suppresses this — the ONLY opt-out point. Fires synchronously inside the create request, one-time, never revisited on later parent edits (unlike `_inheritrights` cascade at `aggregate.js:168`, which is a runtime rights resolution that re-fires). Applies to ALL entity types with a `_parent`, not just rsvp/person. **Roster implication: every create under a domain-shared parent must explicitly set `_sharing` if private-by-default is intended.**
+
+### [LEARNED] No native Entu change-feed — webhooks are the only push primitive and structurally need a real HTTPS server
+
+`utils/plugin.js` `triggerWebhooks()` fires on entity add/edit/delete + property delete (called from `routes/[db]/entity/index.post.js:111`, `routes/[db]/entity/[_id]/index.post.js:150`, `.../index.delete.js:106`, `routes/[db]/property/[_id]/index.delete.js:195`). Hard-requires `https:` + blocks localhost/`.local`/`127.*`/`10.*`/`192.168.*`/`172.16-31.*`/link-local (`utils/plugin.js:71-92`) — a browser tab structurally cannot be a webhook target. No WebSocket/SSE/socket.io anywhere (grepped). No GraphQL `Subscription` type (grepped `graphql/schema.js`+`resolvers.js`, zero hits). `GET /{db}/entity` has NO changed-since/timestamp/ETag param — read full 48-param OpenAPI list on `routes/[db]/entity/index.get.js`, none exist. No entity-level last-modified field at all (only per-property `created.at`). `_id` (Mongo ObjectId, roughly creation-ordered) is the default sort key but not exposed as a filterable param — no cursor poll possible either. **Verdict: needs-a-server** (for push) with no efficient poll-since fallback (only brute-force refetch+diff) — doesn't fit browser-direct/no-server constraint cleanly either way.
+
+(*MVOX:Finn*)
+
+---
+
+
 <!-- Sessions 2–30 findings pruned 2026-06-14: all durable Entu mechanics, Path C architecture, OAuth wire shape, linting versions, etc. are captured in MEMORY.md (project_entu_*, project_cf_*, project_wrangler_*). See git history for full session records. -->
 
 ## Active / Durable findings (S41, single-collective pivot — multi-db platform topology)
