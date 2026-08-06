@@ -514,6 +514,17 @@ Files created/modified:
 
 [DECISION] Follow-up commit `f09c9f3` (same session, before handoff): Pérotin's smoke-create found Entu auto-inherits `_sharing:domain` from the domain-shared person parent when `_sharing` is omitted on create — leaks the private rsvp. Added `{type:'_sharing', string:'private'}` to createRsvp's full-shape assertion; replaced the old (now-wrong) "does NOT contain _sharing" test rather than leaving it alongside the corrected one. Still 25 RED total (swap, not addition), pnpm check clean.
 
+## [CHECKPOINT] 2026-08-06 — mvox-app #11 RED phase (load existing rsvps onto agenda)
+
+[DECISION] #10 GREEN (451f0c5, Bentham-verified) before this started. 8 new RED tests, commit `0809636` on `feat/slice2-rsvp`. pnpm check 0 errors. 150 pre-existing tests (incl. all of #10's) unaffected.
+- `listMyRsvps(cfg, personId, fetchImpl)` — stub. Query is `_type.string=rsvp&_parent.reference=<personId>` only (rsvp is a child of person; no member/person cross-filter — issue AC "no cross-person query"). Maps to `MyRsvp[]`.
+- `rsvpsByEventId(rsvps): RsvpByEventId` — stub, pure (no fetch). `Record<eventId, {rsvpId,status}>`, chosen over `Map` (team-lead offered either) because Byrd's Svelte template will index it directly (`record[event.id]`) — a Map needs `.get()` which is clunkier in markup. Absent-key test (`'x' in map === false`) directly pins the "no default status" AC.
+- `findMyMemberId` hygiene: added ONE new test asserting `encodeURIComponent(personId)` in the query (Bentham's #10 note, consistency with `resolveTypeId`). Used a personId with a space (`'person p'`) so the encoding is actually observable in the assertion. **Did NOT touch the implementation** — I drafted the fix once, caught myself (production-code fix belongs to Josquin's GREEN per the team-lead's brief and my own scope restrictions), reverted, left only the test RED against the still-unencoded shipped code.
+
+[GOTCHA] Caught myself mid-edit: adjusting an *existing GREEN function's* test to a stricter contract is fine (that's what a hygiene-fix RED is), but I initially also patched the implementation directly in the same pass — that's out of scope even for a "tiny fix," since it's already-shipped, already-Bentham-reviewed production code, not a fresh stub. Reverted before running tests. Rule of thumb going forward: stubbing a *new* export = mine; touching a *shipped* function's body = never mine, even for one-line fixes explicitly named in the dispatch.
+
+[OPEN] GREEN — Josquin: implement `listMyRsvps`/`rsvpsByEventId`, and add `encodeURIComponent(personId)` to `findMyMemberId`'s query. Then Byrd wires the load into the agenda (row controls read initial state off `rsvpsByEventId`). Checkout free.
+
 [GOTCHA] Inline `import` inside an `it()` body is invalid TS ("can only be used at the top level"). Type the resolver fn and Promise explicitly at the closure level and import the type at top level.
 
 [PATTERN] YELLOW-10.1 staleness test: structure is a contract forward-guard — the assertion currently passes trivially (stub does nothing). It becomes a genuine regression guard once Byrd's `$effect` cleanup is in place. Test presence is the contract, not a RED signal.
