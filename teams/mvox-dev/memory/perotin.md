@@ -1501,4 +1501,37 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
   source citations: schema.ts creators + parents for invitation/member, entu-api route + setEntity
   + checkEntityAccess + inheritParentProperties trace, README BFF-principle quotes).
 
+### Task #17 addendum — platform `invite=` vs v4E `invitation` entity (READ-ONLY)
+
+[DECISION] entu-api's `invite=` (routes/auth/index.get.js + routes/[db]/entity/[_id]/index.post.js
+  + utils/entity.js:462-465) is a COMPLETELY DIFFERENT mechanism from v4E's `invitation` entity —
+  not a substitute, solves an adjacent problem. Full trace:
+  - Send: POST /{db}/entity/{_id} (UPDATE, not create) with {type:'entu_user',string:'send-invite'}
+    on a PRE-EXISTING entity that already has `email` set (entity/[_id]/index.post.js:122-131).
+    Since entityId is defined, checkEntityAccess DOES run (unlike create) — caller needs _editor
+    (entu_user isn't in rightTypes, so _owner not required). entity.js:462-465 mints a real
+    server-side JWT (jwtSecret, 7d expiry) as the property's `invite` field, deletes the `string`
+    sentinel. index.post.js:143-147 emails it via SES (Entu's own servers, not mvox's).
+  - Accept: GET /auth?db=X&invite=<jwt> (same OAuth callback every mvox login already uses).
+    auth/index.get.js:199 inviteAttempted=true whenever invite= present AND session completed —
+    REGARDLESS of validation success. :236 auto-create gate explicitly EXCLUDES this case.
+    [speculative] if invite= was present but invalid on B's actual sign-in, this SILENTLY skips
+    BOTH invite-accept AND auto-create — a strong candidate explanation for the earlier "B's
+    person doesn't exist" finding, not confirmed against B's actual request params.
+    :209 inviteEntu={...,systemUser:true} — invite-accept write bypasses checkEntityAccess
+    entirely, but it's Entu's OWN backend doing it, not exposed to any API caller.
+    findStoredInvite/replaceInviteWithCredentials (:270-287) OVERWRITE the entu_user property on
+    the SAME pre-existing entity with real OAuth uid/email/provider. NO member, NO org, NO _parent
+    logic anywhere in this path.
+  VERDICT: browser-direct usable end-to-end (both send and accept are calls mvox already makes
+  the shape of — no BFF needed, Entu's hosted API does the "server work"). But it's NOT a ridable
+  substitute for the invitation/application/member bilateral-consent design — it solves "claim an
+  OAuth identity for a pre-provisioned record" (bulk roster import + self-claim), not "recruit
+  someone into org membership." Doesn't resolve the creation-rights gap from the main finding.
+  Surfaced as a possible COMPLEMENT (admin pre-creates person+member with known email, singer
+  self-claims via native invite=) for Mihkel/Gama to weigh — not recommending it, product call.
+
+  Folded into the same findings doc as an Addendum section (same file, doesn't split the report):
+  docs/migration/findings/invitation-member-creation-rights-2026-08-06.md
+
 (*MVOX:Perotin*)

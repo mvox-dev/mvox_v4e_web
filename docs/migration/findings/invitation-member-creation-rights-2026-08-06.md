@@ -138,3 +138,96 @@ call than my remit):
 
 Not implementing or recommending a fix — this is exactly a "don't offer a choice that isn't real"
 finding, reported as asked.
+
+## Addendum — is entu-api's platform `invite=` a ridable substitute for the v4E `invitation` entity?
+
+Gama's hypothesis: two layers may exist, and we might be about to rebuild something the platform
+already ships. Traced `invite=` fully — it's real, it's serverless-usable, but **it solves a
+different problem than the v4E `invitation` entity does.**
+
+### What `invite=` actually is: identity-claiming for a PRE-EXISTING entity, not org membership
+
+**Minting (send side)** — `POST /{db}/entity/{_id}` (an UPDATE on an existing entity, not a
+create) with `{type:'entu_user', string:'send-invite'}`:
+
+- `routes/[db]/entity/[_id]/index.post.js:122` detects the sentinel `string:'send-invite'`.
+- `:125-131` requires the target entity to already have an `email` property set, else 400 "No
+  email" — this is for entities an admin already pre-provisioned with a known email (e.g. bulk
+  roster import), not brand-new signups.
+- `:138` calls `setEntity(entu, entityId, ...)` — since `entityId` IS defined here,
+  `checkEntityAccess` (the function that's a no-op on CREATE, per the main finding above) DOES
+  run — the caller needs `_editor` on the target entity. `entu_user` is not in `rightTypes`
+  (confirmed list: `_noaccess/_viewer/_expander/_editor/_owner/_sharing/_inheritrights`), so
+  `_editor` alone suffices, `_owner` not required.
+- `utils/entity.js:462-465`: inside `insertProperties`, when a `entu_user` property has a
+  `string` value, entu-api **mints a real JWT server-side**: `property.invite = jwt.sign({db,
+  entityId}, jwtSecret, {expiresIn:'7d'})`, then deletes the `string` field — the stored property
+  becomes `{type:'entu_user', invite:'<jwt>', email}`, no plaintext sentinel left behind. The
+  `jwtSecret` is server-only; this cannot be replicated client-side.
+- `routes/[db]/entity/[_id]/index.post.js:143-147`: reads that minted token back off the response,
+  builds `${origin}/{db}/invite?token={jwt}`, and calls `sendInviteEmail` (AWS SES,
+  `utils/ses.js`) to actually email it. **This is genuinely server-mediated** — but the server
+  doing the mediating is Entu's OWN hosted API (`api.entu.app`), not something mvox has to build.
+  From the browser's perspective this is just one more authenticated POST, identical in shape to
+  every other Entu call mvox already makes.
+
+**Acceptance (claim side)** — `GET /auth?db={db}&invite={jwt}` (a normal OAuth callback URL, same
+endpoint every mvox login already uses):
+
+- `:199` `inviteAttempted = !!(onlyForAccount && session && query.invite)` — true whenever an
+  `invite=` param was present and OAuth completed, **regardless of whether the token actually
+  validates**.
+- `:236` the `createUserForAccount` auto-provision gate (traced in the main finding above)
+  explicitly excludes this case: `if (onlyForAccount && accounts.length===0 && session &&
+  !inviteAttempted)`. **If `invite=` is present but fails to validate for any reason (expired,
+  wrong db, malformed), NO person gets created at all — silently.** [speculative, not confirmed
+  against B's actual request] this is a very plausible mechanism for the earlier "person B never
+  got created" finding, if B's sign-in link happened to carry a stale/mismatched `invite=` param
+  — I have not confirmed this against B's actual request, flagging as a candidate explanation
+  worth checking if B's onboarding link included an invite param.
+- `:209` `inviteEntu = {account, db, systemUser:true}` — the invite-accept write runs with
+  `systemUser:true`, which bypasses `checkEntityAccess` entirely (per the earlier profile-
+  visibility probe's read of that function) — a genuinely elevated operation, but again performed
+  by Entu's own backend, not exposed as a capability any API caller can invoke themselves.
+- `:270-287` `findStoredInvite` + `replaceInviteWithCredentials`: looks up the pending
+  `entu_user.invite` property on the target entity by `_id`, and **overwrites that same property
+  record** with `{uid, email, provider}` from the completed OAuth session — converting "pending
+  invite" into "claimed identity" **on the pre-existing entity**. No new entity is created.
+
+### Direct answers
+
+1. **Gate/shape person-creation?** Neither — it explicitly PREVENTS auto-creation (via
+   `inviteAttempted`) and instead binds OAuth credentials onto an entity that already exists.
+   It doesn't create a person under a different parent or bypass db-scope; `inviteData.db ===
+   onlyForAccount` is checked (`:203`) — the invite only works for the db it was minted for.
+2. **Token/secret concept?** Yes — a server-minted JWT (`jwtSecret`, 7-day expiry) embedded as the
+   `invite` field on an `entu_user` property value. Minted at `utils/entity.js:465`, verified at
+   `routes/auth/index.get.js` inside the `try { jwt.verify(query.invite, jwtSecret) }` block
+   (~`:202`, wrapping the invite-branch).
+3. **Does accept create a MEMBER?** No. It only touches the `entu_user` property on the target
+   entity (identity claim). Zero `member`-type or `_parent`-org logic anywhere in this path — it's
+   unrelated to organizational membership.
+4. **Browser-direct usable, no server?** Yes, on both ends — send-side is one authenticated POST
+   (Entu's own servers do the JWT-mint + SES-email); accept-side is a standard OAuth redirect to
+   Entu's `/auth` endpoint, identical to every existing mvox login. mvox needs no server of its
+   own for either step — Entu's hosted API IS the server, same as it already is for every other
+   call this app makes.
+5. **Same thing as v4E's `invitation` entity?** No — unrelated concepts. Platform `invite=` claims
+   OAuth identity for a pre-provisioned entity (typically a `person` an admin already created with
+   a known email, e.g. from a roster import). v4E's `invitation` entity is an app-invented data
+   record for org-membership recruitment, matched against `application` for bilateral consent,
+   intended to produce a `member`. Entu has zero native awareness of the `invitation`/`application`
+   /`member` concept (confirmed in the main finding above); `invite=` is a genuinely different,
+   pre-existing platform primitive.
+
+### Verdict
+
+**Not a substitute — but a genuinely useful, serverless-usable primitive for an adjacent problem:
+claiming a pre-provisioned identity.** It doesn't resolve the creation-rights gap found above (who
+can create the `invitation`/`member` entities is still unenforced either way); it solves "how does
+a person whose record already exists (bulk-imported roster, admin-precreated placeholder) attach
+their real Google login to it," which the v4E schema doesn't natively address at all today. Worth
+considering as a COMPLEMENT for a bulk-roster-import onboarding path (admin pre-creates person +
+member records with known emails, then singers self-claim via this native flow) rather than as a
+replacement for the invitation-entity design — but that's a product/architecture call for
+Mihkel/Gama, not mine to make.
