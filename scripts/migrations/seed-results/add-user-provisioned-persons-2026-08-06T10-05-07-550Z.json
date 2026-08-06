@@ -1,0 +1,46 @@
+{
+  "timestamp": "2026-08-06T10:05:07.020Z",
+  "dbEntityId": "69bcfd8e9c031ab8e6ce807a",
+  "persons": [
+    {
+      "id": "69bcfd8e9c031ab8e6ce8079",
+      "name": "Mihkel Putrinš",
+      "entuUserEmail": "mitselek@gmail.com",
+      "entuUserProvider": "google",
+      "created": "2026-03-20T07:55:58.462Z",
+      "sharing": "private"
+    },
+    {
+      "id": "6a097dcc90c8df7a1cc7d6dd",
+      "name": "Test User",
+      "entuUserEmail": null,
+      "entuUserProvider": null,
+      "created": "2026-05-17T08:35:24.481Z",
+      "sharing": "domain"
+    },
+    {
+      "id": "6a2fc05e4cd971291c5d5ddc",
+      "name": "Mihkel Putrinš",
+      "entuUserEmail": "mihkel.putrinsh@gmail.com",
+      "entuUserProvider": "google",
+      "created": "2026-06-15T09:05:34.146Z",
+      "sharing": "domain"
+    }
+  ],
+  "count": 3,
+  "matchesExpectedTwoPersonSet": false,
+  "expectedIds": [
+    "69bcfd8e9c031ab8e6ce8079",
+    "6a2fc05e4cd971291c5d5ddc"
+  ],
+  "actualIds": [
+    "69bcfd8e9c031ab8e6ce8079",
+    "6a097dcc90c8df7a1cc7d6dd",
+    "6a2fc05e4cd971291c5d5ddc"
+  ],
+  "thirdPersonNote": {
+    "id": "6a097dcc90c8df7a1cc7d6dd",
+    "name": "Test User",
+    "note": "Shares _parent=dbEntity with the 2 expected OAuth persons, but has NO entu_user property at all (email/provider both null). createUserForAccount (routes/auth/index.get.js) ALWAYS sets entu_user as part of the same create call -- a person with this _parent but no entu_user almost certainly did NOT come through the OAuth auto-provision path. Per team scratchpad (perotin.md session 9, Phase D), 'Test User' is a known long-standing test fixture (name-restore work, formula-unwrap sanity checks) predating the add_user reversibility-tracked work (session 37). [speculative] Its _parent match is likely a manual/seed-time choice, not add_user-mediated -- not independently re-confirmed against creation history in this probe."
+  }
+}

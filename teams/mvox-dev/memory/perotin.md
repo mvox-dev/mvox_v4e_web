@@ -1558,4 +1558,30 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
   Findings doc: docs/migration/findings/logged-in-anywhere-domain-read-2026-08-06.md. Not
   proposing a fix — reported urgently per team-lead's framing, Mihkel/Gama triage.
 
+### Close-prep confirmations for the add_user exposure (READ-ONLY, no rush)
+
+[DECISION] Confirmation 1 — RE-CONFIRMED fresh (not from memory): invite= truly skips
+  auto-create. routes/auth/index.get.js:199 `inviteAttempted = !!(onlyForAccount && session &&
+  query.invite)` — true from PRESENCE alone, doesn't require validation. :235-236 comment +
+  `if (onlyForAccount && accounts.length===0 && session && !inviteAttempted)` — auto-create
+  explicitly excludes the inviteAttempted case. Holds.
+
+[PROBE-RESULT] probe-add-user-provisioned-persons-2026-08-06 — Confirmation 2. Queried persons
+  with _parent=dbEntity(69bcfd8e9c031ab8e6ce807a). Found 3, NOT the expected 2:
+  - 69bcfd8e9c031ab8e6ce8079 (mitselek@gmail.com) — expected.
+  - 6a2fc05e4cd971291c5d5ddc (mihkel.putrinsh@gmail.com) — expected.
+  - 6a097dcc90c8df7a1cc7d6dd ("Test User") — UNEXPECTED. Shares the _parent but has NO entu_user
+    at all (email/provider both null). createUserForAccount always sets entu_user in the SAME
+    create call — a person with this _parent but no entu_user almost certainly did NOT come
+    through OAuth auto-provision. [speculative] Per my own session-9 Phase-D scratchpad entries,
+    "Test User" is a known long-standing fixture predating the add_user reversibility work
+    (session 37) — likely a manual/seed-time _parent choice, not add_user-mediated. Not
+    independently re-confirmed against creation history in this probe (Entu has no changefeed
+    per [[entu-create-sharing-and-changefeed]] memory — can't retroactively verify HOW it was
+    created, only that its current shape doesn't match the auto-provision pattern).
+  Reported both to team-lead as prep for a possible add_user-scoping close — did not act, did not
+  touch add_user or anything else.
+  Script: scripts/migrations/probes/probe-add-user-provisioned-persons-2026-08-06.ts (READ-ONLY).
+  Result artifact: scripts/migrations/seed-results/add-user-provisioned-persons-2026-08-06T10-05-07-550Z.json
+
 (*MVOX:Perotin*)
