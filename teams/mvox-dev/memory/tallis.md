@@ -525,6 +525,27 @@ Files created/modified:
 
 [OPEN] GREEN — Josquin: implement `listMyRsvps`/`rsvpsByEventId`, and add `encodeURIComponent(personId)` to `findMyMemberId`'s query. Then Byrd wires the load into the agenda (row controls read initial state off `rsvpsByEventId`). Checkout free.
 
+## [CHECKPOINT] 2026-08-06 — mvox-app #12 RED phase (RsvpControl on the agenda row)
+
+[DECISION] #11 GREEN (9b1b832) before this started. This is the "meatier" one — 4 layers, 30 new tests (29 RED + 1 forward guard), commit `b3a157f` on `feat/slice2-rsvp`. pnpm check 0 errors, 159 pre-existing tests unaffected.
+
+[DECISION] The component/wiring split (team-lead flagged as needing a call): three layers, not two.
+1. `RsvpControl.svelte` — pure presentational, ported from `mvox_v4e_web`'s (same tap-active-to-clear shape), stubbed minimal (empty div) for RED. 14 tests.
+2. `AgendaList.svelte` — Props interface EXTENDED only (`rsvpByEventId`, `memberId`, `onrsvpchange`, all unused stub surface, template untouched) so the wiring spec compiles. 6 new tests on top of the existing 25.
+3. **`rsvpOptimistic.ts` (NEW module, my own call)** — `applyRsvpChange()`, the write-DISPATCH logic (decide create/update/delete/no-op from `(existing, newStatus)`, call the right #10 primitive, propagate failure). Framework-agnostic on purpose: the full RsvpControl-in-AgendaList-in-Page chain doesn't exist until GREEN, so there's no DOM to drive a page-level optimistic-update-and-revert test against yet. Extracting the dispatch logic into a plain async function makes the actual "meat" (which write call, with what args, in which case) unit-testable NOW, without waiting on GREEN. 8 tests (7 RED, 1 forward guard — see below).
+
+[GOTCHA] One forward guard, left in deliberately (not a bug): "rejects WITHOUT calling createRsvp when memberId is null" passes immediately because the stub throws unconditionally, which happens to satisfy both `.rejects.toThrow()` and `expect(createRsvpMock).not.toHaveBeenCalled()`. Documented in the commit and here rather than silently accepted — it's a REAL invariant (don't call createRsvp before checking memberId) that stays passing through GREEN as long as Josquin doesn't reorder the guard after the call.
+
+[GOTCHA] Caught a vacuous-pass before committing: an "absent from rsvpByEventId → no button active" test looped over `row.querySelectorAll('[data-testid^="rsvp-btn-"]')` with zero elements (stub renders none) — the loop body never ran, so the test passed with 0 assertions executed, not because the behavior was right. Added `expect(buttons.length).toBe(4)` before the loop so it RED's on "control isn't rendered" instead of silently passing. General lesson: any `for (const x of possiblyEmptyList)` assertion pattern needs a length guard first, or `expect.hasAssertions()` at minimum.
+
+[GOTCHA] `fireEvent.click(container.querySelector(...)!)` throws a raw testing-library error ("Unable to fire a click event - please provide a DOM element") when the selector returns null, instead of a clean assertion failure — technically still RED-for-the-right-reason but worse test hygiene than a proper assertion. Added an explicit `expect(btn).not.toBeNull()` before every `fireEvent.click` on a not-yet-rendered element. Apply this from now on to any RED spec that clicks into elements a stub doesn't render yet.
+
+[DECISION] i18n keys used exactly as team-lead named them in the dispatch: `rsvp_status_going`/`_not_going`/`_maybe`/`_late`, `rsvp_non_member_hint` (differs from the OLD app's `rsvp_going`/`rsvp_not_member` naming — new app convention, Comenius adds real 4-locale copy at the i18n step). Since RsvpControl's stub doesn't call any `m.*` function yet (empty div), `pnpm check` doesn't need the real keys to exist yet — only the mocked ones in specs. Didn't touch `messages/en.json` etc.
+
+[DEFERRED] The actual "tap → optimistic UI update → revert on failure" behavior (AC1, the headline AC) is NOT driven through a live DOM anywhere in this RED — it can't be, until Byrd's GREEN wires RsvpControl into AgendaList into +page.svelte. What IS tested: RsvpControl's pure tap→callback mapping (unit), AgendaList's prop-to-control wiring (unit), and applyRsvpChange's write-dispatch logic (unit) — GREEN assembles these three correctly-specified pieces plus a thin Svelte-side optimistic-set/revert wrapper (mirrors the harvested `handleRsvpChange`) that isn't independently pre-GREEN-testable. Flagged to team-lead; a Playwright E2E for the full visual optimistic-revert would be the honest way to close this gap later — matches this codebase's existing pattern of deferring viewport/paint-order checks to Playwright (see test-gaps.md CHORE-76/77/78/79 entries).
+
+[OPEN] GREEN — Byrd: wire RsvpControl into AgendaList's row template; wire memberId/rsvpByEventId loading (findMyMemberId/listMyRsvps/rsvpsByEventId) + the optimistic-set/applyRsvpChange/revert handler into +page.svelte, mirroring the harvested `handleRsvpChange` minus the tally delta. Comenius does the real 4-locale copy for the 5 i18n keys above. Checkout free.
+
 [GOTCHA] Inline `import` inside an `it()` body is invalid TS ("can only be used at the top level"). Type the resolver fn and Promise explicitly at the closure level and import the type at top level.
 
 [PATTERN] YELLOW-10.1 staleness test: structure is a contract forward-guard — the assertion currently passes trivially (stub does nothing). It becomes a genuine regression guard once Byrd's `$effect` cleanup is in place. Test presence is the contract, not a RED signal.
