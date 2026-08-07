@@ -115,6 +115,31 @@ counts) even when the underlying records are private; never project raw values t
 Arithmetic operators on formula-derived values are broken (string-concat instead of math) — use
 separate COUNT formulas for totals, never `*`/`+` on a formula output. Single-hop traversal only.
 
+**Bucket exposure is a 3-gate AND, not just the entity's own `_sharing`.** A property value reaches
+a non-owner reader only if ALL THREE hold: (1) the PROP-DEF's own `_sharing` (uniform per type,
+established above), (2) the TYPE entity's own `_sharing` — a CAP (`aggregate.js:94/115`: if the type
+has no `_sharing` at all, it nukes domain/public exposure for EVERY prop-def on that type regardless
+of gate 1), (3) the INSTANCE's own `_sharing`. Missing gate 2 is an easy-to-miss apparent-success
+trap: a script can "successfully" set gate 1 and still change nothing. Always read-verify gate 2
+live before trusting gate-1-only fixes (real incident: #20/mvox-app, 2026-08-07 — `member.person`/
+`member.section` prop-defs had no `_sharing`; fixed by setting both to `domain`, but the fix also
+needed a live check that `member`'s TYPE entity itself was already `domain`, which it was).
+
+**Buckets are write-time SNAPSHOTS, not read-time computed** (`aggregate.js` runs `aggregateEntity`
+on every write, materializing `private`/`domain`/`public` onto the stored document). A prop-def
+`_sharing` fix does NOT retroactively fix any already-aggregated instance — every existing instance
+needs a genuine re-write (touch-save: atomic single `POST entity/{id}` carrying an existing
+property's own `_id` + its own value, re-asserting not changing it — `insertProperties` soft-deletes
++ re-inserts in one call, zero multi-value risk) to pick up the new bucket assignment. New instances
+created AFTER the prop-def fix get it for free. Cross-ref `docs/architecture/entu-rights-and-
+visibility-model.md` §1/§3 (mvox-app) for the full source citations.
+
+**Artifact hygiene during iterative script fixes**: don't leave multiple near-identical dry-run
+artifacts committed while a script is still being revised pre-authorization — team-lead's review
+picked up a stale one instead of the current one this session (real confusion, real time cost).
+Delete superseded pre-authorization dry-run artifacts as you go (they're draft churn, not audit
+history yet); keep exactly one current one until the live run lands its own artifact.
+
 ## Seed / probe script catalog (current, both repos)
 
 **`~/workspace` (mvox_v4e_web) — legacy, stable, not actively extended:**
@@ -140,6 +165,11 @@ shows no trace — treat as workspace-app-absent until re-confirmed; don't hunt 
 there). **workspace-app's `seed-results/`+`probes/` dirs did not exist before 2026-08-07** — going
 forward, every live workspace-app run gets a committed artifact via the same toolkit pattern (port
 `perotin-toolkit.ts` over if/when a second script needs it — not yet extracted there).
+widen-member-refs-2026-08-07.ts + lib/widen-member-refs-2026-08-07.ts + .spec.ts (#20 fix: 2
+prop-def `_sharing` writes + 245-member touch-save sweep, live 2026-08-07, result artifact
+`seed-results/widen-member-refs-2026-08-07-live-2026-08-07T15-24-56-647Z.json`). Has a
+`BASELINE_DOMAIN_MEMBER_IDS` frozen-set drift-check (245 ids) — reusable pattern for any future
+script needing to disambiguate "population changed" from "count happens to match."
 
 ## Privacy boundary register
 
@@ -174,8 +204,11 @@ ping — never self-authorize.
 - **T4.10 (#30) profile migration** — CLOSED superseded 2026-08-07, never ran live. Mihkel ruled:
   don't run it; the one real target's data was already re-established via the shipped profile-edit
   UI (T4.6). Zero migration writes across the whole arc.
-- **#20 (T3.4 two-account live gate)** and **#9 (T4.8 EntuUser.name prefill)** — both Mihkel-blocked
-  per team-lead's 2026-08-07 checkpoint, not data-manager work.
+- **#9 (T4.8 EntuUser.name prefill)** — Mihkel-blocked per team-lead's 2026-08-07 checkpoint, not
+  data-manager work.
+- **#20 last-mile** — the rights-narrowing gap itself (below) is fixed + live-verified by db-root.
+  What's left is Mihkel's real-browser confirmation that a genuine non-owner domain reader now sees
+  `person`/`section` on a member — db-root can never observe this (always reads private bucket).
 - **entu_api_key requires `_owner` (not just `_editor`)** on live api.entu.app — confirmed by direct
   reproduction 2026-08-05, contradicts the local `~/projects/entu-api` clone's `checkEntityAccess`
   `rightTypes` list (no `entu_api_key` entry there). Live/local source drift, unresolved — no
@@ -200,3 +233,17 @@ ran two dry-runs (3-person plan, then 2-person post-exclusion), caught two real 
 team-lead's independent verify each time (db-root visibility change; OAUTH's pre-existing
 conflicting profile), never went live — Mihkel closed it superseded. Confirmed via direct
 `entu-api` source read: `mandatory` is never enforced (see mechanics section above).
+
+## Recent session — 2026-08-07 continued (#20 roster rights-narrowing fix)
+
+Diagnosed + fixed the live "roster crash on legacy orphan members" incident (mvox-app#20/#18).
+Root cause was NOT person-entity tier (red herring team-lead initially proposed) — it was
+`member.person`/`member.section` prop-defs carrying no `_sharing` (see 3-gate-AND mechanics entry
+above). Also caught an identical twin bug on `member.section` before it became its own incident.
+Bentham pre-execution review (YELLOW-A: missing type-level-sharing guard, closed) + Gama's 3
+chain-text requirements (observed-value ledger, disambiguated 245-population with baseline-set
+drift-check, orphan-section-visibility stated as intended) all folded in before authorization.
+Live executed 2026-08-07, 245/245 touched, 0 failures, independently re-verified against fresh
+reads (rotated property `_id`s matched the ledger exactly). Real process lesson this session:
+left 3 near-duplicate dry-run artifacts committed mid-fix, caused a genuine review mix-up — cleaned
+up + captured as a durable habit above.
