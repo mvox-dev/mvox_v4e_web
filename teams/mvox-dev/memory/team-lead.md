@@ -16,6 +16,8 @@ mvox-app main @ `241ea1a`. **Slice 3 (#16) is fully landed** — all five tasks 
 - Bentham scratchpad pruned 985→375 lines (`d78f5c8`). Pérotin scratchpad pruned 1990→~200 (`96a1851`), then updated with session learnings (`fb69bbc`).
 - Filed #38 (YELLOW-20.1: raw thrown message leaks to end users untranslated — Byrd+Comenius).
 
+**Housekeeping (Mihkel, 2026-08-07):** consider moving `teams/mvox-dev/` from `~/workspace` (v4e schema repo) to `~/workspace-app` (mvox-app) — all actual development happens there, and the split caused three separate confusion incidents this session (cwd trap, wrong-repo scripts, issue-number collisions). Touches every prompt file's path references + CLAUDE.md + startup.md.
+
 **Open issues (mvox-app):**
 - **#38** — roster error message i18n leak (small, Byrd+Comenius, not started)
 - **#9** — T4.8 name-prefill follow-up (prefill mandatory name from `EntuUser.name`, small, not started — see #28 comments for the PO ruling)
