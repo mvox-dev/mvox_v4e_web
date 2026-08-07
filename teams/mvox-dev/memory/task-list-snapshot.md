@@ -1,30 +1,17 @@
-# Task List Snapshot — 2026-08-06 end-of-S42 (CHECKPOINT)
+# Task List Snapshot — 2026-08-07 checkpoint (session "MVOX")
 
-Session-scoped local task list was cleared mid-session (known quirk); GitHub issues are the canonical task state. This snapshot mirrors Slice-4 (#21) task status for next-session restore. **NEXT SESSION: ultracode the remaining build wave.**
+main @ `821450a`. Slice-4 (#21) fully done + live. Slice-3 (#16) done except #20.
 
-## Slice-4 Onboarding (#21) — task board
+## ACTIVE (next session)
+- **#20 (T3.4) — roster live gate.** Needs Mihkel: real browser, a second real non-omniscient account (never db-root). Positive control (A sees B's shared roster fields) + negative (A can't reach B's private profile — already covered by #29's evidence). Code fully ready, nothing to build.
+- **#9 — T4.8 follow-up: prefill mandatory name field from `EntuUser.name`** on the /profile page (Mihkel's 2026-08-07 08:40 refinement to #28). Small, additive UI change. Not started.
 
-### DONE (foundation, merged to main @ 7838989)
-- **T4.1 → #22 CLOSED** — remove `add_user` from polyphony db entity (live mutation; Mihkel consent + team-lead per-run verify; AC2 DB-read).
-- **T4.2 → #23** (needs-po) — invite-binding report: TOKEN-POSSESSION (bearer link). Report delivered.
-- **T4.3 → #24 CLOSED** — schema: `profile` type live `6a74933f…817` (public, name+email children); `person` reduced (name/email/notes removed, 18 remain, stays domain). No data loss.
-- **T4.4 → #25 CLOSED** — single create path `createProfile` (`src/lib/profile/profileData.ts`) merged `7838989`; type-level non-omittable `_inheritrights:false`+`_sharing`, `_owner` grant, fail-loud, sole-path guard. Bentham GREEN.
+## DONE this session (all closed on GitHub, no further action)
+T4.9/#29 (live gate) · #23 (T4.2 report) · T4.10/#30 (superseded, no write) · #17 (T3.1, 3 bundles) · #36 (T3.5 invite reduction) · #18+#19 (T3.2/T3.3 roster) · task #8 (fixture hygiene, fallout).
 
-### REMAINING (ultracode next session) — cut, unlabeled/held
-- **T4.5 → #31** — invite: admin creates person+member, generates invite, unauthed `/invite/` landing (guard.ts:43). Needs T4.2✓+T4.3✓ (UNBLOCKED, next; closes no-new-person window). Design decision: reconcile the pre-existing `/invite/[token]` slice-3 page (read: REPLACE).
-- **T4.6 → #26** — profile edit UI: fields per level, lazy create on first save via createProfile, honest round trips. Needs T4.4✓+T4.3✓+a member (T4.5).
-- **T4.7 → #27** — visibility moves: create-before-delete, narrower-wins, two-lit ACTIVE repair path. Needs T4.4✓+T4.6.
-- **T4.8 → #28** — empty-profile fallback (display-name decision pending). Needs T4.3✓.
-- **T4.10 → #30** — migration: name×131/email×2 move into profile entities via createProfile, grant member _owner, loud per-record. Needs T4.4✓+T4.3✓ + 128-singers scope decision.
-- **T4.9 → #29** — deploy + live gate: admin cannot read private profile entity (non-empty + positive control). Last.
-
-## Open PO decisions (non-blocking to start T4.5)
-1. T4.5 old-`/invite/[token]`-page reconciliation direction (team-lead read: REPLACE with native flow; bearer-link handling).
-2. Display-name field on `person` vs drop empty-profile fallback.
-3. T4.10 — do the 128 synthetic public singers get profile entities?
-
-## Carry
-- YELLOW-T4.4.1: downstream reviews verify each create funnels through `createProfile`, not merely that `_inheritrights` appears.
-- Residual exposure: ~15 `person` fields (idcode/birthdate/address/…) stay domain-readable by members — NOT closed by this slice (on #21). Never describe as handled.
+## Process changes to carry forward
+- Wiki Decision 20: per-agent worktrees mandatory when >1 builder concurrent; shared `~/workspace-app` is team-lead's integration-only tree now.
+- `-2` suffix on a spawn = STOP, confirm dead via TaskStop before respawning under the bare name.
+- Paraglide-stale-after-messages-merge: `pnpm build` before `pnpm check` when a merge touches `messages/*.json`.
 
 (*MVOX:Palestrina*)

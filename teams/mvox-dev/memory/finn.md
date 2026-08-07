@@ -3,23 +3,36 @@
 <!-- Pruned 2026-08-06 (S43): S32-39 detail compressed to bullets below; full text in git
 history of this file. S2-30 already pruned 2026-06-14 — durable facts live in MEMORY.md. -->
 
-## [GOTCHA] 2026-08-06 (S44) — `probe-person-sharing-census-2026-07-19.ts` has a field-name
-bug that silently reports 0/21 person prop-defs sharing-shared when the REAL number is 21/21
+## [RESOLVED] Census script `sharing`→`_sharing` bug (S44, 2026-08-06)
 
-Script queries HTTP `props=name,sharing` (script:105,111). Entu's real system field is
-`_sharing` (underscore). `sharing` (no underscore) matches no property on any entity — the
-query silently returns null for every def. **False negative, not true absence.** Verified
-by re-querying the same defs with `props=name,_sharing`: person TYPE + **all 21** person
-prop-defs (incl. `email`, `preferred_contact_email`) carry `_sharing: domain`. Per
-`entu-api/utils/aggregate.js:94,112-121,148-149,269-275`, this means a domain-tier person
-entity's `email` value (when set) IS written into and retained in its domain bucket, and
-IS returned to any authenticated non-owner reader (`cleanupEntity`,
-`entu-api/utils/entity.js:573-586`). Live proof point: person `6a2fc05e4cd971291c5d5ddc`
-(domain-tier) has `email` set — its domain bucket contains it right now. **Reverses the
-"nothing readable at domain tier" conclusion drawn from the buggy census** — flagged
-urgently to team-lead 2026-08-06, since that conclusion may already have reached the PO.
-Fix the script (`props=name,_sharing` + read `.` `_sharing` not `.sharing`) before anyone
-reruns it for provenance again.
+Flagged 2026-08-06, independently confirmed + reversed by team-lead same session (21/21
+person prop-defs ARE `_sharing:domain`), script guard-commented by perotin (`5a7f0fd`).
+Canonical explanation now lives in `~/workspace-app/docs/architecture/entu-rights-and-
+visibility-model.md` §3 — read that, not this entry, for the mechanics.
+
+## [CHECKPOINT] 2026-08-07 (S45) — `add_user` restore risk (T4.9 prep) + roster/membership
+current-state (story #16), both delivered in full to requesters
+
+- **add_user**: auto-create (`entu-api/routes/auth/index.get.js:295-303`) and the invite
+  path's `resolvePersonParentId` (`workspace-app/src/lib/invite/inviteData.ts:79-116`) read
+  the IDENTICAL query/validity bar on `add_user.reference` (mere `$exists`, no self-ref
+  check despite runbook wording) — **no safe shape exists**; restoring `add_user` in ANY
+  form re-arms public auto-provisioning. Fix instead: `resolvePersonParentId` should return
+  `entity._id` (the database entity's own id, already fetched, always present per Mongo
+  default `$project` behavior) instead of reading `add_user` at all —
+  `entu-api/utils/setupDatabase.js:183-191` shows that's entu-api's own bootstrap-parent
+  convention, and it's byte-identical to polyphony's deleted add_user value (both
+  `69bcfd8e9c031ab8e6ce807a`, confirmed via perotin's pre-delete live read,
+  `perotin.md:1591-1594`). Full brief in team-lead thread 2026-08-07.
+- **Roster/#16**: **T4.10 (#30) never ran live** — Mihkel ruled don't-run; task-tracker
+  "completed" = build-only. Orphaned person `name`/`email` are inert (private, post-T4.3).
+  Profiles exist ONLY where a member has actually used the real T4.6 UI — most
+  members/synthetic rows likely have ZERO profile entities. `member` entity STILL gets
+  `name` + `_sharing:'private'` at create (`inviteData.ts:285-294`) — the "domain-shared,
+  no name on member" ruling is not yet in code. No `listMembers`/roster surface exists
+  anywhere (confirmed precise grep, not substring coincidence) — T3.2 starts from nothing.
+  No `member._sharing` tier census exists — T3.1 is genuinely first-of-its-kind. Full brief
+  sent to Victoria 2026-08-07.
 
 ## [CHECKPOINT] 2026-08-06 (S43) — T4.2/#23: invite bind = TOKEN-POSSESSION, not identity-match
 

@@ -65,4 +65,28 @@ Design/mapping session for conductor/admin rehearsal-schedule slice. Spec approv
 
 **[DEFERRED]** Pure-conductor delete rights — conductor-only persona (no org `_owner`) cannot cancel rehearsals (DELETE is `_owner`-tier). Needs PO decision: grant `_owner` on season (scoped), or BFF elevated-op. Surface when pure-conductor persona becomes real.
 
+### [CHECKPOINT] 2026-08-07 — #16 slice-3 roster re-groom, plan sent to team-lead
+
+**[GOTCHA]** Team-lead's task brief said repo `mvox-dev/mvox-app` but my local `~/workspace` git remote is `mvox-dev/mvox_v4e_web` (stale/archived — old #16-#20 there are unrelated D1/D2/ADMIN-1/2 issues from session 3). Always pass `--repo mvox-dev/mvox-app` explicitly on `gh` calls for current work; don't trust the local checkout's remote.
+
+**[DECISION]** Reshaped #17-#20 (T3.1-T3.4) against slice-4 profile-entity model + the 3 rulings (fixture provisioning for 128 singers → home T3.1; member→domain; name-off-member). Recommended: new T3.5 (invite-path reduction: org+create only, drop name+email fields) as its own task, live deploy gated behind #29 same as T3.1's mutations. Recommended split within T3.1 itself: probe (unblocked, running) vs. provisioning/schema-mutation/bulk-conversion (gated behind #29) — kept as one issue, phase-labeled, rather than forking new issue numbers mid-flight.
+
+**[DEFERRED]** Whether #28-gated (nameless) members are filtered server-side (T3.2) or returned-but-UI-hidden (T3.3) — I recommended API-readable/UI-hides per the ruling text but flagged it as my interpretation, not a ruling; needs PO confirmation.
+
+Full plan sent to team-lead 2026-08-07; awaiting Finn's facts (member/profile shapes, #28 gate impl, existing `listMembers`-shaped code) to confirm or correct implementation-level details before PO sign-off finalizes.
+
+**[GOTCHA]** T4.10 (#30 migration) shows "completed" in the task tracker but that's the BUILD task — Mihkel ruled don't-run-it, zero migration writes ever happened live. All pre-T4.10 `person.name`/`email` values on real polyphony data are orphaned/inert (private-bucket, unreadable except to the person/admin, never migrated). Don't design any fallback that reads them — profile entities are the sole live source, and most members have ZERO profile entities today (lazy-create via T4.6 self-edit only).
+
+**[DECISION]** Corrected #17 scope after Pérotin's probe: the 128 synthetic singers already have `member` entities 1:1 at `private` tier — T3.1 provisions DOMAIN PROFILES for them, not member entities. Population: 245 total members = 130 "clean" v4E (person-ref present, status present; 128 private-tier synthetic + 2 domain-tier real) + 115 "orphan" legacy (no person ref, no status, domain tier, all carry dead `name` strings) — near-certainly pre-v2-rewrite dead data. Orphan disposition is a NEW unscoped question, live mutation behind #29, surfaced to PO as a candidate task — not mine to scope ACs for.
+
+**[GOTCHA]** entu-api enforces NO prop-def mandatory-ness anywhere (mandatory is GraphQL-introspection-only, REST never consults it) — the name-off-member schema mutation has no ordering constraint vs. the code change; sequencing is a team scheduling choice, not technical. Resolves the open question I'd flagged in the first pass.
+
+Sent corrected/folded-in addendum to team-lead 2026-08-07.
+
+**[CHECKPOINT]** Re-groom complete and landed on GitHub: #17-#20 bodies edited (profile-entity terminology, #17's provisioning scope corrected, #18 gets server-side #28-gate filter + orphan test case, #20 gets #29-plus-provisioning precondition). New task filed as **#36** (T3.5, invite-path reduction). Closing comment posted on #16 with the mandatory-ness resolution line + #36 pointer + orphan-disposition flag. Full plan sent to Gama by team-lead — signed off, T3.2/T3.3 (#18/#19) built and in Bentham review.
+
+**[GOTCHA]** `add_user` is **permanently deleted** (#22), no restoration path — the OAuth auto-create-person-on-sign-in mechanism that older tasks assumed (observe the fresh person's `_sharing` default) no longer exists to observe. T4.9's fix resolves the parent from `entity._id` instead. Any future task text that says "sign in triggers person auto-create, observe X" needs the same correction #17 got: cite `entu-api/utils/entity.js:296-327` for `_sharing` defaults instead of live-observing them.
+
+**[DEFERRED]** 115 orphan legacy `member` rows (no `person` ref, no `status`, dead `name` strings, pre-v2-rewrite debt) — disposition still genuinely unowned, no PO ruling, no task scoped. Surfaced twice (my plan + #16 comment) but not picked up yet — worth a nudge if it resurfaces.
+
 (*MVOX:Victoria*)

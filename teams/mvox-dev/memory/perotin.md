@@ -1713,4 +1713,277 @@ Promoted from temporary specialist to permanent data-manager (session 7 end). Fu
   scripts).
   Result artifact: scripts/migrations/seed-results/t4-3-profile-type-person-reduction-2026-08-06T13-59-29-013Z.json
 
+### T4.10 (#30) migration — DRY-RUN done, WAITING on team-lead's "I authorize this run" (2026-08-07)
+
+[WIP] Ran `pnpm migrate:t4-10:dry` at workspace-app@b2ae840 (read-only enumerate + pure plan;
+  the DRY_RUN branch never reaches migrateOneGroup, so zero writes is true by construction, not
+  just by observed behavior — confirmed exit 0, no error). All 3 HALT-guards passed silently
+  (EXPECTED_TARGET_IDS set-equality, count===length one-page check, multi-value guard) — a throw
+  from any of them would have aborted before renderPlan.
+  4 profile creates planned across 3 real persons: db-root/PO `…8079` (name private→domain
+  ⚠, email private→private), Test User `6a097dcc…d6dd` (name domain→domain), Mihkel-domain
+  `6a2fc05e…5ddc` (name+email domain→domain). Exactly one ⚠ VISIBILITY CHANGE (db-root name).
+[GOTCHA] The task-list title "name×131/email×2" is stale scope language from issue #30's own
+  history — the issue body originally flagged live data as `name` on all 131 persons before PO
+  scope ruling; a later PO comment on #30 explicitly narrowed scope to "real persons only,"
+  excluding the 128 synthetic public singers (fixtures, no owner to hand profiles to). The
+  script's `EXPECTED_TARGET_IDS` (3 ids) implements that narrowed scope correctly — the dry-run
+  output (3 persons, 4 creates) is NOT a bug, it's the settled scope. Read #30 comments before
+  trusting a task-title headcount again.
+  Script: scripts/migrations/t4-10-migrate-name-email-to-profile-2026-08-07.ts (DRY_RUN=true).
+
+[WIP] Team-lead independently re-verified the plan live (own read of polyphony: 131 persons =
+  1 private + 2 domain + 128 public, 3 real ids match EXPECTED_TARGET_IDS, 128 synthetic provably
+  excluded) — plan confirmed correct. **HOLD**, not yet authorized: the one ⚠ VISIBILITY CHANGE
+  (db-root `…8079` name private→domain) is with the PO for a proceed/exclude call. If PO excludes
+  `…8079`, expect a one-line `EXPECTED_TARGET_IDS` change routed to Josquin + re-review before any
+  live run. Standing by for team-lead's explicit "I authorize this run" — not sent yet.
+
+### T4.10 re-dry-run against af6a1b2 — db-root excluded (2026-08-07)
+
+[WIP] PO ruled (b): exclude db-root/PO `…8079`. Josquin landed `af6a1b2` — added
+  `EXCLUDED_TARGET_IDS=['69bcfd8e...8079']`, dropped BEFORE the drift check, with its own
+  fail-loud premise guard (excluded id must still be present AND still `private` live, else HALT
+  "STALE EXCLUSION"). Re-ran `pnpm migrate:t4-10:dry` at af6a1b2 (lockfile unchanged, no
+  reinstall needed): guard did not HALT (db-root confirmed present+private live), no drift, no
+  multi-value, 0 writes (exit 0). New plan: **2 profile creates** (not 3) — TESTUSER
+  `6a097dcc…d6dd` (name only, domain→domain) + OAUTH `6a2fc05e…5ddc` (name+email, both
+  domain→domain, MERGED into one group since buildPlan packs same-tier fields into one profile).
+  3 field-moves (2 name + 1 email) across those 2 creates. No ⚠ VISIBILITY CHANGE (all
+  domain→domain). db-root `…8079` correctly absent from the plan.
+[GOTCHA] Team-lead's message expected "3 profile creates" — actual is 2 (buildPlan merges
+  OAUTH's name+email into a single group because both land on the SAME target tier; only a
+  cross-tier split, like db-root's old name-domain/email-private, would have produced 2 creates
+  for one person). 3 matches the field-move count, not the create count — flagged the distinction
+  in my report rather than silently reporting "matches" against a number that doesn't.
+  Script: scripts/migrations/t4-10-migrate-name-email-to-profile-2026-08-07.ts (af6a1b2, DRY_RUN=true).
+
+### T4.10 new HOLD — existing-profile conflict on OAUTH …5ddc (2026-08-07)
+
+[WIP] Team-lead's per-run verify found what the dry-run's plan can't see (no existing-profile
+  precheck in `buildPlan`/`enumerateTargets` — YELLOW-T4.10.1 made real): OAUTH `…5ddc` already
+  has 2 profile entities from real T4.6 UI usage. Independently confirmed live (read-only,
+  `entity?_type.string=profile&_parent.reference=6a2fc05e4cd971291c5d5ddc`):
+  - `6a75773136c951d9114ec894` — `_sharing=domain`, name="Mihkel" (short form).
+  - `6a757d1b36c951d9114ec89d` — `_sharing=public`, empty (no name/email).
+  [GOTCHA] Extra detail beyond team-lead's report: the EXISTING domain profile's name is "Mihkel"
+  (short), not "Mihkel Putrinš" (the full raw value the migration would write from `person.name`).
+  Running the current plan against `…5ddc` wouldn't just create a duplicate domain profile — it'd
+  create a domain profile with a DIFFERENT name value than the one already live and in real UI
+  use, both visible at the same tier. Worth surfacing to PO alongside the exclude/reconcile choice.
+  Independently confirmed TESTUSER `…d6dd` has ZERO existing profiles (clean target,
+  `entity?_type.string=profile&_parent.reference=6a097dcc90c8df7a1cc7d6dd` → count:0).
+  HOLDING per team-lead — no live run, no prior message is authorization.
+
+[WIP] Team-lead forwarded the name-value detail to PO; their own read leans toward (c)
+  don't-run-against-…5ddc-at-all or (a) TESTUSER-only over (b) reconcile — rationale: the UI-typed
+  "Mihkel" is Mihkel's own recent deliberate choice, the orphan "Mihkel Putrinš" is a pre-T4.3
+  leftover. Still HOLDING — awaiting PO ruling + team-lead's resolved plan + explicit "I authorize
+  this run". Next action on my side: whatever script/target-set change lands, re-dry-run against
+  it before treating any authorization as covering it (same discipline as the …8079 exclusion).
+
+### T4.10 (#30) CLOSED — stand-down, NO live write ever issued (2026-08-07)
+
+[DECISION] Mihkel ruled (c): don't run the migration at all. #30 closed as
+  superseded-by-live-usage — the orphaned person `name`/`email` values are declared INERT
+  (private-bucket, not domain-readable post-T4.3 prop-def removal per my own T4.3 read-back);
+  TESTUSER's eventual profiles get created through the real UI (T4.6 path), not a migration.
+  Net outcome: zero migration writes across the whole T4.10 arc — 2 dry-runs (3-person plan, then
+  2-person plan post-exclusion) were the only live traffic, both read-only by construction.
+[LEARNED] The per-run gate did its job twice on a script that was dry-run-clean and code-reviewed
+  GREEN both times: (1) db-root/PO visibility change (private→domain) caught by team-lead's
+  independent verify → PO excluded `…8079`; (2) OAUTH `…5ddc` existing-profile conflict (2 real
+  T4.6-created profiles, one with a DIFFERENT name value "Mihkel" vs the orphan "Mihkel Putrinš")
+  caught by team-lead's independent verify, confirmed by me read-only → PO stood down entirely.
+  Neither conflict was visible to the dry-run's own plan (no existing-profile precheck —
+  YELLOW-T4.10.1 flagged this gap in review, never fixed since the run never happened). Reinforces
+  [[authorization-gate-distinct-token]]: "a live write can hit a corner a dry-run + code review
+  didn't catch" held twice on the SAME task, not hypothetically.
+  Nothing further on #30. Standing by for future data work.
+
+### T3.1 (#17) probe half — READ-ONLY member/roster enumeration (2026-08-07)
+
+[PROBE-RESULT] polyphony live: 245 `member` entities, 131 `person` entities, 2 `profile` entities.
+  4 orgs (from `_parent` histogram, names confirmed): EFK=64, Sireen=50, Rahvusmeeskoor=90, TAM=41.
+[DECISION/GOTCHA] `member` splits into TWO structurally distinct populations:
+  - **130 "clean" v4E members**: `person` ref present, `status:'active'`, tier=`private` for the
+    128 public-tier synthetic singers (matches T4.5 shipped shape, `inviteData.ts:290-298`),
+    tier=`domain` for db-root's own + OAUTH's own member (the 2 real non-public persons that HAVE
+    a member). NONE of these 130 carry a `name` value — profile-based naming (T4.6/T4.8) fully
+    replaces it for this population.
+  - **115 "orphan" legacy members**: NO `person` ref, NO `status`, tier=`domain`, and ALL 115
+    carry a `name` string (e.g. "Yena Choi", "Marie Roos") — the ONLY member rows with `name` at
+    all. This is [speculative] almost certainly pre-v2-rewrite leftover: my own May-2026 scratchpad
+    already flagged "[SUPERSEDED] Old manifest (c15df7a) used orphan members... v2 rewrite: members
+    are v4E-clean (person ref required + status: active)" — the v2 reseed created the 130 clean
+    members correctly but never DELETED the old orphan set; both now coexist live. Spread across
+    all 4 orgs proportional to size (26/24/46/19 orphan per org) — not a single-org anomaly.
+  - Cross-check: no person+org duplicate combos among the 130 linked members (clean).
+[DECISION] Persons↔members cross-map: 130 of 131 persons have >=1 member (all 128 public + both
+  non-public-with-member); the ONE person with ZERO members is TESTUSER `6a097dcc…d6dd` (domain) —
+  consistent with it never having gone through org-membership seeding. All 128 public-tier persons
+  DO have a member entity — the #16 roster load-bearing question ("do the 128 synthetic singers
+  have member entities at all") answers YES, cleanly, 1:1.
+[DECISION] Existing `profile` entities unchanged from the T4.10 arc: both on OAUTH `…5ddc`
+  (domain "Mihkel" name-only + empty public). person tiers re-confirmed live: 1 private / 2 domain
+  / 128 public — matches team-lead's slice-4 read exactly.
+[DECISION] Source question (entu-api mandatory enforcement), delegated to a sub-agent against
+  `~/projects/entu-api` source, verified citations: **NOT enforced at create or update.**
+  `setEntity` (`utils/entity.js:8-58`) → `validatePropertyTypes` (125-271) validates only
+  properties PRESENT in the payload, never iterates prop-defs to find omissions;
+  `applyPropertyDefaults` (274-397) only backfills from `private.default`, never reads `mandatory`.
+  `mandatory` appears exactly twice in the whole entu-api source, both in
+  `utils/graphql/schema.js:346,375` — read-only GraphQL-introspection metadata, never consulted by
+  any REST create/update path. So: **order is free** — the member-create code change (dropping
+  `name`) need not wait on any schema-side mandatory flag, since nothing server-side would reject
+  either way.
+  Scripts (ad-hoc, not committed — read-only curl+node, results in scratchpad tmp dir, not repo):
+  members.json/persons.json/profiles.json fetched live, analyzed via a throwaway node script.
+  Reported full brief to team-lead for #16 re-groom (Victoria) + T3.2/T3.3 build.
+
+### T3.1 (#17) RESUMES post-#29-gate — fixture B re-verify + auto-create-moot check (2026-08-07)
+
+[PROBE-RESULT] Fixture B (`6a7591cc36c951d9114ec8de`) re-verified live:
+  - person: `_sharing=domain`.
+  - member: `6a7591cd36c951d9114ec8e7`, org=EFK (`69c7f8718489bfcb0e81b065`), `_sharing=private`,
+    `status=active`, `name="Mibiro"`.
+  - profile: only ONE visible to db-root identity — `6a75923936c951d9114ec8f4`, `_sharing=domain`,
+    `name="Mibiri"`, `email=mibiri@gmail.com`.
+[GOTCHA] Team-lead's brief said B carries "a domain profile + a non-empty private profile." I
+  could NOT independently see a private-tier profile — the full unfiltered `profile` collection
+  scan (4 entities live) contains ZERO private-tier rows anywhere, not just for B. Read this as
+  EXPECTED, not a gap: `checkEntityAccess` (`entu-api/utils/entity.js:83`, gated at 106/116/256 on
+  `entu.systemUser`) is the same rights check for reads as writes, and db-root's API-key identity
+  is a real person (`…8079`), not `entu.systemUser` (matches my own prior RECON B §4 finding: no
+  systemUser bypass reachable via the JWT/API-key route). So a private profile owned solely by B
+  with no db-root grant is INVISIBLE to my query, not absent — and #29 (already closed:
+  "admin cannot read private profile entity") is EXACTLY this boundary working as designed.
+  Team-lead's original #29 evidence was almost certainly read as/with B's own session, which CAN
+  see her own private profile; my db-root read structurally cannot and should not be able to.
+  Do not request a grant to check — that would defeat the gate being verified.
+[GOTCHA] Name mismatch worth flagging: member.name="Mibiro" vs profile.name="Mibiri" — one letter
+  apart. [speculative] Likely just two different manually-typed values during the T4.9 walkthrough,
+  not a bug, but surfacing it since a precheck's job is to notice mismatches, not paper over them.
+[LEARNED] B's member DOES carry `name="Mibiro"` — she was created via the REAL shipped T4.5
+  invite path (`inviteData.ts:290-298` literally sets `{type:'name', string: input.memberName}`),
+  not a stale fixture. This SHARPENS my earlier T3.1 finding (135-orphan-only claim): `member.name`
+  isn't only legacy debt — the CURRENT shipped invite code still writes it on every new member.
+  Ruling `name` off `member`'s schema needs a matching code change to `inviteData.ts` (drop that
+  literal), not just a cleanup of the 115 old orphans — confirms this is exactly the "member-create
+  code change" team-lead referenced re: the mandatory-enforcement question.
+[DECISION] Point 2 (Mihkel-signs-in-as-B auto-create observation) — independently verified TRUE,
+  agree it's answered-by-construction: `createUserForAccount` (`entu-api/routes/auth/index.get.js`
+  ~289-333) is gated on `add_user.reference` off the db entity (~295-303: Mongo query filters on
+  `private.add_user.reference` existing; `parent` derives from it; `if (!parent) return` — early
+  exit, no person ever created). Grep-confirmed the ONLY reads of `add_user` in entu-api are in
+  this one function. The invite path (`replaceInviteWithCredentials`) is a real alternate mechanism
+  but attaches credentials to an EXISTING person, never auto-creates one — doesn't rescue the
+  observation. With `add_user` permanently deleted (#22), there is no live path left; recommend
+  routing the #17 body update to Victoria as team-lead offered.
+[PROBE-RESULT] Point 3, freshly re-verified (not assumed stale) against a NEW live snapshot: all
+  128 public-tier persons have exactly 1 member each, 100% `_sharing=private`, zero deviation;
+  zero of the 128 have any visible profile entity. Exactly matches the earlier probe + team-lead's
+  expectation.
+[DECISION] Live counts moved since the earlier T3.1 probe (real T4.9-walkthrough activity, not
+  migration/probe side-effects): persons 131→132 (+B), members 245→246 (+B's), profiles 2→4
+  (+B's domain profile, +db-root's own new "Admin mihkel" domain profile on `…8079` — created via
+  the real T4.6 UI during the walkthrough, unrelated to the closed #30 migration).
+  Reported full findings to team-lead. Nothing written. Standing by for the 2-3 separate §8.6
+  authorization chains (profiles / tier-conversion / schema-mutation).
+
+### T3.1 (#17) Bundles 1+2 — script built, dry-run clean, PAUSED before live (2026-08-07)
+
+[DECISION] Team-lead recorded the §8.6 chain on #17 and authorized bundles 1+2 ("Go ahead...
+  Report per-record results as usual"). No script existed yet for this work (unlike T4.10, the
+  issue names me sole build+execute owner — "Owner: Pérotin (live, authorized)"). Built:
+  `scripts/migrations/lib/t3-1-singer-provision.ts` (enumerate+guards, `provisionDomainProfiles`
+  Bundle 1 engine, `convertMemberTiers` Bundle 2 engine, `renderPlan`, `ProvisionLedger`) +
+  `scripts/migrations/t3-1-provision-singers-2026-08-07.ts` (entrypoint, DRY_RUN default true,
+  Bundle 2 hard-gated on Bundle 1 succeeding for EVERY target) + a 17-case spec
+  (`t3-1-singer-provision.spec.ts`). `pnpm test`/`pnpm check`: clean (506 tests, 0 type errors).
+  Committed + pushed direct to main (`eed66b1`) — my own established convention for
+  data-manager-authored scripts (T4.1/T4.3 precedent), not the Josquin-build/Bentham-GREEN chain
+  T4.10 used.
+[DECISION] `_sharing` tier-conversion mechanics (delegated to a sub-agent against
+  `~/projects/entu-api`, source-cited): POST only ADDS, never dedupes `_sharing`
+  (`routes/[db]/entity/[_id]/index.post.js:4` doc: "Does not remove existing properties");
+  correct op is a SINGLE atomic `POST entity/{id}` carrying the OLD `_sharing` property's `_id`
+  plus the new string — `insertProperties` (`entity.js:440-444`) soft-deletes the named old value
+  and inserts the new one in the same call. No `_inheritrights` cascade on `_sharing` (excluded
+  from `aggregate.js`'s `rightProperties` re-aggregation list) — flat, local change only.
+[PROBE-RESULT] Dry-run against live polyphony: **clean**. 128 targets enumerated (drift guard:
+  128==EXPECTED_PUBLIC_PERSON_COUNT), zero truncation, all 128 members singular+private, ZERO
+  existing profiles (fresh re-check, not reused from the earlier probe), all 128 have a name.
+  Plan: exactly 128 profile creates (Bundle 1) + 128 tier conversions (Bundle 2). Writes issued:
+  0 (DRY_RUN branch never reaches either engine). Exit code 0.
+[DECISION] PAUSED before flipping to live, despite team-lead's categorical "go ahead" already
+  being on record. Rationale, stated to team-lead: the earlier authorization covers the BUNDLES
+  (what changes), but this is code NOBODY has reviewed — no Bentham GREEN, no second pair of eyes
+  — about to touch 128 live entities for the first time, at a materially larger blast radius than
+  anything else this session. Asked for an independent per-run verify + explicit go on THIS
+  script specifically before executing, consistent with the dry-run→independent-verify→authorize
+  pattern that caught two real problems on T4.10. Standing by, no live write yet.
+
+### T3.1 (#17) Bundles 1+2 — LIVE, authorized, VERIFIED (2026-08-07)
+
+[CHECKPOINT] Explicit "I authorize this run. Go live on bundles 1+2." received from team-lead,
+  after their own independent read of the gating logic (not just my description) + direct sample
+  of the dry-run output. Ran `pnpm migrate:t3-1:live`. Script's own ledger: 128 CREATED (Bundle 1),
+  0 FAILED, 128 CONVERTED (Bundle 2), 0 INCOMPLETE markers, exit code 0.
+[CHECKPOINT] Independently re-verified against a FRESH live read (not the script's own read-backs
+  — a separate query pass afterward), per the standing "ran without exception is not evidence"
+  rule: ALL 128 public-tier persons now have exactly 1 DOMAIN-tier member (was private) AND
+  exactly 1 DOMAIN-tier profile entity, with the profile's `name` matching the person's own `name`
+  value exactly, for all 128 — zero mismatches. The 3 OTHER non-public persons carrying a member
+  (db-root `…8079`, OAUTH `…5ddc`, fixture B `…8de`) are completely untouched — their member tiers
+  are exactly what they were pre-run (domain, domain, private respectively) — confirms the script
+  stayed correctly scoped to only the 128 targets, nothing else. Aggregate reconciliation: member
+  `_sharing` histogram now `{domain:245, private:1}` (245 = 115 pre-existing orphans + 2 pre-existing
+  real (db-root+OAUTH) + 128 newly-converted; the 1 private = B's, correctly out of scope); profile
+  histogram now `{domain:131, public:1}` (131 = 128 new + db-root's own admin profile + OAUTH's
+  domain profile + B's domain profile, all pre-existing and untouched; 1 public = OAUTH's
+  pre-existing empty public profile).
+  VERIFIED: true, all checks, independently, live.
+  Script: scripts/migrations/t3-1-provision-singers-2026-08-07.ts (main @ eed66b1).
+  Reported full results to team-lead. Nothing outstanding on my side for bundles 1+2 — #17's
+  remaining items (bundle 3 schema mutation, held until #36 merges; the boundary API-level
+  verify, Mihkel's browser step) are not mine.
+
+### T3.1 (#17) Bundle 3 — schema mutation LIVE, authorized, VERIFIED (2026-08-07)
+
+[CHECKPOINT] #36 merged (main @ 7177f85). Team-lead: "I AUTHORIZE bundle 3... dry-run first if
+  there's meaningful risk to sample, otherwise proceed per your judgment on this one (schema
+  mutation, not a bulk data write)." Assessed low risk (single, well-scoped DELETE, precondition
+  checkable twice) — used a lighter pattern than bundles 1+2's full dry-run harness: inline
+  precheck + single DELETE + read-back verify, ONE script
+  (`scripts/migrations/t3-1-bundle3-remove-member-name-2026-08-07.ts`), not a separate
+  build-then-report round.
+[GOTCHA] Went looking for my own earlier T4.1/T4.3 "cleanup-*" scripts as a template
+  (referenced in this very scratchpad as "committed direct to main") — `git log --all` on
+  workspace-app shows they were NEVER actually committed to this repo, only T4.10's and T3.1's
+  scripts exist in history. Those scratchpad entries either predate this repo's current state or
+  described work that was run without being committed. Wrote bundle 3 fresh instead of relying on
+  a template that turned out not to exist — flagging so a future me doesn't go looking for those
+  files again. Worth a memory-hygiene pass on this scratchpad at some point.
+[DECISION] Precondition double-verified before the DELETE: (1) read `inviteData.ts:288-295` on
+  main directly — `memberProps` no longer includes `{type:'name',...}` (also confirmed #36's
+  actual scope: member create now `_sharing:'domain'` not `'private'`, `_viewer` grant dropped —
+  broader than just the name removal, per #36's own title); (2) live query confirms the precheck
+  the script itself also runs.
+  Member type: `69c7ea4a8489bfcb0e819edd`. `name` prop-def: `69c7ea4a8489bfcb0e819ee4` (exactly
+  one, unambiguous). Dry-run matched this exactly, 0 writes, exit 0. Committed+pushed to main
+  (`82bb58b`), then ran live directly (no extra pause round — team-lead explicitly delegated that
+  judgment call for this specific low-blast-radius mutation).
+[CHECKPOINT] LIVE result: script's own read-back confirms `name` absent from member type's
+  prop-defs. Independently re-verified with a FRESH separate query (not reusing the script):
+  member type prop-defs are now exactly `person, section, current_section, status` — `name` gone.
+  Also spot-checked the no-purge expectation on one legacy orphan member
+  (`69c7f8728489bfcb0e81b085`): its raw `name` value ("Yena Choi") PERSISTS untouched — confirms
+  this mutation removed only the schema declaration, never the underlying values, exactly as
+  documented (T4.3 precedent) and as the #17 PO ruling anticipated (115 orphans' disposition
+  stays a separate, unscoped question).
+  VERIFIED: true. Script: `scripts/migrations/t3-1-bundle3-remove-member-name-2026-08-07.ts`
+  (main @ 82bb58b). Reported to team-lead. #17's remaining items (boundary API-level verify,
+  Mihkel's browser step) are not mine — nothing outstanding on my side.
+
 (*MVOX:Perotin*)
