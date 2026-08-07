@@ -7,6 +7,121 @@ metadata:
 
 # Bentham scratchpad
 
+## 2026-08-07 — #20 widen-member-refs PRE-EXECUTION review (main @ 5d49a6a, 247 planned live writes) — YELLOW, one precondition to close first. **[RESOLVED @ bdcb21d — YELLOW-A closed, run AUTHORIZED at session end; result NOT yet reviewed by me, see [WIP] below.]**
+
+[WIP — first thing to pick up next session] The live run was authorized 2026-08-07 ~15:35 but had not
+completed/been reported when I shut down. **I have reviewed the CODE only; no live ledger has crossed
+my desk.** Two things to look at when it lands: (1) the **canary ledger line** specifically —
+`touchSaveCanary` is the hard gate that proves the replace mechanic on one member (re-reads, asserts
+exactly ONE surviving `_sharing`, value `'domain'`, THROWS rather than logging) before the other 244
+run; if it threw, nothing after it executed. (2) whether the **last-mile visibility check used a
+genuinely non-omniscient identity** — not db-root, and not an account that happens to hold `_owner`
+on these entities, or it proves nothing (see the proof-of-write≠proof-of-visibility note above).
+Guard resolution at `bdcb21d`: `verifyMemberTypeSharing` reads the member TYPE entity live and the
+fresh dry-run recorded `memberTypeSharingObserved: "domain"` — gate 2 measured, not assumed; 28 specs;
+canary + population disambiguation (245 total / 245 unchanged / 0 new / 115 orphans) all landed.
+
+[DEFERRED — two carry-forward notes, non-blocking, for whenever anyone next touches that script]
+(a) `verifyMemberTypeSharing` HALTs unless the type is `'domain'`/`'public'`, which is deliberately
+STRICTER than the mechanism (a truthy `'private'` would actually pass a prop-def `'domain'` through).
+Fail-safe direction so I did not ask for a change — but the halt MESSAGE only explains the absent
+case, so an operator hitting it on `'private'` could "fix" it by needlessly widening the TYPE
+entity's sharing. (b) `MEMBER_TYPE_ID` is a third hardcoded id; nothing verifies the two prop-def ids
+are actually CHILDREN of that type. Cheap close: have `verifyPropDefsAbsent` also request `_parent`
+and assert it equals `MEMBER_TYPE_ID`. Also noted on record: the count drift guard loosened from
+exact-match to shrink-only, so unexpected GROWTH now proceeds (named as `newSinceBaselineIds`) rather
+than halting — right trade, but a real one-directional loosening.
+
+[GOTCHA-ENTU-BUCKET-EXPOSURE-IS-A-THREE-GATE-AND (VERIFIED at entu-api source) — standing, applies to
+EVERY prop-def `_sharing` change] A property value reaches a non-owner reader's domain/public bucket
+only if ALL THREE hold. Checking one or two is the trap:
+1. **The prop-def's own `_sharing`** — projected during aggregation (`aggregate.js:86`).
+2. **The entity TYPE's own `_sharing`, acting as a CAP** — `definitionSharing =
+   definitionEntity?.private?._sharing?.at(0)?.string` (`aggregate.js:94`), then `:115`
+   `if (!definitionSharing) { sharing = undefined }`. **A type with no `_sharing` silently nukes the
+   prop-def setting for EVERY prop-def on that type.** Only the `domain`-caps-`public` case narrows;
+   any truthy type `_sharing` lets a prop-def `'domain'` through.
+3. **The entity's own `_sharing`** — second retention gate (`aggregate.js:269-275`) deletes
+   `newEntity.domain`/`.public` wholesale unless the instance itself is at that tier.
+Review move: on any prop-def sharing fix, demand a guard on gate 2 (the TYPE entity), not just the
+prop-def. Its absence is a SILENT no-op — writes land, ledger reads clean, nothing becomes visible.
+Ours is documented in `docs/architecture/entu-rights-and-visibility-model.md` §3 lines 63-83.
+
+[GOTCHA-ENTU-INCLUDE-_id-TO-REPLACE — VERIFIED, supersedes the naive read of the POST-appends rule]
+`POST entity/{id}` with `_id` INCLUDED in a property object is a genuine atomic REPLACE, not an
+append: `utils/entity.js:441` pushes that `_id` to `oldPIds` and strips it, `:52` inserts the NEW
+value, `:54` `markPropertiesDeleted(oldPIds)` soft-deletes the old, `:55` `aggregateEntity` re-runs
+unconditionally. Three consequences worth carrying: (a) it's the correct single-call replace — no
+DELETE-then-POST round trip and no multi-value append; (b) the order is **insert-then-soft-delete**,
+so an interrupted request leaves a DUPLICATE, never a MISSING value — the "entity loses its
+`_sharing` and silently defaults to private" failure mode is structurally impossible; (c) because
+`aggregateEntity` runs on every write, re-asserting a property's OWN existing value under its OWN
+`_id` is a legitimate **touch-save** to force re-aggregation (buckets are write-time snapshots).
+`markPropertiesDeleted` filters `deleted:{$exists:false}`, so it's idempotent. `_sharing` is in
+`rightTypes` (`:27`) ⇒ needs `_owner`, and `checkEntityAccess` runs BEFORE any write ⇒ a 403 is a
+clean per-record failure with zero partial state.
+
+[REVIEW NOTE — "proof of write" ≠ "proof of visibility"] A ledger built from a db-root/`_owner`
+credential can never observe what a non-owner domain reader receives (`cleanupEntity`'s first branch
+always serves the private bucket to an owner). A rotated property `_id` proves a write happened and
+that aggregation re-ran — nothing more. Last-mile confirmation always needs a genuinely
+non-omniscient identity. Pérotin pre-declared this one honestly in both code and artifact; hold that
+standard for any future rights-tier ledger.
+
+(*MVOX:Bentham*)
+
+## 2026-08-07 — #20 roster error-message honesty fix (fix/18-roster-orphan-crash @ 8652be0) — GREEN + YELLOW-20.1 (user-visible untranslated throw message) + a framing correction.
+
+[GOTCHA-THROWN-MESSAGE-IS-USER-COPY 2026-08-07 — standing trigger] A thrown `Error`'s message stops
+being dev-facing the moment a page does `loadError = e.message` and renders it through a localized
+wrapper — here `roster/+page.svelte:49` + `:88` `{m.roster_load_error({ message: loadError })}`. The
+WRAPPER is translated ×4; the interpolated PAYLOAD is hardcoded English. Net: et/lv/uk users get a
+localized frame around English jargon, plus whatever internal ids the message names. **Review move:
+whenever a diff changes a thrown message, grep for `e.message`/`err.message` reaching a template
+before judging it dev-facing** — if it does, the change is user-visible copy and the usual i18n +
+information-disclosure questions apply. The honest fix is a split: rich detail to console for
+developers, generic localized string to the user. Cheap to miss because a `throw new Error(...)` in a
+data-layer `.ts` LOOKS internal.
+
+[FRAMING CORRECTION — #18/#20: the 115 legacy orphans CANNOT reach this throw.] The issue was briefed
+as "roster crash on legacy-orphan members — 115 exist by design." Verified false in source this turn:
+`listActiveMembers` queries `entity?_type.string=member&status.string=active&...`, and the orphans
+carry NO `status` → they never match → never reach the resolver. Independently matches my own #18/#19
+note and Pérotin's population probe. The crash that actually fired was a rights-tier case (consistent
+with Mihkel's finding). Keep this straight: a future recurrence must NOT be diagnosed as orphan data,
+and orphan handling in this path needs no "fix" because it is unreachable.
+
+(*MVOX:Bentham*)
+
+## 2026-08-07 — Pérotin's RECONSTRUCTED T3.1 result artifact (mvox-app 84af649) — YELLOW ×4. New review class: a record, not a PR.
+
+[PATTERN-RECONSTRUCTED-ARTIFACT 2026-08-07 — standing] Reviewing a *backfilled* audit record is a
+distinct job from reviewing code: the question is not "does it work" but "does every field's
+confidence match its evidence." The move that worked: **sort each field by provenance tier and check
+each tier differently** — (1) git-derived (SHAs/timestamps) → re-derive from `git log`, and verify
+timezone conversion, not just SHA existence (Pérotin's three UTC conversions were all correct);
+(2) source-derived (`EXPECTED_PUBLIC_PERSON_COUNT`, the endpoint choice, a precondition) → grep the
+committed source at the cited SHA; (3) **console-only** (live-resolved entity IDs, histograms,
+read-back lists) → these can NEVER be re-derived from the repo when the script resolves IDs at
+runtime rather than hardcoding them, so they rest entirely on operator attestation. Tier 3 is where a
+reconstructed artifact silently over-claims: a top-level `"overallVerified": true` reads as
+machine-checked when it is operator-attested. **Standing ask: a reconstructed artifact must either
+cite a retrievable location for its tier-3 values (the persisted inbox/message record), or label the
+attestation tier per field.** Also: the `writeResultArtifact` convention shares one timestamp between
+filename and an `executedAt` payload field — a reconstruction that fills the filename slot with the
+RECONSTRUCTION time and omits the payload field puts a misleading date in the conventional
+"when did this run" position. Demand an explicit `reconstructedAt`.
+
+[CALIBRATION-CITATION-PRECISION-RECURS 2026-08-07] Third instance of "pointer wrong, substance right"
+(after the finn.md invite-allowlist ref). Both defects here were citation-side: an auto-memory cited
+as flagging a gap it never mentions, and a path written `src/routes/.../inviteData.ts` when the file
+is `src/lib/invite/inviteData.ts`. In a document whose entire VALUE is its citations, a wrong pointer
+is not cosmetic — the next auditor follows it, finds nothing, and discounts the whole record. Review
+move: follow EVERY citation to its target and confirm the target says what it is cited for — existence
+of the file is not confirmation of the claim about it. Cheap: one grep per citation.
+
+(*MVOX:Bentham*)
+
 ## 2026-08-07 — #36 invite-path reduction (feat/36-invite-domain-member, worktree ~/workspace-app-t36) — GREEN at HEAD a25e78d + COORDINATION FLAG: handoff's frozen SHA a755ceb FAILS the YELLOW-T4.4.1 guard. **[CLOSED 2026-08-07 — #36 merged 10:17; flag resolved, nothing outstanding. The technique it taught survives as [GOTCHA-BRANCH-MOVED-UNDER-REVIEW] below.]**
 
 [#36 2026-08-07 — GREEN at a25e78d] member create → `_sharing:'domain'`, DROPS `name` prop + `_viewer` grant (aligns invite path to the ruled target model that the roster #18/#19 reads). Admin form reduced to org-select only (memberName+email fields removed; email already dead since #34). Security-sound: member `_sharing:'domain'` exposes only membership-fact + person-ref + status (name lives on the domain PROFILE, not the member) = the intended domain-shared membership; dropping `_viewer` is safe (domain sharing covers the invitee's own read — no access regression, she was read-only via _viewer before, read-only via domain now); `_inheritrights:true` keeps admin management via org inheritance. Mandatory-name concern MOOT: entu-api create path has NO 'mandatory' enforcement (grep utils/entity.js + index.post.js empty — consistent with [[entu-creation-rights-unenforced]]), so dropping `name` won't fail live regardless of #17-bundle-3 timing. i18n (Byrd's own, not Comenius): all 4 locales drop name_label+email_label + rework bearer_warning {email}→"the invited person" identically; Estonian verified correct directly ("kutsutavale isikule"), lv/uk match the pattern + internally consistent — no error, formal Comenius pass optional. YELLOW-T4.4.1 holds at a25e78d (inviteData no 'profile', profileData UNCHANGED, resolveTypeId only person/member; soleCreatePath.spec UNCHANGED). Fixture hygiene task #8 closed as fallout: `_omitsMemberName` removed, `_omitsOrgId={}` now errors precisely on the sole missing field — resolves my old #34 stray-email fixture-precision YELLOW. RED 222e724 tests-only, staged-set clean.
