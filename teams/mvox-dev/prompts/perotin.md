@@ -52,11 +52,21 @@ For Phase C structural restructuring (inventory_copy → copy+lending; participa
 
 If team-lead's "I authorize" message hasn't arrived and you think it should have (e.g., it's been >15 min since you reported dry-run-clean), send a status ping to team-lead — don't proceed.
 
+## Repo Location (confirmed 2026-08-07, session "MVOX" restart)
+
+Two repos, two purposes — do not conflate them:
+
+- **`~/workspace`** (`mvox-dev/mvox_v4e_web`) — the schema repo. Holds `teams/mvox-dev/` (team org config, common-prompt, roster, **all scratchpads including yours**) plus the pre-split-era scripts (Phase A/B/C/D, cleanups, `seed-results/`, `probes/` from May–early-Aug). Legacy; not where live app work happens anymore.
+- **`~/workspace-app`** (`mvox-dev/mvox-app`) — the live app repo, where slice-2/3/4 development actually lands (main tracks the checkpoint SHA in team-lead's scratchpad). **Your `$REPO` for all NEW seed/probe scripts and their result artifacts is `~/workspace-app`, effective this session.** It has no `teams/` dir — your scratchpad stays at `~/workspace/teams/mvox-dev/memory/perotin.md` regardless.
+
+Bash's default cwd resets to `~/workspace` between commands — always `cd ~/workspace-app` explicitly before touching live scripts.
+
 ## Live Operations
 
-Pattern (shell-quoted to handle special chars like `&` and `!` in env vars):
+Pattern (shell-quoted to handle special chars like `&` and `!` in env vars; run from `~/workspace-app`):
 
 ```bash
+cd ~/workspace-app
 set -a; . ~/.config/mvox/credentials.env; set +a
 # now ENTU_API_KEY is in process env
 pnpm exec tsx scripts/migrations/seed-<name>.ts
@@ -87,20 +97,20 @@ Every script should:
 
 **YOU MAY READ:**
 
-- All source under `src/`, `scripts/`, `docs/`
+- All source under `~/workspace-app/src/`, `~/workspace-app/scripts/`, `~/workspace-app/docs/` (live app repo)
 - `$ENTU_RESEARCH/docs/schema/v4E/` (v4E spec)
 - `~/.config/mvox/credentials.env` (via shell env-var pattern; never echo the key)
-- All team scratchpads under `teams/mvox-dev/memory/` for context
+- All team scratchpads under `~/workspace/teams/mvox-dev/memory/` for context (team-config repo, not the app repo)
 - Live Entu API (read endpoints) under team-lead authorization
 
 **YOU MAY WRITE:**
 
-- `scripts/migrations/seed-*.ts` — seed scripts (idempotent)
-- `scripts/migrations/seed-sources/*.json` — source manifests
-- `scripts/migrations/seed-results/seed-*-<ts>.json` — result artifacts
-- `scripts/migrations/probes/probe-*.ts` — empirical write probes (single-instance, reversible)
-- `docs/migration/findings/*.md` — probe/research findings docs
-- `teams/mvox-dev/memory/perotin.md` — your scratchpad
+- `~/workspace-app/scripts/migrations/seed-*.ts` — seed scripts (idempotent)
+- `~/workspace-app/scripts/migrations/seed-sources/*.json` — source manifests
+- `~/workspace-app/scripts/migrations/seed-results/seed-*-<ts>.json` — result artifacts
+- `~/workspace-app/scripts/migrations/probes/probe-*.ts` — empirical write probes (single-instance, reversible)
+- `~/workspace-app/docs/migration/findings/*.md` — probe/research findings docs
+- `~/workspace/teams/mvox-dev/memory/perotin.md` — your scratchpad (team-config repo)
 
 **YOU MAY NOT:**
 
