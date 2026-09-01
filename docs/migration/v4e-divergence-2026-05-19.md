@@ -3,6 +3,13 @@
 
 Status: snapshot. Regenerate after Phase A/B/C/D ops complete.
 
+**Post-hoc corrections** (the snapshot is dated; these override it where they conflict):
+
+- **2026-09-01 — `person.entu_user`**: the "currently `string`, Phase B pending" line was stale. Entu
+  already owns the rich multi-valued `{uid, provider, email}` credential form plus a lazy old-format
+  migration; no mvox-side op is owed. Marked in §2 `person` and §Phase B · **[SRC]**
+  `entu-api routes/auth/index.get.js:155-183`.
+
 ---
 
 ## 1. Polyphony DB Inventory
@@ -130,6 +137,24 @@ Queried via `GET /entity?_type.reference=69bcfd8e9c031ab8e6ce8034&limit=50` (met
 | `timezone` | string | — | — | — |
 | `town` | string | — | — | — |
 | `voice` | string | — | list | — |
+
+> **Correction 2026-09-01 — `entu_user` is not a plain single string.** The `string` above is the
+> *declared prop-def type* as snapshotted on 2026-05-19, and it still reads that way — but the values
+> Entu stores under it are **multi-valued and structured**, carrying `uid` / `provider` / `email`
+> subfields. Entu's auth path resolves a person by `private.entu_user.uid` + `private.entu_user.provider`
+> · **[SRC]** `entu-api routes/auth/index.get.js:155-161`, falls back to the legacy
+> `private.entu_user.string` (the bare email) when that misses, and **migrates the old value in place on
+> that login** — writing `{type:'entu_user', _id, uid, email, provider}` over the matched entry
+> · **[SRC]** `:163-183`. The property is read with `.find()` over an array at `:171`, which is what
+> establishes it as multi-valued.
+>
+> Two consequences for migration planning: (a) **no mvox-side Phase B op is owed for `entu_user`** —
+> Entu owns both formats and the conversion; (b) the migration is **lazy, not swept** — it fires only
+> when a session supplies both `id` and `provider` (`:173`), so legacy single-string values persist
+> indefinitely for anyone who has not signed in since. Don't read "already migrated" as "uniformly
+> migrated": expect both shapes live in the data at once, and query for both.
+>
+> (*MVOX:Bentham*)
 
 #### `program_item` (4 props)
 | Property | Type | Formula | List | Required |
@@ -318,7 +343,7 @@ Source: `~/projects/entu-research/docs/schema/v4E/schema.json` (version `v4E.0.1
 | Remove `forename`, `surname` → keep `name` formula | Phase B — v4E uses only `name`; existing formula `forename ' ' surname` kept; delete `forename`/`surname` props |
 | Remove `address`, `birthdate`, `county`, `idcode`, `phone`, `postalcode`, `timezone`, `town`, `language`, `locale` | Phase B — not in v4E |
 | Remove `entu_api_key`, `entu_passkey` | Phase B — system use; not in v4E spec |
-| `entu_user` type | Phase B — currently `string`; v4E says `oauth` (Entu system type) |
+| `entu_user` type | **No mvox action — corrected 2026-09-01.** Entu already stores the rich multi-valued credential form `{uid, provider, email}` and migrates old single-string values itself, lazily, on login · **[SRC]** `entu-api routes/auth/index.get.js:155-183`. See the correction note under §2 `person`. |
 | `notes` — keep | exists and matches |
 
 #### `program_item` — add `notes`, fix formula (Phase A + B)
