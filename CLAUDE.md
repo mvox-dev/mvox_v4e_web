@@ -40,7 +40,7 @@ See the app repo for roster, prompts, common-prompt, startup procedure, and all 
 | This repo (schema) | `~/workspace/` (i.e., current dir) |
 | App repo | `~/workspace-app/` |
 | Team config (source of truth) | `~/workspace-app/teams/mvox-dev/` |
-| v4E schema (historical reference only) | `$ENTU_RESEARCH/docs/schema/v4E/` — not a sync target since 2026-09-06; mvox schema-of-record home pending (see common-prompt.md "Schema Evolution") |
+| v4E schema (historical reference only) | `$ENTU_RESEARCH/docs/schema/v4E/` — not a sync target since 2026-09-06; mvox schema-of-record = `~/workspace-app/scripts/migrations/lib/mvox-schema-extensions.ts` + `docs/architecture/mvox-schema-extensions.md` (#263 ruling; see common-prompt.md "Schema Evolution" item 5) |
 | Polyphony prototype (archived) | `~/projects/polyphony/` |
 | Team runtime (ephemeral, per-session) | `~/.claude/teams/session-<id>/` |
 
