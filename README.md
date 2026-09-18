@@ -1,6 +1,6 @@
 # mvox
 
-**mvox** is a choral music sharing web app built on the [v4E schema](https://github.com/entu/research/tree/main/docs/schema/v4E). It acts as a BFF in front of [Entu](https://entu.app/) (entity-property database platform) — no own database. Scaffolding is live and evolving: BFF MVP and OAuth flow are wired; the app is deployed at **https://multivox.pages.dev/** on Cloudflare Pages.
+**mvox** is a choral music sharing web app built on the [v4E schema](https://github.com/entu/research/tree/main/docs/schema/v4E). It is a static SPA that talks to [Entu](https://entu.app/) (entity-property database platform) directly with the user's JWT — no own database, no server. Scaffolding is live and evolving: OAuth flow is wired; the app is deployed at **https://multivox.pages.dev/** on Cloudflare Pages.
 
 ## Setup
 

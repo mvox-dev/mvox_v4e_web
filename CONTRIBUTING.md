@@ -43,7 +43,7 @@ pnpm check         # Type-check (svelte-check + tsc)
 
 ### Patterns
 
-**Entu client mock** — BFF route tests mock the Entu client at the module boundary:
+**Entu client mock** — integration tests mock the Entu client at the module boundary:
 
 ```ts
 import { vi } from 'vitest';
@@ -61,7 +61,7 @@ This is the standard pattern for `src/tests/` integration tests. Do not make rea
 Tests come **before** implementation. The full chain:
 
 1. **Tallis** writes failing tests (RED) — `*.spec.ts` colocated with source, `tests/` for E2E
-2. **Byrd + Josquin** make them pass (GREEN) — Josquin implements API/BFF, Byrd implements UI
+2. **Byrd + Josquin** make them pass (GREEN) — Josquin implements the Entu client/data layer, Byrd implements UI
 3. **Comenius** adds i18n strings
 4. **Bentham** reviews (RED / YELLOW / GREEN verdict)
 5. **Josquin** squash-merges after Bentham GREEN

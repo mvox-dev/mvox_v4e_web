@@ -25,7 +25,7 @@ This is the mental model that governs everything in this handbook. Entu has exac
 
 | Mechanic | What it does |
 |---|---|
-| **Type → instance** | Nothing at runtime. An entity type is a template and UI hint. System properties set on the type entity (including `_sharing`, `_inheritrights`, `_owner`) belong to the type entity itself — they do not flow into instances at create time or afterward. If a creating client (Entu admin UI, migration script, BFF) copies type-level properties onto new instances, that is a creating-client convention, not an Entu runtime mechanic. |
+| **Type → instance** | Nothing at runtime. An entity type is a template and UI hint. System properties set on the type entity (including `_sharing`, `_inheritrights`, `_owner`) belong to the type entity itself — they do not flow into instances at create time or afterward. If a creating client (Entu admin UI, migration script, the app) copies type-level properties onto new instances, that is a creating-client convention, not an Entu runtime mechanic. |
 | **Parent → child (rights cascade)** | Rights propagate via `_inheritrights`. When a child entity has `_inheritrights: true`, it inherits `_owner` / `_editor` / `_viewer` from its `_parent`. This is Entu's real cascade mechanic — and it is parent-child, not type-instance. |
 | **Formula re-aggregation** | Formula values are materialized at save time on the bearing entity. Changing a formula expression on a property-definition entity does not retroactively update existing instance entities. Each instance must be touched (re-saved) to recompute its formula output. Internal Entu server routines may re-aggregate server-side outside our scope, but there is no API endpoint to trigger this. |
 | **`_sharing` specifically** | Lives only on the bearing entity. No mechanic propagates it — not type→instance, not parent→child. Each entity carries its own. |
@@ -90,7 +90,7 @@ curl -s -X POST \
 
 Entu auto-adds `_sharing: domain`, `_inheritrights: true`, `_owner`, `_created` on creation.
 
-**`_sharing` on the type entity** controls the type entity's own visibility (see §1.5). Each instance owns its own `_sharing`. Creating clients (BFF, admin UI, migration scripts) must set `_sharing` explicitly at create time per the v4E spec for that entity type.
+**`_sharing` on the type entity** controls the type entity's own visibility (see §1.5). Each instance owns its own `_sharing`. Creating clients (the app, admin UI, migration scripts) must set `_sharing` explicitly at create time per the v4E spec for that entity type.
 
 **Doc ref:** https://entu.ee/configuration/entity-types
 
@@ -476,7 +476,7 @@ Live probe results (explicit `_sharing` set on 3 instances at creation time — 
 2. `domain` and `private` are **identical** from the API access perspective — both block unauthenticated requests. The distinction, if any, is not observable via the API (may be a UI-layer concept in Entu).
 3. No `/public/entity/` API path. Public entities served at the standard `/entity/{id}` endpoint, without auth.
 
-**Operational implication for Phase D:** Creating clients (BFF, migration scripts) must set `_sharing` explicitly on each entity instance at create time per the v4E spec for that type. Setting `_sharing: public` on `organization` and `section` instances will make them readable by unauthenticated HTTP clients (federation discoverability). v4E's `public` = Entu `public`; v4E's `private` = Entu `private` or `domain` (functionally identical via API).
+**Operational implication for Phase D:** Creating clients (the app, migration scripts) must set `_sharing` explicitly on each entity instance at create time per the v4E spec for that type. Setting `_sharing: public` on `organization` and `section` instances will make them readable by unauthenticated HTTP clients (federation discoverability). v4E's `public` = Entu `public`; v4E's `private` = Entu `private` or `domain` (functionally identical via API).
 
 **Doc gap (§6 row 5):** `domain` vs `private` distinction undocumented and not observable via API.
 

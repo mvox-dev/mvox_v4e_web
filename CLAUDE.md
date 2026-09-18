@@ -8,7 +8,7 @@ This file is the project-level guidance for Claude Code running in this repo.
 
 - **Repo:** https://github.com/mvox-dev/mvox_v4e_web
 - **Schema:** mvox is independent (Mihkel ruling 2026-09-06) — mvox evolves its own schema; the [`entu/research`](https://github.com/entu/research) v4E docs (`docs/schema/v4E/`) are historical reference/design heritage, not a sync target. New types are commissioned via GitHub issue + PO sign-off; see `~/workspace-app/teams/mvox-dev/common-prompt.md` "Schema Evolution".
-- **Backend:** Entu (entity-property database platform) — no own database. mvox acts as a BFF in front of Entu's API.
+- **Backend:** Entu (entity-property database platform) — no own database. mvox is a static SPA; the browser calls Entu directly with the user's JWT, and Entu's grants are the only authority.
 - **Successor to:** the polyphony prototype (now archived at `~/projects/polyphony`, remote `mitselek/polyphony`).
 
 ## Status
@@ -16,7 +16,7 @@ This file is the project-level guidance for Claude Code running in this repo.
 Schema repo, bootstrapped 2026-05-18. **Team config moved to the app repo** (`~/workspace-app/teams/mvox-dev/`) as of 2026-08-07.
 
 **Stack landed** (see `~/workspace-app/teams/mvox-dev/common-prompt.md` "Stack" and `~/workspace-app/teams/mvox-dev/memory/architecture-decisions.md` for rationale):
-SvelteKit 2 + Svelte 5 (Runes) + TS strict + Tailwind v4 + Vitest + Playwright + pnpm, on Cloudflare Pages/Workers, backed by Entu API (no own DB), auth via Entu OAuth + BFF JWT cookie, i18n via Paraglide (en/et/lv/uk), flat single-app layout.
+SvelteKit 2 + Svelte 5 (Runes) + TS strict + Tailwind v4 + Vitest + Playwright + pnpm, static SPA (adapter-static) deployed to Cloudflare Pages, backed by Entu API directly (no own DB, no server), auth via Entu OAuth callback + client-held JWT, i18n via Paraglide (en/et/lv/uk), flat single-app layout.
 
 ## Team
 
