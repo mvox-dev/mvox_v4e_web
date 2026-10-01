@@ -28,7 +28,7 @@ See the app repo for roster, prompts, common-prompt, startup procedure, and all 
 
 - Use `pnpm`, never `npm`
 - All persistent text output authored under `(*MVOX:<AgentName>*)` attribution — exception: files originally authored by another team's member keep the original author's trailer (e.g., `(*FR:Celes*)`) unless substantially rewritten
-- Co-author trailer `Co-authored-by: Mihkel Putrinš <mihkel.putrinsh@gmail.com>` on all commits
+- Commits and PR bodies end with only the author's `(*MVOX:<Name>*)` — no Co-authored-by trailer, email or session link (Mihkel 2026-10-01)
 - TDD chain: Tallis (RED) → Byrd + Josquin (GREEN) → Comenius (i18n) → Bentham (review) → Josquin (merge)
 - Schema evolution is mvox-independent (Mihkel 2026-09-06): NO upstream `entu/research` PRs; new entity types/shapes need a PO ruling on the commissioning issue + `PO-Approved:` trailer on the mvox PR (the `Schema-Change:` upstream trailer is retired) — see common-prompt.md "Schema Evolution" + `architecture-decisions.md`
 - **The `polyphony` Entu db is frozen, dated history only (#407, Mihkel ruling 2026-09-18).** It receives no further schema changes and is not the provisioning template for real collectives. `crede` is the live pilot with real PII — every live op on it needs per-run authorization, no pre-authorization. NOTE: mvox-app-specific marker/config types (e.g. `mvox_collective`) are app extensions, **not** canonical v4E — they skip the `entu/research` PR flow (PO sign-off + direct seed suffices).
