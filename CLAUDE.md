@@ -15,7 +15,7 @@ This file is the project-level guidance for Claude Code running in this repo.
 
 Schema repo, bootstrapped 2026-05-18. **Team config moved to the app repo** (`~/workspace-app/teams/mvox-dev/`) as of 2026-08-07.
 
-**Stack landed** (see `~/workspace-app/teams/mvox-dev/common-prompt.md` "Stack" and `~/workspace-app/teams/mvox-dev/memory/architecture-decisions.md` for rationale):
+**Stack landed** (see `~/workspace-app/teams/mvox-dev/common-prompt.md` "Stack" and `~/workspace-app/teams/mvox-dev/docs/architecture-decisions.md` for rationale):
 SvelteKit 2 + Svelte 5 (Runes) + TS strict + Tailwind v4 + Vitest + Playwright + pnpm, static SPA (adapter-static) deployed to Cloudflare Pages, backed by Entu API directly (no own DB, no server), auth via Entu OAuth callback + client-held JWT, i18n via Paraglide (en/et/lv/uk), flat single-app layout.
 
 ## Team
@@ -28,10 +28,10 @@ See the app repo for roster, prompts, common-prompt, startup procedure, and all 
 
 - Use `pnpm`, never `npm`
 - All persistent text output authored under `(*MVOX:<AgentName>*)` attribution — exception: files originally authored by another team's member keep the original author's trailer (e.g., `(*FR:Celes*)`) unless substantially rewritten
-- Commits and PR bodies end with only the author's `(*MVOX:<Name>*)` — no Co-authored-by trailer, email or session link (Mihkel 2026-10-01)
-- TDD chain: Tallis (RED) → Byrd + Josquin (GREEN) → Comenius (i18n) → Bentham (review) → Josquin (merge)
-- Schema evolution is mvox-independent (Mihkel 2026-09-06): NO upstream `entu/research` PRs; new entity types/shapes need a PO ruling on the commissioning issue + `PO-Approved:` trailer on the mvox PR (the `Schema-Change:` upstream trailer is retired) — see common-prompt.md "Schema Evolution" + `architecture-decisions.md`
-- **The `polyphony` Entu db is frozen, dated history only (#407, Mihkel ruling 2026-09-18).** It receives no further schema changes and is not the provisioning template for real collectives. `crede` is the live pilot with real PII — every live op on it needs per-run authorization, no pre-authorization. NOTE: mvox-app-specific marker/config types (e.g. `mvox_collective`) are app extensions, **not** canonical v4E — they skip the `entu/research` PR flow (PO sign-off + direct seed suffices).
+- Standing rules (attribution trailers, schema sign-off, crede authorization and the rest): `~/workspace-app/teams/mvox-dev/memory/rules.yaml` — read on spawn
+- TDD chain (Mihkel 2026-09-30): one fresh Josquin per issue (`josquin-<N>`) does RED and GREEN from a brief → Bentham reviews → team-lead merges via PR
+- Schema evolution is mvox-independent (Mihkel 2026-09-06): no upstream `entu/research` PRs; the `Schema-Change:` trailer is retired — see common-prompt.md "Schema Evolution" + `teams/mvox-dev/docs/architecture-decisions.md`
+- The `polyphony` Entu db (#407, Mihkel 2026-09-18) is not the provisioning template for real collectives. `crede` is the live pilot with real PII. mvox-app marker/config types (e.g. `mvox_collective`) are app extensions, **not** canonical v4E.
 
 ## Where things live
 
@@ -40,12 +40,13 @@ See the app repo for roster, prompts, common-prompt, startup procedure, and all 
 | This repo (schema) | `~/workspace/` (i.e., current dir) |
 | App repo | `~/workspace-app/` |
 | Team config (source of truth) | `~/workspace-app/teams/mvox-dev/` |
+| Team memory (memory-kit) | `~/workspace-app/teams/mvox-dev/memory/` — rules, scratchpads, facts, lessons; kit vendored at `~/workspace-app/memory-kit/` |
 | v4E schema (historical reference only) | `$ENTU_RESEARCH/docs/schema/v4E/` — not a sync target since 2026-09-06; mvox schema-of-record = `~/workspace-app/scripts/migrations/lib/mvox-schema-extensions.ts` + `docs/architecture/mvox-schema-extensions.md` (#263 ruling; see common-prompt.md "Schema Evolution" item 5) |
 | Polyphony prototype (archived) | `~/projects/polyphony/` |
 | Team runtime (ephemeral, per-session) | `~/.claude/teams/session-<id>/` |
 
 ## Open questions
 
-All four stack-shape questions resolved in session 2 (2026-05-18). See `~/workspace-app/teams/mvox-dev/memory/architecture-decisions.md` for the decisions and rationale; `~/workspace-app/teams/mvox-dev/common-prompt.md` Stack table for the working summary.
+All four stack-shape questions resolved in session 2 (2026-05-18). See `~/workspace-app/teams/mvox-dev/docs/architecture-decisions.md` for the decisions and rationale; `~/workspace-app/teams/mvox-dev/common-prompt.md` Stack table for the working summary.
 
-Current open items live in `~/workspace-app/teams/mvox-dev/memory/team-lead.md` under `[DEFERRED]`.
+Current open items live in `current` of `~/workspace-app/teams/mvox-dev/memory/team-lead.yaml`.
